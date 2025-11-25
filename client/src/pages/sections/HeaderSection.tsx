@@ -54,18 +54,26 @@ const utilityIcons = [
 ];
 
 export const HeaderSection = (): JSX.Element => {
-  const getIcon = (iconName: string) => {
+  const getTabIcon = (iconName: string, isActive: boolean) => {
+    const colorClass = isActive ? "text-gray-700" : "text-gray-400";
     switch (iconName) {
       case "x":
-        return <XIcon className="w-3 h-3 text-gray-400" />;
+        return <XIcon className={`w-3 h-3 ${colorClass}`} />;
       case "pin":
-        return <PinIcon className="w-3 h-3 text-gray-400" />;
+        return <PinIcon className={`w-3 h-3 ${colorClass}`} />;
       case "settings":
-        return <SettingsIcon className="w-3 h-3 text-gray-400" />;
+        return <SettingsIcon className={`w-3 h-3 ${colorClass}`} />;
       case "files":
-        return <FilesIcon className="w-3 h-3 text-gray-400" />;
+        return <FilesIcon className={`w-3 h-3 ${colorClass}`} />;
       case "plug":
-        return <PlugIcon className="w-3 h-[12.5px] text-gray-400" />;
+        return <PlugIcon className={`w-3 h-[12.5px] ${colorClass}`} />;
+      default:
+        return null;
+    }
+  };
+
+  const getUtilityIcon = (iconName: string) => {
+    switch (iconName) {
       case "bot":
         return <BotIcon className="w-4 h-4 text-gray-400" />;
       case "clock":
@@ -86,7 +94,7 @@ export const HeaderSection = (): JSX.Element => {
           <Button
             key={index}
             variant="ghost"
-            className={`flex ${tab.width} h-10 items-center ${
+            className={`flex ${tab.width} h-10 items-center justify-start ${
               tab.text ? "gap-1.5" : "gap-1.5"
             } px-3.5 py-0 ${
               tab.active ? "bg-white" : "bg-gray-600"
@@ -95,11 +103,11 @@ export const HeaderSection = (): JSX.Element => {
             }`}
             data-testid={`header-tab-${index}`}
           >
-            {getIcon(tab.icon)}
+            {getTabIcon(tab.icon, tab.active)}
             {tab.text && (
               <span
-                className={`flex-1 font-medium text-sm ${
-                  tab.active ? "text-gray-900" : "text-white"
+                className={`text-left font-medium text-sm ${
+                  tab.active ? "text-gray-900" : "text-gray-400"
                 } truncate whitespace-nowrap overflow-hidden`}
               >
                 {tab.text}
@@ -119,7 +127,7 @@ export const HeaderSection = (): JSX.Element => {
               className="w-10 h-10 rounded hover:bg-gray-800"
               data-testid={`header-utility-${item.icon}`}
             >
-              {getIcon(item.icon)}
+              {getUtilityIcon(item.icon)}
             </Button>
           ))}
         </div>
