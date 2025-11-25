@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
 
 interface Step {
   id: number;
@@ -41,17 +42,17 @@ export const MultiStepHeader = ({ currentStep, steps }: MultiStepHeaderProps): J
         {steps.map((step, index) => (
           <div key={step.id} className="flex flex-col gap-4 items-start w-40 relative z-10" data-testid={`step-indicator-${index + 1}`}>
             <div
-              className={`flex items-center justify-center w-6 h-6 rounded-full border-2 bg-white ${
+              className={`flex items-center justify-center w-6 h-6 rounded-full border-2 ${
                 index < currentStep
-                  ? "border-[#18315399]"
+                  ? "border-green-600 bg-green-600"
                   : index === currentStep
-                  ? "border-[#18315399]"
-                  : "border-[#01377e1c]"
+                  ? "border-[#18315399] bg-white"
+                  : "border-[#01377e1c] bg-white"
               }`}
               data-testid={`step-circle-${index + 1}`}
             >
               {index < currentStep && (
-                <div className="w-4 h-4 rounded-full bg-[#18315399]" />
+                <Check className="w-4 h-4 text-white" strokeWidth={3} data-testid={`step-check-${index + 1}`} />
               )}
               {index === currentStep && (
                 <div className="w-4 h-4 rounded-full bg-[#18315399]" />
