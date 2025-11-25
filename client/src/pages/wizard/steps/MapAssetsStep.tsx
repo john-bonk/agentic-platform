@@ -61,7 +61,7 @@ export const MapAssetsStep = (): JSX.Element => {
   return (
     <div className="flex flex-col w-full">
       <div className="flex flex-col gap-4 p-8 bg-white">
-        <Card className="border border-gray-200" data-testid="map-assets-info-card">
+        <Card className="border border-gray-200 bg-gray-50" data-testid="map-assets-info-card">
           <CardContent className="p-6">
             <div className="flex items-start gap-8 w-full">
               <div className="flex-1">
