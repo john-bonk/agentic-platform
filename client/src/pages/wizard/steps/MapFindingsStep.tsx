@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -17,7 +17,7 @@ interface FieldMapping {
   fieldType: "required" | "recommended" | "custom";
 }
 
-const mockMappings: FieldMapping[] = [
+const initialMappings: FieldMapping[] = [
   { id: "1", tenableField: "[Rule_name]", auditboardField: "", fieldType: "required" },
   { id: "2", tenableField: "Category ID", auditboardField: "", fieldType: "required" },
   { id: "3", tenableField: "Class ID", auditboardField: "", fieldType: "required" },
@@ -36,10 +36,77 @@ const mockMappings: FieldMapping[] = [
   { id: "16", tenableField: "Status ID", auditboardField: "", fieldType: "recommended" },
 ];
 
+const tenableFieldOptions = [
+  "[Rule_name]",
+  "Category ID",
+  "Class ID",
+  "Event Time",
+  "Finding Information",
+  "Metadata",
+  "Severity ID",
+  "Vulnerabilities",
+  "Affected Resources",
+  "Confidence ID",
+  "Device",
+  "Message",
+  "Observables",
+  "Status Code",
+  "Status Detail",
+  "Status ID",
+  "Custom Field 1",
+  "Custom Field 2",
+  "Custom Field 3",
+];
+
+const auditboardFieldOptions = [
+  "Rule Name",
+  "Category",
+  "Classification",
+  "Timestamp",
+  "Finding Details",
+  "Meta Info",
+  "Severity Level",
+  "Vulnerability List",
+  "Impacted Assets",
+  "Confidence Score",
+  "Device Info",
+  "Description",
+  "Observable Data",
+  "Status",
+  "Status Description",
+  "Status Type",
+];
+
 export const MapFindingsStep = (): JSX.Element => {
-  const requiredCount = mockMappings.filter(m => m.fieldType === "required").length;
-  const recommendedCount = mockMappings.filter(m => m.fieldType === "recommended").length;
-  const customCount = 6;
+  const [mappings, setMappings] = useState<FieldMapping[]>(initialMappings);
+  
+  const requiredCount = mappings.filter(m => m.fieldType === "required").length;
+  const recommendedCount = mappings.filter(m => m.fieldType === "recommended").length;
+  const customCount = mappings.filter(m => m.fieldType === "custom").length;
+
+  const handleAddMapping = () => {
+    const newId = (mappings.length + 1).toString();
+    setMappings([
+      ...mappings,
+      { id: newId, tenableField: "", auditboardField: "", fieldType: "custom" }
+    ]);
+  };
+
+  const handleDeleteMapping = (id: string) => {
+    setMappings(mappings.filter(m => m.id !== id));
+  };
+
+  const handleTenableFieldChange = (id: string, value: string) => {
+    setMappings(mappings.map(m => 
+      m.id === id ? { ...m, tenableField: value } : m
+    ));
+  };
+
+  const handleAuditboardFieldChange = (id: string, value: string) => {
+    setMappings(mappings.map(m => 
+      m.id === id ? { ...m, auditboardField: value } : m
+    ));
+  };
 
   return (
     <div className="flex flex-col w-full">
@@ -110,26 +177,47 @@ export const MapFindingsStep = (): JSX.Element => {
             </div>
           </div>
 
-          {mockMappings.map((mapping, index) => (
+          {mappings.map((mapping, index) => (
             <div
               key={mapping.id}
-              className={`flex items-center ${index === 0 ? "mb-2" : ""}`}
+              className="flex items-center mb-1"
               data-testid={`field-mapping-row-${index}`}
             >
               <div className="w-[707px]">
-                <div className={`h-[34px] flex items-center px-3 rounded border border-gray-300 bg-white ${index === 0 ? "pt-4 pb-4" : ""}`}>
-                  <span className="text-sm text-gray-900">{mapping.tenableField}</span>
-                  {mapping.fieldType === "required" && (
-                    <span className="ml-auto text-xs text-gray-500 px-2 py-0.5 rounded bg-gray-100">
-                      Required
-                    </span>
-                  )}
-                  {mapping.fieldType === "recommended" && (
-                    <span className="ml-auto text-xs text-gray-500 px-2 py-0.5 rounded bg-gray-100">
-                      Recommended
-                    </span>
-                  )}
-                </div>
+                <Select
+                  value={mapping.tenableField || undefined}
+                  onValueChange={(value) => handleTenableFieldChange(mapping.id, value)}
+                >
+                  <SelectTrigger 
+                    className="h-[34px] border-gray-300" 
+                    data-testid={`tenable-field-select-${index}`}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <SelectValue placeholder="Select Tenable field..." />
+                      {mapping.fieldType === "required" && (
+                        <span className="text-xs text-gray-500 px-2 py-0.5 rounded bg-gray-100 ml-2">
+                          Required
+                        </span>
+                      )}
+                      {mapping.fieldType === "recommended" && (
+                        <span className="text-xs text-gray-500 px-2 py-0.5 rounded bg-gray-100 ml-2">
+                          Recommended
+                        </span>
+                      )}
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tenableFieldOptions.map((field) => (
+                      <SelectItem 
+                        key={field} 
+                        value={field}
+                        data-testid={`tenable-option-${field.replace(/[\[\]]/g, '').replace(/\s+/g, '-').toLowerCase()}-${index}`}
+                      >
+                        {field}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="w-4 mx-2 flex items-center justify-center">
@@ -152,17 +240,30 @@ export const MapFindingsStep = (): JSX.Element => {
               </div>
 
               <div className="flex-1">
-                <Select>
+                <Select
+                  value={mapping.auditboardField || undefined}
+                  onValueChange={(value) => handleAuditboardFieldChange(mapping.id, value)}
+                >
                   <SelectTrigger 
                     className="h-[34px] border-gray-300" 
                     data-testid={`auditboard-field-select-${index}`}
                   >
-                    <SelectValue placeholder={mapping.fieldType === "required" ? "[Required]" : "[Recommended]"} />
+                    <SelectValue placeholder={
+                      mapping.fieldType === "required" ? "[Required]" : 
+                      mapping.fieldType === "recommended" ? "[Recommended]" : 
+                      "Select AuditBoard field..."
+                    } />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="field1" data-testid={`auditboard-option-field1-${index}`}>Field 1</SelectItem>
-                    <SelectItem value="field2" data-testid={`auditboard-option-field2-${index}`}>Field 2</SelectItem>
-                    <SelectItem value="field3" data-testid={`auditboard-option-field3-${index}`}>Field 3</SelectItem>
+                    {auditboardFieldOptions.map((field) => (
+                      <SelectItem 
+                        key={field} 
+                        value={field}
+                        data-testid={`auditboard-option-${field.replace(/\s+/g, '-').toLowerCase()}-${index}`}
+                      >
+                        {field}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -180,6 +281,7 @@ export const MapFindingsStep = (): JSX.Element => {
                   variant="ghost"
                   size="icon"
                   className="w-9 h-9"
+                  onClick={() => handleDeleteMapping(mapping.id)}
                   data-testid={`delete-mapping-${index}`}
                 >
                   <Trash2 className="w-4 h-4 text-gray-500" />
@@ -192,6 +294,7 @@ export const MapFindingsStep = (): JSX.Element => {
             <Button
               variant="outline"
               className="h-[34px] gap-2 px-3 bg-white border border-gray-300"
+              onClick={handleAddMapping}
               data-testid="add-field-mapping-button"
             >
               <Plus className="w-4 h-4" />
