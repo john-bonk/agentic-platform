@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { importJobStore, type ImportJob } from "@/lib/importJobStore";
 
 const tabItems = [
   { label: "Workflow Library", value: "workflow" },
@@ -24,6 +25,15 @@ const tableHeaders = [
 
 export const MainContentSection = (): JSX.Element => {
   const [, setLocation] = useLocation();
+  const [importJobs, setImportJobs] = useState<ImportJob[]>([]);
+
+  useEffect(() => {
+    setImportJobs(importJobStore.getJobs());
+    const unsubscribe = importJobStore.subscribe(() => {
+      setImportJobs(importJobStore.getJobs());
+    });
+    return unsubscribe;
+  }, []);
 
   return (
     <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white">
@@ -170,34 +180,96 @@ export const MainContentSection = (): JSX.Element => {
                 ))}
               </div>
 
-              <div className="flex flex-col max-w-[400px] items-center gap-2 px-4 py-5 relative w-full flex-[0_0_auto] rounded">
-                <div className="gap-4 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-                  <div className="gap-2 pt-2 pb-0 px-0 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-                    <h3 className="relative flex items-center justify-center self-stretch mt-[-1.00px] font-font-400-18px-medium font-[number:var(--font-400-18px-medium-font-weight)] text-slate-900 text-[length:var(--font-400-18px-medium-font-size)] text-center tracking-[var(--font-400-18px-medium-letter-spacing)] leading-[var(--font-400-18px-medium-line-height)] [font-style:var(--font-400-18px-medium-font-style)]">
-                      No vulnerability import jobs found
-                    </h3>
+              {importJobs.length === 0 ? (
+                <div className="flex flex-col max-w-[400px] items-center gap-2 px-4 py-5 relative w-full flex-[0_0_auto] rounded">
+                  <div className="gap-4 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
+                    <div className="gap-2 pt-2 pb-0 px-0 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
+                      <h3 className="relative flex items-center justify-center self-stretch mt-[-1.00px] font-font-400-18px-medium font-[number:var(--font-400-18px-medium-font-weight)] text-slate-900 text-[length:var(--font-400-18px-medium-font-size)] text-center tracking-[var(--font-400-18px-medium-letter-spacing)] leading-[var(--font-400-18px-medium-line-height)] [font-style:var(--font-400-18px-medium-font-style)]">
+                        No vulnerability import jobs found
+                      </h3>
 
-                    <p className="relative self-stretch font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-slate-700 text-[length:var(--font-200-14px-regular-font-size)] text-center tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
-                      Currently there are no import jobs between Tenable and
-                      AuditBoard. Add one below.
-                    </p>
+                      <p className="relative self-stretch font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-slate-700 text-[length:var(--font-200-14px-regular-font-size)] text-center tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
+                        Currently there are no import jobs between Tenable and
+                        AuditBoard. Add one below.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-1 relative self-stretch w-full flex-[0_0_auto]">
+                      <Button
+                        variant="outline"
+                        className="h-[30px] gap-2 px-[10.4px] ml-[-8.30px] bg-white border-slate-300"
+                      >
+                        <div className="w-3.5 h-3.5 bg-[url(/figmaAssets/module-narrative-.svg)] bg-[100%_100%]" />
+                        <span className="font-font-100-12px-regular font-[number:var(--font-100-12px-regular-font-weight)] text-slate-900 text-[length:var(--font-100-12px-regular-font-size)] tracking-[var(--font-100-12px-regular-letter-spacing)] leading-[var(--font-100-12px-regular-line-height)] [font-style:var(--font-100-12px-regular-font-style)]">
+                          Vulnerability Import Documentation
+                        </span>
+                      </Button>
+
+                      <Button 
+                        onClick={() => setLocation("/vulnerability-import-wizard")}
+                        className="h-[30px] gap-2 px-[10.4px] mr-[-8.30px] bg-[#3f85b2] hover:bg-[#3f85b2]/90 border-[#266c92] shadow-shadow-100"
+                        data-testid="add-vulnerability-import-job-button"
+                      >
+                        <div className="w-3.5 h-3.5 bg-[url(/figmaAssets/plus-lg.svg)] bg-[100%_100%]" />
+                        <span className="font-font-100-12px-regular font-[number:var(--font-100-12px-regular-font-weight)] text-[#e3f0f2] text-[length:var(--font-100-12px-regular-font-size)] tracking-[var(--font-100-12px-regular-letter-spacing)] leading-[var(--font-100-12px-regular-line-height)] [font-style:var(--font-100-12px-regular-font-style)]">
+                          Vulnerability Import Job
+                        </span>
+                      </Button>
+                    </div>
                   </div>
-
-                  <div className="flex items-center justify-center gap-1 relative self-stretch w-full flex-[0_0_auto]">
-                    <Button
-                      variant="outline"
-                      className="h-[30px] gap-2 px-[10.4px] ml-[-8.30px] bg-white border-slate-300"
+                </div>
+              ) : (
+                <div className="flex flex-col w-full" data-testid="import-jobs-table">
+                  {importJobs.map((job, index) => (
+                    <div
+                      key={job.id}
+                      className={`flex items-start self-stretch w-full ${
+                        index % 2 === 0 ? "bg-white" : "bg-slate-50"
+                      } border-b border-slate-200`}
+                      data-testid={`import-job-row-${index}`}
                     >
-                      <div className="w-3.5 h-3.5 bg-[url(/figmaAssets/module-narrative-.svg)] bg-[100%_100%]" />
-                      <span className="font-font-100-12px-regular font-[number:var(--font-100-12px-regular-font-weight)] text-slate-900 text-[length:var(--font-100-12px-regular-font-size)] tracking-[var(--font-100-12px-regular-letter-spacing)] leading-[var(--font-100-12px-regular-line-height)] [font-style:var(--font-100-12px-regular-font-style)]">
-                        Vulnerability Import Documentation
-                      </span>
-                    </Button>
-
+                      <div className="flex flex-col w-20 justify-center gap-2 p-3 items-start relative">
+                        <div className="flex items-center justify-center w-9 h-5 bg-[#266c92] rounded-full relative">
+                          <div className="w-3 h-3 bg-white rounded-full" />
+                        </div>
+                      </div>
+                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
+                        <span className="text-sm text-slate-900" data-testid={`job-auditboard-type-${index}`}>
+                          {job.auditboardType}
+                        </span>
+                      </div>
+                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
+                        <span className="text-sm text-slate-900" data-testid={`job-tenable-type-${index}`}>
+                          {job.tenableType}
+                        </span>
+                      </div>
+                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
+                        <span className="text-sm text-slate-900" data-testid={`job-frequency-${index}`}>
+                          {job.frequency}
+                        </span>
+                      </div>
+                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
+                        <Badge className="h-5 bg-green-100 text-green-800 hover:bg-green-100" data-testid={`job-status-${index}`}>
+                          <span className="text-xs">{job.status}</span>
+                        </Badge>
+                      </div>
+                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
+                        <span className="text-sm text-slate-900" data-testid={`job-last-import-${index}`}>
+                          {job.lastImport}
+                        </span>
+                      </div>
+                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
+                        <span className="text-sm text-slate-900" data-testid={`job-next-import-${index}`}>
+                          {job.nextImport}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-center gap-1 py-6 relative self-stretch w-full flex-[0_0_auto]">
                     <Button 
                       onClick={() => setLocation("/vulnerability-import-wizard")}
-                      className="h-[30px] gap-2 px-[10.4px] mr-[-8.30px] bg-[#3f85b2] hover:bg-[#3f85b2]/90 border-[#266c92] shadow-shadow-100"
-                      data-testid="add-vulnerability-import-job-button"
+                      className="h-[30px] gap-2 px-[10.4px] bg-[#3f85b2] hover:bg-[#3f85b2]/90 border-[#266c92] shadow-shadow-100"
+                      data-testid="add-another-vulnerability-import-job-button"
                     >
                       <div className="w-3.5 h-3.5 bg-[url(/figmaAssets/plus-lg.svg)] bg-[100%_100%]" />
                       <span className="font-font-100-12px-regular font-[number:var(--font-100-12px-regular-font-weight)] text-[#e3f0f2] text-[length:var(--font-100-12px-regular-font-size)] tracking-[var(--font-100-12px-regular-letter-spacing)] leading-[var(--font-100-12px-regular-line-height)] [font-style:var(--font-100-12px-regular-font-style)]">
@@ -206,7 +278,7 @@ export const MainContentSection = (): JSX.Element => {
                     </Button>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
