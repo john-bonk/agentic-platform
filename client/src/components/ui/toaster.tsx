@@ -1,4 +1,5 @@
 import { useToast } from "@/hooks/use-toast"
+import { Info } from "lucide-react"
 import {
   Toast,
   ToastClose,
@@ -15,8 +16,11 @@ export function Toaster() {
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
+          <Toast key={id} {...props} data-testid="growl-notification">
+            <div className="shrink-0">
+              <Info className="w-4 h-4 text-gray-500" />
+            </div>
+            <div className="flex flex-col gap-0.5 flex-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (
                 <ToastDescription>{description}</ToastDescription>

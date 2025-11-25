@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { importJobStore, type ImportJob } from "@/lib/importJobStore";
+import { useToast } from "@/hooks/use-toast";
 
 const tabItems = [
   { label: "Workflow Library", value: "workflow" },
@@ -26,6 +27,8 @@ const tableHeaders = [
 export const MainContentSection = (): JSX.Element => {
   const [, setLocation] = useLocation();
   const [importJobs, setImportJobs] = useState<ImportJob[]>([]);
+  const [showLiabilityCard, setShowLiabilityCard] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     setImportJobs(importJobStore.getJobs());
@@ -34,6 +37,22 @@ export const MainContentSection = (): JSX.Element => {
     });
     return unsubscribe;
   }, []);
+
+  const handleAcceptLiability = () => {
+    setShowLiabilityCard(false);
+    toast({
+      title: "Liability Accepted",
+      description: "You have accepted the liability statement for Tenable Vulnerability Import Jobs.",
+    });
+  };
+
+  const handleDeclineLiability = () => {
+    setShowLiabilityCard(false);
+    toast({
+      title: "Liability Declined",
+      description: "You have declined the liability statement. Some features may be limited.",
+    });
+  };
 
   return (
     <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white">
@@ -103,50 +122,58 @@ export const MainContentSection = (): JSX.Element => {
       <main className="flex items-start relative flex-1 self-stretch w-full grow overflow-y-scroll">
         <div className="flex items-start justify-between relative flex-1 self-stretch grow">
           <div className="flex flex-col items-start gap-6 pt-6 pb-0 px-8 relative flex-1 self-stretch grow">
-            <Card className="self-stretch w-full rounded-lg border border-gray-200 [background:radial-gradient(50%_50%_at_115%_-44%,rgba(1,51,101,0.03)_0%,rgba(1,51,101,0.03)_100%)]">
-              <CardContent className="flex flex-col items-start gap-6 p-6">
-                <div className="gap-1 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-                  <h2 className="relative self-stretch mt-[-1.00px] font-font-400-18px-semibold font-[number:var(--font-400-18px-semibold-font-weight)] text-gray-900 text-[length:var(--font-400-18px-semibold-font-size)] tracking-[var(--font-400-18px-semibold-letter-spacing)] leading-[var(--font-400-18px-semibold-line-height)] [font-style:var(--font-400-18px-semibold-font-style)]">
-                    Liability Statement for Tenable Vulnerability Import Jobs
-                  </h2>
+            {showLiabilityCard && (
+              <Card className="self-stretch w-full rounded-lg border border-gray-200 [background:radial-gradient(50%_50%_at_115%_-44%,rgba(1,51,101,0.03)_0%,rgba(1,51,101,0.03)_100%)]" data-testid="liability-card">
+                <CardContent className="flex flex-col items-start gap-6 p-6">
+                  <div className="gap-1 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
+                    <h2 className="relative self-stretch mt-[-1.00px] font-font-400-18px-semibold font-[number:var(--font-400-18px-semibold-font-weight)] text-gray-900 text-[length:var(--font-400-18px-semibold-font-size)] tracking-[var(--font-400-18px-semibold-letter-spacing)] leading-[var(--font-400-18px-semibold-line-height)] [font-style:var(--font-400-18px-semibold-font-style)]" data-testid="liability-card-title">
+                      Liability Statement for Tenable Vulnerability Import Jobs
+                    </h2>
 
-                  <p className="relative self-stretch font-font-200-14px-light font-[number:var(--font-200-14px-light-font-weight)] text-gray-900 text-[length:var(--font-200-14px-light-font-size)] tracking-[var(--font-200-14px-light-letter-spacing)] leading-[var(--font-200-14px-light-line-height)] [font-style:var(--font-200-14px-light-font-style)]">
-                    AuditBoard may make certain content available through the
-                    Service, Customer retains sole responsibility for verifying
-                    such content prior to use. The content is provided on an
-                    &quot;as is&quot; basis and all warranties, conditions,
-                    representations, indemnities and guarantees with respect to
-                    the content, and all components thereof, whether express or
-                    implied, arising by law, custom, or prior oral or written
-                    statements made by AuditBoard, their representatives, third
-                    parties, or otherwise, including but not limited to its
-                    accuracy, completeness, fitness for any particular purpose,
-                    non-infringement, or that the use of or reliance upon any
-                    content will cause Customer or any of its Affiliates to
-                    achieve compliance with any laws, regulations, or authority
-                    documents are hereby excluded and disclaimed to the fullest
-                    extent permitted by applicable law.
-                  </p>
-                </div>
+                    <p className="relative self-stretch font-font-200-14px-light font-[number:var(--font-200-14px-light-font-weight)] text-gray-900 text-[length:var(--font-200-14px-light-font-size)] tracking-[var(--font-200-14px-light-letter-spacing)] leading-[var(--font-200-14px-light-line-height)] [font-style:var(--font-200-14px-light-font-style)]" data-testid="liability-card-content">
+                      AuditBoard may make certain content available through the
+                      Service, Customer retains sole responsibility for verifying
+                      such content prior to use. The content is provided on an
+                      &quot;as is&quot; basis and all warranties, conditions,
+                      representations, indemnities and guarantees with respect to
+                      the content, and all components thereof, whether express or
+                      implied, arising by law, custom, or prior oral or written
+                      statements made by AuditBoard, their representatives, third
+                      parties, or otherwise, including but not limited to its
+                      accuracy, completeness, fitness for any particular purpose,
+                      non-infringement, or that the use of or reliance upon any
+                      content will cause Customer or any of its Affiliates to
+                      achieve compliance with any laws, regulations, or authority
+                      documents are hereby excluded and disclaimed to the fullest
+                      extent permitted by applicable law.
+                    </p>
+                  </div>
 
-                <footer className="inline-flex items-center gap-1 relative flex-[0_0_auto] bg-transparent">
-                  <Button className="h-[34px] gap-2 px-[10.4px] bg-teal-500 hover:bg-teal-500/90 rounded border border-solid shadow-shadow-100">
-                    <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-white text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
-                      Accept
-                    </span>
-                  </Button>
+                  <footer className="inline-flex items-center gap-1 relative flex-[0_0_auto] bg-transparent">
+                    <Button 
+                      onClick={handleAcceptLiability}
+                      className="h-[34px] gap-2 px-[10.4px] bg-teal-500 hover:bg-teal-500/90 rounded border border-solid shadow-shadow-100"
+                      data-testid="liability-accept-button"
+                    >
+                      <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-white text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
+                        Accept
+                      </span>
+                    </Button>
 
-                  <Button
-                    variant="secondary"
-                    className="h-[34px] gap-2 px-[10.4px] bg-gray-100 hover:bg-gray-200 rounded"
-                  >
-                    <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-gray-900 text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
-                      Decline
-                    </span>
-                  </Button>
-                </footer>
-              </CardContent>
-            </Card>
+                    <Button
+                      variant="secondary"
+                      onClick={handleDeclineLiability}
+                      className="h-[34px] gap-2 px-[10.4px] bg-gray-100 hover:bg-gray-200 rounded"
+                      data-testid="liability-decline-button"
+                    >
+                      <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-gray-900 text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
+                        Decline
+                      </span>
+                    </Button>
+                  </footer>
+                </CardContent>
+              </Card>
+            )}
 
             <section className="flex flex-col items-start gap-1 relative self-stretch w-full flex-[0_0_auto]">
               <h2 className="relative self-stretch mt-[-1.00px] font-font-400-18px-semibold font-[number:var(--font-400-18px-semibold-font-weight)] text-gray-900 text-[length:var(--font-400-18px-semibold-font-size)] tracking-[var(--font-400-18px-semibold-letter-spacing)] leading-[var(--font-400-18px-semibold-line-height)] [font-style:var(--font-400-18px-semibold-font-style)]">
