@@ -204,7 +204,7 @@ export const MainContentSection = (): JSX.Element => {
               </div>
 
               {importJobs.length === 0 ? (
-                <div className="flex flex-col max-w-[400px] items-center gap-2 px-4 py-5 relative w-full flex-[0_0_auto] rounded">
+                <div className="flex flex-col max-w-[400px] items-center gap-2 px-4 py-12 relative w-full flex-[0_0_auto] rounded">
                   <div className="gap-4 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
                     <div className="gap-2 pt-2 pb-0 px-0 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
                       <h3 className="relative flex items-center justify-center self-stretch mt-[-1.00px] font-font-400-18px-medium font-[number:var(--font-400-18px-medium-font-weight)] text-gray-900 text-[length:var(--font-400-18px-medium-font-size)] text-center tracking-[var(--font-400-18px-medium-letter-spacing)] leading-[var(--font-400-18px-medium-line-height)] [font-style:var(--font-400-18px-medium-font-style)]">
@@ -217,26 +217,30 @@ export const MainContentSection = (): JSX.Element => {
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-center gap-1 relative self-stretch w-full flex-[0_0_auto]">
+                    <div className="flex items-center justify-center gap-2 relative self-stretch w-full flex-[0_0_auto]">
                       <Button
                         variant="outline"
-                        className="h-[30px] gap-2 px-[10.4px] ml-[-8.30px] bg-white border-gray-300"
+                        className="h-8 gap-1.5 px-2.5 bg-white border border-gray-300 text-gray-900 text-[13px] font-normal rounded"
                       >
-                        <div className="w-3.5 h-3.5 bg-[url(/figmaAssets/module-narrative-.svg)] bg-[100%_100%]" />
-                        <span className="font-font-100-12px-regular font-[number:var(--font-100-12px-regular-font-weight)] text-gray-900 text-[length:var(--font-100-12px-regular-font-size)] tracking-[var(--font-100-12px-regular-letter-spacing)] leading-[var(--font-100-12px-regular-line-height)] [font-style:var(--font-100-12px-regular-font-style)]">
-                          Vulnerability Import Documentation
-                        </span>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-70">
+                          <path d="M2 3.5C2 2.67157 2.67157 2 3.5 2H12.5C13.3284 2 14 2.67157 14 3.5V12.5C14 13.3284 13.3284 14 12.5 14H3.5C2.67157 14 2 13.3284 2 12.5V3.5Z" stroke="currentColor" strokeWidth="1.25" />
+                          <path d="M5 5H11" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+                          <path d="M5 8H11" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+                          <path d="M5 11H8" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+                        </svg>
+                        Vulnerability Import Documentation
                       </Button>
 
                       <Button 
                         onClick={() => setLocation("/vulnerability-import-wizard")}
-                        className="h-[30px] gap-2 px-[10.4px] mr-[-8.30px] bg-teal-500 hover:bg-teal-500/90 border-teal-500 shadow-shadow-100"
+                        className="h-8 gap-1.5 px-2.5 bg-teal-500 hover:bg-teal-500/90 border-teal-500 text-[13px] font-normal rounded"
                         data-testid="add-vulnerability-import-job-button"
                       >
-                        <div className="w-3.5 h-3.5 bg-[url(/figmaAssets/plus-lg.svg)] bg-[100%_100%]" />
-                        <span className="font-font-100-12px-regular font-[number:var(--font-100-12px-regular-font-weight)] text-[#e3f0f2] text-[length:var(--font-100-12px-regular-font-size)] tracking-[var(--font-100-12px-regular-letter-spacing)] leading-[var(--font-100-12px-regular-line-height)] [font-style:var(--font-100-12px-regular-font-style)]">
-                          Vulnerability Import Job
-                        </span>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M8 3V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                          <path d="M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        </svg>
+                        <span className="text-white">Vulnerability Import Job</span>
                       </Button>
                     </div>
                   </div>
