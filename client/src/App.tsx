@@ -6,12 +6,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
 import { Integrations } from "@/pages/Integrations";
+import { VulnerabilityImportWizard } from "@/pages/wizard/VulnerabilityImportWizard";
 
 function Router() {
   return (
     <Switch>
       {/* Add pages below */}
       <Route path="/" component={Integrations} />
+      <Route path="/vulnerability-import-wizard" component={VulnerabilityImportWizard} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +23,8 @@ const tableHeaders = [
 ];
 
 export const MainContentSection = (): JSX.Element => {
+  const [, setLocation] = useLocation();
+
   return (
     <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white">
       <header className="items-start justify-center pt-8 pb-0 px-8 self-stretch w-full flex-[0_0_auto] bg-white flex flex-col relative">
@@ -191,7 +194,11 @@ export const MainContentSection = (): JSX.Element => {
                       </span>
                     </Button>
 
-                    <Button className="h-[30px] gap-2 px-[10.4px] mr-[-8.30px] bg-[#3f85b2] hover:bg-[#3f85b2]/90 border-[#266c92] shadow-shadow-100">
+                    <Button 
+                      onClick={() => setLocation("/vulnerability-import-wizard")}
+                      className="h-[30px] gap-2 px-[10.4px] mr-[-8.30px] bg-[#3f85b2] hover:bg-[#3f85b2]/90 border-[#266c92] shadow-shadow-100"
+                      data-testid="add-vulnerability-import-job-button"
+                    >
                       <div className="w-3.5 h-3.5 bg-[url(/figmaAssets/plus-lg.svg)] bg-[100%_100%]" />
                       <span className="font-font-100-12px-regular font-[number:var(--font-100-12px-regular-font-weight)] text-[#e3f0f2] text-[length:var(--font-100-12px-regular-font-size)] tracking-[var(--font-100-12px-regular-letter-spacing)] leading-[var(--font-100-12px-regular-line-height)] [font-style:var(--font-100-12px-regular-font-style)]">
                         Vulnerability Import Job
