@@ -59,8 +59,8 @@ export const MapAssetsStep = (): JSX.Element => {
   }, []);
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="flex flex-col gap-4 p-8 bg-white">
+    <div className="flex flex-col flex-1 min-h-0 w-full">
+      <div className="flex flex-col gap-4 p-8 bg-white flex-shrink-0">
         <Card className="border border-gray-200 bg-gray-50" data-testid="map-assets-info-card">
           <CardContent className="p-6">
             <div className="flex items-start gap-8 w-full">
@@ -132,11 +132,11 @@ export const MapAssetsStep = (): JSX.Element => {
         </Card>
       </div>
 
-      <div className="flex flex-col px-8 pb-8">
-        <div className="border border-gray-200 rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
+      <div className="flex flex-col flex-1 min-h-0 px-8 pb-8">
+        <div className="flex flex-col flex-1 min-h-0 border border-gray-200 rounded-lg overflow-hidden">
+          <div className="flex-1 overflow-y-auto overflow-x-auto">
             <table className="w-full" data-testid="assets-mapping-table">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
                 <tr>
                   <th className="text-left p-3 text-xs font-medium text-gray-700 tracking-wide">
                     TENABLE ASSET UID
