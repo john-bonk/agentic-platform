@@ -195,30 +195,6 @@ export const MapDetailsStep = (): JSX.Element => {
             </Button>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <Button
-              variant="ghost"
-              className="h-auto p-0 gap-2 text-gray-700 hover:text-gray-900"
-              data-testid="previous-step-button-details"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M10 12L6 8l4-4"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="text-sm">Previous</span>
-            </Button>
-          </div>
         </div>
       </div>
     </div>
