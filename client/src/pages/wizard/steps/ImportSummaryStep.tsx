@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -13,125 +14,94 @@ interface VulnerabilityFinding {
 }
 
 const mockFindings: VulnerabilityFinding[] = [
-  {
-    id: "1",
-    name: "Security Updates for Microsoft SharePoint Server 2016 (January 2022)",
-    severity: "High",
-    status: "New",
-    cvssScore: 8,
-  },
-  {
-    id: "2",
-    name: "Missing or Permissive Content-Security-Policy frame-ancestors HTTP Response Header",
-    severity: "Critical",
-    status: "In Progress",
-    cvssScore: 9,
-  },
-  {
-    id: "3",
-    name: "Security Updates for Microsoft SharePoint Server 2016 (January 2022)",
-    severity: "High",
-    status: "New",
-    cvssScore: 8,
-  },
-  {
-    id: "4",
-    name: "Missing or Permissive Content-Security-Policy frame-ancestors HTTP Response Header",
-    severity: "Critical",
-    status: "In Progress",
-    cvssScore: 9,
-  },
-  {
-    id: "5",
-    name: "Security Updates for Microsoft SharePoint Server 2016 (January 2022)",
-    severity: "High",
-    status: "New",
-    cvssScore: 8,
-  },
-  {
-    id: "6",
-    name: "Missing or Permissive Content-Security-Policy frame-ancestors HTTP Response Header",
-    severity: "Critical",
-    status: "In Progress",
-    cvssScore: 9,
-  },
-  {
-    id: "7",
-    name: "Security Updates for Microsoft SharePoint Server 2016 (January 2022)",
-    severity: "High",
-    status: "New",
-    cvssScore: 8,
-  },
-  {
-    id: "8",
-    name: "Missing or Permissive Content-Security-Policy frame-ancestors HTTP Response Header",
-    severity: "Critical",
-    status: "In Progress",
-    cvssScore: 9,
-  },
-  {
-    id: "9",
-    name: "Security Updates for Microsoft SharePoint Server 2016 (January 2022)",
-    severity: "High",
-    status: "New",
-    cvssScore: 8,
-  },
-  {
-    id: "10",
-    name: "Missing or Permissive Content-Security-Policy frame-ancestors HTTP Response Header",
-    severity: "Critical",
-    status: "In Progress",
-    cvssScore: 9,
-  },
+  { id: "1", name: "Security Updates for Microsoft SharePoint Server 2016 (January 2022)", severity: "High", status: "New", cvssScore: 8 },
+  { id: "2", name: "Missing or Permissive Content-Security-Policy frame-ancestors HTTP Response Header", severity: "Critical", status: "In Progress", cvssScore: 9 },
+  { id: "3", name: "Apache Log4j2 Remote Code Execution Vulnerability (CVE-2021-44228)", severity: "Critical", status: "New", cvssScore: 10 },
+  { id: "4", name: "OpenSSL Buffer Overflow Vulnerability (CVE-2022-3602)", severity: "High", status: "In Progress", cvssScore: 8 },
+  { id: "5", name: "Microsoft Exchange Server Remote Code Execution (CVE-2022-41082)", severity: "Critical", status: "New", cvssScore: 9 },
+  { id: "6", name: "Spring Framework RCE via Data Binding (CVE-2022-22965)", severity: "Critical", status: "In Progress", cvssScore: 9 },
+  { id: "7", name: "VMware Workspace ONE Access Authentication Bypass", severity: "High", status: "New", cvssScore: 8 },
+  { id: "8", name: "Fortinet FortiOS SSL VPN Path Traversal (CVE-2022-42475)", severity: "Critical", status: "In Progress", cvssScore: 9 },
+  { id: "9", name: "Citrix ADC and Gateway Remote Code Execution (CVE-2022-27518)", severity: "Critical", status: "New", cvssScore: 9 },
+  { id: "10", name: "F5 BIG-IP iControl REST Authentication Bypass (CVE-2022-1388)", severity: "Critical", status: "In Progress", cvssScore: 9 },
+  { id: "11", name: "Atlassian Confluence OGNL Injection (CVE-2022-26134)", severity: "Critical", status: "New", cvssScore: 9 },
+  { id: "12", name: "SolarWinds Orion API Authentication Bypass (CVE-2020-10148)", severity: "High", status: "In Progress", cvssScore: 8 },
+  { id: "13", name: "Zoho ManageEngine RCE via SAML (CVE-2022-47966)", severity: "Critical", status: "New", cvssScore: 9 },
+  { id: "14", name: "Cisco IOS XE Web UI Privilege Escalation (CVE-2023-20198)", severity: "Critical", status: "In Progress", cvssScore: 10 },
+  { id: "15", name: "MOVEit Transfer SQL Injection (CVE-2023-34362)", severity: "Critical", status: "New", cvssScore: 9 },
+  { id: "16", name: "Barracuda Email Security Gateway RCE (CVE-2023-2868)", severity: "Critical", status: "In Progress", cvssScore: 9 },
+  { id: "17", name: "PaperCut NG/MF Authentication Bypass (CVE-2023-27350)", severity: "High", status: "New", cvssScore: 8 },
+  { id: "18", name: "Ivanti EPMM Authentication Bypass (CVE-2023-35078)", severity: "Critical", status: "In Progress", cvssScore: 9 },
+  { id: "19", name: "Adobe ColdFusion Deserialization RCE (CVE-2023-38203)", severity: "Critical", status: "New", cvssScore: 9 },
+  { id: "20", name: "JetBrains TeamCity Authentication Bypass (CVE-2023-42793)", severity: "Critical", status: "In Progress", cvssScore: 9 },
+  { id: "21", name: "Confluence Data Center Template Injection (CVE-2023-22515)", severity: "Critical", status: "New", cvssScore: 10 },
+  { id: "22", name: "Curl SOCKS5 Heap Overflow (CVE-2023-38545)", severity: "High", status: "In Progress", cvssScore: 8 },
+  { id: "23", name: "HTTP/2 Rapid Reset Attack (CVE-2023-44487)", severity: "High", status: "New", cvssScore: 8 },
+  { id: "24", name: "Juniper Junos OS RCE (CVE-2023-36845)", severity: "Critical", status: "In Progress", cvssScore: 9 },
+  { id: "25", name: "Citrix NetScaler Information Disclosure (CVE-2023-4966)", severity: "High", status: "New", cvssScore: 8 },
+  { id: "26", name: "Zyxel Firewall Command Injection (CVE-2023-28771)", severity: "Critical", status: "In Progress", cvssScore: 9 },
+  { id: "27", name: "Progress WS_FTP Server Directory Traversal (CVE-2023-40044)", severity: "Critical", status: "New", cvssScore: 9 },
+  { id: "28", name: "Exim SMTP Server Buffer Overflow (CVE-2023-42115)", severity: "High", status: "In Progress", cvssScore: 8 },
+  { id: "29", name: "Grafana Authentication Bypass (CVE-2023-3128)", severity: "Critical", status: "New", cvssScore: 9 },
+  { id: "30", name: "Microsoft Outlook Privilege Escalation (CVE-2023-23397)", severity: "Critical", status: "In Progress", cvssScore: 9 },
+  { id: "31", name: "Redis Lua Sandbox Escape (CVE-2023-28856)", severity: "High", status: "New", cvssScore: 8 },
+  { id: "32", name: "GitLab CE/EE Path Traversal RCE (CVE-2023-2825)", severity: "Critical", status: "In Progress", cvssScore: 10 },
+  { id: "33", name: "Nginx LDAP Authentication Bypass", severity: "High", status: "New", cvssScore: 8 },
+  { id: "34", name: "HashiCorp Vault Token Validation Bypass (CVE-2023-0620)", severity: "Critical", status: "In Progress", cvssScore: 9 },
+  { id: "35", name: "Docker Desktop Privilege Escalation (CVE-2023-0626)", severity: "High", status: "New", cvssScore: 8 },
 ];
 
 export const ImportSummaryStep = (): JSX.Element => {
   return (
     <div className="flex flex-col w-full">
-      <div className="flex flex-col gap-4 p-8 bg-white border-b border-gray-200">
-        <div className="flex items-start gap-8 w-full">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-[#010818ed] mb-1">
-              Confirm import job summary
-            </h3>
-            <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-green-600"
-              >
-                <circle cx="8" cy="8" r="7" fill="currentColor" />
-                <path
-                  d="M6 8.5L7.5 10L10.5 6.5"
-                  stroke="white"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span data-testid="import-summary-stats">
-                5,000 or more vulnerability findings will be imported from Tenable to AuditBoard
-              </span>
-            </div>
-            <p className="text-sm text-gray-600" data-testid="sample-limit-note">
-              Note: Vulnerabilities summarized below are limited to a sample of 5,000. However, all vulnerability assets under 10,000 records will be imported when the job is processed.
-            </p>
-          </div>
+      <div className="flex flex-col gap-4 p-8 bg-white">
+        <Card className="border border-gray-200" data-testid="import-summary-info-card">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-8 w-full">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-[#010818ed] mb-1" data-testid="import-summary-heading">
+                  Confirm import job summary
+                </h3>
+                <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-green-600"
+                  >
+                    <circle cx="8" cy="8" r="7" fill="currentColor" />
+                    <path
+                      d="M6 8.5L7.5 10L10.5 6.5"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span data-testid="import-summary-stats">
+                    5,000 or more vulnerability findings will be imported from Tenable to AuditBoard
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600" data-testid="sample-limit-note">
+                  Note: Vulnerabilities summarized below are limited to a sample of 5,000. However, all vulnerability assets under 10,000 records will be imported when the job is processed.
+                </p>
+              </div>
 
-          <div className="flex items-center gap-2">
-            <Input
-              placeholder="Import Job Schedule"
-              className="w-[320px] h-[34px]"
-              data-testid="import-schedule-input"
-            />
-          </div>
-        </div>
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="Import Job Schedule"
+                  className="w-[320px] h-[34px]"
+                  data-testid="import-schedule-input"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="flex flex-col p-8">
+      <div className="flex flex-col px-8 pb-8">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-[200px]">
