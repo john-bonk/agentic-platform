@@ -14,7 +14,7 @@ interface MultiStepHeaderProps {
 
 export const MultiStepHeader = ({ currentStep, steps }: MultiStepHeaderProps): JSX.Element => {
   return (
-    <div className="bg-white flex flex-col gap-8 pb-3 pt-8 px-8 border-b border-slate-200">
+    <div className="bg-white flex flex-col gap-8 pb-3 pt-8 px-8 border-b border-slate-200 w-full">
       <div className="flex gap-4 items-end w-full">
         <p className="flex-1 font-semibold text-lg text-[#010818ed]">
           Add Vulnerability Import Job

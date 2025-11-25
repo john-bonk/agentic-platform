@@ -19,7 +19,7 @@ export const MultiStepFooter = ({
   const isLastStep = currentStep === 3;
   const buttonLabel = isLastStep ? "Start Import" : continueLabel;
   return (
-    <div className="bg-white flex items-start px-8 py-6 border-t border-slate-200">
+    <div className="bg-white flex items-start px-8 py-6 border-t border-slate-200 w-full">
       <div className="flex items-start justify-between w-full">
         <div className="flex gap-2 items-start" />
         <div className="flex gap-2 items-start">
