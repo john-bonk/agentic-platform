@@ -88,7 +88,7 @@ export const HeaderSection = (): JSX.Element => {
   };
 
   return (
-    <header className="flex h-12 items-end justify-between pl-0 pr-2 py-0 w-full bg-gray-900">
+    <header className="flex h-12 items-end justify-between pl-0 pr-2 py-0 w-full bg-gray-900 flex-shrink-0">
       <nav className="inline-flex items-end gap-1 flex-[0_0_auto] h-full">
         {tabs.map((tab, index) => (
           <Button

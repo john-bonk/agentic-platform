@@ -13,7 +13,7 @@ export const SideNavigationSection = (): JSX.Element => {
   const [selectedItem, setSelectedItem] = useState("installed");
 
   return (
-    <nav className="flex w-[272px] items-start relative self-stretch bg-gray-100 border-r-[3px] border-r-gray-100 border-solid" data-testid="side-navigation">
+    <nav className="flex w-[272px] items-start relative self-stretch bg-gray-100 border-r-[3px] border-r-gray-100 border-solid flex-shrink-0" data-testid="side-navigation">
       <div className="flex flex-col items-start gap-2 relative flex-1 self-stretch grow bg-white overflow-hidden">
         <header className="flex items-center justify-between pl-6 pr-2 py-6 relative self-stretch w-full flex-[0_0_auto]">
           <div className="flex flex-col items-start justify-center relative flex-1 grow">
