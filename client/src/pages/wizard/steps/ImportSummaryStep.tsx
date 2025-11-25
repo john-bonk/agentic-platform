@@ -159,7 +159,7 @@ export const ImportSummaryStep = (): JSX.Element => {
             </Button>
           </div>
 
-          <div className="flex flex-col flex-1 min-h-0 border border-gray-200 rounded-lg overflow-hidden">
+          <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
             <div className="flex-1 overflow-y-auto overflow-x-auto">
               <table className="w-full" data-testid="vulnerabilities-summary-table">
                 <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
@@ -182,26 +182,16 @@ export const ImportSummaryStep = (): JSX.Element => {
                   {mockFindings.map((finding, index) => (
                     <tr
                       key={finding.id}
-                      className={`border-b border-gray-200 ${
-                        index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
-                      }`}
+                      className="border-b border-gray-200 bg-white"
                       data-testid={`vulnerability-row-${index}`}
                     >
                       <td className="p-3 text-sm text-gray-900" data-testid={`vulnerability-name-${index}`}>
                         {finding.name}
                       </td>
-                      <td className="p-3 text-sm" data-testid={`vulnerability-severity-${index}`}>
-                        <span
-                          className={`font-medium ${
-                            finding.severity === "Critical"
-                              ? "text-red-600"
-                              : "text-orange-600"
-                          }`}
-                        >
-                          {finding.severity}
-                        </span>
+                      <td className="p-3 text-sm text-gray-900" data-testid={`vulnerability-severity-${index}`}>
+                        {finding.severity}
                       </td>
-                      <td className="p-3 text-sm text-gray-700" data-testid={`vulnerability-status-${index}`}>
+                      <td className="p-3 text-sm text-gray-900" data-testid={`vulnerability-status-${index}`}>
                         {finding.status}
                       </td>
                       <td className="p-3 text-sm text-gray-900" data-testid={`vulnerability-cvss-${index}`}>

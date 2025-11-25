@@ -246,9 +246,7 @@ export const MainContentSection = (): JSX.Element => {
                   {importJobs.map((job, index) => (
                     <div
                       key={job.id}
-                      className={`flex items-start self-stretch w-full ${
-                        index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                      } border-b border-gray-200`}
+                      className="flex items-start self-stretch w-full bg-white border-b border-gray-200"
                       data-testid={`import-job-row-${index}`}
                     >
                       <div className="flex flex-col w-20 justify-center gap-2 p-3 items-start relative">

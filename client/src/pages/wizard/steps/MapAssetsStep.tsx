@@ -198,7 +198,7 @@ export const MapAssetsStep = (): JSX.Element => {
       </div>
 
       <div className="flex flex-col flex-1 min-h-0 px-8 pb-8">
-        <div className="flex flex-col flex-1 min-h-0 border border-gray-200 rounded-lg overflow-hidden">
+        <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
           <div className="flex-1 overflow-y-auto overflow-x-auto">
             <table className="w-full" data-testid="assets-mapping-table">
               <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
@@ -222,20 +222,14 @@ export const MapAssetsStep = (): JSX.Element => {
                   {mockAssets.map((asset, index) => (
                     <tr
                       key={index}
-                      className={`border-b border-gray-200 ${
-                        index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
-                      }`}
+                      className="border-b border-gray-200 bg-white"
                       data-testid={`asset-row-${index}`}
                     >
                       <td className="p-3 text-sm text-gray-900" data-testid={`tenable-id-${index}`}>{asset.tenableId}</td>
                       <td className="p-3 text-sm text-gray-900" data-testid={`auditboard-id-${index}`}>{asset.auditboardId}</td>
                       <td className="p-3 text-sm text-gray-900" data-testid={`asset-name-${index}`}>{asset.name}</td>
-                      <td className="p-3 text-sm" data-testid={`is-matched-${index}`}>
-                        {asset.matched ? (
-                          <span className="text-green-600 font-medium">True</span>
-                        ) : (
-                          <span className="text-gray-400">False</span>
-                        )}
+                      <td className="p-3 text-sm text-gray-900" data-testid={`is-matched-${index}`}>
+                        {asset.matched ? "True" : "False"}
                       </td>
                     </tr>
                   ))}
