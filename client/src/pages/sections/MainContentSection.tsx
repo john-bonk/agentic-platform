@@ -79,30 +79,17 @@ export const MainContentSection = (): JSX.Element => {
           {/* Action Bar */}
           <div className="flex items-end gap-1">
             <Button
-              onClick={() => setLocation("/vulnerability-import-wizard")}
-              className="h-8 gap-1.5 px-2.5 bg-teal-500 hover:bg-teal-600 border border-teal-500 text-white text-[13px] font-normal rounded"
-              data-testid="object-header-primary-action"
-            >
-              Vulnerability Import Job
-            </Button>
-            <Button
               variant="outline"
               className="h-8 gap-1.5 px-2.5 bg-white border border-gray-300 text-gray-900 text-[13px] font-normal rounded"
               data-testid="object-header-docs-button"
             >
-              Documentation
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8 bg-white border border-gray-300 rounded"
-              data-testid="object-header-more-button"
-            >
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="3" cy="8" r="1.5" fill="#64748b" />
-                <circle cx="8" cy="8" r="1.5" fill="#64748b" />
-                <circle cx="13" cy="8" r="1.5" fill="#64748b" />
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-70">
+                <path d="M2 3.5C2 2.67157 2.67157 2 3.5 2H12.5C13.3284 2 14 2.67157 14 3.5V12.5C14 13.3284 13.3284 14 12.5 14H3.5C2.67157 14 2 13.3284 2 12.5V3.5Z" stroke="currentColor" strokeWidth="1.25" />
+                <path d="M5 5H11" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+                <path d="M5 8H11" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+                <path d="M5 11H8" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
               </svg>
+              Tenable Documentation
             </Button>
           </div>
         </div>
