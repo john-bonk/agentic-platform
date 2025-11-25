@@ -90,9 +90,9 @@ export const HeaderSection = (): JSX.Element => {
               tab.text ? "gap-1.5" : "gap-1.5"
             } px-3.5 py-0 ${
               tab.active ? "bg-white" : "bg-gray-600"
-            } rounded-t-[4px] hover:${
+            } rounded-t-[4px] rounded-b-none hover:${
               tab.active ? "bg-white" : "bg-gray-600"
-            } min-w-fit`}
+            }`}
             data-testid={`header-tab-${index}`}
           >
             {getIcon(tab.icon)}
