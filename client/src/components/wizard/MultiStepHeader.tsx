@@ -14,7 +14,7 @@ interface MultiStepHeaderProps {
 
 export const MultiStepHeader = ({ currentStep, steps }: MultiStepHeaderProps): JSX.Element => {
   return (
-    <div className="bg-white flex flex-col gap-8 pb-3 pt-8 px-8 border-b border-slate-200 w-full">
+    <div className="bg-white flex flex-col gap-8 pb-3 pt-8 px-8 border-b border-gray-200 w-full">
       <div className="flex gap-4 items-end w-full">
         <p className="flex-1 font-semibold text-lg text-[#010818ed]">
           Add Vulnerability Import Job
@@ -22,11 +22,11 @@ export const MultiStepHeader = ({ currentStep, steps }: MultiStepHeaderProps): J
         <div className="flex gap-3 items-center">
           <Button
             variant="outline"
-            className="h-[38px] gap-2 px-[10.4px] bg-white shadow-sm border border-slate-200"
+            className="h-[38px] gap-2 px-[10.4px] bg-white shadow-sm border border-gray-200"
             data-testid="vulnerability-documentation-button"
           >
             <div className="w-4 h-4 opacity-85 bg-[url(/figmaAssets/module-narrative-.svg)] bg-[100%_100%]" />
-            <span className="font-normal text-sm text-slate-600">
+            <span className="font-normal text-sm text-gray-600">
               Vulnerability Import Documentation
             </span>
           </Button>

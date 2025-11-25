@@ -72,7 +72,7 @@ export const MainContentSection = (): JSX.Element => {
                 className="h-[34px] gap-2 px-[10.4px] bg-white shadow-shadow-100 border-none before:content-[''] before:absolute before:inset-0 before:p-px before:rounded before:[background:linear-gradient(180deg,rgba(226,232,240,1)_0%,rgba(203,213,225,1)_100%)] before:[-webkit-mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[-webkit-mask-composite:xor] before:[mask-composite:exclude] before:z-[1] before:pointer-events-none"
               >
                 <div className="w-4 h-4 ml-[-0.40px] opacity-85 bg-[url(/figmaAssets/module-narrative-.svg)] bg-[100%_100%]" />
-                <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-slate-600 text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
+                <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-gray-600 text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
                   Tenable Documentation
                 </span>
               </Button>
@@ -82,7 +82,7 @@ export const MainContentSection = (): JSX.Element => {
 
         <Tabs
           defaultValue="import"
-          className="flex items-center pt-2 pb-0 px-0 relative self-stretch w-full flex-[0_0_auto] z-0 border-b border-slate-200"
+          className="flex items-center pt-2 pb-0 px-0 relative self-stretch w-full flex-[0_0_auto] z-0 border-b border-gray-200"
         >
           <TabsList className="h-auto bg-transparent p-0 gap-0">
             {tabItems.map((tab) => (
@@ -103,14 +103,14 @@ export const MainContentSection = (): JSX.Element => {
       <main className="flex items-start relative flex-1 self-stretch w-full grow overflow-y-scroll">
         <div className="flex items-start justify-between relative flex-1 self-stretch grow">
           <div className="flex flex-col items-start gap-6 pt-6 pb-0 px-8 relative flex-1 self-stretch grow">
-            <Card className="self-stretch w-full rounded-lg border border-slate-200 [background:radial-gradient(50%_50%_at_115%_-44%,rgba(1,51,101,0.03)_0%,rgba(1,51,101,0.03)_100%)]">
+            <Card className="self-stretch w-full rounded-lg border border-gray-200 [background:radial-gradient(50%_50%_at_115%_-44%,rgba(1,51,101,0.03)_0%,rgba(1,51,101,0.03)_100%)]">
               <CardContent className="flex flex-col items-start gap-6 p-6">
                 <div className="gap-1 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-                  <h2 className="relative self-stretch mt-[-1.00px] font-font-400-18px-semibold font-[number:var(--font-400-18px-semibold-font-weight)] text-slate-900 text-[length:var(--font-400-18px-semibold-font-size)] tracking-[var(--font-400-18px-semibold-letter-spacing)] leading-[var(--font-400-18px-semibold-line-height)] [font-style:var(--font-400-18px-semibold-font-style)]">
+                  <h2 className="relative self-stretch mt-[-1.00px] font-font-400-18px-semibold font-[number:var(--font-400-18px-semibold-font-weight)] text-gray-900 text-[length:var(--font-400-18px-semibold-font-size)] tracking-[var(--font-400-18px-semibold-letter-spacing)] leading-[var(--font-400-18px-semibold-line-height)] [font-style:var(--font-400-18px-semibold-font-style)]">
                     Liability Statement for Tenable Vulnerability Import Jobs
                   </h2>
 
-                  <p className="relative self-stretch font-font-200-14px-light font-[number:var(--font-200-14px-light-font-weight)] text-slate-900 text-[length:var(--font-200-14px-light-font-size)] tracking-[var(--font-200-14px-light-letter-spacing)] leading-[var(--font-200-14px-light-line-height)] [font-style:var(--font-200-14px-light-font-style)]">
+                  <p className="relative self-stretch font-font-200-14px-light font-[number:var(--font-200-14px-light-font-weight)] text-gray-900 text-[length:var(--font-200-14px-light-font-size)] tracking-[var(--font-200-14px-light-letter-spacing)] leading-[var(--font-200-14px-light-line-height)] [font-style:var(--font-200-14px-light-font-style)]">
                     AuditBoard may make certain content available through the
                     Service, Customer retains sole responsibility for verifying
                     such content prior to use. The content is provided on an
@@ -130,7 +130,7 @@ export const MainContentSection = (): JSX.Element => {
                 </div>
 
                 <footer className="inline-flex items-center gap-1 relative flex-[0_0_auto] bg-transparent">
-                  <Button className="h-[34px] gap-2 px-[10.4px] bg-[#266c92] hover:bg-[#266c92]/90 rounded border border-solid shadow-shadow-100">
+                  <Button className="h-[34px] gap-2 px-[10.4px] bg-teal-500 hover:bg-teal-500/90 rounded border border-solid shadow-shadow-100">
                     <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-white text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
                       Accept
                     </span>
@@ -138,9 +138,9 @@ export const MainContentSection = (): JSX.Element => {
 
                   <Button
                     variant="secondary"
-                    className="h-[34px] gap-2 px-[10.4px] bg-slate-100 hover:bg-slate-200 rounded"
+                    className="h-[34px] gap-2 px-[10.4px] bg-gray-100 hover:bg-gray-200 rounded"
                   >
-                    <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-slate-900 text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
+                    <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-gray-900 text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
                       Decline
                     </span>
                   </Button>
@@ -149,11 +149,11 @@ export const MainContentSection = (): JSX.Element => {
             </Card>
 
             <section className="flex flex-col items-start gap-1 relative self-stretch w-full flex-[0_0_auto]">
-              <h2 className="relative self-stretch mt-[-1.00px] font-font-400-18px-semibold font-[number:var(--font-400-18px-semibold-font-weight)] text-slate-900 text-[length:var(--font-400-18px-semibold-font-size)] tracking-[var(--font-400-18px-semibold-letter-spacing)] leading-[var(--font-400-18px-semibold-line-height)] [font-style:var(--font-400-18px-semibold-font-style)]">
+              <h2 className="relative self-stretch mt-[-1.00px] font-font-400-18px-semibold font-[number:var(--font-400-18px-semibold-font-weight)] text-gray-900 text-[length:var(--font-400-18px-semibold-font-size)] tracking-[var(--font-400-18px-semibold-letter-spacing)] leading-[var(--font-400-18px-semibold-line-height)] [font-style:var(--font-400-18px-semibold-font-style)]">
                 Vulnerability Import Jobs
               </h2>
 
-              <p className="relative self-stretch font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-slate-700 text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
+              <p className="relative self-stretch font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-gray-700 text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
                 Import vulnerability assets (both findings and details) from
                 Tenable. Match them to existing AuditBoard inventory, map
                 specific fields, and filter for critical vulnerabilities. Please
@@ -171,7 +171,7 @@ export const MainContentSection = (): JSX.Element => {
                   >
                     <div className="flex items-center gap-1 relative self-stretch w-full flex-[0_0_auto]">
                       <div className="inline-flex flex-[0_0_auto] items-start relative">
-                        <div className="relative w-fit mt-[-1.00px] [font-family:'SF_Pro_Display-Medium',Helvetica] font-medium text-slate-700 text-xs tracking-[0.35px] leading-[18px] whitespace-nowrap">
+                        <div className="relative w-fit mt-[-1.00px] [font-family:'SF_Pro_Display-Medium',Helvetica] font-medium text-gray-700 text-xs tracking-[0.35px] leading-[18px] whitespace-nowrap">
                           {header.label}
                         </div>
                       </div>
@@ -184,11 +184,11 @@ export const MainContentSection = (): JSX.Element => {
                 <div className="flex flex-col max-w-[400px] items-center gap-2 px-4 py-5 relative w-full flex-[0_0_auto] rounded">
                   <div className="gap-4 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
                     <div className="gap-2 pt-2 pb-0 px-0 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-                      <h3 className="relative flex items-center justify-center self-stretch mt-[-1.00px] font-font-400-18px-medium font-[number:var(--font-400-18px-medium-font-weight)] text-slate-900 text-[length:var(--font-400-18px-medium-font-size)] text-center tracking-[var(--font-400-18px-medium-letter-spacing)] leading-[var(--font-400-18px-medium-line-height)] [font-style:var(--font-400-18px-medium-font-style)]">
+                      <h3 className="relative flex items-center justify-center self-stretch mt-[-1.00px] font-font-400-18px-medium font-[number:var(--font-400-18px-medium-font-weight)] text-gray-900 text-[length:var(--font-400-18px-medium-font-size)] text-center tracking-[var(--font-400-18px-medium-letter-spacing)] leading-[var(--font-400-18px-medium-line-height)] [font-style:var(--font-400-18px-medium-font-style)]">
                         No vulnerability import jobs found
                       </h3>
 
-                      <p className="relative self-stretch font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-slate-700 text-[length:var(--font-200-14px-regular-font-size)] text-center tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
+                      <p className="relative self-stretch font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-gray-700 text-[length:var(--font-200-14px-regular-font-size)] text-center tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
                         Currently there are no import jobs between Tenable and
                         AuditBoard. Add one below.
                       </p>
@@ -197,17 +197,17 @@ export const MainContentSection = (): JSX.Element => {
                     <div className="flex items-center justify-center gap-1 relative self-stretch w-full flex-[0_0_auto]">
                       <Button
                         variant="outline"
-                        className="h-[30px] gap-2 px-[10.4px] ml-[-8.30px] bg-white border-slate-300"
+                        className="h-[30px] gap-2 px-[10.4px] ml-[-8.30px] bg-white border-gray-300"
                       >
                         <div className="w-3.5 h-3.5 bg-[url(/figmaAssets/module-narrative-.svg)] bg-[100%_100%]" />
-                        <span className="font-font-100-12px-regular font-[number:var(--font-100-12px-regular-font-weight)] text-slate-900 text-[length:var(--font-100-12px-regular-font-size)] tracking-[var(--font-100-12px-regular-letter-spacing)] leading-[var(--font-100-12px-regular-line-height)] [font-style:var(--font-100-12px-regular-font-style)]">
+                        <span className="font-font-100-12px-regular font-[number:var(--font-100-12px-regular-font-weight)] text-gray-900 text-[length:var(--font-100-12px-regular-font-size)] tracking-[var(--font-100-12px-regular-letter-spacing)] leading-[var(--font-100-12px-regular-line-height)] [font-style:var(--font-100-12px-regular-font-style)]">
                           Vulnerability Import Documentation
                         </span>
                       </Button>
 
                       <Button 
                         onClick={() => setLocation("/vulnerability-import-wizard")}
-                        className="h-[30px] gap-2 px-[10.4px] mr-[-8.30px] bg-[#3f85b2] hover:bg-[#3f85b2]/90 border-[#266c92] shadow-shadow-100"
+                        className="h-[30px] gap-2 px-[10.4px] mr-[-8.30px] bg-teal-500 hover:bg-teal-500/90 border-teal-500 shadow-shadow-100"
                         data-testid="add-vulnerability-import-job-button"
                       >
                         <div className="w-3.5 h-3.5 bg-[url(/figmaAssets/plus-lg.svg)] bg-[100%_100%]" />
@@ -224,27 +224,27 @@ export const MainContentSection = (): JSX.Element => {
                     <div
                       key={job.id}
                       className={`flex items-start self-stretch w-full ${
-                        index % 2 === 0 ? "bg-white" : "bg-slate-50"
-                      } border-b border-slate-200`}
+                        index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } border-b border-gray-200`}
                       data-testid={`import-job-row-${index}`}
                     >
                       <div className="flex flex-col w-20 justify-center gap-2 p-3 items-start relative">
-                        <div className="flex items-center justify-center w-9 h-5 bg-[#266c92] rounded-full relative">
+                        <div className="flex items-center justify-center w-9 h-5 bg-teal-500 rounded-full relative">
                           <div className="w-3 h-3 bg-white rounded-full" />
                         </div>
                       </div>
                       <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
-                        <span className="text-sm text-slate-900" data-testid={`job-auditboard-type-${index}`}>
+                        <span className="text-sm text-gray-900" data-testid={`job-auditboard-type-${index}`}>
                           {job.auditboardType}
                         </span>
                       </div>
                       <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
-                        <span className="text-sm text-slate-900" data-testid={`job-tenable-type-${index}`}>
+                        <span className="text-sm text-gray-900" data-testid={`job-tenable-type-${index}`}>
                           {job.tenableType}
                         </span>
                       </div>
                       <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
-                        <span className="text-sm text-slate-900" data-testid={`job-frequency-${index}`}>
+                        <span className="text-sm text-gray-900" data-testid={`job-frequency-${index}`}>
                           {job.frequency}
                         </span>
                       </div>
@@ -254,12 +254,12 @@ export const MainContentSection = (): JSX.Element => {
                         </Badge>
                       </div>
                       <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
-                        <span className="text-sm text-slate-900" data-testid={`job-last-import-${index}`}>
+                        <span className="text-sm text-gray-900" data-testid={`job-last-import-${index}`}>
                           {job.lastImport}
                         </span>
                       </div>
                       <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
-                        <span className="text-sm text-slate-900" data-testid={`job-next-import-${index}`}>
+                        <span className="text-sm text-gray-900" data-testid={`job-next-import-${index}`}>
                           {job.nextImport}
                         </span>
                       </div>
@@ -268,7 +268,7 @@ export const MainContentSection = (): JSX.Element => {
                   <div className="flex items-center justify-center gap-1 py-6 relative self-stretch w-full flex-[0_0_auto]">
                     <Button 
                       onClick={() => setLocation("/vulnerability-import-wizard")}
-                      className="h-[30px] gap-2 px-[10.4px] bg-[#3f85b2] hover:bg-[#3f85b2]/90 border-[#266c92] shadow-shadow-100"
+                      className="h-[30px] gap-2 px-[10.4px] bg-teal-500 hover:bg-teal-500/90 border-teal-500 shadow-shadow-100"
                       data-testid="add-another-vulnerability-import-job-button"
                     >
                       <div className="w-3.5 h-3.5 bg-[url(/figmaAssets/plus-lg.svg)] bg-[100%_100%]" />

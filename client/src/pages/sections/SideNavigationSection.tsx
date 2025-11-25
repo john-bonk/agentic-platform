@@ -13,12 +13,12 @@ export const SideNavigationSection = (): JSX.Element => {
   const [selectedItem, setSelectedItem] = useState("installed");
 
   return (
-    <nav className="flex w-[272px] items-start relative self-stretch bg-slate-100 border-r-[3px] border-r-slate-100 border-solid" data-testid="side-navigation">
+    <nav className="flex w-[272px] items-start relative self-stretch bg-gray-100 border-r-[3px] border-r-gray-100 border-solid" data-testid="side-navigation">
       <div className="flex flex-col items-start gap-2 relative flex-1 self-stretch grow bg-white overflow-hidden">
         <header className="flex items-center justify-between pl-6 pr-2 py-6 relative self-stretch w-full flex-[0_0_auto]">
           <div className="flex flex-col items-start justify-center relative flex-1 grow">
             <div className="flex items-start relative self-stretch w-full flex-[0_0_auto]">
-              <h1 className="relative font-semibold text-slate-900 text-lg leading-[1.2]" data-testid="navigation-title">
+              <h1 className="relative font-semibold text-gray-900 text-lg leading-[1.2]" data-testid="navigation-title">
                 Integrations
               </h1>
             </div>
@@ -31,7 +31,7 @@ export const SideNavigationSection = (): JSX.Element => {
             data-testid="navigation-collapse-button"
           >
             <div className="relative w-3 h-3">
-              <ChevronDownIcon className="w-3 h-3 text-slate-500" />
+              <ChevronDownIcon className="w-3 h-3 text-gray-500" />
             </div>
           </Button>
         </header>
@@ -44,8 +44,8 @@ export const SideNavigationSection = (): JSX.Element => {
                   variant="ghost"
                   className={`h-[33px] w-full items-center gap-2 px-2 py-1.5 rounded flex justify-start ${
                     selectedItem === item.id 
-                      ? "bg-[#f3fafb] hover:bg-[#f3fafb]" 
-                      : "hover:bg-slate-100"
+                      ? "bg-teal-50 hover:bg-teal-50" 
+                      : "hover:bg-gray-100"
                   }`}
                   onClick={() => setSelectedItem(item.id)}
                   data-testid={`nav-item-${item.id}`}
@@ -53,8 +53,8 @@ export const SideNavigationSection = (): JSX.Element => {
                   <span
                     className={`relative flex-1 text-left text-sm ${
                       selectedItem === item.id
-                        ? "font-semibold text-[#0e5371] leading-[21px]"
-                        : "font-normal text-slate-600 leading-[1.5]"
+                        ? "font-semibold text-teal-600 leading-[21px]"
+                        : "font-normal text-gray-600 leading-[1.5]"
                     }`}
                   >
                     {item.label}

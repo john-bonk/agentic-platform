@@ -19,24 +19,24 @@ export const MultiStepFooter = ({
   const isLastStep = currentStep === 3;
   const buttonLabel = isLastStep ? "Start Import" : continueLabel;
   return (
-    <div className="bg-white flex items-start px-8 py-6 border-t border-slate-200 w-full">
+    <div className="bg-white flex items-start px-8 py-6 border-t border-gray-200 w-full">
       <div className="flex items-start justify-between w-full">
         <div className="flex gap-2 items-start" />
         <div className="flex gap-2 items-start">
           <Button
             variant="outline"
             onClick={onCancel}
-            className="h-[38px] bg-white border border-slate-300"
+            className="h-[38px] bg-white border border-gray-300"
             data-testid="wizard-cancel-button"
           >
-            <span className="font-normal text-sm text-[#0f172a] text-center">
+            <span className="font-normal text-sm text-gray-900 text-center">
               Cancel
             </span>
           </Button>
           <Button
             onClick={onContinue}
             disabled={!canContinue}
-            className="h-[38px] gap-2 bg-[#266c92] hover:bg-[#266c92]/90 border border-[#266c92]"
+            className="h-[38px] gap-2 bg-teal-500 hover:bg-teal-500/90 border border-teal-500"
             data-testid="wizard-continue-button"
           >
             <span className="font-normal text-sm text-white text-center">

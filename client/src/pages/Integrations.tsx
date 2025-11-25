@@ -68,7 +68,7 @@ export const Integrations = (): JSX.Element => {
   return (
     <div className="flex items-start relative">
       <aside
-        className="flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 relative bg-slate-900"
+        className="flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 relative bg-gray-900"
         style={{ minHeight: "100vh" }}
         data-testid="side-navbar"
       >
@@ -87,7 +87,7 @@ export const Integrations = (): JSX.Element => {
             <div
               key={index}
               className={`w-10 h-10 rounded flex items-center justify-center ${
-                icon.active ? "bg-[#266c92]" : ""
+                icon.active ? "bg-teal-500" : ""
               }`}
               data-testid={`navbar-icon-${index}`}
             >
