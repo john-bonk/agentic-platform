@@ -75,7 +75,7 @@ export const Integrations = (): JSX.Element => {
         <nav className="flex flex-col items-center gap-1 relative flex-[0_0_auto]">
           <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-logo">
             <img
-              className="w-7 h-[18px] object-contain"
+              className="w-7 h-auto"
               alt="AuditBoard Logo"
               src="/figmaAssets/auditboard-logo.png?v=2"
             />
