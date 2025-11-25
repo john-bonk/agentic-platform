@@ -203,44 +203,42 @@ export const ImportSummaryStep = (): JSX.Element => {
               </table>
             </div>
 
-            <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-t border-gray-200">
-              <div className="flex items-center gap-3 text-sm text-gray-700">
+            <div className="flex items-center justify-between px-4 py-2 bg-white border-t border-gray-200">
+              <div className="flex items-center gap-2 text-xs text-gray-500 italic">
                 <svg
-                  width="16"
-                  height="16"
+                  width="14"
+                  height="14"
                   viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="text-amber-600"
+                  className="text-gray-400"
                 >
-                  <path
-                    d="M8 1L9.5 6H14.5L10.5 9L12 14L8 11L4 14L5.5 9L1.5 6H6.5L8 1Z"
-                    fill="currentColor"
-                  />
+                  <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
+                  <path d="M8 5V8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  <circle cx="8" cy="11" r="0.75" fill="currentColor" />
                 </svg>
                 <span data-testid="table-limit-message-summary">
                   This table is limited to a sample of 5,000 rows
                 </span>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  className="h-[34px] px-3"
+                  className="h-[30px] px-2 gap-1"
                   data-testid="page-size-button-summary"
                 >
-                  <span className="text-sm">50</span>
+                  <span className="text-xs">50</span>
                   <svg
                     width="12"
                     height="12"
                     viewBox="0 0 12 12"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="ml-1"
                   >
                     <path
-                      d="M3 5L6 8L9 5"
+                      d="M3 5L6 7L9 5"
                       stroke="currentColor"
                       strokeWidth="1.5"
                       strokeLinecap="round"
@@ -248,23 +246,22 @@ export const ImportSummaryStep = (): JSX.Element => {
                     />
                   </svg>
                 </Button>
-                <span className="text-sm text-gray-700" data-testid="pagination-info-summary">
+                <span className="text-xs text-gray-600" data-testid="pagination-info-summary">
                   1 - 50 of 5,000
                 </span>
-                <div className="flex">
+                <div className="flex gap-1">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="h-[34px] px-3 border-r"
+                    className="h-[30px] w-[30px] p-0"
                     data-testid="pagination-prev-button-summary"
                   >
                     <svg
-                      width="16"
-                      height="16"
+                      width="14"
+                      height="14"
                       viewBox="0 0 16 16"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="w-4 h-4"
                     >
                       <path
                         d="M10 3L5 8L10 13"
@@ -276,18 +273,17 @@ export const ImportSummaryStep = (): JSX.Element => {
                     </svg>
                   </Button>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="h-[34px] px-3"
+                    className="h-[30px] w-[30px] p-0"
                     data-testid="pagination-next-button-summary"
                   >
                     <svg
-                      width="16"
-                      height="16"
+                      width="14"
+                      height="14"
                       viewBox="0 0 16 16"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="w-4 h-4"
                     >
                       <path
                         d="M6 3L11 8L6 13"
