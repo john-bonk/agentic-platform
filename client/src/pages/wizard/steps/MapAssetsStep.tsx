@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Loader2, ChevronDown } from "lucide-react";
+
+const mappingKeyOptions = [
+  { id: "ip-address", label: "IP Address" },
+  { id: "hostname", label: "Hostname" },
+  { id: "fqdn", label: "Fully Qualified Domain Name" },
+  { id: "mac-address", label: "MAC Address" },
+];
 
 const mockAssets = [
   { tenableId: "123abc_987xyz", auditboardId: "123abc_987xyz", name: "Amazon EC2 - 123abc_987xyz", matched: true },
@@ -50,6 +56,8 @@ const mockAssets = [
 
 export const MapAssetsStep = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedMappingKeys, setSelectedMappingKeys] = useState<string[]>(["ip-address"]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -57,6 +65,24 @@ export const MapAssetsStep = (): JSX.Element => {
     }, 2000);
     return () => clearTimeout(timer);
   }, []);
+
+  const toggleMappingKey = (id: string) => {
+    setSelectedMappingKeys(prev => 
+      prev.includes(id)
+        ? prev.filter(k => k !== id)
+        : [...prev, id]
+    );
+  };
+
+  const getSelectedLabels = () => {
+    const labels = selectedMappingKeys.map(id => 
+      mappingKeyOptions.find(opt => opt.id === id)?.label
+    ).filter(Boolean);
+    
+    if (labels.length === 0) return "Select Mapping Keys";
+    if (labels.length === 1) return `Mapping Key Column: ${labels[0]}`;
+    return `Mapping Key Columns: ${labels.length} selected`;
+  };
 
   return (
     <div className="flex flex-col flex-1 min-h-0 w-full">
@@ -106,15 +132,45 @@ export const MapAssetsStep = (): JSX.Element => {
 
               {!isLoading && (
                 <div className="flex items-center gap-4">
-                  <Select defaultValue="tenable-id">
-                    <SelectTrigger className="w-[320px] h-[34px]" data-testid="mapping-key-select">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="tenable-id" data-testid="mapping-key-option-tenable-id">Mapping Key Column: Tenable ID</SelectItem>
-                      <SelectItem value="asset-name" data-testid="mapping-key-option-asset-name">Mapping Key Column: Asset Name</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Popover open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={isDropdownOpen}
+                        className="w-[320px] h-[34px] justify-between bg-white border border-gray-300 text-gray-700 font-normal"
+                        data-testid="mapping-key-select"
+                      >
+                        <span className="truncate">{getSelectedLabels()}</span>
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[320px] p-0" align="start">
+                      <div className="flex flex-col">
+                        {mappingKeyOptions.map((option) => (
+                          <div
+                            key={option.id}
+                            className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                            onClick={() => toggleMappingKey(option.id)}
+                            data-testid={`mapping-key-option-${option.id}`}
+                          >
+                            <Checkbox
+                              id={option.id}
+                              checked={selectedMappingKeys.includes(option.id)}
+                              onCheckedChange={() => toggleMappingKey(option.id)}
+                              data-testid={`mapping-key-checkbox-${option.id}`}
+                            />
+                            <label
+                              htmlFor={option.id}
+                              className="text-sm text-gray-700 cursor-pointer flex-1"
+                            >
+                              {option.label}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
 
                   <Button
                     variant="outline"
