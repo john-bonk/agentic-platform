@@ -68,49 +68,50 @@ export const Integrations = (): JSX.Element => {
   return (
     <div className="flex items-start relative">
       <aside
-        className="flex flex-col w-14 items-start justify-between pt-2 pb-2.5 px-2 relative bg-slate-900"
+        className="flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 relative bg-slate-900"
         style={{ minHeight: "100vh" }}
+        data-testid="side-navbar"
       >
-        <nav className="inline-flex flex-col items-center gap-1 relative flex-[0_0_auto]">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-10 h-10 p-[11px] rounded overflow-hidden"
-          >
-            <div className="relative w-[18px] h-[18px]">
+        <nav className="flex flex-col items-center gap-1 relative flex-[0_0_auto]">
+          <div className="w-10 h-10 p-[11px] rounded flex items-center justify-center" data-testid="navbar-logo">
+            <div className="relative w-7 h-7">
               <img
-                className="absolute top-[calc(50.00%_-_12px)] left-[calc(50.00%_-_12px)] w-6 h-6 object-cover"
-                alt="Image"
+                className="w-full h-full object-cover"
+                alt="AuditBoard Logo"
                 src="/figmaAssets/image-2.png"
               />
             </div>
-          </Button>
+          </div>
 
           {navigationIcons.map((icon, index) => (
-            <Button
+            <div
               key={index}
-              variant="ghost"
-              size="icon"
-              className={`w-10 h-10 rounded overflow-hidden ${
-                icon.active ? "bg-[#3172e3]" : ""
+              className={`w-10 h-10 rounded flex items-center justify-center ${
+                icon.active ? "bg-[#266c92]" : ""
               }`}
+              data-testid={`navbar-icon-${index}`}
             >
               <img className="w-4 h-4" alt={icon.alt} src={icon.src} />
-            </Button>
+            </div>
           ))}
         </nav>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          className="w-10 h-10 rounded overflow-hidden"
-        >
-          <img
-            className="w-4 h-4"
-            alt="Circle question"
-            src="/figmaAssets/circle-question-.svg"
-          />
-        </Button>
+        <div className="flex flex-col items-center gap-1">
+          <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-settings">
+            <img
+              className="w-4 h-4"
+              alt="Settings"
+              src="/figmaAssets/gear.svg"
+            />
+          </div>
+          <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-support">
+            <img
+              className="w-4 h-4"
+              alt="Support"
+              src="/figmaAssets/circle-question-.svg"
+            />
+          </div>
+        </div>
       </aside>
 
       <div className="flex flex-col items-start relative flex-1 grow">
