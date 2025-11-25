@@ -78,7 +78,7 @@ export const Integrations = (): JSX.Element => {
               <img
                 className="w-full h-full object-contain"
                 alt="AuditBoard Logo"
-                src="/figmaAssets/auditboard-logo.png"
+                src="/figmaAssets/auditboard-logo.png?v=2"
               />
             </div>
           </div>
