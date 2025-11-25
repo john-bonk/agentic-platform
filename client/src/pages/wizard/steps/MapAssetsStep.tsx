@@ -7,7 +7,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Loader2, ChevronDown } from "lucide-react";
+import { Loader2, ChevronDown, HelpCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const mappingKeyOptions = [
   { id: "ip-address", label: "IP Address" },
@@ -79,9 +84,10 @@ export const MapAssetsStep = (): JSX.Element => {
       mappingKeyOptions.find(opt => opt.id === id)?.label
     ).filter(Boolean);
     
-    if (labels.length === 0) return "Select Mapping Keys";
-    if (labels.length === 1) return `Mapping Key Column: ${labels[0]}`;
-    return `Mapping Key Columns: ${labels.length} selected`;
+    if (labels.length === 0) return "Select columns...";
+    if (labels.length === 1) return labels[0];
+    if (labels.length === mappingKeyOptions.length) return "All columns selected";
+    return `${labels.length} columns selected`;
   };
 
   return (
@@ -131,21 +137,34 @@ export const MapAssetsStep = (): JSX.Element => {
               </div>
 
               {!isLoading && (
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <label className="text-sm font-medium text-gray-700" data-testid="mapping-key-label">
+                      Mapping Key Columns
+                    </label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" data-testid="mapping-key-tooltip-trigger" />
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-[280px]" data-testid="mapping-key-tooltip-content">
+                        <p className="text-sm">When multiple columns are selected, assets must match on ALL selected columns (AND logic) to be considered a match.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                   <Popover open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         role="combobox"
                         aria-expanded={isDropdownOpen}
-                        className="w-[320px] h-[34px] justify-between bg-white border border-gray-300 text-gray-700 font-normal"
+                        className="w-[280px] h-[34px] justify-between bg-white border border-gray-300 text-gray-700 font-normal"
                         data-testid="mapping-key-select"
                       >
                         <span className="truncate">{getSelectedLabels()}</span>
                         <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[320px] p-0" align="start">
+                    <PopoverContent className="w-[280px] p-0" align="start">
                       <div className="flex flex-col">
                         {mappingKeyOptions.map((option) => (
                           <div
@@ -171,16 +190,6 @@ export const MapAssetsStep = (): JSX.Element => {
                       </div>
                     </PopoverContent>
                   </Popover>
-
-                  <Button
-                    variant="outline"
-                    className="h-8 gap-2 px-3 bg-white border border-gray-300"
-                    data-testid="identify-matched-button"
-                  >
-                    <span className="font-normal text-sm text-gray-900">
-                      Identify Matched for Mapping
-                    </span>
-                  </Button>
                 </div>
               )}
             </div>
