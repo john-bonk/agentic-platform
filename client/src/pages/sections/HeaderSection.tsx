@@ -38,6 +38,12 @@ const tabs = [
     text: "AS.IN.1.C18 Peachtree Invento",
     active: false,
   },
+  {
+    icon: "plug",
+    width: "w-36",
+    text: "Tenable",
+    active: true,
+  },
 ];
 
 const utilityIcons = [
@@ -75,18 +81,18 @@ export const HeaderSection = (): JSX.Element => {
 
   return (
     <header className="flex h-12 items-end justify-between pl-0 pr-2 py-0 w-full bg-slate-900">
-      <nav className="inline-flex items-start gap-1 flex-[0_0_auto]">
+      <nav className="inline-flex items-end gap-1 flex-[0_0_auto] h-full">
         {tabs.map((tab, index) => (
           <Button
             key={index}
             variant="ghost"
-            className={`flex ${tab.width} h-9 items-center ${
+            className={`flex ${tab.width} h-10 items-center ${
               tab.text ? "gap-1.5" : "gap-1.5"
             } px-3.5 py-0 ${
               tab.active ? "bg-white" : "bg-slate-600"
             } rounded-t-[4px] hover:${
               tab.active ? "bg-white" : "bg-slate-600"
-            } h-auto min-w-fit`}
+            } min-w-fit`}
             data-testid={`header-tab-${index}`}
           >
             {getIcon(tab.icon)}
