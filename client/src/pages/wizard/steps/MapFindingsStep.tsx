@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -42,58 +43,62 @@ export const MapFindingsStep = (): JSX.Element => {
 
   return (
     <div className="flex flex-col w-full">
-      <div className="flex flex-col gap-4 p-8 bg-white border-b border-gray-200">
-        <div className="flex items-start gap-8 w-full">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-[#010818ed] mb-1">
-              Provide field mappings for Vulnerability Findings, the events and metadata that make up a vulnerability
-            </h3>
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-gray-500"
-              >
-                <path
-                  d="M8 2v12M2 8h12"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <span data-testid="field-mapping-stats">
-                0 of {requiredCount} required fields mapped • 0 of {recommendedCount} recommended fields mapped • {customCount} custom fields mapped
-              </span>
+      <div className="flex flex-col gap-4 p-8 bg-white">
+        <Card className="border border-gray-200" data-testid="map-findings-info-card">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-8 w-full">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-[#010818ed] mb-1" data-testid="map-findings-heading">
+                  Provide field mappings for Vulnerability Findings, the events and metadata that make up a vulnerability
+                </h3>
+                <div className="flex items-center gap-2 text-sm text-gray-700">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-gray-500"
+                  >
+                    <path
+                      d="M8 2v12M2 8h12"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span data-testid="field-mapping-stats">
+                    0 of {requiredCount} required fields mapped • 0 of {recommendedCount} recommended fields mapped • {customCount} custom fields mapped
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  className="h-8 gap-2 px-3 bg-white border border-gray-300"
+                  data-testid="reset-mappings-button"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span className="font-normal text-sm text-gray-900">Reset</span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  className="h-8 gap-2 px-3 bg-white border border-gray-300"
+                  data-testid="suggest-mappings-button"
+                >
+                  <span className="font-normal text-sm text-gray-900">
+                    Suggest Field Mappings
+                  </span>
+                </Button>
+              </div>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              className="h-8 gap-2 px-3 bg-white border border-gray-300"
-              data-testid="reset-mappings-button"
-            >
-              <RotateCcw className="w-4 h-4" />
-              <span className="font-normal text-sm text-gray-900">Reset</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              className="h-8 gap-2 px-3 bg-white border border-gray-300"
-              data-testid="suggest-mappings-button"
-            >
-              <span className="font-normal text-sm text-gray-900">
-                Suggest Field Mappings
-              </span>
-            </Button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="flex flex-col p-8">
+      <div className="flex flex-col px-8 pb-8">
         <div className="flex flex-col gap-0">
           <div className="flex items-center mb-4">
             <div className="w-[707px] text-xs font-medium text-gray-700 tracking-wide">
