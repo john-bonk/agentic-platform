@@ -56,67 +56,76 @@ export const MainContentSection = (): JSX.Element => {
 
   return (
     <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white">
-      <header className="items-start justify-center pt-8 pb-0 px-8 self-stretch w-full flex-[0_0_auto] bg-white flex flex-col relative">
-        <div className="flex h-6 items-center gap-2 relative self-stretch w-full z-[2]">
-          <div className="relative flex-1 font-font-200-14px-semibold font-[number:var(--font-200-14px-semibold-font-weight)] text-[#152741c9] text-[length:var(--font-200-14px-semibold-font-size)] tracking-[var(--font-200-14px-semibold-letter-spacing)] leading-[var(--font-200-14px-semibold-line-height)] [font-style:var(--font-200-14px-semibold-font-style)]">
-            Installed Service
-          </div>
-        </div>
-
-        <div className="flex items-start gap-4 relative self-stretch w-full flex-[0_0_auto] z-[1]">
-          <div className="flex flex-col items-start justify-center gap-1 relative flex-1 grow">
-            <h1 className="relative mt-[-1.00px] font-font-500-24px-medium font-[number:var(--font-500-24px-medium-font-weight)] text-[#010818ed] text-[length:var(--font-500-24px-medium-font-size)] tracking-[var(--font-500-24px-medium-letter-spacing)] leading-[var(--font-500-24px-medium-line-height)] [font-style:var(--font-500-24px-medium-font-style)]">
-              Tenable
-            </h1>
-
-            <div className="flex items-center gap-1 pt-2 pb-0 px-0 relative self-stretch w-full flex-[0_0_auto]">
-              <div className="inline-flex items-center gap-1 relative flex-[0_0_auto]">
-                <Badge className="h-4 bg-[#dbeaff] text-[#0e48a1] hover:bg-[#dbeaff] rounded-[999px] px-1.5 py-0">
-                  <span className="font-font-50-11px-semibold font-[number:var(--font-50-11px-semibold-font-weight)] text-[length:var(--font-50-11px-semibold-font-size)] tracking-[var(--font-50-11px-semibold-letter-spacing)] leading-[var(--font-50-11px-semibold-line-height)] [font-style:var(--font-50-11px-semibold-font-style)]">
-                    Valid
-                  </span>
-                </Badge>
-              </div>
-
-              <p className="relative flex-1 mt-[-0.50px] font-font-100-12px-regular font-[number:var(--font-100-12px-regular-font-weight)] text-[#010818ed] text-[length:var(--font-100-12px-regular-font-size)] tracking-[var(--font-100-12px-regular-letter-spacing)] leading-[var(--font-100-12px-regular-line-height)] [font-style:var(--font-100-12px-regular-font-style)]">
-                Installation last checked January 1, 2025
-              </p>
+      <header className="flex flex-col gap-2 pt-6 pb-0 px-8 w-full bg-white">
+        {/* Level 1: Subhead + Heading + Actions */}
+        <div className="flex gap-3 items-start w-full">
+          {/* Text Section */}
+          <div className="flex flex-col flex-1 gap-1 items-start justify-center">
+            {/* Subhead */}
+            <span className="text-[13px] font-semibold text-gray-500 leading-[1.35]">
+              Installed Service
+            </span>
+            {/* Heading with Badge */}
+            <div className="flex items-center gap-2 w-full">
+              <h1 className="text-xl font-semibold text-gray-900 leading-[1.2]">
+                Tenable
+              </h1>
+              <Badge className="h-4 bg-gray-200/60 text-gray-700 hover:bg-gray-200/60 rounded-full px-1.5 py-0 text-[10px] font-semibold">
+                Valid
+              </Badge>
             </div>
           </div>
 
-          <div className="w-[341px] items-end gap-3 flex flex-col relative">
-            <div className="inline-flex items-center gap-3 relative flex-[0_0_auto]">
-              <Button
-                variant="outline"
-                className="h-[34px] gap-2 px-[10.4px] bg-white shadow-shadow-100 border-none before:content-[''] before:absolute before:inset-0 before:p-px before:rounded before:[background:linear-gradient(180deg,rgba(226,232,240,1)_0%,rgba(203,213,225,1)_100%)] before:[-webkit-mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] before:[-webkit-mask-composite:xor] before:[mask-composite:exclude] before:z-[1] before:pointer-events-none"
-              >
-                <div className="w-4 h-4 ml-[-0.40px] opacity-85 bg-[url(/figmaAssets/module-narrative-.svg)] bg-[100%_100%]" />
-                <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-gray-600 text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
-                  Tenable Documentation
-                </span>
-              </Button>
-            </div>
+          {/* Action Bar */}
+          <div className="flex items-end gap-1">
+            <Button
+              onClick={() => setLocation("/vulnerability-import-wizard")}
+              className="h-8 gap-1.5 px-2.5 bg-teal-500 hover:bg-teal-600 border border-teal-500 text-white text-[13px] font-normal rounded"
+              data-testid="object-header-primary-action"
+            >
+              Vulnerability Import Job
+            </Button>
+            <Button
+              variant="outline"
+              className="h-8 gap-1.5 px-2.5 bg-white border border-gray-300 text-gray-900 text-[13px] font-normal rounded"
+              data-testid="object-header-docs-button"
+            >
+              Documentation
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 bg-white border border-gray-300 rounded"
+              data-testid="object-header-more-button"
+            >
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="3" cy="8" r="1.5" fill="#64748b" />
+                <circle cx="8" cy="8" r="1.5" fill="#64748b" />
+                <circle cx="13" cy="8" r="1.5" fill="#64748b" />
+              </svg>
+            </Button>
           </div>
         </div>
 
-        <Tabs
-          defaultValue="import"
-          className="flex items-center pt-2 pb-0 px-0 relative self-stretch w-full flex-[0_0_auto] z-0 border-b border-gray-200"
-        >
-          <TabsList className="h-auto bg-transparent p-0 gap-0">
-            {tabItems.map((tab) => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className="inline-flex items-center gap-1 px-3 py-0 h-auto data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-b-[3px] border-transparent data-[state=active]:border-[#3172e3]"
-              >
-                <span className="[font-family:'SF_Pro_Display-Semibold',Helvetica] font-normal text-sm tracking-[0] leading-10 data-[state=active]:text-[#3172e3] text-[#152741c9]">
+        {/* Level 2: Tabs */}
+        <div className="pt-2 w-full">
+          <Tabs
+            defaultValue="import"
+            className="w-full"
+          >
+            <TabsList className="h-9 bg-transparent p-0 gap-3 border-b border-gray-200 w-full justify-start rounded-none">
+              {tabItems.map((tab) => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="h-9 px-0.5 pb-1 rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-[3px] border-transparent data-[state=active]:border-teal-500 text-sm font-semibold text-gray-600 data-[state=active]:text-teal-500"
+                >
                   {tab.label}
-                </span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
       </header>
 
       <main className="flex items-start relative flex-1 self-stretch w-full grow overflow-y-scroll">
