@@ -1,4 +1,3 @@
-import { ChevronDownIcon } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -24,16 +23,6 @@ export const SideNavigationSection = (): JSX.Element => {
             </div>
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-auto items-center justify-center gap-1.5 px-2 py-0 rounded hover:bg-transparent"
-            data-testid="navigation-collapse-button"
-          >
-            <div className="relative w-3 h-3">
-              <ChevronDownIcon className="w-3 h-3 text-gray-500" />
-            </div>
-          </Button>
         </header>
 
         <div className="flex flex-col items-start gap-7 pt-0 pb-6 px-4 relative flex-1 self-stretch w-full grow">
