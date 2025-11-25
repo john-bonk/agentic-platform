@@ -36,7 +36,7 @@ export const MultiStepHeader = ({ currentStep, steps }: MultiStepHeaderProps): J
 
       <div className="flex gap-8 items-start overflow-hidden w-full relative">
         <div className="absolute h-0 left-0 right-0 top-[13px]">
-          <div className="absolute bottom-0 left-0 right-0 top-[-1px] border-t-2 border-[#01377e]" />
+          <div className="absolute bottom-0 left-0 right-0 top-[-1px] border-t-2 border-gray-200" />
         </div>
 
         {steps.map((step, index) => (
