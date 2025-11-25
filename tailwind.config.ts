@@ -43,6 +43,18 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        teal: {
+          50: "#f3fafb",
+          100: "#d9f1f5",
+          200: "#b3e3eb",
+          300: "#82cfdd",
+          400: "#4db4c9",
+          500: "#266c92",
+          600: "#0e5371",
+          700: "#0a405a",
+          800: "#082f44",
+          900: "#05202e",
+        },
       },
       fontFamily: {
         "font-100-12px-regular": "var(--font-100-12px-regular-font-family)",

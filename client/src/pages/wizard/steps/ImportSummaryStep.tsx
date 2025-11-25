@@ -88,13 +88,13 @@ const mockFindings: VulnerabilityFinding[] = [
 export const ImportSummaryStep = (): JSX.Element => {
   return (
     <div className="flex flex-col w-full">
-      <div className="flex flex-col gap-4 p-8 bg-white border-b border-slate-200">
+      <div className="flex flex-col gap-4 p-8 bg-white border-b border-gray-200">
         <div className="flex items-start gap-8 w-full">
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-[#010818ed] mb-1">
               Confirm import job summary
             </h3>
-            <div className="flex items-center gap-2 text-sm text-slate-700 mb-2">
+            <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
               <svg
                 width="16"
                 height="16"
@@ -116,7 +116,7 @@ export const ImportSummaryStep = (): JSX.Element => {
                 5,000 or more vulnerability findings will be imported from Tenable to AuditBoard
               </span>
             </div>
-            <p className="text-sm text-slate-600" data-testid="sample-limit-note">
+            <p className="text-sm text-gray-600" data-testid="sample-limit-note">
               Note: Vulnerabilities summarized below are limited to a sample of 5,000. However, all vulnerability assets under 10,000 records will be imported when the job is processed.
             </p>
           </div>
@@ -135,7 +135,7 @@ export const ImportSummaryStep = (): JSX.Element => {
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-[200px]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 transform -trangray-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 placeholder="Search"
                 className="h-[30px] pl-9"
@@ -146,7 +146,7 @@ export const ImportSummaryStep = (): JSX.Element => {
             <div className="flex items-center gap-2">
               <Badge
                 variant="secondary"
-                className="h-[30px] px-3 gap-2 bg-slate-100 hover:bg-slate-200"
+                className="h-[30px] px-3 gap-2 bg-gray-100 hover:bg-gray-200"
                 data-testid="filter-severity"
               >
                 <span className="text-sm">Severity: High, Critical</span>
@@ -155,7 +155,7 @@ export const ImportSummaryStep = (): JSX.Element => {
 
               <Badge
                 variant="secondary"
-                className="h-[30px] px-3 gap-2 bg-slate-100 hover:bg-slate-200"
+                className="h-[30px] px-3 gap-2 bg-gray-100 hover:bg-gray-200"
                 data-testid="filter-status"
               >
                 <span className="text-sm">Status: New, In Progress</span>
@@ -164,7 +164,7 @@ export const ImportSummaryStep = (): JSX.Element => {
 
               <Badge
                 variant="secondary"
-                className="h-[30px] px-3 gap-2 bg-slate-100 hover:bg-slate-200"
+                className="h-[30px] px-3 gap-2 bg-gray-100 hover:bg-gray-200"
                 data-testid="filter-cvss"
               >
                 <span className="text-sm">CVSS Score {">"} 9.0</span>
@@ -182,28 +182,28 @@ export const ImportSummaryStep = (): JSX.Element => {
 
             <Button
               variant="ghost"
-              className="h-[30px] px-0 text-sm text-slate-700"
+              className="h-[30px] px-0 text-sm text-gray-700"
               data-testid="clear-all-filters-button"
             >
               Clear All
             </Button>
           </div>
 
-          <div className="border border-slate-200 rounded-lg overflow-hidden">
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full" data-testid="vulnerabilities-summary-table">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide w-[928px]">
+                    <th className="text-left p-3 text-xs font-medium text-gray-700 tracking-wide w-[928px]">
                       VULNERABILITY FINDING
                     </th>
-                    <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide w-[200px]">
+                    <th className="text-left p-3 text-xs font-medium text-gray-700 tracking-wide w-[200px]">
                       SEVERITY
                     </th>
-                    <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide w-[200px]">
+                    <th className="text-left p-3 text-xs font-medium text-gray-700 tracking-wide w-[200px]">
                       STATUS
                     </th>
-                    <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide w-[200px]">
+                    <th className="text-left p-3 text-xs font-medium text-gray-700 tracking-wide w-[200px]">
                       CVSS SCORE
                     </th>
                   </tr>
@@ -212,12 +212,12 @@ export const ImportSummaryStep = (): JSX.Element => {
                   {mockFindings.map((finding, index) => (
                     <tr
                       key={finding.id}
-                      className={`border-b border-slate-200 ${
-                        index % 2 === 0 ? "bg-white" : "bg-slate-50/30"
+                      className={`border-b border-gray-200 ${
+                        index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
                       }`}
                       data-testid={`vulnerability-row-${index}`}
                     >
-                      <td className="p-3 text-sm text-slate-900" data-testid={`vulnerability-name-${index}`}>
+                      <td className="p-3 text-sm text-gray-900" data-testid={`vulnerability-name-${index}`}>
                         {finding.name}
                       </td>
                       <td className="p-3 text-sm" data-testid={`vulnerability-severity-${index}`}>
@@ -231,10 +231,10 @@ export const ImportSummaryStep = (): JSX.Element => {
                           {finding.severity}
                         </span>
                       </td>
-                      <td className="p-3 text-sm text-slate-700" data-testid={`vulnerability-status-${index}`}>
+                      <td className="p-3 text-sm text-gray-700" data-testid={`vulnerability-status-${index}`}>
                         {finding.status}
                       </td>
-                      <td className="p-3 text-sm text-slate-900" data-testid={`vulnerability-cvss-${index}`}>
+                      <td className="p-3 text-sm text-gray-900" data-testid={`vulnerability-cvss-${index}`}>
                         {finding.cvssScore}
                       </td>
                     </tr>
@@ -243,8 +243,8 @@ export const ImportSummaryStep = (): JSX.Element => {
               </table>
             </div>
 
-            <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-t border-slate-200">
-              <div className="flex items-center gap-3 text-sm text-slate-700">
+            <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-t border-gray-200">
+              <div className="flex items-center gap-3 text-sm text-gray-700">
                 <svg
                   width="16"
                   height="16"
@@ -288,7 +288,7 @@ export const ImportSummaryStep = (): JSX.Element => {
                     />
                   </svg>
                 </Button>
-                <span className="text-sm text-slate-700" data-testid="pagination-info-summary">
+                <span className="text-sm text-gray-700" data-testid="pagination-info-summary">
                   1 - 50 of 5,000
                 </span>
                 <div className="flex">
@@ -343,10 +343,10 @@ export const ImportSummaryStep = (): JSX.Element => {
             </div>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-slate-200">
+          <div className="mt-6 pt-6 border-t border-gray-200">
             <Button
               variant="ghost"
-              className="h-auto p-0 gap-2 text-slate-700 hover:text-slate-900"
+              className="h-auto p-0 gap-2 text-gray-700 hover:text-gray-900"
               data-testid="previous-step-button-summary"
             >
               <svg

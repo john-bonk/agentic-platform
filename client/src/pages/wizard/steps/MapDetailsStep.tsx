@@ -33,20 +33,20 @@ export const MapDetailsStep = (): JSX.Element => {
 
   return (
     <div className="flex flex-col w-full">
-      <div className="flex flex-col gap-4 p-8 bg-white border-b border-slate-200">
+      <div className="flex flex-col gap-4 p-8 bg-white border-b border-gray-200">
         <div className="flex items-start gap-8 w-full">
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-[#010818ed] mb-1">
               Provide field mappings for Vulnerability Details, the parent object to which vulnerability findings are attached
             </h3>
-            <div className="flex items-center gap-2 text-sm text-slate-700 mb-2">
+            <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
               <svg
                 width="16"
                 height="16"
                 viewBox="0 0 16 16"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="text-slate-500"
+                className="text-gray-500"
               >
                 <path
                   d="M8 2v12M2 8h12"
@@ -59,7 +59,7 @@ export const MapDetailsStep = (): JSX.Element => {
                 0 of {requiredCount} required fields mapped • 0 of {recommendedCount} recommended fields mapped • {customCount} custom fields mapped
               </span>
             </div>
-            <p className="text-sm text-slate-600" data-testid="nvd-disclaimer">
+            <p className="text-sm text-gray-600" data-testid="nvd-disclaimer">
               Note: This product uses the NVD API but is not endorsed or certified by the NVD.
             </p>
           </div>
@@ -67,19 +67,19 @@ export const MapDetailsStep = (): JSX.Element => {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              className="h-8 gap-2 px-3 bg-white border border-slate-300"
+              className="h-8 gap-2 px-3 bg-white border border-gray-300"
               data-testid="reset-mappings-button-details"
             >
               <RotateCcw className="w-4 h-4" />
-              <span className="font-normal text-sm text-slate-900">Reset</span>
+              <span className="font-normal text-sm text-gray-900">Reset</span>
             </Button>
 
             <Button
               variant="outline"
-              className="h-8 gap-2 px-3 bg-white border border-slate-300"
+              className="h-8 gap-2 px-3 bg-white border border-gray-300"
               data-testid="suggest-mappings-button-details"
             >
-              <span className="font-normal text-sm text-slate-900">
+              <span className="font-normal text-sm text-gray-900">
                 Suggest Field Mappings
               </span>
             </Button>
@@ -90,11 +90,11 @@ export const MapDetailsStep = (): JSX.Element => {
       <div className="flex flex-col p-8">
         <div className="flex flex-col gap-0">
           <div className="flex items-center mb-4">
-            <div className="w-[707px] text-xs font-medium text-slate-700 tracking-wide">
+            <div className="w-[707px] text-xs font-medium text-gray-700 tracking-wide">
               FIELD, TENABLE
             </div>
             <div className="w-4 mx-2" />
-            <div className="flex-1 text-xs font-medium text-slate-700 tracking-wide">
+            <div className="flex-1 text-xs font-medium text-gray-700 tracking-wide">
               FIELD, AUDITBOARD
             </div>
           </div>
@@ -106,15 +106,15 @@ export const MapDetailsStep = (): JSX.Element => {
               data-testid={`field-mapping-row-details-${index}`}
             >
               <div className="w-[707px]">
-                <div className={`h-[34px] flex items-center px-3 rounded border border-slate-300 bg-white ${index === 0 ? "pt-4 pb-4" : ""}`}>
-                  <span className="text-sm text-slate-900">{mapping.tenableField}</span>
+                <div className={`h-[34px] flex items-center px-3 rounded border border-gray-300 bg-white ${index === 0 ? "pt-4 pb-4" : ""}`}>
+                  <span className="text-sm text-gray-900">{mapping.tenableField}</span>
                   {mapping.fieldType === "required" && (
-                    <span className="ml-auto text-xs text-slate-500 px-2 py-0.5 rounded bg-slate-100">
+                    <span className="ml-auto text-xs text-gray-500 px-2 py-0.5 rounded bg-gray-100">
                       Required
                     </span>
                   )}
                   {mapping.fieldType === "recommended" && (
-                    <span className="ml-auto text-xs text-slate-500 px-2 py-0.5 rounded bg-slate-100">
+                    <span className="ml-auto text-xs text-gray-500 px-2 py-0.5 rounded bg-gray-100">
                       Recommended
                     </span>
                   )}
@@ -128,7 +128,7 @@ export const MapDetailsStep = (): JSX.Element => {
                   viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="text-slate-500"
+                  className="text-gray-500"
                 >
                   <path
                     d="M2 8h12M10 4l4 4-4 4"
@@ -143,7 +143,7 @@ export const MapDetailsStep = (): JSX.Element => {
               <div className="flex-1">
                 <Select>
                   <SelectTrigger 
-                    className="h-[34px] border-slate-300" 
+                    className="h-[34px] border-gray-300" 
                     data-testid={`auditboard-field-select-details-${index}`}
                   >
                     <SelectValue placeholder={mapping.fieldType === "required" ? "[Required]" : "[Recommended]"} />
@@ -163,7 +163,7 @@ export const MapDetailsStep = (): JSX.Element => {
                   className="w-9 h-9"
                   data-testid={`help-button-details-${index}`}
                 >
-                  <HelpCircle className="w-4 h-4 text-slate-500" />
+                  <HelpCircle className="w-4 h-4 text-gray-500" />
                 </Button>
                 <Button
                   variant="ghost"
@@ -171,7 +171,7 @@ export const MapDetailsStep = (): JSX.Element => {
                   className="w-9 h-9"
                   data-testid={`delete-mapping-details-${index}`}
                 >
-                  <Trash2 className="w-4 h-4 text-slate-500" />
+                  <Trash2 className="w-4 h-4 text-gray-500" />
                 </Button>
               </div>
             </div>
@@ -180,20 +180,20 @@ export const MapDetailsStep = (): JSX.Element => {
           <div className="mt-4">
             <Button
               variant="outline"
-              className="h-[34px] gap-2 px-3 bg-white border border-slate-300"
+              className="h-[34px] gap-2 px-3 bg-white border border-gray-300"
               data-testid="add-field-mapping-button-details"
             >
               <Plus className="w-4 h-4" />
-              <span className="font-normal text-sm text-slate-900">
+              <span className="font-normal text-sm text-gray-900">
                 Add Field Mapping
               </span>
             </Button>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-slate-200">
+          <div className="mt-6 pt-6 border-t border-gray-200">
             <Button
               variant="ghost"
-              className="h-auto p-0 gap-2 text-slate-700 hover:text-slate-900"
+              className="h-auto p-0 gap-2 text-gray-700 hover:text-gray-900"
               data-testid="previous-step-button-details"
             >
               <svg

@@ -29,13 +29,13 @@ const mockAssets = [
 export const MapAssetsStep = (): JSX.Element => {
   return (
     <div className="flex flex-col w-full">
-      <div className="flex flex-col gap-4 p-8 bg-white border-b border-slate-200">
+      <div className="flex flex-col gap-4 p-8 bg-white border-b border-gray-200">
         <div className="flex items-start gap-8 w-full">
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-[#010818ed] mb-1">
               Identify matching assets between Tenable and AuditBoard to import as vulnerabilities
             </h3>
-            <div className="flex items-center gap-2 text-sm text-slate-700">
+            <div className="flex items-center gap-2 text-sm text-gray-700">
               <svg
                 width="16"
                 height="16"
@@ -57,7 +57,7 @@ export const MapAssetsStep = (): JSX.Element => {
                 4,996 or more matching assets • 2 unmatched in Tenable • 2 unmatched in AuditBoard
               </span>
             </div>
-            <p className="text-sm text-slate-600 mt-2" data-testid="sample-note">
+            <p className="text-sm text-gray-600 mt-2" data-testid="sample-note">
               Note: Assets matched below are limited to a sample of 5,000. However, all matched assets will be imported when the job is processed.
             </p>
           </div>
@@ -75,10 +75,10 @@ export const MapAssetsStep = (): JSX.Element => {
 
             <Button
               variant="outline"
-              className="h-8 gap-2 px-3 bg-white border border-slate-300"
+              className="h-8 gap-2 px-3 bg-white border border-gray-300"
               data-testid="identify-matched-button"
             >
-              <span className="font-normal text-sm text-slate-900">
+              <span className="font-normal text-sm text-gray-900">
                 Identify Matched for Mapping
               </span>
             </Button>
@@ -87,21 +87,21 @@ export const MapAssetsStep = (): JSX.Element => {
       </div>
 
       <div className="flex flex-col p-8">
-        <div className="border border-slate-200 rounded-lg overflow-hidden">
+        <div className="border border-gray-200 rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full" data-testid="assets-mapping-table">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide">
+                  <th className="text-left p-3 text-xs font-medium text-gray-700 tracking-wide">
                     TENABLE ASSET UID
                   </th>
-                  <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide">
+                  <th className="text-left p-3 text-xs font-medium text-gray-700 tracking-wide">
                     AUDITBOARD INVENTORY UID
                   </th>
-                  <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide">
+                  <th className="text-left p-3 text-xs font-medium text-gray-700 tracking-wide">
                     AUDITBOARD INVENTORY NAME
                   </th>
-                  <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide">
+                  <th className="text-left p-3 text-xs font-medium text-gray-700 tracking-wide">
                     IS MATCHED
                   </th>
                 </tr>
@@ -110,19 +110,19 @@ export const MapAssetsStep = (): JSX.Element => {
                 {mockAssets.map((asset, index) => (
                   <tr
                     key={index}
-                    className={`border-b border-slate-200 ${
-                      index % 2 === 0 ? "bg-white" : "bg-slate-50/30"
+                    className={`border-b border-gray-200 ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
                     }`}
                     data-testid={`asset-row-${index}`}
                   >
-                    <td className="p-3 text-sm text-slate-900" data-testid={`tenable-id-${index}`}>{asset.tenableId}</td>
-                    <td className="p-3 text-sm text-slate-900" data-testid={`auditboard-id-${index}`}>{asset.auditboardId}</td>
-                    <td className="p-3 text-sm text-slate-900" data-testid={`asset-name-${index}`}>{asset.name}</td>
+                    <td className="p-3 text-sm text-gray-900" data-testid={`tenable-id-${index}`}>{asset.tenableId}</td>
+                    <td className="p-3 text-sm text-gray-900" data-testid={`auditboard-id-${index}`}>{asset.auditboardId}</td>
+                    <td className="p-3 text-sm text-gray-900" data-testid={`asset-name-${index}`}>{asset.name}</td>
                     <td className="p-3 text-sm" data-testid={`is-matched-${index}`}>
                       {asset.matched ? (
                         <span className="text-green-600 font-medium">True</span>
                       ) : (
-                        <span className="text-slate-400">False</span>
+                        <span className="text-gray-400">False</span>
                       )}
                     </td>
                   </tr>
@@ -131,8 +131,8 @@ export const MapAssetsStep = (): JSX.Element => {
             </table>
           </div>
 
-          <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-t border-slate-200">
-            <div className="flex items-center gap-3 text-sm text-slate-700">
+          <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center gap-3 text-sm text-gray-700">
               <svg
                 width="16"
                 height="16"
@@ -168,7 +168,7 @@ export const MapAssetsStep = (): JSX.Element => {
                   />
                 </svg>
               </Button>
-              <span className="text-sm text-slate-700" data-testid="pagination-info">1 - 50 of 5,000</span>
+              <span className="text-sm text-gray-700" data-testid="pagination-info">1 - 50 of 5,000</span>
               <div className="flex">
                 <Button variant="ghost" size="sm" className="h-[34px] px-3 border-r" data-testid="pagination-prev-button">
                   <svg
