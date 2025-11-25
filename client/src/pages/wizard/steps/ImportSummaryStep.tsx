@@ -1,0 +1,374 @@
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+interface VulnerabilityFinding {
+  id: string;
+  name: string;
+  severity: "High" | "Critical";
+  status: "New" | "In Progress";
+  cvssScore: number;
+}
+
+const mockFindings: VulnerabilityFinding[] = [
+  {
+    id: "1",
+    name: "Security Updates for Microsoft SharePoint Server 2016 (January 2022)",
+    severity: "High",
+    status: "New",
+    cvssScore: 8,
+  },
+  {
+    id: "2",
+    name: "Missing or Permissive Content-Security-Policy frame-ancestors HTTP Response Header",
+    severity: "Critical",
+    status: "In Progress",
+    cvssScore: 9,
+  },
+  {
+    id: "3",
+    name: "Security Updates for Microsoft SharePoint Server 2016 (January 2022)",
+    severity: "High",
+    status: "New",
+    cvssScore: 8,
+  },
+  {
+    id: "4",
+    name: "Missing or Permissive Content-Security-Policy frame-ancestors HTTP Response Header",
+    severity: "Critical",
+    status: "In Progress",
+    cvssScore: 9,
+  },
+  {
+    id: "5",
+    name: "Security Updates for Microsoft SharePoint Server 2016 (January 2022)",
+    severity: "High",
+    status: "New",
+    cvssScore: 8,
+  },
+  {
+    id: "6",
+    name: "Missing or Permissive Content-Security-Policy frame-ancestors HTTP Response Header",
+    severity: "Critical",
+    status: "In Progress",
+    cvssScore: 9,
+  },
+  {
+    id: "7",
+    name: "Security Updates for Microsoft SharePoint Server 2016 (January 2022)",
+    severity: "High",
+    status: "New",
+    cvssScore: 8,
+  },
+  {
+    id: "8",
+    name: "Missing or Permissive Content-Security-Policy frame-ancestors HTTP Response Header",
+    severity: "Critical",
+    status: "In Progress",
+    cvssScore: 9,
+  },
+  {
+    id: "9",
+    name: "Security Updates for Microsoft SharePoint Server 2016 (January 2022)",
+    severity: "High",
+    status: "New",
+    cvssScore: 8,
+  },
+  {
+    id: "10",
+    name: "Missing or Permissive Content-Security-Policy frame-ancestors HTTP Response Header",
+    severity: "Critical",
+    status: "In Progress",
+    cvssScore: 9,
+  },
+];
+
+export const ImportSummaryStep = (): JSX.Element => {
+  return (
+    <div className="flex flex-col w-full">
+      <div className="flex flex-col gap-4 p-8 bg-white border-b border-slate-200">
+        <div className="flex items-start gap-8 w-full">
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold text-[#010818ed] mb-1">
+              Confirm import job summary
+            </h3>
+            <div className="flex items-center gap-2 text-sm text-slate-700 mb-2">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-green-600"
+              >
+                <circle cx="8" cy="8" r="7" fill="currentColor" />
+                <path
+                  d="M6 8.5L7.5 10L10.5 6.5"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span data-testid="import-summary-stats">
+                5,000 or more vulnerability findings will be imported from Tenable to AuditBoard
+              </span>
+            </div>
+            <p className="text-sm text-slate-600" data-testid="sample-limit-note">
+              Note: Vulnerabilities summarized below are limited to a sample of 5,000. However, all vulnerability assets under 10,000 records will be imported when the job is processed.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="Import Job Schedule"
+              className="w-[320px] h-[34px]"
+              data-testid="import-schedule-input"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col p-8">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1 max-w-[200px]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input
+                placeholder="Search"
+                className="h-[30px] pl-9"
+                data-testid="search-vulnerabilities-input"
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Badge
+                variant="secondary"
+                className="h-[30px] px-3 gap-2 bg-slate-100 hover:bg-slate-200"
+                data-testid="filter-severity"
+              >
+                <span className="text-sm">Severity: High, Critical</span>
+                <X className="w-3 h-3" />
+              </Badge>
+
+              <Badge
+                variant="secondary"
+                className="h-[30px] px-3 gap-2 bg-slate-100 hover:bg-slate-200"
+                data-testid="filter-status"
+              >
+                <span className="text-sm">Status: New, In Progress</span>
+                <X className="w-3 h-3" />
+              </Badge>
+
+              <Badge
+                variant="secondary"
+                className="h-[30px] px-3 gap-2 bg-slate-100 hover:bg-slate-200"
+                data-testid="filter-cvss"
+              >
+                <span className="text-sm">CVSS Score {">"} 9.0</span>
+                <X className="w-3 h-3" />
+              </Badge>
+
+              <Button
+                variant="outline"
+                className="h-[30px] px-3"
+                data-testid="add-filter-button"
+              >
+                <span className="text-sm">Add Filter</span>
+              </Button>
+            </div>
+
+            <Button
+              variant="ghost"
+              className="h-[30px] px-0 text-sm text-slate-700"
+              data-testid="clear-all-filters-button"
+            >
+              Clear All
+            </Button>
+          </div>
+
+          <div className="border border-slate-200 rounded-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full" data-testid="vulnerabilities-summary-table">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide w-[928px]">
+                      VULNERABILITY FINDING
+                    </th>
+                    <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide w-[200px]">
+                      SEVERITY
+                    </th>
+                    <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide w-[200px]">
+                      STATUS
+                    </th>
+                    <th className="text-left p-3 text-xs font-medium text-slate-700 tracking-wide w-[200px]">
+                      CVSS SCORE
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mockFindings.map((finding, index) => (
+                    <tr
+                      key={finding.id}
+                      className={`border-b border-slate-200 ${
+                        index % 2 === 0 ? "bg-white" : "bg-slate-50/30"
+                      }`}
+                      data-testid={`vulnerability-row-${index}`}
+                    >
+                      <td className="p-3 text-sm text-slate-900" data-testid={`vulnerability-name-${index}`}>
+                        {finding.name}
+                      </td>
+                      <td className="p-3 text-sm" data-testid={`vulnerability-severity-${index}`}>
+                        <span
+                          className={`font-medium ${
+                            finding.severity === "Critical"
+                              ? "text-red-600"
+                              : "text-orange-600"
+                          }`}
+                        >
+                          {finding.severity}
+                        </span>
+                      </td>
+                      <td className="p-3 text-sm text-slate-700" data-testid={`vulnerability-status-${index}`}>
+                        {finding.status}
+                      </td>
+                      <td className="p-3 text-sm text-slate-900" data-testid={`vulnerability-cvss-${index}`}>
+                        {finding.cvssScore}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-t border-slate-200">
+              <div className="flex items-center gap-3 text-sm text-slate-700">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="text-amber-600"
+                >
+                  <path
+                    d="M8 1L9.5 6H14.5L10.5 9L12 14L8 11L4 14L5.5 9L1.5 6H6.5L8 1Z"
+                    fill="currentColor"
+                  />
+                </svg>
+                <span data-testid="table-limit-message-summary">
+                  This table is limited to a sample of 5,000 rows
+                </span>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-[34px] px-3"
+                  data-testid="page-size-button-summary"
+                >
+                  <span className="text-sm">50</span>
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="ml-1"
+                  >
+                    <path
+                      d="M3 5L6 8L9 5"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </Button>
+                <span className="text-sm text-slate-700" data-testid="pagination-info-summary">
+                  1 - 50 of 5,000
+                </span>
+                <div className="flex">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-[34px] px-3 border-r"
+                    data-testid="pagination-prev-button-summary"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        d="M10 3L5 8L10 13"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-[34px] px-3"
+                    data-testid="pagination-next-button-summary"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        d="M6 3L11 8L6 13"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-slate-200">
+            <Button
+              variant="ghost"
+              className="h-auto p-0 gap-2 text-slate-700 hover:text-slate-900"
+              data-testid="previous-step-button-summary"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10 12L6 8l4-4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="text-sm">Previous</span>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

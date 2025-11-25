@@ -6,6 +6,7 @@ interface MultiStepFooterProps {
   onContinue: () => void;
   canContinue?: boolean;
   continueLabel?: string;
+  currentStep?: number;
 }
 
 export const MultiStepFooter = ({
@@ -13,7 +14,10 @@ export const MultiStepFooter = ({
   onContinue,
   canContinue = true,
   continueLabel = "Continue",
+  currentStep,
 }: MultiStepFooterProps): JSX.Element => {
+  const isLastStep = currentStep === 3;
+  const buttonLabel = isLastStep ? "Start Import" : continueLabel;
   return (
     <div className="bg-white flex items-start px-8 py-6 border-t border-slate-200">
       <div className="flex items-start justify-between w-full">
@@ -36,7 +40,7 @@ export const MultiStepFooter = ({
             data-testid="wizard-continue-button"
           >
             <span className="font-normal text-sm text-white text-center">
-              {continueLabel}
+              {buttonLabel}
             </span>
             <svg
               width="16"
