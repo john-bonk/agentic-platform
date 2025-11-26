@@ -600,7 +600,11 @@ function KeyDependenciesContent({ dependencies, ownerTeam }: { dependencies: Dep
     const apps = getApplicationsForTeam(ownerTeam);
     const vendorsList = getVendorsForApplications(apps);
     const locationsList = getLocationsForApplications(apps);
-    const teamsList = getTeamsUsingApplications(apps).filter(t => t.name !== ownerTeam);
+    
+    const ownerDepartment = getDepartmentForTeam(ownerTeam);
+    const teamsList = getTeamsUsingApplications(apps).filter(t => 
+      t.name !== ownerTeam && t.name !== ownerDepartment?.name
+    );
     
     return {
       itSystems: apps,
