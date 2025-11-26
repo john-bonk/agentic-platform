@@ -424,11 +424,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 -mb-[1px] transition-colors ${
-                    activeTab === tab
-                      ? "border-teal-600 text-teal-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700"
-                  }`}
+                  className="px-4 py-2 text-sm font-medium border-b-2 -mb-[1px] transition-colors border-teal-600 text-teal-600 pl-[2px] pr-[2px]"
                   data-testid={`tab-${tab.toLowerCase().replace(/\s+/g, '-')}`}
                 >
                   {tab}
