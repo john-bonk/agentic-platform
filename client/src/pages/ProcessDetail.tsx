@@ -623,70 +623,78 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
   };
 
   const sections = [
-    { key: "itSystems", label: "IT Systems", icon: "monitor", items: dependencies.itSystems },
-    { key: "personnel", label: "Personnel", icon: "users", items: dependencies.personnel },
-    { key: "vendors", label: "Vendors", icon: "building", items: dependencies.vendors },
-    { key: "locations", label: "Locations", icon: "map-pin", items: dependencies.locations },
-    { key: "otherProcesses", label: "Other Processes", icon: "git-branch", items: dependencies.otherProcesses },
+    { key: "itSystems", label: "IT Systems", items: dependencies.itSystems },
+    { key: "personnel", label: "Personnel", items: dependencies.personnel },
+    { key: "vendors", label: "Vendors", items: dependencies.vendors },
+    { key: "locations", label: "Locations", items: dependencies.locations },
+    { key: "otherProcesses", label: "Other Processes", items: dependencies.otherProcesses },
   ];
 
   return (
-    <div className="space-y-2">
-      {sections.map((section) => (
-        <div
-          key={section.key}
-          className={`border rounded-md overflow-hidden ${
-            expandedSections[section.key] ? "border-l-2 border-l-teal-500" : ""
-          }`}
-        >
-          <button
-            onClick={() => toggleSection(section.key)}
-            className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors"
-            data-testid={`accordion-${section.key}`}
+    <div className="flex flex-col gap-4">
+      {sections.map((section) => {
+        const isExpanded = expandedSections[section.key];
+        
+        return (
+          <div
+            key={section.key}
+            className="w-full"
           >
-            <div className="flex items-center gap-3">
-              <ChevronRight
-                className={`w-4 h-4 text-gray-400 transition-transform ${
-                  expandedSections[section.key] ? "rotate-90" : ""
-                }`}
-              />
-              <span className="font-medium text-sm">{section.label}</span>
-              <span className="text-xs text-gray-500">({section.items.length})</span>
-            </div>
-          </button>
-
-          {expandedSections[section.key] && (
-            <div className="border-t bg-gray-50">
-              {section.items.length > 0 ? (
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left text-xs text-gray-500 border-b">
-                      <th className="px-4 py-2 font-medium">Name</th>
-                      {section.key !== "otherProcesses" && (
-                        <th className="px-4 py-2 font-medium">Type</th>
-                      )}
-                      <th className="px-4 py-2 font-medium">Criticality</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {section.items.map((item, idx) => (
-                      <tr key={idx} className="border-b last:border-b-0 bg-white">
-                        <td className="px-4 py-3 text-sm">{item.name}</td>
-                        {section.key !== "otherProcesses" && (
-                          <td className="px-4 py-3 text-sm text-gray-500">{item.type || "-"}</td>
-                        )}
-                        <td className="px-4 py-3">{getCriticalityBadge(item.criticality)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <div className="px-4 py-3 text-sm text-gray-500">No items in this category</div>
+            <button
+              onClick={() => toggleSection(section.key)}
+              className={`w-full flex items-center h-10 border border-[#e2e8f0] ${
+                isExpanded 
+                  ? "bg-[#f3fafb] rounded-t" 
+                  : "bg-white rounded"
+              }`}
+              data-testid={`accordion-${section.key}`}
+            >
+              {isExpanded && (
+                <div className="w-1 h-10 bg-[#266c92] rounded-tl" />
               )}
-            </div>
-          )}
-        </div>
-      ))}
+              <div className={`flex items-center gap-4 ${isExpanded ? "pl-3" : "pl-4"} pr-3 flex-1`}>
+                <ChevronDown
+                  className={`w-3 h-3 text-[#64748b] transition-transform ${
+                    !isExpanded ? "-rotate-90" : ""
+                  }`}
+                />
+                <span className="font-bold text-sm text-[#0f172a]">{section.label}</span>
+              </div>
+            </button>
+
+            {isExpanded && (
+              <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white">
+                {section.items.length > 0 ? (
+                  <table className="w-full">
+                    <thead>
+                      <tr className="text-left text-xs text-gray-500 border-b">
+                        <th className="pb-2 font-medium">Name</th>
+                        {section.key !== "otherProcesses" && (
+                          <th className="pb-2 font-medium">Type</th>
+                        )}
+                        <th className="pb-2 font-medium">Criticality</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {section.items.map((item, idx) => (
+                        <tr key={idx} className="border-b last:border-b-0">
+                          <td className="py-2 text-sm text-[#0f172a]">{item.name}</td>
+                          {section.key !== "otherProcesses" && (
+                            <td className="py-2 text-sm text-[#64748b]">{item.type || "-"}</td>
+                          )}
+                          <td className="py-2">{getCriticalityBadge(item.criticality)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="text-sm text-gray-500">No items in this category</div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
