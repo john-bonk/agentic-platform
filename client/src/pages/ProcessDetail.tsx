@@ -612,24 +612,24 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
             <table className="w-full table-fixed">
               <thead>
                 <tr className="text-left text-xs text-gray-500 border-b">
-                  <th className="pb-2 font-medium w-[20%]">Name</th>
-                  <th className="pb-2 font-medium w-[30%]">Description</th>
-                  <th className="pb-2 font-medium w-[18%]">Recovery Timeframe Capability</th>
-                  <th className="pb-2 font-medium w-[14%]">Recovery Time Gap</th>
-                  <th className="pb-2 font-medium w-[18%]">Asset Owner</th>
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Name</th>
+                  <th className="pb-2 font-medium" style={{ width: "280px" }}>Description</th>
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Recovery Timeframe Capability</th>
+                  <th className="pb-2 font-medium" style={{ width: "120px" }}>Recovery Time Gap</th>
+                  <th className="pb-2 font-medium">Asset Owner</th>
                 </tr>
               </thead>
               <tbody>
                 {dependencies.itAssets.map((item, idx) => (
                   <tr key={idx} className="border-b last:border-b-0">
-                    <td className="py-2 text-sm">
+                    <td className="py-2 text-sm" style={{ width: "180px" }}>
                       <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-itAssets-${idx}`}>
                         {item.name}
                       </a>
                     </td>
-                    <td className="py-2 text-sm text-[#64748b]">{item.description}</td>
-                    <td className="py-2 text-sm text-[#64748b]">{item.recoveryTimeframe}</td>
-                    <td className="py-2"><RecoveryGapIcon gap={item.recoveryGap} /></td>
+                    <td className="py-2 text-sm text-[#64748b]" style={{ width: "280px" }}>{item.description}</td>
+                    <td className="py-2 text-sm text-[#64748b]" style={{ width: "180px" }}>{item.recoveryTimeframe}</td>
+                    <td className="py-2" style={{ width: "120px" }}><RecoveryGapIcon gap={item.recoveryGap} /></td>
                     <td className="py-2 text-sm">
                       <a href="#" className="text-[#266c92] hover:underline">{item.assetOwner}</a>
                     </td>
@@ -670,20 +670,20 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
             <table className="w-full table-fixed">
               <thead>
                 <tr className="text-left text-xs text-gray-500 border-b">
-                  <th className="pb-2 font-medium w-[25%]">Name</th>
-                  <th className="pb-2 font-medium w-[50%]">Description</th>
-                  <th className="pb-2 font-medium w-[25%]">Vendor Contact</th>
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Name</th>
+                  <th className="pb-2 font-medium" style={{ width: "280px" }}>Description</th>
+                  <th className="pb-2 font-medium">Vendor Contact</th>
                 </tr>
               </thead>
               <tbody>
                 {dependencies.vendors.map((item, idx) => (
                   <tr key={idx} className="border-b last:border-b-0">
-                    <td className="py-2 text-sm">
+                    <td className="py-2 text-sm" style={{ width: "180px" }}>
                       <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-vendors-${idx}`}>
                         {item.name}
                       </a>
                     </td>
-                    <td className="py-2 text-sm text-[#64748b]">{item.description}</td>
+                    <td className="py-2 text-sm text-[#64748b]" style={{ width: "280px" }}>{item.description}</td>
                     <td className="py-2 text-sm">
                       <a href="#" className="text-[#266c92] hover:underline">{item.vendorContact}</a>
                     </td>
@@ -724,22 +724,22 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
             <table className="w-full table-fixed">
               <thead>
                 <tr className="text-left text-xs text-gray-500 border-b">
-                  <th className="pb-2 font-medium w-[25%]">Name</th>
-                  <th className="pb-2 font-medium w-[40%]">Description</th>
-                  <th className="pb-2 font-medium w-[15%]">RTO</th>
-                  <th className="pb-2 font-medium w-[20%]">Process Owner</th>
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Name</th>
+                  <th className="pb-2 font-medium" style={{ width: "280px" }}>Description</th>
+                  <th className="pb-2 font-medium" style={{ width: "100px" }}>RTO</th>
+                  <th className="pb-2 font-medium">Process Owner</th>
                 </tr>
               </thead>
               <tbody>
                 {dependencies.businessProcesses.map((item, idx) => (
                   <tr key={idx} className="border-b last:border-b-0">
-                    <td className="py-2 text-sm">
+                    <td className="py-2 text-sm" style={{ width: "180px" }}>
                       <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-businessProcesses-${idx}`}>
                         {item.name}
                       </a>
                     </td>
-                    <td className="py-2 text-sm text-[#64748b]">{item.description}</td>
-                    <td className="py-2 text-sm">
+                    <td className="py-2 text-sm text-[#64748b]" style={{ width: "280px" }}>{item.description}</td>
+                    <td className="py-2 text-sm" style={{ width: "100px" }}>
                       <a href="#" className="text-[#266c92] hover:underline">{item.rto}</a>
                     </td>
                     <td className="py-2 text-sm">
@@ -782,14 +782,14 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
             <table className="w-full table-fixed">
               <thead>
                 <tr className="text-left text-xs text-gray-500 border-b">
-                  <th className="pb-2 font-medium w-[60%]">Name</th>
-                  <th className="pb-2 font-medium w-[40%]">Type</th>
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Name</th>
+                  <th className="pb-2 font-medium">Type</th>
                 </tr>
               </thead>
               <tbody>
                 {dependencies.branches.map((item, idx) => (
                   <tr key={idx} className="border-b last:border-b-0">
-                    <td className="py-2 text-sm">
+                    <td className="py-2 text-sm" style={{ width: "180px" }}>
                       <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-branches-${idx}`}>
                         {item.name}
                       </a>
