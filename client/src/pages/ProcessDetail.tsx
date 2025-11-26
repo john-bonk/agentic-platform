@@ -287,28 +287,6 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
 
               <div className="flex gap-2 items-center flex-shrink-0">
                 <Button
-                  className="h-[38px] gap-2 px-4 bg-teal-600 hover:bg-teal-600/90 border border-teal-600 text-white text-sm font-normal rounded"
-                  data-testid="send-questionnaire-button"
-                >
-                  Send Questionnaire
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-[38px] gap-2 px-4 text-sm font-normal rounded"
-                  data-testid="approved-button"
-                >
-                  Approved
-                  <ChevronDown className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-[38px] w-[38px]"
-                  data-testid="warning-button"
-                >
-                  <Triangle className="w-4 h-4 text-gray-500" />
-                </Button>
-                <Button
                   variant="outline"
                   size="icon"
                   className="h-[38px] w-[38px]"
