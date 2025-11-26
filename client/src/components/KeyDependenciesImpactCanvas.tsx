@@ -248,23 +248,6 @@ interface GenericItem {
   [key: string]: unknown;
 }
 
-interface CategoryConfig {
-  key: string;
-  label: string;
-  items: GenericItem[];
-  childCategory: string;
-}
-
-interface BlockMeasurement {
-  category: CategoryConfig;
-  isExpanded: boolean;
-  visibleItemCount: number;
-  hasMore: boolean;
-  blockHeight: number;
-  categoryY: number;
-  itemsStartY: number;
-}
-
 function generateMindMapData(
   processName: string, 
   dependencies: ImpactCanvasProps["dependencies"],
@@ -273,87 +256,72 @@ function generateMindMapData(
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
-  const CATEGORY_NODE_HEIGHT = 48;
-  const ITEM_NODE_HEIGHT = 44;
-  const ITEM_VERTICAL_GAP = 12;
-  const CATEGORY_VERTICAL_GAP = 32;
-  const ROOT_TO_CATEGORY_GAP = 180;
-  const CATEGORY_TO_ITEM_GAP = 160;
-  const MAX_VISIBLE_ITEMS = 5;
-  const ROOT_NODE_HEIGHT = 60;
+  const ITEM_HEIGHT = 48;
+  const ITEM_GAP = 8;
+  const CATEGORY_GAP = 40;
+  const MAX_ITEMS = 5;
+  
   const ROOT_X = 0;
+  const CATEGORY_X = 220;
+  const ITEM_X = 420;
 
-  const categories: CategoryConfig[] = [
+  const allCategories = [
     { key: "itAssets", label: "IT Assets", items: (dependencies.itAssets || []) as unknown as GenericItem[], childCategory: "itAsset" },
     { key: "vendors", label: "Vendors", items: (dependencies.vendors || []) as unknown as GenericItem[], childCategory: "vendor" },
     { key: "processes", label: "Business Processes", items: (dependencies.businessProcesses || []) as unknown as GenericItem[], childCategory: "process" },
     { key: "branches", label: "Locations", items: (dependencies.branches || []) as unknown as GenericItem[], childCategory: "branch" },
   ].filter(cat => cat.items.length > 0);
 
-  const measurements: BlockMeasurement[] = categories.map(cat => {
+  let currentY = 0;
+  const categoryPositions: { key: string; y: number; itemsStartY: number; itemCount: number }[] = [];
+
+  allCategories.forEach((cat, catIndex) => {
     const isExpanded = expanded[cat.key as keyof ExpandedState];
-    const visibleItemCount = isExpanded ? Math.min(cat.items.length, MAX_VISIBLE_ITEMS) : 0;
-    const hasMore = isExpanded && cat.items.length > MAX_VISIBLE_ITEMS;
-    const totalItemsShown = visibleItemCount + (hasMore ? 1 : 0);
+    const visibleItems = isExpanded ? Math.min(cat.items.length, MAX_ITEMS) : 0;
+    const hasMore = isExpanded && cat.items.length > MAX_ITEMS;
+    const totalRows = visibleItems + (hasMore ? 1 : 0);
     
-    let blockHeight: number;
-    if (isExpanded && totalItemsShown > 0) {
-      blockHeight = totalItemsShown * ITEM_NODE_HEIGHT + (totalItemsShown - 1) * ITEM_VERTICAL_GAP;
-      blockHeight = Math.max(blockHeight, CATEGORY_NODE_HEIGHT);
-    } else {
-      blockHeight = CATEGORY_NODE_HEIGHT;
-    }
+    const blockHeight = isExpanded && totalRows > 0 
+      ? totalRows * ITEM_HEIGHT + (totalRows - 1) * ITEM_GAP
+      : ITEM_HEIGHT;
 
-    return {
-      category: cat,
-      isExpanded,
-      visibleItemCount,
-      hasMore,
-      blockHeight,
-      categoryY: 0,
-      itemsStartY: 0,
-    };
+    const categoryY = currentY + blockHeight / 2 - ITEM_HEIGHT / 2;
+    
+    categoryPositions.push({
+      key: cat.key,
+      y: categoryY,
+      itemsStartY: currentY,
+      itemCount: totalRows
+    });
+
+    currentY += blockHeight + CATEGORY_GAP;
   });
 
-  let totalHeight = 0;
-  measurements.forEach((m, idx) => {
-    m.categoryY = totalHeight + m.blockHeight / 2 - CATEGORY_NODE_HEIGHT / 2;
-    m.itemsStartY = totalHeight;
-    totalHeight += m.blockHeight;
-    if (idx < measurements.length - 1) {
-      totalHeight += CATEGORY_VERTICAL_GAP;
-    }
-  });
+  const totalHeight = currentY - CATEGORY_GAP;
+  const rootY = totalHeight / 2 - ITEM_HEIGHT / 2;
 
-  const rootY = (totalHeight - ROOT_NODE_HEIGHT) / 2;
-  
   nodes.push({
     id: "root",
     type: "root",
-    position: { x: ROOT_X, y: rootY },
-    data: {
-      id: "root",
-      label: processName,
-      highlighted: false,
-    },
+    position: { x: ROOT_X, y: Math.max(0, rootY) },
+    data: { id: "root", label: processName, highlighted: false },
   });
 
-  const CATEGORY_X = ROOT_X + ROOT_TO_CATEGORY_GAP;
-  const ITEM_X = CATEGORY_X + CATEGORY_TO_ITEM_GAP;
-
-  measurements.forEach((m) => {
-    const categoryId = `cat-${m.category.key}`;
+  allCategories.forEach((cat, catIndex) => {
+    const pos = categoryPositions[catIndex];
+    const categoryId = `cat-${cat.key}`;
+    const isExpanded = expanded[cat.key as keyof ExpandedState];
 
     nodes.push({
       id: categoryId,
       type: "category",
-      position: { x: CATEGORY_X, y: m.categoryY },
+      position: { x: CATEGORY_X, y: pos.y },
       data: {
         id: categoryId,
-        label: m.category.label,
-        childCategory: m.category.childCategory,
-        expanded: m.isExpanded,
-        count: m.category.items.length,
+        label: cat.label,
+        childCategory: cat.childCategory,
+        expanded: isExpanded,
+        count: cat.items.length,
         highlighted: false,
       },
     });
@@ -366,22 +334,22 @@ function generateMindMapData(
       style: { stroke: "#94a3b8", strokeWidth: 2 },
     });
 
-    if (m.isExpanded) {
-      const itemsToShow = m.category.items.slice(0, MAX_VISIBLE_ITEMS);
-      const totalItemsShown = itemsToShow.length + (m.hasMore ? 1 : 0);
-      
+    if (isExpanded) {
+      const itemsToShow = cat.items.slice(0, MAX_ITEMS);
+      const hasMore = cat.items.length > MAX_ITEMS;
+
       itemsToShow.forEach((item, itemIdx) => {
-        const itemId = `${m.category.key}-${itemIdx}`;
-        const itemY = m.itemsStartY + itemIdx * (ITEM_NODE_HEIGHT + ITEM_VERTICAL_GAP);
+        const itemId = `${cat.key}-${itemIdx}`;
+        const itemY = pos.itemsStartY + itemIdx * (ITEM_HEIGHT + ITEM_GAP);
 
         let subLabel = "";
-        if (m.category.childCategory === "branch" && "type" in item) {
+        if (cat.childCategory === "branch" && "type" in item) {
           subLabel = String(item.type || "");
-        } else if (m.category.childCategory === "process" && "rto" in item) {
+        } else if (cat.childCategory === "process" && "rto" in item) {
           subLabel = `RTO: ${String(item.rto || "")}`;
-        } else if (m.category.childCategory === "itAsset") {
+        } else if (cat.childCategory === "itAsset") {
           subLabel = "IT Asset";
-        } else if (m.category.childCategory === "vendor") {
+        } else if (cat.childCategory === "vendor") {
           subLabel = "Vendor";
         }
 
@@ -393,7 +361,7 @@ function generateMindMapData(
             id: itemId,
             label: item.name.length > 20 ? item.name.substring(0, 18) + "..." : item.name,
             fullName: item.name,
-            category: m.category.childCategory,
+            category: cat.childCategory,
             subLabel,
             highlighted: false,
           },
@@ -408,9 +376,9 @@ function generateMindMapData(
         });
       });
 
-      if (m.hasMore) {
-        const moreId = `${m.category.key}-more`;
-        const moreY = m.itemsStartY + itemsToShow.length * (ITEM_NODE_HEIGHT + ITEM_VERTICAL_GAP);
+      if (hasMore) {
+        const moreId = `${cat.key}-more`;
+        const moreY = pos.itemsStartY + itemsToShow.length * (ITEM_HEIGHT + ITEM_GAP);
         
         nodes.push({
           id: moreId,
@@ -418,8 +386,8 @@ function generateMindMapData(
           position: { x: ITEM_X, y: moreY },
           data: {
             id: moreId,
-            label: `+${m.category.items.length - MAX_VISIBLE_ITEMS} more`,
-            category: m.category.childCategory,
+            label: `+${cat.items.length - MAX_ITEMS} more`,
+            category: cat.childCategory,
             subLabel: "",
             highlighted: false,
           },
@@ -459,7 +427,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
     const { nodes: newNodes, edges: newEdges } = generateMindMapData(processName, dependencies, expanded);
     setNodes(newNodes);
     setEdges(newEdges);
-    setTimeout(() => fitView({ padding: 0.15, duration: 300 }), 100);
+    setTimeout(() => fitView({ padding: 0.1, duration: 250 }), 50);
   }, [expanded, processName, dependencies, setNodes, setEdges, fitView]);
 
   const onNodeClick = useCallback(
@@ -523,7 +491,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
         },
       }))
     );
-    setTimeout(() => fitView({ padding: 0.15 }), 50);
+    setTimeout(() => fitView({ padding: 0.1 }), 50);
   }, [fitView, setNodes, setEdges]);
 
   const handleExpandAll = useCallback(() => {
@@ -535,7 +503,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
   }, []);
 
   return (
-    <div className="relative w-full h-[380px] bg-gradient-to-br from-slate-50 to-white border border-[#e2e8f0] rounded-md mb-6" data-testid="impact-canvas">
+    <div className="relative w-full h-[400px] bg-gradient-to-br from-slate-50 to-white border border-[#e2e8f0] rounded-md mb-6" data-testid="impact-canvas">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -544,7 +512,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.15 }}
+        fitViewOptions={{ padding: 0.1 }}
         minZoom={0.3}
         maxZoom={1.5}
         proOptions={{ hideAttribution: true }}
