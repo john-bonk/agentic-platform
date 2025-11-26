@@ -243,6 +243,28 @@ interface ExpandedState {
   branches: boolean;
 }
 
+interface GenericItem {
+  name: string;
+  [key: string]: unknown;
+}
+
+interface CategoryConfig {
+  key: string;
+  label: string;
+  items: GenericItem[];
+  childCategory: string;
+}
+
+interface BlockMeasurement {
+  category: CategoryConfig;
+  isExpanded: boolean;
+  visibleItemCount: number;
+  hasMore: boolean;
+  blockHeight: number;
+  categoryY: number;
+  itemsStartY: number;
+}
+
 function generateMindMapData(
   processName: string, 
   dependencies: ImpactCanvasProps["dependencies"],
@@ -251,38 +273,62 @@ function generateMindMapData(
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
-  const itemSpacing = 52;
-  const horizontalGap = 200;
-  const categoryNodeHeight = 45;
+  const CATEGORY_NODE_HEIGHT = 48;
+  const ITEM_NODE_HEIGHT = 44;
+  const ITEM_VERTICAL_GAP = 12;
+  const CATEGORY_VERTICAL_GAP = 32;
+  const HORIZONTAL_GAP_BASE = 220;
+  const MAX_VISIBLE_ITEMS = 5;
+  const ROOT_NODE_HEIGHT = 60;
 
-  const categories = [
-    { key: "itAssets", label: "IT Assets", items: dependencies.itAssets || [], childCategory: "itAsset" },
-    { key: "vendors", label: "Vendors", items: dependencies.vendors || [], childCategory: "vendor" },
-    { key: "processes", label: "Business Processes", items: dependencies.businessProcesses || [], childCategory: "process" },
-    { key: "branches", label: "Locations", items: dependencies.branches || [], childCategory: "branch" },
+  const categories: CategoryConfig[] = [
+    { key: "itAssets", label: "IT Assets", items: (dependencies.itAssets || []) as unknown as GenericItem[], childCategory: "itAsset" },
+    { key: "vendors", label: "Vendors", items: (dependencies.vendors || []) as unknown as GenericItem[], childCategory: "vendor" },
+    { key: "processes", label: "Business Processes", items: (dependencies.businessProcesses || []) as unknown as GenericItem[], childCategory: "process" },
+    { key: "branches", label: "Locations", items: (dependencies.branches || []) as unknown as GenericItem[], childCategory: "branch" },
   ].filter(cat => cat.items.length > 0);
 
-  let categoryYPositions: number[] = [];
-  let currentY = 0;
-
-  categories.forEach((cat, idx) => {
+  const measurements: BlockMeasurement[] = categories.map(cat => {
     const isExpanded = expanded[cat.key as keyof ExpandedState];
-    const itemCount = Math.min(cat.items.length, 5);
-    const categoryHeight = isExpanded 
-      ? Math.max(categoryNodeHeight, itemCount * itemSpacing)
-      : categoryNodeHeight;
+    const visibleItemCount = isExpanded ? Math.min(cat.items.length, MAX_VISIBLE_ITEMS) : 0;
+    const hasMore = isExpanded && cat.items.length > MAX_VISIBLE_ITEMS;
+    const totalItemsShown = visibleItemCount + (hasMore ? 1 : 0);
     
-    categoryYPositions.push(currentY + categoryHeight / 2);
-    currentY += categoryHeight + 20;
+    let blockHeight: number;
+    if (isExpanded && totalItemsShown > 0) {
+      blockHeight = totalItemsShown * ITEM_NODE_HEIGHT + (totalItemsShown - 1) * ITEM_VERTICAL_GAP;
+      blockHeight = Math.max(blockHeight, CATEGORY_NODE_HEIGHT);
+    } else {
+      blockHeight = CATEGORY_NODE_HEIGHT;
+    }
+
+    return {
+      category: cat,
+      isExpanded,
+      visibleItemCount,
+      hasMore,
+      blockHeight,
+      categoryY: 0,
+      itemsStartY: 0,
+    };
   });
 
-  const totalHeight = currentY - 20;
-  const rootY = totalHeight / 2;
+  let totalHeight = 0;
+  measurements.forEach((m, idx) => {
+    m.categoryY = totalHeight + m.blockHeight / 2 - CATEGORY_NODE_HEIGHT / 2;
+    m.itemsStartY = totalHeight;
+    totalHeight += m.blockHeight;
+    if (idx < measurements.length - 1) {
+      totalHeight += CATEGORY_VERTICAL_GAP;
+    }
+  });
 
+  const rootY = (totalHeight - ROOT_NODE_HEIGHT) / 2;
+  
   nodes.push({
     id: "root",
     type: "root",
-    position: { x: 0, y: rootY - 25 },
+    position: { x: 0, y: rootY },
     data: {
       id: "root",
       label: processName,
@@ -290,27 +336,19 @@ function generateMindMapData(
     },
   });
 
-  currentY = 0;
-  categories.forEach((cat, catIdx) => {
-    const categoryId = `cat-${cat.key}`;
-    const isExpanded = expanded[cat.key as keyof ExpandedState];
-    const itemCount = Math.min(cat.items.length, 5);
-    const categoryHeight = isExpanded 
-      ? Math.max(categoryNodeHeight, itemCount * itemSpacing)
-      : categoryNodeHeight;
-
-    const categoryY = currentY + categoryHeight / 2 - categoryNodeHeight / 2;
+  measurements.forEach((m) => {
+    const categoryId = `cat-${m.category.key}`;
 
     nodes.push({
       id: categoryId,
       type: "category",
-      position: { x: horizontalGap, y: categoryY },
+      position: { x: HORIZONTAL_GAP_BASE, y: m.categoryY },
       data: {
         id: categoryId,
-        label: cat.label,
-        childCategory: cat.childCategory,
-        expanded: isExpanded,
-        count: cat.items.length,
+        label: m.category.label,
+        childCategory: m.category.childCategory,
+        expanded: m.isExpanded,
+        count: m.category.items.length,
         highlighted: false,
       },
     });
@@ -323,35 +361,34 @@ function generateMindMapData(
       style: { stroke: "#94a3b8", strokeWidth: 2 },
     });
 
-    if (isExpanded) {
-      const itemsToShow = cat.items.slice(0, 5);
-      const itemBlockHeight = itemsToShow.length * itemSpacing;
-      const itemStartY = currentY + (categoryHeight - itemBlockHeight) / 2;
-
+    if (m.isExpanded) {
+      const itemsToShow = m.category.items.slice(0, MAX_VISIBLE_ITEMS);
+      const totalItemsShown = itemsToShow.length + (m.hasMore ? 1 : 0);
+      
       itemsToShow.forEach((item, itemIdx) => {
-        const itemId = `${cat.key}-${itemIdx}`;
-        const itemY = itemStartY + itemIdx * itemSpacing;
+        const itemId = `${m.category.key}-${itemIdx}`;
+        const itemY = m.itemsStartY + itemIdx * (ITEM_NODE_HEIGHT + ITEM_VERTICAL_GAP);
 
         let subLabel = "";
-        if (cat.childCategory === "branch" && "type" in item) {
-          subLabel = (item as BranchItem).type;
-        } else if (cat.childCategory === "process" && "rto" in item) {
-          subLabel = `RTO: ${(item as BusinessProcessItem).rto}`;
-        } else if (cat.childCategory === "itAsset") {
+        if (m.category.childCategory === "branch" && "type" in item) {
+          subLabel = String(item.type || "");
+        } else if (m.category.childCategory === "process" && "rto" in item) {
+          subLabel = `RTO: ${String(item.rto || "")}`;
+        } else if (m.category.childCategory === "itAsset") {
           subLabel = "IT Asset";
-        } else if (cat.childCategory === "vendor") {
+        } else if (m.category.childCategory === "vendor") {
           subLabel = "Vendor";
         }
 
         nodes.push({
           id: itemId,
           type: "item",
-          position: { x: horizontalGap * 2 + 20, y: itemY },
+          position: { x: HORIZONTAL_GAP_BASE * 2, y: itemY },
           data: {
             id: itemId,
             label: item.name.length > 20 ? item.name.substring(0, 18) + "..." : item.name,
             fullName: item.name,
-            category: cat.childCategory,
+            category: m.category.childCategory,
             subLabel,
             highlighted: false,
           },
@@ -366,20 +403,23 @@ function generateMindMapData(
         });
       });
 
-      if (cat.items.length > 5) {
-        const moreId = `${cat.key}-more`;
+      if (m.hasMore) {
+        const moreId = `${m.category.key}-more`;
+        const moreY = m.itemsStartY + itemsToShow.length * (ITEM_NODE_HEIGHT + ITEM_VERTICAL_GAP);
+        
         nodes.push({
           id: moreId,
           type: "item",
-          position: { x: horizontalGap * 2 + 20, y: itemStartY + 5 * itemSpacing },
+          position: { x: HORIZONTAL_GAP_BASE * 2, y: moreY },
           data: {
             id: moreId,
-            label: `+${cat.items.length - 5} more`,
-            category: cat.childCategory,
+            label: `+${m.category.items.length - MAX_VISIBLE_ITEMS} more`,
+            category: m.category.childCategory,
             subLabel: "",
             highlighted: false,
           },
         });
+        
         edges.push({
           id: `edge-${categoryId}-${moreId}`,
           source: categoryId,
@@ -389,8 +429,6 @@ function generateMindMapData(
         });
       }
     }
-
-    currentY += categoryHeight + 20;
   });
 
   return { nodes, edges };
@@ -416,7 +454,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
     const { nodes: newNodes, edges: newEdges } = generateMindMapData(processName, dependencies, expanded);
     setNodes(newNodes);
     setEdges(newEdges);
-    setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 50);
+    setTimeout(() => fitView({ padding: 0.15, duration: 300 }), 100);
   }, [expanded, processName, dependencies, setNodes, setEdges, fitView]);
 
   const onNodeClick = useCallback(
@@ -480,7 +518,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
         },
       }))
     );
-    setTimeout(() => fitView({ padding: 0.2 }), 50);
+    setTimeout(() => fitView({ padding: 0.15 }), 50);
   }, [fitView, setNodes, setEdges]);
 
   const handleExpandAll = useCallback(() => {
@@ -492,7 +530,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
   }, []);
 
   return (
-    <div className="relative w-full h-[340px] bg-gradient-to-br from-slate-50 to-white border border-[#e2e8f0] rounded-md mb-6" data-testid="impact-canvas">
+    <div className="relative w-full h-[380px] bg-gradient-to-br from-slate-50 to-white border border-[#e2e8f0] rounded-md mb-6" data-testid="impact-canvas">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -501,8 +539,8 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.4}
+        fitViewOptions={{ padding: 0.15 }}
+        minZoom={0.3}
         maxZoom={1.5}
         proOptions={{ hideAttribution: true }}
       >
