@@ -1,18 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { importJobStore, type ImportJob } from "@/lib/importJobStore";
 import { useToast } from "@/hooks/use-toast";
-
-const tabItems = [
-  { label: "Workflow Library", value: "workflow" },
-  { label: "Import Library", value: "import" },
-  { label: "Permissions", value: "permissions" },
-  { label: "Installation", value: "installation" },
-];
 
 const tableHeaders = [
   { label: "ENABLED", width: "w-20" },
@@ -56,58 +48,28 @@ export const MainContentSection = (): JSX.Element => {
 
   return (
     <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white">
-      <header className="flex flex-col gap-2 pt-6 pb-0 px-8 w-full bg-white">
-        {/* Level 1: Subhead + Heading + Actions */}
-        <div className="flex gap-3 items-start w-full">
-          {/* Text Section */}
-          <div className="flex flex-col flex-1 gap-1 items-start justify-center">
-            {/* Heading with Badge */}
-            <div className="flex items-center gap-2 w-full">
-              <h1 className="text-xl font-semibold text-gray-900 leading-[1.2]">
-                Tenable
-              </h1>
-              <Badge className="h-4 bg-gray-200/60 text-gray-700 hover:bg-gray-200/60 rounded-full px-1.5 py-0 text-[10px] font-semibold">
-                Valid
-              </Badge>
-            </div>
+      <header className="flex flex-col gap-2 py-8 px-8 w-full bg-white border-b border-[rgba(1,55,126,0.11)]">
+        <div className="flex gap-4 items-start w-full">
+          {/* Title */}
+          <div className="flex flex-1 flex-col justify-center">
+            <h1 className="text-[32px] font-semibold text-gray-900 leading-[1.33]" data-testid="page-title">
+              Business Processes
+            </h1>
           </div>
 
           {/* Action Bar */}
-          <div className="flex items-end gap-1">
+          <div className="flex gap-1 items-start">
             <Button
-              variant="outline"
-              className="h-8 gap-1.5 px-2.5 bg-white border border-gray-300 text-gray-900 text-[13px] font-normal rounded"
-              data-testid="object-header-docs-button"
+              className="h-[38px] gap-2 px-4 bg-teal-600 hover:bg-teal-600/90 border border-teal-600 text-white text-sm font-normal rounded"
+              data-testid="create-button"
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-70">
-                <path d="M2 3.5C2 2.67157 2.67157 2 3.5 2H12.5C13.3284 2 14 2.67157 14 3.5V12.5C14 13.3284 13.3284 14 12.5 14H3.5C2.67157 14 2 13.3284 2 12.5V3.5Z" stroke="currentColor" strokeWidth="1.25" />
-                <path d="M5 5H11" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-                <path d="M5 8H11" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-                <path d="M5 11H8" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 3V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                <path d="M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
-              Tenable Documentation
+              Create
             </Button>
           </div>
-        </div>
-
-        {/* Level 2: Tabs */}
-        <div className="pt-2 w-full">
-          <Tabs
-            defaultValue="import"
-            className="w-full"
-          >
-            <TabsList className="h-9 bg-transparent p-0 gap-3 border-b border-gray-200 w-full justify-start rounded-none">
-              {tabItems.map((tab) => (
-                <TabsTrigger
-                  key={tab.value}
-                  value={tab.value}
-                  className="h-9 px-0.5 pb-1 rounded-none bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none border-b-[3px] border-transparent data-[state=active]:border-teal-500 text-sm font-semibold text-gray-600 data-[state=active]:text-teal-500"
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
         </div>
       </header>
 
