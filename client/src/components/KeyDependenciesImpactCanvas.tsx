@@ -14,61 +14,118 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Button } from "@/components/ui/button";
-import { RefreshCcw, Server, Database, Globe, Shield, Cloud, ChevronRight } from "lucide-react";
+import { RefreshCcw, Server, Database, Globe, Building2, MapPin, ChevronRight } from "lucide-react";
+
+interface ITAsset {
+  name: string;
+  description: string;
+}
+
+interface VendorItem {
+  name: string;
+  description: string;
+}
+
+interface BusinessProcessItem {
+  name: string;
+  description: string;
+  rto: string;
+  processOwner: string;
+}
+
+interface BranchItem {
+  name: string;
+  type: string;
+}
 
 interface ImpactCanvasProps {
   processName: string;
   dependencies: {
-    itAssets: { name: string; description: string }[];
-    vendors: { name: string; description: string }[];
+    itAssets: ITAsset[];
+    vendors: VendorItem[];
+    businessProcesses?: BusinessProcessItem[];
+    branches?: BranchItem[];
   };
 }
 
 const getCategoryIcon = (category: string) => {
   switch (category) {
     case "root":
-      return <Cloud className="w-4 h-4 text-orange-500" />;
-    case "infrastructure":
+      return <Globe className="w-4 h-4 text-orange-500" />;
+    case "itAsset":
       return <Server className="w-4 h-4 text-blue-500" />;
-    case "service":
-      return <Shield className="w-4 h-4 text-blue-600" />;
-    case "application":
-      return <Globe className="w-4 h-4 text-blue-500" />;
-    case "endpoint":
-      return <Database className="w-4 h-4 text-blue-400" />;
+    case "vendor":
+      return <Building2 className="w-4 h-4 text-purple-500" />;
+    case "process":
+      return <Database className="w-4 h-4 text-teal-500" />;
+    case "branch":
+      return <MapPin className="w-4 h-4 text-green-500" />;
     default:
       return <Server className="w-4 h-4 text-gray-500" />;
   }
 };
 
+const getCategoryColor = (category: string, isHighlighted: boolean) => {
+  if (isHighlighted) return "border-blue-500 bg-blue-50";
+  switch (category) {
+    case "root":
+      return "border-orange-300 bg-orange-50";
+    case "itAsset":
+      return "border-blue-200 bg-blue-50/50";
+    case "vendor":
+      return "border-purple-200 bg-purple-50/50";
+    case "process":
+      return "border-teal-200 bg-teal-50/50";
+    case "branch":
+      return "border-green-200 bg-green-50/50";
+    default:
+      return "border-gray-200 bg-white";
+  }
+};
+
+const getIconBgColor = (category: string, isHighlighted: boolean) => {
+  if (isHighlighted) return "bg-blue-100";
+  switch (category) {
+    case "root":
+      return "bg-orange-100";
+    case "itAsset":
+      return "bg-blue-100";
+    case "vendor":
+      return "bg-purple-100";
+    case "process":
+      return "bg-teal-100";
+    case "branch":
+      return "bg-green-100";
+    default:
+      return "bg-gray-100";
+  }
+};
+
 const CustomNode = ({ data }: NodeProps) => {
   const isHighlighted = data.highlighted;
-  const isRoot = data.category === "root";
 
   return (
     <div
-      className={`px-3 py-2 rounded-md border-2 transition-all ${
-        isHighlighted
-          ? "border-blue-500 bg-blue-50 shadow-lg"
-          : isRoot
-          ? "border-orange-300 bg-orange-50"
-          : "border-gray-200 bg-white"
-      }`}
-      style={{ minWidth: "160px" }}
+      className={`px-3 py-2 rounded-md border-2 transition-all shadow-sm ${getCategoryColor(data.category, isHighlighted)}`}
+      style={{ minWidth: "150px", maxWidth: "180px" }}
       data-testid={`flow-node-${data.id}`}
     >
       <Handle type="target" position={Position.Left} className="!bg-gray-400 !w-2 !h-2" />
       <div className="flex items-center gap-2">
-        <div className={`p-1.5 rounded ${isHighlighted ? "bg-blue-100" : isRoot ? "bg-orange-100" : "bg-gray-100"}`}>
+        <div className={`p-1.5 rounded ${getIconBgColor(data.category, isHighlighted)}`}>
           {getCategoryIcon(data.category)}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-gray-900 truncate">{data.label}</div>
-          <div className="text-xs text-gray-500">{data.type}</div>
+          <div className="text-xs font-medium text-gray-900 truncate">{data.label}</div>
+          <div className="text-[10px] text-gray-500">{data.type}</div>
         </div>
-        <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+        {data.category !== "root" && (
+          <ChevronRight className="w-3 h-3 text-gray-400 flex-shrink-0" />
+        )}
       </div>
-      <div className="mt-1 text-xs text-gray-400">via {data.relationship || "powers"}</div>
+      {data.relationship && (
+        <div className="mt-1 text-[10px] text-gray-400">via {data.relationship}</div>
+      )}
       <Handle type="source" position={Position.Right} className="!bg-gray-400 !w-2 !h-2" />
     </div>
   );
@@ -83,196 +140,159 @@ function generateCascadeData(processName: string, dependencies: ImpactCanvasProp
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
-  const horizontalSpacing = 220;
-  const verticalSpacing = 90;
+  const horizontalSpacing = 200;
+  const verticalSpacing = 80;
 
   nodes.push({
     id: "root",
     type: "custom",
-    position: { x: 0, y: 120 },
+    position: { x: 0, y: 150 },
     data: {
       id: "root",
       label: processName,
       type: "Business Process",
       category: "root",
-      relationship: "powers",
+      relationship: null,
       highlighted: false,
     },
   });
 
-  const itAssets = dependencies.itAssets.slice(0, 3);
+  let currentLevel = 1;
+  let yOffset = 0;
+
+  const itAssets = dependencies.itAssets || [];
+  const itAssetStartY = 0;
   itAssets.forEach((asset, idx) => {
-    const infrastructureId = `infra-${idx}`;
-    const yOffset = idx * verticalSpacing;
-    
+    const nodeId = `itAsset-${idx}`;
     nodes.push({
-      id: infrastructureId,
+      id: nodeId,
       type: "custom",
-      position: { x: horizontalSpacing, y: yOffset + 40 },
+      position: { x: horizontalSpacing * currentLevel, y: itAssetStartY + idx * verticalSpacing },
       data: {
-        id: infrastructureId,
-        label: asset.name.length > 20 ? asset.name.substring(0, 18) + "..." : asset.name,
-        type: "IT System",
-        category: "infrastructure",
+        id: nodeId,
+        label: asset.name.length > 22 ? asset.name.substring(0, 20) + "..." : asset.name,
+        type: "IT Asset",
+        category: "itAsset",
         relationship: "powers",
         highlighted: false,
       },
     });
-    
     edges.push({
-      id: `edge-root-${infrastructureId}`,
+      id: `edge-root-${nodeId}`,
       source: "root",
-      target: infrastructureId,
-      label: "powers",
+      target: nodeId,
       type: "smoothstep",
       animated: false,
       style: { stroke: "#94a3b8", strokeWidth: 1.5 },
-      labelStyle: { fontSize: 10, fill: "#64748b" },
-      labelBgStyle: { fill: "white", fillOpacity: 0.8 },
     });
-
-    if (idx === 0) {
-      const serviceId = `service-${idx}`;
-      nodes.push({
-        id: serviceId,
-        type: "custom",
-        position: { x: horizontalSpacing * 2, y: 0 },
-        data: {
-          id: serviceId,
-          label: "Auth Service",
-          type: "IT System",
-          category: "service",
-          relationship: "powers",
-          highlighted: false,
-        },
-      });
-      edges.push({
-        id: `edge-${infrastructureId}-${serviceId}`,
-        source: infrastructureId,
-        target: serviceId,
-        label: "powers",
-        type: "smoothstep",
-        animated: false,
-        style: { stroke: "#94a3b8", strokeWidth: 1.5 },
-        labelStyle: { fontSize: 10, fill: "#64748b" },
-        labelBgStyle: { fill: "white", fillOpacity: 0.8 },
-      });
-
-      const appId = `app-${idx}`;
-      nodes.push({
-        id: appId,
-        type: "custom",
-        position: { x: horizontalSpacing * 3, y: 60 },
-        data: {
-          id: appId,
-          label: "Web Applications",
-          type: "IT System",
-          category: "application",
-          relationship: "enables",
-          highlighted: false,
-        },
-      });
-      edges.push({
-        id: `edge-${serviceId}-${appId}`,
-        source: serviceId,
-        target: appId,
-        label: "enables",
-        type: "smoothstep",
-        animated: false,
-        style: { stroke: "#94a3b8", strokeWidth: 1.5 },
-        labelStyle: { fontSize: 10, fill: "#64748b" },
-        labelBgStyle: { fill: "white", fillOpacity: 0.8 },
-      });
-
-      const endpoints = ["Marketing Website", "Analytics Dashboard", "Product API", "Developer Docs", "Deploy Pipeline"];
-      endpoints.forEach((name, endIdx) => {
-        const endpointId = `endpoint-${idx}-${endIdx}`;
-        nodes.push({
-          id: endpointId,
-          type: "custom",
-          position: { x: horizontalSpacing * 4, y: endIdx * 75 - 40 },
-          data: {
-            id: endpointId,
-            label: name,
-            type: "IT System",
-            category: "endpoint",
-            relationship: "enables",
-            highlighted: false,
-          },
-        });
-        edges.push({
-          id: `edge-${appId}-${endpointId}`,
-          source: appId,
-          target: endpointId,
-          label: "enables",
-          type: "smoothstep",
-          animated: false,
-          style: { stroke: "#94a3b8", strokeWidth: 1.5 },
-          labelStyle: { fontSize: 10, fill: "#64748b" },
-          labelBgStyle: { fill: "white", fillOpacity: 0.8 },
-        });
-      });
-    } else if (idx === 1) {
-      const dbId = `db-${idx}`;
-      nodes.push({
-        id: dbId,
-        type: "custom",
-        position: { x: horizontalSpacing * 2, y: verticalSpacing + 40 },
-        data: {
-          id: dbId,
-          label: "Primary Database",
-          type: "IT System",
-          category: "service",
-          relationship: "powers",
-          highlighted: false,
-        },
-      });
-      edges.push({
-        id: `edge-${infrastructureId}-${dbId}`,
-        source: infrastructureId,
-        target: dbId,
-        label: "powers",
-        type: "smoothstep",
-        animated: false,
-        style: { stroke: "#94a3b8", strokeWidth: 1.5 },
-        labelStyle: { fontSize: 10, fill: "#64748b" },
-        labelBgStyle: { fill: "white", fillOpacity: 0.8 },
-      });
-    } else {
-      const cdnId = `cdn-${idx}`;
-      nodes.push({
-        id: cdnId,
-        type: "custom",
-        position: { x: horizontalSpacing * 2, y: verticalSpacing * 2 + 40 },
-        data: {
-          id: cdnId,
-          label: "Asset CDN",
-          type: "IT System",
-          category: "service",
-          relationship: "powers",
-          highlighted: false,
-        },
-      });
-      edges.push({
-        id: `edge-${infrastructureId}-${cdnId}`,
-        source: infrastructureId,
-        target: cdnId,
-        label: "powers",
-        type: "smoothstep",
-        animated: false,
-        style: { stroke: "#94a3b8", strokeWidth: 1.5 },
-        labelStyle: { fontSize: 10, fill: "#64748b" },
-        labelBgStyle: { fill: "white", fillOpacity: 0.8 },
-      });
-    }
   });
+  yOffset = itAssets.length * verticalSpacing;
+
+  currentLevel = 2;
+
+  const vendors = dependencies.vendors || [];
+  vendors.forEach((vendor, idx) => {
+    const nodeId = `vendor-${idx}`;
+    const connectedItAsset = itAssets.length > 0 ? `itAsset-${Math.min(idx, itAssets.length - 1)}` : "root";
+    
+    nodes.push({
+      id: nodeId,
+      type: "custom",
+      position: { x: horizontalSpacing * currentLevel, y: idx * verticalSpacing },
+      data: {
+        id: nodeId,
+        label: vendor.name.length > 22 ? vendor.name.substring(0, 20) + "..." : vendor.name,
+        type: "Vendor",
+        category: "vendor",
+        relationship: "provides",
+        highlighted: false,
+      },
+    });
+    edges.push({
+      id: `edge-${connectedItAsset}-${nodeId}`,
+      source: connectedItAsset,
+      target: nodeId,
+      type: "smoothstep",
+      animated: false,
+      style: { stroke: "#94a3b8", strokeWidth: 1.5 },
+    });
+  });
+
+  currentLevel = 3;
+
+  const businessProcesses = dependencies.businessProcesses || [];
+  businessProcesses.forEach((proc, idx) => {
+    const nodeId = `process-${idx}`;
+    const connectedVendor = vendors.length > 0 ? `vendor-${Math.min(idx, vendors.length - 1)}` : 
+                           itAssets.length > 0 ? `itAsset-${Math.min(idx, itAssets.length - 1)}` : "root";
+    
+    nodes.push({
+      id: nodeId,
+      type: "custom",
+      position: { x: horizontalSpacing * currentLevel, y: idx * verticalSpacing },
+      data: {
+        id: nodeId,
+        label: proc.name.length > 22 ? proc.name.substring(0, 20) + "..." : proc.name,
+        type: "Business Process",
+        category: "process",
+        relationship: "depends on",
+        highlighted: false,
+      },
+    });
+    edges.push({
+      id: `edge-${connectedVendor}-${nodeId}`,
+      source: connectedVendor,
+      target: nodeId,
+      type: "smoothstep",
+      animated: false,
+      style: { stroke: "#94a3b8", strokeWidth: 1.5 },
+    });
+  });
+
+  currentLevel = 4;
+
+  const branches = dependencies.branches || [];
+  branches.forEach((branch, idx) => {
+    const nodeId = `branch-${idx}`;
+    const connectedProcess = businessProcesses.length > 0 ? `process-${Math.min(idx, businessProcesses.length - 1)}` :
+                            vendors.length > 0 ? `vendor-${Math.min(idx, vendors.length - 1)}` :
+                            itAssets.length > 0 ? `itAsset-${Math.min(idx, itAssets.length - 1)}` : "root";
+    
+    nodes.push({
+      id: nodeId,
+      type: "custom",
+      position: { x: horizontalSpacing * currentLevel, y: idx * verticalSpacing },
+      data: {
+        id: nodeId,
+        label: branch.name.length > 22 ? branch.name.substring(0, 20) + "..." : branch.name,
+        type: branch.type,
+        category: "branch",
+        relationship: "operates at",
+        highlighted: false,
+      },
+    });
+    edges.push({
+      id: `edge-${connectedProcess}-${nodeId}`,
+      source: connectedProcess,
+      target: nodeId,
+      type: "smoothstep",
+      animated: false,
+      style: { stroke: "#94a3b8", strokeWidth: 1.5 },
+    });
+  });
+
+  const maxItems = Math.max(itAssets.length, vendors.length, businessProcesses.length, branches.length, 1);
+  const totalHeight = maxItems * verticalSpacing;
+  const rootNode = nodes.find(n => n.id === "root");
+  if (rootNode) {
+    rootNode.position.y = (totalHeight - verticalSpacing) / 2;
+  }
 
   return { nodes, edges };
 }
 
 function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
   const { fitView } = useReactFlow();
-  const [highlightedPath, setHighlightedPath] = useState<Set<string>>(new Set());
 
   const { initialNodes, initialEdges } = useMemo(() => {
     const cascadeData = generateCascadeData(processName, dependencies);
@@ -313,7 +333,6 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
       const connectedNodes = findConnectedNodes(node.id, edges);
-      setHighlightedPath(connectedNodes);
 
       setNodes((nds) =>
         nds.map((n) => ({
@@ -341,7 +360,6 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
   );
 
   const handleResetView = useCallback(() => {
-    setHighlightedPath(new Set());
     setNodes((nds) =>
       nds.map((n) => ({
         ...n,
@@ -366,7 +384,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
   }, [fitView, setNodes, setEdges]);
 
   return (
-    <div className="relative w-full h-[300px] bg-white border border-[#e2e8f0] rounded-md mb-6" data-testid="impact-canvas">
+    <div className="relative w-full h-[280px] bg-white border border-[#e2e8f0] rounded-md mb-6" data-testid="impact-canvas">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -375,7 +393,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
+        fitViewOptions={{ padding: 0.3 }}
         minZoom={0.3}
         maxZoom={1.5}
         proOptions={{ hideAttribution: true }}

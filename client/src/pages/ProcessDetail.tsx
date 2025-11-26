@@ -644,6 +644,13 @@ function KeyDependenciesContent({ dependencies, ownerTeam, processName }: { depe
         dependencies={{
           itAssets: dependencies.itAssets.map(a => ({ name: a.name, description: a.description })),
           vendors: dependencies.vendors.map(v => ({ name: v.name, description: v.description })),
+          businessProcesses: dependencies.businessProcesses.map(p => ({ 
+            name: p.name, 
+            description: p.description, 
+            rto: p.rto, 
+            processOwner: p.processOwner 
+          })),
+          branches: dependencies.branches.map(b => ({ name: b.name, type: b.type })),
         }}
       />
 
