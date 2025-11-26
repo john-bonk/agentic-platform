@@ -106,41 +106,41 @@ const getVendorLogo = (name: string) => {
   if (normalizedName.includes("okta")) return <SiOkta className="w-4 h-4 text-[#007DC1]" />;
   if (normalizedName.includes("oracle")) return <SiOracle className="w-4 h-4 text-[#F80000]" />;
   
-  return <FaBuilding className="w-4 h-4 text-purple-500" />;
+  return <FaBuilding className="w-4 h-4 text-gray-500" />;
 };
 
 const getCategoryIcon = (category: CategoryType) => {
   switch (category) {
     case "root":
-      return <Globe className="w-4 h-4 text-orange-500" />;
+      return <Globe className="w-4 h-4 text-gray-500" />;
     case "itAsset":
-      return <Server className="w-4 h-4 text-blue-500" />;
+      return <Server className="w-4 h-4 text-gray-500" />;
     case "vendor":
-      return <Building2 className="w-4 h-4 text-purple-500" />;
+      return <Building2 className="w-4 h-4 text-gray-500" />;
     case "process":
-      return <Database className="w-4 h-4 text-teal-500" />;
+      return <Database className="w-4 h-4 text-gray-500" />;
     case "branch":
-      return <MapPin className="w-4 h-4 text-green-500" />;
+      return <MapPin className="w-4 h-4 text-gray-500" />;
     default:
       return <Server className="w-4 h-4 text-gray-500" />;
   }
 };
 
 const getCategoryColors = (category: CategoryType, isHighlighted: boolean) => {
-  if (isHighlighted) return { border: "border-blue-500", bg: "bg-blue-50", iconBg: "bg-blue-100" };
+  if (isHighlighted) return { border: "border-gray-400", bg: "bg-gray-100", iconBg: "bg-gray-200" };
   switch (category) {
     case "root":
-      return { border: "border-orange-400", bg: "bg-orange-50", iconBg: "bg-orange-100" };
+      return { border: "border-gray-300", bg: "bg-white", iconBg: "bg-gray-100" };
     case "category":
-      return { border: "border-gray-300", bg: "bg-gray-50", iconBg: "bg-gray-100" };
+      return { border: "border-gray-300", bg: "bg-white", iconBg: "bg-gray-100" };
     case "itAsset":
-      return { border: "border-blue-300", bg: "bg-blue-50/70", iconBg: "bg-blue-100" };
+      return { border: "border-gray-200", bg: "bg-white", iconBg: "bg-gray-100" };
     case "vendor":
-      return { border: "border-purple-300", bg: "bg-purple-50/70", iconBg: "bg-purple-100" };
+      return { border: "border-gray-200", bg: "bg-white", iconBg: "bg-gray-100" };
     case "process":
-      return { border: "border-teal-300", bg: "bg-teal-50/70", iconBg: "bg-teal-100" };
+      return { border: "border-gray-200", bg: "bg-white", iconBg: "bg-gray-100" };
     case "branch":
-      return { border: "border-green-300", bg: "bg-green-50/70", iconBg: "bg-green-100" };
+      return { border: "border-gray-200", bg: "bg-white", iconBg: "bg-gray-100" };
     default:
       return { border: "border-gray-200", bg: "bg-white", iconBg: "bg-gray-100" };
   }
@@ -154,10 +154,10 @@ const RootNode = ({ data }: NodeProps) => {
       style={{ minWidth: "180px" }}
       data-testid={`flow-node-${data.id}`}
     >
-      <Handle type="source" position={Position.Right} className="!bg-orange-400 !w-3 !h-3" />
+      <Handle type="source" position={Position.Right} className="!bg-gray-400 !w-3 !h-3" />
       <div className="flex items-center gap-3">
         <div className={`p-2 rounded-lg ${colors.iconBg}`}>
-          <Globe className="w-5 h-5 text-orange-500" />
+          <Globe className="w-5 h-5 text-gray-500" />
         </div>
         <div>
           <div className="text-sm font-semibold text-gray-900">{data.label}</div>
