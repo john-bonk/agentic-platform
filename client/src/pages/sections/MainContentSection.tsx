@@ -266,10 +266,10 @@ export const MainContentSection = (): JSX.Element => {
                       </div>
                       <div className="w-[100px] lg:w-[120px] flex-shrink-0 px-3">
                         <Badge
-                          className={`text-xs font-medium px-2 py-0.5 rounded ${
+                          className={`text-[10px] font-semibold px-1.5 py-0 rounded-full ${
                             process.criticality === "High"
-                              ? "bg-red-100 text-red-700 hover:bg-red-100"
-                              : "bg-green-100 text-green-700 hover:bg-green-100"
+                              ? "bg-[#db3535] text-white hover:bg-[#db3535]"
+                              : "bg-[#36844a] text-white hover:bg-[#36844a]"
                           }`}
                           data-testid={`criticality-badge-${process.id}`}
                         >

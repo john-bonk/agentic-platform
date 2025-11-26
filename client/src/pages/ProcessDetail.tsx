@@ -340,10 +340,10 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-gray-500 uppercase">Criticality</span>
                 <Badge
-                  className={`text-xs font-medium px-2 py-0.5 rounded ${
+                  className={`text-[10px] font-semibold px-1.5 py-0 rounded-full ${
                     process.criticality === "High"
-                      ? "bg-red-100 text-red-700 hover:bg-red-100"
-                      : "bg-green-100 text-green-700 hover:bg-green-100"
+                      ? "bg-[#db3535] text-white hover:bg-[#db3535]"
+                      : "bg-[#36844a] text-white hover:bg-[#36844a]"
                   }`}
                   data-testid="criticality-value"
                 >
@@ -456,7 +456,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-sm text-gray-500">Financial Impact</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full w-fit" data-testid="bia-financial-impact">
+                    <Badge className="bg-[#db3535] text-white hover:bg-[#db3535] text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit" data-testid="bia-financial-impact">
                       High
                     </Badge>
                   </div>
@@ -465,7 +465,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-sm text-gray-500">Operational Impact</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full w-fit" data-testid="bia-operational-impact">
+                    <Badge className="bg-[#db3535] text-white hover:bg-[#db3535] text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit" data-testid="bia-operational-impact">
                       High
                     </Badge>
                   </div>
@@ -474,7 +474,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-sm text-gray-500">Reputational Impact</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full w-fit" data-testid="bia-reputational-impact">
+                    <Badge className="bg-[#db3535] text-white hover:bg-[#db3535] text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit" data-testid="bia-reputational-impact">
                       High
                     </Badge>
                   </div>
@@ -483,7 +483,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-sm text-gray-500">Legal Impact</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full w-fit" data-testid="bia-legal-impact">
+                    <Badge className="bg-[#db3535] text-white hover:bg-[#db3535] text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit" data-testid="bia-legal-impact">
                       High
                     </Badge>
                   </div>
@@ -492,7 +492,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-sm text-gray-500">Regulatory Impact</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full w-fit" data-testid="bia-regulatory-impact">
+                    <Badge className="bg-[#db3535] text-white hover:bg-[#db3535] text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit" data-testid="bia-regulatory-impact">
                       High
                     </Badge>
                   </div>
