@@ -62,11 +62,11 @@ function BCPTableView({ bcps, processId }: { bcps: BusinessContinuityPlan[]; pro
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-slate-900">Business Continuity Plans</h3>
         <Button 
-          size="sm" 
           onClick={() => navigate(`/create-bcp/${processId}`)}
+          className="h-[38px] gap-2 px-4 bg-teal-500 hover:bg-teal-500/90 border border-teal-500 text-white text-sm font-normal rounded"
           data-testid="button-add-bcp"
         >
-          <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
+          <PlusCircle className="w-4 h-4" />
           Add Plan
         </Button>
       </div>
