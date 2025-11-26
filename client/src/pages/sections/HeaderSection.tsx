@@ -38,12 +38,6 @@ const tabs = [
     text: "AS.IN.1.C18 Peachtree Invento",
     active: false,
   },
-  {
-    icon: "plug",
-    width: "w-36",
-    text: "Tenable",
-    active: true,
-  },
 ];
 
 const utilityIcons = [

@@ -1,63 +1,76 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
+import { RefreshCcw } from "lucide-react";
 import { HeaderSection } from "./sections/HeaderSection";
 import { MainContentSection } from "./sections/MainContentSection";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
 
-const navigationIcons = [
+type NavigationIcon = 
+  | { type: "image"; src: string; alt: string; active: boolean }
+  | { type: "lucide"; icon: "refresh-ccw"; alt: string; active: boolean };
+
+const navigationIcons: NavigationIcon[] = [
   {
+    type: "image",
     src: "/figmaAssets/module-dashboard-.svg",
     alt: "Module dashboard",
     active: false,
   },
   {
+    type: "image",
     src: "/figmaAssets/module-controls-.svg",
     alt: "Module controls",
     active: false,
   },
-  { src: "/figmaAssets/module-risk-.svg", alt: "Module risk", active: false },
-  { src: "/figmaAssets/module-esg-.svg", alt: "Module esg", active: false },
+  { type: "image", src: "/figmaAssets/module-risk-.svg", alt: "Module risk", active: false },
+  { type: "image", src: "/figmaAssets/module-esg-.svg", alt: "Module esg", active: false },
   {
+    type: "image",
     src: "/figmaAssets/module-crosscomply-.svg",
     alt: "Module crosscomply",
     active: false,
   },
   {
+    type: "image",
     src: "/figmaAssets/module-opsaudit.svg",
     alt: "Module opsaudit",
     active: false,
   },
-  { src: "/figmaAssets/module-tprm.svg", alt: "Module tprm", active: false },
-  { src: "/figmaAssets/vector.svg", alt: "Vector", active: false },
-  { src: "/figmaAssets/files.svg", alt: "Files", active: false },
+  { type: "image", src: "/figmaAssets/module-tprm.svg", alt: "Module tprm", active: false },
+  { type: "lucide", icon: "refresh-ccw", alt: "BCM", active: true },
+  { type: "image", src: "/figmaAssets/files.svg", alt: "Files", active: false },
   {
+    type: "image",
     src: "/figmaAssets/module-report-.svg",
     alt: "Module report",
     active: false,
   },
   {
+    type: "image",
     src: "/figmaAssets/module-workstream-.svg",
     alt: "Module workstream",
     active: false,
   },
   {
+    type: "image",
     src: "/figmaAssets/module-automations-.svg",
     alt: "Module automations",
     active: false,
   },
-  { src: "/figmaAssets/plug.svg", alt: "Plug", active: true },
+  { type: "image", src: "/figmaAssets/plug.svg", alt: "Plug", active: false },
   {
+    type: "image",
     src: "/figmaAssets/module-issues.svg",
     alt: "Module issues",
     active: false,
   },
-  { src: "/figmaAssets/module-files.svg", alt: "Module files", active: false },
+  { type: "image", src: "/figmaAssets/module-files.svg", alt: "Module files", active: false },
   {
+    type: "image",
     src: "/figmaAssets/module-timesheets.svg",
     alt: "Module timesheets",
     active: false,
   },
   {
+    type: "image",
     src: "/figmaAssets/module-settings-.svg",
     alt: "Module settings",
     active: false,
@@ -89,19 +102,16 @@ export const Integrations = (): JSX.Element => {
               }`}
               data-testid={`navbar-icon-${index}`}
             >
-              <img className="w-4 h-4" alt={icon.alt} src={icon.src} />
+              {icon.type === "lucide" ? (
+                <RefreshCcw className="w-4 h-4 text-white" />
+              ) : (
+                <img className="w-4 h-4" alt={icon.alt} src={icon.src} />
+              )}
             </div>
           ))}
         </nav>
 
         <div className="flex flex-col items-center gap-1">
-          <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-settings">
-            <img
-              className="w-4 h-4"
-              alt="Settings"
-              src="/figmaAssets/gear.svg"
-            />
-          </div>
           <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-support">
             <img
               className="w-4 h-4"
