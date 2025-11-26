@@ -51,6 +51,8 @@ export const HeaderSection = ({ activeProcess }: HeaderSectionProps): JSX.Elemen
   useEffect(() => {
     if (activeProcess) {
       openTab(activeProcess);
+    } else {
+      setActiveTab(null);
     }
   }, [activeProcess?.id]);
   

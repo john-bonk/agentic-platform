@@ -10,7 +10,7 @@ interface TabStore {
   activeTabId: string | null;
   openTab: (tab: ProcessTab) => void;
   closeTab: (id: string) => void;
-  setActiveTab: (id: string) => void;
+  setActiveTab: (id: string | null) => void;
 }
 
 export const useTabStore = create<TabStore>((set, get) => ({
@@ -50,7 +50,7 @@ export const useTabStore = create<TabStore>((set, get) => ({
     });
   },
   
-  setActiveTab: (id: string) => {
+  setActiveTab: (id: string | null) => {
     set({ activeTabId: id });
   },
 }));
