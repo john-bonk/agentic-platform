@@ -277,9 +277,11 @@ function generateMindMapData(
   const ITEM_NODE_HEIGHT = 44;
   const ITEM_VERTICAL_GAP = 12;
   const CATEGORY_VERTICAL_GAP = 32;
-  const HORIZONTAL_GAP_BASE = 220;
+  const ROOT_TO_CATEGORY_GAP = 180;
+  const CATEGORY_TO_ITEM_GAP = 160;
   const MAX_VISIBLE_ITEMS = 5;
   const ROOT_NODE_HEIGHT = 60;
+  const ROOT_X = 0;
 
   const categories: CategoryConfig[] = [
     { key: "itAssets", label: "IT Assets", items: (dependencies.itAssets || []) as unknown as GenericItem[], childCategory: "itAsset" },
@@ -328,7 +330,7 @@ function generateMindMapData(
   nodes.push({
     id: "root",
     type: "root",
-    position: { x: 0, y: rootY },
+    position: { x: ROOT_X, y: rootY },
     data: {
       id: "root",
       label: processName,
@@ -336,13 +338,16 @@ function generateMindMapData(
     },
   });
 
+  const CATEGORY_X = ROOT_X + ROOT_TO_CATEGORY_GAP;
+  const ITEM_X = CATEGORY_X + CATEGORY_TO_ITEM_GAP;
+
   measurements.forEach((m) => {
     const categoryId = `cat-${m.category.key}`;
 
     nodes.push({
       id: categoryId,
       type: "category",
-      position: { x: HORIZONTAL_GAP_BASE, y: m.categoryY },
+      position: { x: CATEGORY_X, y: m.categoryY },
       data: {
         id: categoryId,
         label: m.category.label,
@@ -383,7 +388,7 @@ function generateMindMapData(
         nodes.push({
           id: itemId,
           type: "item",
-          position: { x: HORIZONTAL_GAP_BASE * 2, y: itemY },
+          position: { x: ITEM_X, y: itemY },
           data: {
             id: itemId,
             label: item.name.length > 20 ? item.name.substring(0, 18) + "..." : item.name,
@@ -410,7 +415,7 @@ function generateMindMapData(
         nodes.push({
           id: moreId,
           type: "item",
-          position: { x: HORIZONTAL_GAP_BASE * 2, y: moreY },
+          position: { x: ITEM_X, y: moreY },
           data: {
             id: moreId,
             label: `+${m.category.items.length - MAX_VISIBLE_ITEMS} more`,
