@@ -66,9 +66,7 @@ export function BCPEmptyState({ onCreateNew }: BCPEmptyStateProps) {
             <button
               className="h-7 px-2 bg-white dark:bg-slate-800 border border-[#cbd5e1] dark:border-slate-600 rounded text-[13px] text-[#0f172a] dark:text-slate-100 leading-[1.35] hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               data-testid="button-view-template"
-            >
-              View Template
-            </button>
+            >Import</button>
             <button
               onClick={onCreateNew}
               className="h-7 px-2 bg-[#266c92] border border-[#266c92] rounded text-[13px] text-white leading-[1.35] hover:bg-[#1e5a7a] transition-colors"
