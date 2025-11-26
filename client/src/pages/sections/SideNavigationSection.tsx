@@ -17,9 +17,7 @@ export const SideNavigationSection = (): JSX.Element => {
         <header className="flex items-center justify-between pl-6 pr-2 py-6 relative self-stretch w-full flex-[0_0_auto]">
           <div className="flex flex-col items-start justify-center relative flex-1 grow">
             <div className="flex items-start relative self-stretch w-full flex-[0_0_auto]">
-              <h1 className="relative font-semibold text-gray-900 text-lg leading-[1.2]" data-testid="navigation-title">
-                Integrations
-              </h1>
+              <h1 className="relative font-semibold text-gray-900 text-lg leading-[1.2]" data-testid="navigation-title">BCM</h1>
             </div>
           </div>
 
