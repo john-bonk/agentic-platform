@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { useLocation, useRoute } from "wouter";
-import { X, PlusCircle, Download, Check } from "lucide-react";
+import { useLocation, useRoute, Link } from "wouter";
+import { X, PlusCircle, Download, Check, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getProcessById } from "@/data/businessProcessData";
+import { SideNavigationSection } from "./sections/SideNavigationSection";
+import { HeaderSection } from "./sections/HeaderSection";
 
 type WizardStep = 1 | 2 | 3;
 
@@ -23,6 +25,30 @@ const BASE_PLAN_OWNERS = [
   { value: "michael-chen", label: "Michael Chen" },
   { value: "emily-davis", label: "Emily Davis" },
   { value: "david-wilson", label: "David Wilson" },
+];
+
+type NavigationIcon = 
+  | { type: "image"; src: string; alt: string; active: boolean }
+  | { type: "lucide"; icon: "refresh-ccw"; alt: string; active: boolean };
+
+const navigationIcons: NavigationIcon[] = [
+  { type: "image", src: "/figmaAssets/module-dashboard-.svg", alt: "Module dashboard", active: false },
+  { type: "image", src: "/figmaAssets/module-controls-.svg", alt: "Module controls", active: false },
+  { type: "image", src: "/figmaAssets/module-risk-.svg", alt: "Module risk", active: false },
+  { type: "image", src: "/figmaAssets/module-esg-.svg", alt: "Module esg", active: false },
+  { type: "image", src: "/figmaAssets/module-crosscomply-.svg", alt: "Module crosscomply", active: false },
+  { type: "image", src: "/figmaAssets/module-opsaudit.svg", alt: "Module opsaudit", active: false },
+  { type: "image", src: "/figmaAssets/module-tprm.svg", alt: "Module tprm", active: false },
+  { type: "lucide", icon: "refresh-ccw", alt: "BCM", active: true },
+  { type: "image", src: "/figmaAssets/files.svg", alt: "Files", active: false },
+  { type: "image", src: "/figmaAssets/module-report-.svg", alt: "Module report", active: false },
+  { type: "image", src: "/figmaAssets/module-workstream-.svg", alt: "Module workstream", active: false },
+  { type: "image", src: "/figmaAssets/module-automations-.svg", alt: "Module automations", active: false },
+  { type: "image", src: "/figmaAssets/plug.svg", alt: "Plug", active: false },
+  { type: "image", src: "/figmaAssets/module-issues.svg", alt: "Module issues", active: false },
+  { type: "image", src: "/figmaAssets/module-files.svg", alt: "Module files", active: false },
+  { type: "image", src: "/figmaAssets/module-timesheets.svg", alt: "Module timesheets", active: false },
+  { type: "image", src: "/figmaAssets/module-settings-.svg", alt: "Module settings", active: false },
 ];
 
 interface StepIndicatorProps {
@@ -106,6 +132,56 @@ function PlanTypeCard({ type, selected, onSelect }: PlanTypeCardProps) {
         </p>
       </div>
     </button>
+  );
+}
+
+function LeftNavbar() {
+  return (
+    <aside
+      className="flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 bg-gray-900 sticky top-0 h-screen z-50 flex-shrink-0"
+      data-testid="side-navbar"
+    >
+      <nav className="flex flex-col items-center gap-1 relative flex-[0_0_auto]">
+        <Link href="/">
+          <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-logo">
+            <img
+              className="w-7 h-auto"
+              alt="AuditBoard Logo"
+              src="/figmaAssets/auditboard-logo.png?v=2"
+            />
+          </div>
+        </Link>
+
+        {navigationIcons.map((icon, index) => (
+          <div
+            key={index}
+            className={`w-10 h-10 rounded flex items-center justify-center ${
+              icon.active ? "bg-teal-500" : ""
+            }`}
+            data-testid={`navbar-icon-${index}`}
+          >
+            {icon.type === "lucide" ? (
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                <RefreshCcw className="w-4 h-4 text-white absolute" />
+                <Check className="w-2 h-2 text-white" strokeWidth={3} />
+              </div>
+            ) : (
+              <img className={`w-4 h-4 ${icon.alt === "Plug" ? "opacity-50" : ""}`} alt={icon.alt} src={icon.src} />
+            )}
+          </div>
+        ))}
+      </nav>
+
+      <div className="flex flex-col items-center gap-1">
+        <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-support">
+          <img
+            className="w-4 h-4"
+            alt="Support"
+            src="/figmaAssets/circle-question-.svg"
+          />
+        </div>
+      </div>
+    </aside>
   );
 }
 
@@ -250,78 +326,87 @@ export function BCPWizardPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-slate-900">
-      {/* Header */}
-      <div className="flex flex-col gap-8 pt-8 px-8 bg-white dark:bg-slate-900">
-        <div className="flex items-start justify-between gap-4">
-          <h1 className="text-2xl font-semibold text-[rgba(1,8,24,0.93)] dark:text-white">
-            Create new Business Continuity Plan
-          </h1>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleClose}
-            className="text-slate-500 hover:text-slate-700"
-            data-testid="button-close-wizard"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
+    <div className="flex h-screen w-full bg-background" data-testid="bcp-wizard-page">
+      <LeftNavbar />
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <HeaderSection activeProcess={process || undefined} />
+        <div className="flex items-stretch relative flex-1 self-stretch w-full grow">
+          <SideNavigationSection />
+          <div className="flex flex-col relative flex-1 self-stretch grow bg-white min-w-0" style={{ maxHeight: "calc(100vh - 60px)" }}>
+            {/* Wizard Header */}
+            <div className="flex flex-col gap-8 pt-8 px-8 bg-white border-b border-gray-200">
+              <div className="flex items-start justify-between gap-4">
+                <h1 className="text-2xl font-semibold text-[rgba(1,8,24,0.93)]">
+                  Create new Business Continuity Plan
+                </h1>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleClose}
+                  className="text-slate-500 hover:text-slate-700"
+                  data-testid="button-close-wizard"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
 
-        {/* Step Indicator */}
-        <div className="flex gap-8 items-start relative overflow-hidden">
-          {/* Connecting line */}
-          <div className="absolute top-3 left-0 right-0 h-px bg-[#01377e] z-0" />
-          
-          {STEP_LABELS.map((label, index) => (
-            <div key={label} className="z-10">
-              <StepIndicator
-                step={(index + 1) as WizardStep}
-                currentStep={currentStep}
-                label={label}
-              />
+              {/* Step Indicator */}
+              <div className="flex gap-8 items-start relative overflow-hidden pb-6">
+                {/* Connecting line */}
+                <div className="absolute top-3 left-0 right-0 h-px bg-[#01377e] z-0" />
+                
+                {STEP_LABELS.map((label, index) => (
+                  <div key={label} className="z-10">
+                    <StepIndicator
+                      step={(index + 1) as WizardStep}
+                      currentStep={currentStep}
+                      label={label}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto px-8 pt-8 pb-20">
-        {renderStepContent()}
-      </div>
+            {/* Wizard Content */}
+            <div className="flex-1 overflow-y-auto px-8 pt-8 pb-20">
+              {renderStepContent()}
+            </div>
 
-      {/* Footer */}
-      <div className="bg-white dark:bg-slate-900 px-8 py-6 border-t border-slate-200 dark:border-slate-700">
-        <div className="flex items-center justify-between w-[700px]">
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              className="h-10 px-3 border-[rgba(14,59,113,0.21)] text-[rgba(1,8,24,0.93)] dark:text-white"
-              data-testid="button-cancel"
-            >
-              Cancel
-            </Button>
-            {currentStep > 1 && (
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                className="h-10 px-3 border-[rgba(14,59,113,0.21)] text-[rgba(1,8,24,0.93)] dark:text-white"
-                data-testid="button-back"
-              >
-                Back
-              </Button>
-            )}
+            {/* Wizard Footer */}
+            <div className="bg-white px-8 py-6 border-t border-slate-200">
+              <div className="flex items-center justify-between w-[700px]">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={handleClose}
+                    className="h-10 px-3 border-[rgba(14,59,113,0.21)] text-[rgba(1,8,24,0.93)]"
+                    data-testid="button-cancel"
+                  >
+                    Cancel
+                  </Button>
+                  {currentStep > 1 && (
+                    <Button
+                      variant="outline"
+                      onClick={handleBack}
+                      className="h-10 px-3 border-[rgba(14,59,113,0.21)] text-[rgba(1,8,24,0.93)]"
+                      data-testid="button-back"
+                    >
+                      Back
+                    </Button>
+                  )}
+                </div>
+
+                <Button
+                  onClick={handleNext}
+                  disabled={currentStep === 1 && !isStep1Valid}
+                  className="h-10 px-3 bg-[#266c92] hover:bg-[#1e5a7a] text-white"
+                  data-testid="button-next"
+                >
+                  {currentStep === 3 ? "Complete" : "Next"}
+                </Button>
+              </div>
+            </div>
           </div>
-
-          <Button
-            onClick={handleNext}
-            disabled={currentStep === 1 && !isStep1Valid}
-            className="h-10 px-3 bg-[#266c92] hover:bg-[#1e5a7a] text-white"
-            data-testid="button-next"
-          >
-            {currentStep === 3 ? "Complete" : "Next"}
-          </Button>
         </div>
       </div>
     </div>
