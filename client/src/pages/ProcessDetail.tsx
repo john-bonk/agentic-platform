@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, MoreHorizontal, Triangle, RefreshCcw, Check, Link2 } from "lucide-react";
 import { HeaderSection } from "./sections/HeaderSection";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
+import { KeyDependenciesImpactCanvas } from "@/components/KeyDependenciesImpactCanvas";
 import { 
   getApplicationsForTeam, 
   getVendorsForApplications, 
@@ -584,7 +585,7 @@ interface SemanticRelationships {
   deploymentLocations: Location[];
 }
 
-function KeyDependenciesContent({ dependencies, ownerTeam }: { dependencies: Dependencies; ownerTeam: string }) {
+function KeyDependenciesContent({ dependencies, ownerTeam, processName }: { dependencies: Dependencies; ownerTeam: string; processName: string }) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     itAssets: true,
     vendors: false,
@@ -637,6 +638,15 @@ function KeyDependenciesContent({ dependencies, ownerTeam }: { dependencies: Dep
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Impact Cascade Canvas */}
+      <KeyDependenciesImpactCanvas
+        processName={processName}
+        dependencies={{
+          itAssets: dependencies.itAssets.map(a => ({ name: a.name, description: a.description })),
+          vendors: dependencies.vendors.map(v => ({ name: v.name, description: v.description })),
+        }}
+      />
+
       {/* IT Assets Section */}
       <div className="w-full">
         <button
@@ -1207,7 +1217,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
             )}
 
             {activeTab === "Key Dependencies" && process.dependencies && (
-              <KeyDependenciesContent dependencies={process.dependencies} ownerTeam={process.ownerTeam} />
+              <KeyDependenciesContent dependencies={process.dependencies} ownerTeam={process.ownerTeam} processName={process.name} />
             )}
 
             {activeTab === "Business Continuity Plan" && (
