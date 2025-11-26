@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
 import { Integrations } from "@/pages/Integrations";
+import { ProcessDetail } from "@/pages/ProcessDetail";
 import { VulnerabilityImportWizard } from "@/pages/wizard/VulnerabilityImportWizard";
 
 function Router() {
@@ -13,6 +14,9 @@ function Router() {
     <Switch>
       {/* Add pages below */}
       <Route path="/" component={Integrations} />
+      <Route path="/process/:id">
+        {(params) => <ProcessDetail processId={params.id} />}
+      </Route>
       <Route path="/vulnerability-import-wizard" component={VulnerabilityImportWizard} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />

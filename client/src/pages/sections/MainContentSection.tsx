@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -221,14 +222,12 @@ export const MainContentSection = (): JSX.Element => {
                         <ChevronRight className="w-4 h-4 text-gray-500" />
                       )}
                     </button>
-                    <a
-                      href="#"
-                      className="text-sm text-blue-600 hover:underline truncate font-normal"
-                      onClick={(e) => e.stopPropagation()}
+                    <span
+                      className="text-sm font-medium text-gray-900 truncate"
                       data-testid={`category-link-${category.id}`}
                     >
                       {category.name}
-                    </a>
+                    </span>
                   </div>
                   <div className="w-[140px] lg:w-[180px] flex-shrink-0 px-3"></div>
                   <div className="w-[100px] lg:w-[120px] flex-shrink-0 px-3"></div>
@@ -253,14 +252,14 @@ export const MainContentSection = (): JSX.Element => {
                       </div>
                       <div className="flex-1 min-w-[200px] flex items-center gap-2 px-3 pl-10">
                         <span className="text-gray-400 text-lg leading-none flex-shrink-0">&#8226;</span>
-                        <a
-                          href="#"
+                        <Link
+                          href={`/process/${process.id}`}
                           className="text-sm text-blue-600 hover:underline truncate"
                           onClick={(e) => e.stopPropagation()}
                           data-testid={`process-link-${process.id}`}
                         >
                           {process.name}
-                        </a>
+                        </Link>
                       </div>
                       <div className="w-[140px] lg:w-[180px] flex-shrink-0 px-3">
                         <span className="text-sm text-gray-900 truncate block">{process.processOwner}</span>
