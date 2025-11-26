@@ -370,79 +370,167 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
           </header>
 
           <main className="flex flex-col flex-1 w-full px-8 py-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Details</h2>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-6">
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm text-gray-500">Name</span>
-                    <span className="text-gray-400 text-xs">?</span>
+            {activeTab === "Overview" && (
+              <>
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Details</h2>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-6">
+                  <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-gray-500">Name</span>
+                        <span className="text-gray-400 text-xs">?</span>
+                      </div>
+                      <span className="text-sm text-gray-900" data-testid="detail-name">{process.name}</span>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-gray-500">Description</span>
+                        <span className="text-gray-400 text-xs">?</span>
+                      </div>
+                      <p className="text-sm text-gray-900 leading-relaxed" data-testid="detail-description">
+                        {process.description}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-gray-500">Process Owner</span>
+                        <span className="text-gray-400 text-xs">?</span>
+                      </div>
+                      <span className="text-sm text-gray-900" data-testid="detail-owner">{process.processOwner}</span>
+                    </div>
                   </div>
-                  <span className="text-sm text-gray-900" data-testid="detail-name">{process.name}</span>
+
+                  <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-gray-500">Business Units</span>
+                        <span className="text-gray-400 text-xs">?</span>
+                      </div>
+                      <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-business-units">
+                        {process.businessUnits}
+                      </a>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-gray-500">Related Risks</span>
+                        <span className="text-gray-400 text-xs">?</span>
+                      </div>
+                      <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-related-risks">
+                        {process.relatedRisks}
+                      </a>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-gray-500">Frameworks</span>
+                        <span className="text-gray-400 text-xs">?</span>
+                      </div>
+                      <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-frameworks">
+                        {process.frameworks}
+                      </a>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-gray-500">Controls</span>
+                        <span className="text-gray-400 text-xs">?</span>
+                      </div>
+                      <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-controls">
+                        {process.controls}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === "Business Impact Analysis" && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-6">
+                <div className="flex flex-col gap-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Financial Impact</span>
+                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full" data-testid="bia-financial-impact">
+                      High
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Operational Impact</span>
+                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full" data-testid="bia-operational-impact">
+                      High
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Reputational Impact</span>
+                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full" data-testid="bia-reputational-impact">
+                      High
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Legal Impact</span>
+                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full" data-testid="bia-legal-impact">
+                      High
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Regulatory Impact</span>
+                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full" data-testid="bia-regulatory-impact">
+                      High
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Maximum Time Down (MTD)</span>
+                    <span className="text-sm text-gray-900" data-testid="bia-mtd">2 hours</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Recovery Time Objective (RTO)</span>
+                    <span className="text-sm text-gray-900" data-testid="bia-rto">2 hours</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Recovery point Objective (RPO)</span>
+                    <span className="text-sm text-gray-900" data-testid="bia-rpo">30 minutes</span>
+                  </div>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm text-gray-500">Description</span>
-                    <span className="text-gray-400 text-xs">?</span>
+                <div className="flex flex-col gap-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Last Updated</span>
+                    <span className="text-sm text-gray-900" data-testid="bia-last-updated">{process.biaLastUpdated}</span>
                   </div>
-                  <p className="text-sm text-gray-900 leading-relaxed" data-testid="detail-description">
-                    {process.description}
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm text-gray-500">Process Owner</span>
-                    <span className="text-gray-400 text-xs">?</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Latest BIA Update</span>
+                    <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="bia-latest-update">View</a>
                   </div>
-                  <span className="text-sm text-gray-900" data-testid="detail-owner">{process.processOwner}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Maximum Time Down (MTD)</span>
+                    <span className="text-sm text-gray-900" data-testid="bia-mtd-right">2 hours</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Recovery Time Objective (RTO)</span>
+                    <span className="text-sm text-gray-900" data-testid="bia-rto-right">2 hours</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-900 font-medium">Recovery point Objective (RPO)</span>
+                    <span className="text-sm text-gray-900" data-testid="bia-rpo-right">30 minutes</span>
+                  </div>
                 </div>
               </div>
+            )}
 
-              <div className="flex flex-col gap-6">
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm text-gray-500">Business Units</span>
-                    <span className="text-gray-400 text-xs">?</span>
-                  </div>
-                  <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-business-units">
-                    {process.businessUnits}
-                  </a>
-                </div>
+            {activeTab === "Key Dependencies" && (
+              <div className="text-sm text-gray-500">Key Dependencies content coming soon...</div>
+            )}
 
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm text-gray-500">Related Risks</span>
-                    <span className="text-gray-400 text-xs">?</span>
-                  </div>
-                  <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-related-risks">
-                    {process.relatedRisks}
-                  </a>
-                </div>
+            {activeTab === "Business Continuity Plan" && (
+              <div className="text-sm text-gray-500">Business Continuity Plan content coming soon...</div>
+            )}
 
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm text-gray-500">Frameworks</span>
-                    <span className="text-gray-400 text-xs">?</span>
-                  </div>
-                  <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-frameworks">
-                    {process.frameworks}
-                  </a>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm text-gray-500">Controls</span>
-                    <span className="text-gray-400 text-xs">?</span>
-                  </div>
-                  <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-controls">
-                    {process.controls}
-                  </a>
-                </div>
-              </div>
-            </div>
+            {activeTab === "Issues" && (
+              <div className="text-sm text-gray-500">Issues content coming soon...</div>
+            )}
           </main>
           </div>
         </div>
