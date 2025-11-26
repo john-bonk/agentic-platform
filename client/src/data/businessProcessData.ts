@@ -77,6 +77,48 @@ export interface Category {
   processes: ProcessDetail[];
 }
 
+// Business Continuity Plan interface
+export interface BusinessContinuityPlan {
+  id: string;
+  name: string;
+  planOwner: string;
+  planType: "create" | "import";
+  importFileName?: string;
+  processIds: string[];
+  reviewGranularity: "entire" | "section";
+  reviewType: "single" | "nonsequential" | "sequential";
+  status: "Draft" | "In Review" | "Approved";
+  createdAt: string;
+  originProcessId: string;
+}
+
+// In-memory storage for BCPs
+let bcpStorage: BusinessContinuityPlan[] = [];
+let bcpIdCounter = 1;
+
+export function createBCP(bcp: Omit<BusinessContinuityPlan, "id" | "createdAt" | "status">): BusinessContinuityPlan {
+  const newBCP: BusinessContinuityPlan = {
+    ...bcp,
+    id: `bcp-${bcpIdCounter++}`,
+    status: "Draft",
+    createdAt: new Date().toISOString(),
+  };
+  bcpStorage.push(newBCP);
+  return newBCP;
+}
+
+export function getAllBCPs(): BusinessContinuityPlan[] {
+  return [...bcpStorage];
+}
+
+export function getBCPById(id: string): BusinessContinuityPlan | undefined {
+  return bcpStorage.find((bcp) => bcp.id === id);
+}
+
+export function getBCPsByProcessId(processId: string): BusinessContinuityPlan[] {
+  return bcpStorage.filter((bcp) => bcp.processIds.includes(processId) || bcp.originProcessId === processId);
+}
+
 export const businessProcessData: Category[] = [
   {
     id: "retail-banking",

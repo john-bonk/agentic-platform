@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getProcessById, businessProcessData, type ProcessDetail, type Category } from "@/data/businessProcessData";
+import { getProcessById, businessProcessData, createBCP, type ProcessDetail, type Category } from "@/data/businessProcessData";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
 import { HeaderSection } from "./sections/HeaderSection";
 
@@ -262,6 +262,73 @@ function FileDropZone({ file, onFileSelect }: FileDropZoneProps) {
         data-testid="input-file-upload"
       />
     </div>
+  );
+}
+
+interface ReviewOptionCardProps {
+  icon: "file" | "sections" | "person" | "check-all" | "arrow-right";
+  title: string;
+  description: string;
+  selected: boolean;
+  onSelect: () => void;
+  testId: string;
+}
+
+function ReviewOptionCard({ icon, title, description, selected, onSelect, testId }: ReviewOptionCardProps) {
+  const getIcon = () => {
+    switch (icon) {
+      case "file":
+        return <FileText className="w-3 h-3 text-slate-500" />;
+      case "sections":
+        return (
+          <div className="flex flex-col gap-0.5">
+            <div className="w-3 h-0.5 bg-slate-500 rounded-sm" />
+            <div className="w-2 h-0.5 bg-slate-500 rounded-sm" />
+            <div className="w-2.5 h-0.5 bg-slate-500 rounded-sm" />
+          </div>
+        );
+      case "person":
+        return (
+          <svg className="w-3 h-3 text-slate-500" viewBox="0 0 12 12" fill="none">
+            <circle cx="6" cy="3.5" r="2.5" stroke="currentColor" strokeWidth="1.2" />
+            <path d="M1.5 11c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
+        );
+      case "check-all":
+        return (
+          <svg className="w-3 h-3 text-slate-500" viewBox="0 0 12 12" fill="none">
+            <circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.2" />
+            <path d="M3.5 6l2 2 3-4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+      case "arrow-right":
+        return (
+          <svg className="w-3 h-3 text-slate-500" viewBox="0 0 12 12" fill="none">
+            <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`flex-1 flex flex-col items-center gap-1.5 p-4 rounded border text-center transition-colors ${
+        selected
+          ? "border-[#266c92] bg-white"
+          : "border-slate-200 bg-white"
+      }`}
+      data-testid={testId}
+    >
+      <div className="w-3 h-3 flex items-center justify-center">
+        {getIcon()}
+      </div>
+      <span className="text-[13px] text-slate-900">{title}</span>
+      <span className="text-xs text-slate-500 leading-tight">{description}</span>
+    </button>
   );
 }
 
@@ -581,6 +648,10 @@ export function BCPWizardPage() {
     return initial;
   });
   
+  // Step 3: Reviewer configuration state
+  const [reviewGranularity, setReviewGranularity] = useState<"entire" | "section">("entire");
+  const [reviewType, setReviewType] = useState<"single" | "nonsequential" | "sequential">("single");
+  
   // AI Suggested processes based on dependencies.businessProcesses
   const aiSuggestedProcessIds = useMemo(() => {
     const suggestions = new Set<string>();
@@ -612,8 +683,20 @@ export function BCPWizardPage() {
     if (currentStep < 3) {
       setCurrentStep((prev) => (prev + 1) as WizardStep);
     } else {
-      console.log("Complete wizard", { planName, planOwner, planType, importFile: importFile?.name });
-      handleClose();
+      // Create the BCP
+      const newBCP = createBCP({
+        name: planName,
+        planOwner,
+        planType,
+        importFileName: importFile?.name,
+        processIds: Array.from(selectedProcessIds),
+        reviewGranularity,
+        reviewType,
+        originProcessId: processId,
+      });
+      
+      // Navigate to the new BCP detail page
+      navigate(`/bcp/${newBCP.id}`);
     }
   };
 
@@ -712,12 +795,67 @@ export function BCPWizardPage() {
 
       case 3:
         return (
-          <div className="flex flex-col gap-4 w-[700px]">
-            <div className="text-center py-20">
-              <h3 className="text-lg font-medium text-slate-900 dark:text-white">Select Reviewers</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                Choose the reviewers who will approve your Business Continuity Plan
-              </p>
+          <div className="flex flex-col gap-6 w-[700px]">
+            <h3 className="text-2xl font-semibold text-[rgba(1,8,24,0.93)]">
+              Configure reviews for your plan
+            </h3>
+            
+            {/* Plan Review Granularity */}
+            <div className="flex flex-col gap-3">
+              <Label className="text-sm font-medium text-slate-900">
+                Plan Review Granularity
+              </Label>
+              <div className="flex gap-4">
+                <ReviewOptionCard
+                  icon="file"
+                  title="Review entire plan"
+                  description="The same reviewers certify the entire plan."
+                  selected={reviewGranularity === "entire"}
+                  onSelect={() => setReviewGranularity("entire")}
+                  testId="option-review-entire"
+                />
+                <ReviewOptionCard
+                  icon="sections"
+                  title="Review by section"
+                  description="Configure different reviewers for specific areas of the plan."
+                  selected={reviewGranularity === "section"}
+                  onSelect={() => setReviewGranularity("section")}
+                  testId="option-review-section"
+                />
+              </div>
+            </div>
+            
+            {/* Plan Review Type */}
+            <div className="flex flex-col gap-3">
+              <Label className="text-sm font-medium text-slate-900">
+                Plan Review Type
+              </Label>
+              <div className="flex gap-4">
+                <ReviewOptionCard
+                  icon="person"
+                  title="Single reviewer sign off"
+                  description="Any user from the list can review and certify the BCP."
+                  selected={reviewType === "single"}
+                  onSelect={() => setReviewType("single")}
+                  testId="option-review-single"
+                />
+                <ReviewOptionCard
+                  icon="check-all"
+                  title="Nonsequential"
+                  description="All users are required to review and certify the BCP."
+                  selected={reviewType === "nonsequential"}
+                  onSelect={() => setReviewType("nonsequential")}
+                  testId="option-review-nonsequential"
+                />
+                <ReviewOptionCard
+                  icon="arrow-right"
+                  title="Sequential"
+                  description="All users are required to review and certify the BCP in the specified order."
+                  selected={reviewType === "sequential"}
+                  onSelect={() => setReviewType("sequential")}
+                  testId="option-review-sequential"
+                />
+              </div>
             </div>
           </div>
         );

@@ -1,4 +1,8 @@
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
+import { getBCPsByProcessId, type BusinessContinuityPlan } from "@/data/businessProcessData";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
 
 interface BCPEmptyStateProps {
   processId: string;
@@ -37,7 +41,81 @@ function DocumentIcon() {
   );
 }
 
-export function BCPEmptyState({ processId }: BCPEmptyStateProps) {
+function BCPTableView({ bcps, processId }: { bcps: BusinessContinuityPlan[]; processId: string }) {
+  const [, navigate] = useLocation();
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "Draft":
+        return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 text-[11px] h-5">Draft</Badge>;
+      case "In Review":
+        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 text-[11px] h-5">In Review</Badge>;
+      case "Approved":
+        return <Badge className="bg-green-100 text-green-700 hover:bg-green-100 text-[11px] h-5">Approved</Badge>;
+      default:
+        return <Badge variant="outline" className="text-[11px] h-5">{status}</Badge>;
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-4 p-4 w-full" data-testid="bcp-table-view">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium text-slate-900">Business Continuity Plans</h3>
+        <Button 
+          size="sm" 
+          onClick={() => navigate(`/create-bcp/${processId}`)}
+          data-testid="button-add-bcp"
+        >
+          <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
+          Add Plan
+        </Button>
+      </div>
+      
+      {/* Table Header */}
+      <div className="border border-slate-200 rounded-md overflow-hidden">
+        <div className="flex items-center bg-slate-50 border-b border-slate-200 py-2.5 px-4">
+          <div className="flex-1 min-w-[200px]">
+            <span className="text-xs font-bold text-[rgba(24,49,83,0.67)] uppercase">Plan Name</span>
+          </div>
+          <div className="w-[140px]">
+            <span className="text-xs font-bold text-[rgba(24,49,83,0.67)] uppercase">Owner</span>
+          </div>
+          <div className="w-[100px]">
+            <span className="text-xs font-bold text-[rgba(24,49,83,0.67)] uppercase">Status</span>
+          </div>
+          <div className="w-[120px]">
+            <span className="text-xs font-bold text-[rgba(24,49,83,0.67)] uppercase">Created</span>
+          </div>
+        </div>
+        
+        {/* Table Body */}
+        {bcps.map((bcp) => (
+          <Link key={bcp.id} href={`/bcp/${bcp.id}`}>
+            <div 
+              className="flex items-center py-3 px-4 border-b border-slate-200 last:border-b-0 hover:bg-slate-50 cursor-pointer transition-colors"
+              data-testid={`bcp-row-${bcp.id}`}
+            >
+              <div className="flex-1 min-w-[200px]">
+                <span className="text-sm text-[#3172e3]">{bcp.name}</span>
+              </div>
+              <div className="w-[140px]">
+                <span className="text-sm text-slate-900 capitalize">{bcp.planOwner.replace(/-/g, ' ')}</span>
+              </div>
+              <div className="w-[100px]">
+                {getStatusBadge(bcp.status)}
+              </div>
+              <div className="w-[120px]">
+                <span className="text-sm text-slate-500">{new Date(bcp.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function EmptyStateView({ processId }: { processId: string }) {
   const [, navigate] = useLocation();
 
   const handleCreatePlan = () => {
@@ -87,4 +165,14 @@ export function BCPEmptyState({ processId }: BCPEmptyStateProps) {
       </div>
     </div>
   );
+}
+
+export function BCPEmptyState({ processId }: BCPEmptyStateProps) {
+  const bcps = getBCPsByProcessId(processId);
+  
+  if (bcps.length > 0) {
+    return <BCPTableView bcps={bcps} processId={processId} />;
+  }
+  
+  return <EmptyStateView processId={processId} />;
 }
