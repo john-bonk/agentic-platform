@@ -16,6 +16,7 @@ import { HeaderSection } from "./sections/HeaderSection";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
 import { KeyDependenciesImpactCanvas } from "@/components/KeyDependenciesImpactCanvas";
 import { BCPEmptyState } from "@/components/BCPEmptyState";
+import { BCPWizard } from "@/components/BCPWizard";
 import { getProcessById, type IssueItem } from "../data/businessProcessData";
 import { 
   getApplicationsForTeam, 
@@ -483,6 +484,7 @@ function IssuesContent({ issues }: { issues: IssueItem[] }) {
 
 export function ProcessDetail({ processId }: ProcessDetailProps) {
   const [activeTab, setActiveTab] = useState("Overview");
+  const [wizardOpen, setWizardOpen] = useState(false);
   const process = getProcessById(processId);
 
   const LeftNavbar = () => (
@@ -831,11 +833,18 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
 
             {activeTab === "Business Continuity Plan" && (
               <BCPEmptyState 
-                onCreateNew={() => {
-                  console.log("Create new BCP for process:", processId);
-                }} 
+                onCreateNew={() => setWizardOpen(true)} 
               />
             )}
+            
+            <BCPWizard
+              open={wizardOpen}
+              onOpenChange={setWizardOpen}
+              processName={process.name}
+              onComplete={(data) => {
+                console.log("BCP created:", data);
+              }}
+            />
 
             {activeTab === "Issues" && (
               <IssuesContent issues={process.issues || []} />
