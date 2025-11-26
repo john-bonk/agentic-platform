@@ -34,6 +34,8 @@ const navigationIcons: NavigationIcon[] = [
   { type: "image", src: "/figmaAssets/module-settings-.svg", alt: "Module settings", active: false },
 ];
 
+type ImpactLevel = "High" | "Medium" | "Low";
+
 const processData: Record<string, {
   name: string;
   description: string;
@@ -46,6 +48,16 @@ const processData: Record<string, {
   relatedRisks: string;
   frameworks: string;
   controls: string;
+  bia: {
+    financialImpact: ImpactLevel;
+    operationalImpact: ImpactLevel;
+    reputationalImpact: ImpactLevel;
+    legalImpact: ImpactLevel;
+    regulatoryImpact: ImpactLevel;
+    mtd: string;
+    rto: string;
+    rpo: string;
+  };
 }> = {
   "1": {
     name: "Account Management",
@@ -59,6 +71,16 @@ const processData: Record<string, {
     relatedRisks: "Credit Risk, System Outages, Data Breaches",
     frameworks: "PCI-DSS, SOX, Anti-Money Laundering (AML) regulations, Federal Reserve requirements",
     controls: "AC-01 Multi-Factor Authentication, AC-02 Customer Identity Verification, AC-03 Account Activity Monitoring, AC-04 Suspicious Activity Reporting, AC-05 Data Encryption at Rest",
+    bia: {
+      financialImpact: "High",
+      operationalImpact: "High",
+      reputationalImpact: "High",
+      legalImpact: "High",
+      regulatoryImpact: "High",
+      mtd: "2 hours",
+      rto: "1 hour",
+      rpo: "30 minutes",
+    },
   },
   "2": {
     name: "Loan Origination and Servicing",
@@ -72,6 +94,16 @@ const processData: Record<string, {
     relatedRisks: "Credit Risk, Compliance Risk",
     frameworks: "SOX, Consumer Financial Protection Bureau (CFPB) regulations",
     controls: "LN-01 Credit Score Verification, LN-02 Income Documentation Review, LN-03 Dual Approval for Large Loans, LN-04 Automated Underwriting Validation, LN-05 Loan Document Retention",
+    bia: {
+      financialImpact: "High",
+      operationalImpact: "Medium",
+      reputationalImpact: "Medium",
+      legalImpact: "High",
+      regulatoryImpact: "High",
+      mtd: "4 hours",
+      rto: "2 hours",
+      rpo: "1 hour",
+    },
   },
   "3": {
     name: "Customer Service and Support",
@@ -85,6 +117,16 @@ const processData: Record<string, {
     relatedRisks: "Reputation Risk, Operational Risk",
     frameworks: "Consumer Protection regulations",
     controls: "CS-01 Call Recording and Monitoring, CS-02 Customer Authentication Protocol, CS-03 Complaint Escalation Procedures, CS-04 Service Level Agreement Tracking, CS-05 Quality Assurance Reviews",
+    bia: {
+      financialImpact: "Low",
+      operationalImpact: "Medium",
+      reputationalImpact: "High",
+      legalImpact: "Low",
+      regulatoryImpact: "Medium",
+      mtd: "24 hours",
+      rto: "8 hours",
+      rpo: "4 hours",
+    },
   },
   "4": {
     name: "Employee Onboarding and Offboarding",
@@ -98,6 +140,16 @@ const processData: Record<string, {
     relatedRisks: "Access Control Risk, Compliance Risk",
     frameworks: "SOX, GDPR, Employment regulations",
     controls: "HR-01 Background Check Verification, HR-02 Access Provisioning Workflow, HR-03 Mandatory Security Training, HR-04 Same-Day Access Revocation, HR-05 Exit Interview Documentation",
+    bia: {
+      financialImpact: "Low",
+      operationalImpact: "Medium",
+      reputationalImpact: "Low",
+      legalImpact: "Medium",
+      regulatoryImpact: "Medium",
+      mtd: "48 hours",
+      rto: "24 hours",
+      rpo: "8 hours",
+    },
   },
   "5": {
     name: "Payroll Processing",
@@ -111,6 +163,16 @@ const processData: Record<string, {
     relatedRisks: "Financial Risk, Compliance Risk",
     frameworks: "Tax regulations, Labor laws",
     controls: "PR-01 Payroll Reconciliation Review, PR-02 Segregation of Duties, PR-03 Tax Withholding Validation, PR-04 Direct Deposit Verification, PR-05 Payroll Audit Trail",
+    bia: {
+      financialImpact: "High",
+      operationalImpact: "High",
+      reputationalImpact: "Medium",
+      legalImpact: "High",
+      regulatoryImpact: "High",
+      mtd: "24 hours",
+      rto: "4 hours",
+      rpo: "1 hour",
+    },
   },
   "6": {
     name: "Benefits Administration",
@@ -124,6 +186,16 @@ const processData: Record<string, {
     relatedRisks: "Compliance Risk, Financial Risk",
     frameworks: "ERISA, ACA regulations",
     controls: "BN-01 Eligibility Verification, BN-02 Open Enrollment Controls, BN-03 COBRA Compliance Tracking, BN-04 401k Contribution Limits, BN-05 Benefits Cost Reconciliation",
+    bia: {
+      financialImpact: "Medium",
+      operationalImpact: "Low",
+      reputationalImpact: "Medium",
+      legalImpact: "Medium",
+      regulatoryImpact: "High",
+      mtd: "72 hours",
+      rto: "24 hours",
+      rpo: "12 hours",
+    },
   },
   "7": {
     name: "Training & Development",
@@ -137,6 +209,16 @@ const processData: Record<string, {
     relatedRisks: "Compliance Risk, Skill Gap Risk",
     frameworks: "Industry training standards",
     controls: "TR-01 Mandatory Training Completion Tracking, TR-02 Annual Compliance Certification, TR-03 Training Effectiveness Assessment, TR-04 Skills Gap Analysis, TR-05 Training Record Retention",
+    bia: {
+      financialImpact: "Low",
+      operationalImpact: "Low",
+      reputationalImpact: "Low",
+      legalImpact: "Low",
+      regulatoryImpact: "Medium",
+      mtd: "1 week",
+      rto: "72 hours",
+      rpo: "24 hours",
+    },
   },
   "8": {
     name: "Cash Flow Forecasting",
@@ -150,6 +232,16 @@ const processData: Record<string, {
     relatedRisks: "Liquidity Risk, Market Risk",
     frameworks: "Basel III requirements, Internal treasury policies",
     controls: "CF-01 Daily Cash Position Reporting, CF-02 Variance Analysis Review, CF-03 Forecast Model Validation, CF-04 Management Approval for Projections, CF-05 Historical Data Integrity Checks",
+    bia: {
+      financialImpact: "High",
+      operationalImpact: "Medium",
+      reputationalImpact: "Low",
+      legalImpact: "Low",
+      regulatoryImpact: "Medium",
+      mtd: "8 hours",
+      rto: "4 hours",
+      rpo: "2 hours",
+    },
   },
   "9": {
     name: "Liquidity Management",
@@ -163,6 +255,16 @@ const processData: Record<string, {
     relatedRisks: "Liquidity Risk, Credit Risk",
     frameworks: "Basel III requirements, Federal Reserve regulations",
     controls: "LQ-01 Liquidity Coverage Ratio Monitoring, LQ-02 Stress Testing Procedures, LQ-03 Counterparty Exposure Limits, LQ-04 Collateral Management, LQ-05 Intraday Liquidity Monitoring",
+    bia: {
+      financialImpact: "High",
+      operationalImpact: "High",
+      reputationalImpact: "Medium",
+      legalImpact: "Medium",
+      regulatoryImpact: "High",
+      mtd: "4 hours",
+      rto: "2 hours",
+      rpo: "30 minutes",
+    },
   },
   "10": {
     name: "Payment Processing",
@@ -176,6 +278,16 @@ const processData: Record<string, {
     relatedRisks: "Credit Risk, System Outages, Data Breaches",
     frameworks: "PCI-DSS, SOX, Anti-Money Laundering (AML) regulations, Federal Reserve requirements",
     controls: "PP-01 Transaction Authorization Limits, PP-02 Dual Approval for Wire Transfers, PP-03 OFAC Sanctions Screening, PP-04 Fraud Detection Algorithms, PP-05 End-of-Day Reconciliation",
+    bia: {
+      financialImpact: "High",
+      operationalImpact: "High",
+      reputationalImpact: "High",
+      legalImpact: "High",
+      regulatoryImpact: "High",
+      mtd: "2 hours",
+      rto: "1 hour",
+      rpo: "15 minutes",
+    },
   },
   "11": {
     name: "Benefits Administration",
@@ -189,6 +301,16 @@ const processData: Record<string, {
     relatedRisks: "Financial Risk, Compliance Risk",
     frameworks: "Treasury management standards",
     controls: "TB-01 Deferred Compensation Tracking, TB-02 Executive Benefits Approval, TB-03 Investment Option Monitoring, TB-04 Vesting Schedule Compliance, TB-05 Tax Reporting Accuracy",
+    bia: {
+      financialImpact: "Medium",
+      operationalImpact: "Low",
+      reputationalImpact: "Low",
+      legalImpact: "Medium",
+      regulatoryImpact: "Medium",
+      mtd: "48 hours",
+      rto: "24 hours",
+      rpo: "8 hours",
+    },
   },
 };
 
@@ -434,8 +556,12 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-sm text-gray-500">Financial Impact</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <Badge className="bg-[#db3535] text-white hover:bg-[#db3535] text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit" data-testid="bia-financial-impact">
-                      High
+                    <Badge className={`text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit ${
+                      process.bia.financialImpact === "High" ? "bg-[#db3535] text-white hover:bg-[#db3535]" :
+                      process.bia.financialImpact === "Medium" ? "bg-[#f59e0b] text-white hover:bg-[#f59e0b]" :
+                      "bg-[#36844a] text-white hover:bg-[#36844a]"
+                    }`} data-testid="bia-financial-impact">
+                      {process.bia.financialImpact}
                     </Badge>
                   </div>
                   <div className="flex flex-col gap-1">
@@ -443,8 +569,12 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-sm text-gray-500">Operational Impact</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <Badge className="bg-[#db3535] text-white hover:bg-[#db3535] text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit" data-testid="bia-operational-impact">
-                      High
+                    <Badge className={`text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit ${
+                      process.bia.operationalImpact === "High" ? "bg-[#db3535] text-white hover:bg-[#db3535]" :
+                      process.bia.operationalImpact === "Medium" ? "bg-[#f59e0b] text-white hover:bg-[#f59e0b]" :
+                      "bg-[#36844a] text-white hover:bg-[#36844a]"
+                    }`} data-testid="bia-operational-impact">
+                      {process.bia.operationalImpact}
                     </Badge>
                   </div>
                   <div className="flex flex-col gap-1">
@@ -452,8 +582,12 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-sm text-gray-500">Reputational Impact</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <Badge className="bg-[#db3535] text-white hover:bg-[#db3535] text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit" data-testid="bia-reputational-impact">
-                      High
+                    <Badge className={`text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit ${
+                      process.bia.reputationalImpact === "High" ? "bg-[#db3535] text-white hover:bg-[#db3535]" :
+                      process.bia.reputationalImpact === "Medium" ? "bg-[#f59e0b] text-white hover:bg-[#f59e0b]" :
+                      "bg-[#36844a] text-white hover:bg-[#36844a]"
+                    }`} data-testid="bia-reputational-impact">
+                      {process.bia.reputationalImpact}
                     </Badge>
                   </div>
                   <div className="flex flex-col gap-1">
@@ -461,8 +595,12 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-sm text-gray-500">Legal Impact</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <Badge className="bg-[#db3535] text-white hover:bg-[#db3535] text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit" data-testid="bia-legal-impact">
-                      High
+                    <Badge className={`text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit ${
+                      process.bia.legalImpact === "High" ? "bg-[#db3535] text-white hover:bg-[#db3535]" :
+                      process.bia.legalImpact === "Medium" ? "bg-[#f59e0b] text-white hover:bg-[#f59e0b]" :
+                      "bg-[#36844a] text-white hover:bg-[#36844a]"
+                    }`} data-testid="bia-legal-impact">
+                      {process.bia.legalImpact}
                     </Badge>
                   </div>
                   <div className="flex flex-col gap-1">
@@ -470,8 +608,12 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-sm text-gray-500">Regulatory Impact</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <Badge className="bg-[#db3535] text-white hover:bg-[#db3535] text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit" data-testid="bia-regulatory-impact">
-                      High
+                    <Badge className={`text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit ${
+                      process.bia.regulatoryImpact === "High" ? "bg-[#db3535] text-white hover:bg-[#db3535]" :
+                      process.bia.regulatoryImpact === "Medium" ? "bg-[#f59e0b] text-white hover:bg-[#f59e0b]" :
+                      "bg-[#36844a] text-white hover:bg-[#36844a]"
+                    }`} data-testid="bia-regulatory-impact">
+                      {process.bia.regulatoryImpact}
                     </Badge>
                   </div>
                   <div className="flex flex-col gap-1">
@@ -479,21 +621,21 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-sm text-gray-500">Maximum Time Down (MTD)</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <span className="text-sm text-gray-900" data-testid="bia-mtd">2 hours</span>
+                    <span className="text-sm text-gray-900" data-testid="bia-mtd">{process.bia.mtd}</span>
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">Recovery Time Objective (RTO)</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <span className="text-sm text-gray-900" data-testid="bia-rto">2 hours</span>
+                    <span className="text-sm text-gray-900" data-testid="bia-rto">{process.bia.rto}</span>
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
-                      <span className="text-sm text-gray-500">Recovery point Objective (RPO)</span>
+                      <span className="text-sm text-gray-500">Recovery Point Objective (RPO)</span>
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
-                    <span className="text-sm text-gray-900" data-testid="bia-rpo">30 minutes</span>
+                    <span className="text-sm text-gray-900" data-testid="bia-rpo">{process.bia.rpo}</span>
                   </div>
                 </div>
 
@@ -511,27 +653,6 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                       <span className="text-gray-400 text-xs">?</span>
                     </div>
                     <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="bia-latest-update">View</a>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm text-gray-500">Maximum Time Down (MTD)</span>
-                      <span className="text-gray-400 text-xs">?</span>
-                    </div>
-                    <span className="text-sm text-gray-900" data-testid="bia-mtd-right">2 hours</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm text-gray-500">Recovery Time Objective (RTO)</span>
-                      <span className="text-gray-400 text-xs">?</span>
-                    </div>
-                    <span className="text-sm text-gray-900" data-testid="bia-rto-right">2 hours</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm text-gray-500">Recovery point Objective (RPO)</span>
-                      <span className="text-gray-400 text-xs">?</span>
-                    </div>
-                    <span className="text-sm text-gray-900" data-testid="bia-rpo-right">30 minutes</span>
                   </div>
                 </div>
               </div>
