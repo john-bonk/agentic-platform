@@ -58,7 +58,7 @@ const processData: Record<string, {
     businessUnits: "Retail Banking Operations",
     relatedRisks: "Credit Risk, System Outages, Data Breaches",
     frameworks: "PCI-DSS, SOX, Anti-Money Laundering (AML) regulations, Federal Reserve requirements",
-    controls: "Lorem Ipsum",
+    controls: "AC-01 Multi-Factor Authentication, AC-02 Customer Identity Verification, AC-03 Account Activity Monitoring, AC-04 Suspicious Activity Reporting, AC-05 Data Encryption at Rest",
   },
   "2": {
     name: "Loan Origination and Servicing",
@@ -71,7 +71,7 @@ const processData: Record<string, {
     businessUnits: "Retail Banking Operations",
     relatedRisks: "Credit Risk, Compliance Risk",
     frameworks: "SOX, Consumer Financial Protection Bureau (CFPB) regulations",
-    controls: "Lorem Ipsum",
+    controls: "LN-01 Credit Score Verification, LN-02 Income Documentation Review, LN-03 Dual Approval for Large Loans, LN-04 Automated Underwriting Validation, LN-05 Loan Document Retention",
   },
   "3": {
     name: "Customer Service and Support",
@@ -84,7 +84,7 @@ const processData: Record<string, {
     businessUnits: "Retail Banking Operations",
     relatedRisks: "Reputation Risk, Operational Risk",
     frameworks: "Consumer Protection regulations",
-    controls: "Lorem Ipsum",
+    controls: "CS-01 Call Recording and Monitoring, CS-02 Customer Authentication Protocol, CS-03 Complaint Escalation Procedures, CS-04 Service Level Agreement Tracking, CS-05 Quality Assurance Reviews",
   },
   "4": {
     name: "Employee Onboarding and Offboarding",
@@ -97,7 +97,7 @@ const processData: Record<string, {
     businessUnits: "Human Resources",
     relatedRisks: "Access Control Risk, Compliance Risk",
     frameworks: "SOX, GDPR, Employment regulations",
-    controls: "Lorem Ipsum",
+    controls: "HR-01 Background Check Verification, HR-02 Access Provisioning Workflow, HR-03 Mandatory Security Training, HR-04 Same-Day Access Revocation, HR-05 Exit Interview Documentation",
   },
   "5": {
     name: "Payroll Processing",
@@ -110,7 +110,7 @@ const processData: Record<string, {
     businessUnits: "Human Resources",
     relatedRisks: "Financial Risk, Compliance Risk",
     frameworks: "Tax regulations, Labor laws",
-    controls: "Lorem Ipsum",
+    controls: "PR-01 Payroll Reconciliation Review, PR-02 Segregation of Duties, PR-03 Tax Withholding Validation, PR-04 Direct Deposit Verification, PR-05 Payroll Audit Trail",
   },
   "6": {
     name: "Benefits Administration",
@@ -123,7 +123,7 @@ const processData: Record<string, {
     businessUnits: "Human Resources",
     relatedRisks: "Compliance Risk, Financial Risk",
     frameworks: "ERISA, ACA regulations",
-    controls: "Lorem Ipsum",
+    controls: "BN-01 Eligibility Verification, BN-02 Open Enrollment Controls, BN-03 COBRA Compliance Tracking, BN-04 401k Contribution Limits, BN-05 Benefits Cost Reconciliation",
   },
   "7": {
     name: "Training & Development",
@@ -136,7 +136,7 @@ const processData: Record<string, {
     businessUnits: "Human Resources",
     relatedRisks: "Compliance Risk, Skill Gap Risk",
     frameworks: "Industry training standards",
-    controls: "Lorem Ipsum",
+    controls: "TR-01 Mandatory Training Completion Tracking, TR-02 Annual Compliance Certification, TR-03 Training Effectiveness Assessment, TR-04 Skills Gap Analysis, TR-05 Training Record Retention",
   },
   "8": {
     name: "Cash Flow Forecasting",
@@ -149,7 +149,7 @@ const processData: Record<string, {
     businessUnits: "Treasury & Cash Management",
     relatedRisks: "Liquidity Risk, Market Risk",
     frameworks: "Basel III requirements, Internal treasury policies",
-    controls: "Lorem Ipsum",
+    controls: "CF-01 Daily Cash Position Reporting, CF-02 Variance Analysis Review, CF-03 Forecast Model Validation, CF-04 Management Approval for Projections, CF-05 Historical Data Integrity Checks",
   },
   "9": {
     name: "Liquidity Management",
@@ -162,7 +162,7 @@ const processData: Record<string, {
     businessUnits: "Treasury & Cash Management",
     relatedRisks: "Liquidity Risk, Credit Risk",
     frameworks: "Basel III requirements, Federal Reserve regulations",
-    controls: "Lorem Ipsum",
+    controls: "LQ-01 Liquidity Coverage Ratio Monitoring, LQ-02 Stress Testing Procedures, LQ-03 Counterparty Exposure Limits, LQ-04 Collateral Management, LQ-05 Intraday Liquidity Monitoring",
   },
   "10": {
     name: "Payment Processing",
@@ -175,7 +175,7 @@ const processData: Record<string, {
     businessUnits: "Treasury & Cash Management",
     relatedRisks: "Credit Risk, System Outages, Data Breaches",
     frameworks: "PCI-DSS, SOX, Anti-Money Laundering (AML) regulations, Federal Reserve requirements",
-    controls: "Lorem Ipsum",
+    controls: "PP-01 Transaction Authorization Limits, PP-02 Dual Approval for Wire Transfers, PP-03 OFAC Sanctions Screening, PP-04 Fraud Detection Algorithms, PP-05 End-of-Day Reconciliation",
   },
   "11": {
     name: "Benefits Administration",
@@ -188,7 +188,7 @@ const processData: Record<string, {
     businessUnits: "Treasury & Cash Management",
     relatedRisks: "Financial Risk, Compliance Risk",
     frameworks: "Treasury management standards",
-    controls: "Lorem Ipsum",
+    controls: "TB-01 Deferred Compensation Tracking, TB-02 Executive Benefits Approval, TB-03 Investment Option Monitoring, TB-04 Vesting Schedule Compliance, TB-05 Tax Reporting Accuracy",
   },
 };
 
