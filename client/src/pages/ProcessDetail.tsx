@@ -192,7 +192,7 @@ const processData: Record<string, {
   },
 };
 
-const tabs = ["Overview", "BIA", "Key Dependencies", "BCP", "Issues"];
+const tabs = ["Overview", "Business Impact Analysis", "Key Dependencies", "Business Continuity Plan", "Issues"];
 
 export function ProcessDetail({ processId }: ProcessDetailProps) {
   const [activeTab, setActiveTab] = useState("Overview");
