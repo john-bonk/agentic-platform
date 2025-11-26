@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useLocation, useRoute, Link } from "wouter";
-import { X, PlusCircle, Download, Check, RefreshCcw } from "lucide-react";
+import { X, PlusCircle, Download, Check, RefreshCcw, Upload, FileText, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -135,6 +135,134 @@ function PlanTypeCard({ type, selected, onSelect }: PlanTypeCardProps) {
   );
 }
 
+const ACCEPTED_FILE_TYPES = ".pdf,.doc,.docx,.xls,.xlsx";
+const ACCEPTED_MIME_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+];
+
+interface FileDropZoneProps {
+  file: File | null;
+  onFileSelect: (file: File | null) => void;
+}
+
+function FileDropZone({ file, onFileSelect }: FileDropZoneProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile && ACCEPTED_MIME_TYPES.includes(droppedFile.type)) {
+      onFileSelect(droppedFile);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      onFileSelect(selectedFile);
+    }
+  };
+
+  const handleBrowseClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleRemoveFile = () => {
+    onFileSelect(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const getFileExtension = (filename: string): string => {
+    return filename.split('.').pop()?.toUpperCase() || '';
+  };
+
+  if (file) {
+    return (
+      <div className="flex items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded" data-testid="file-preview">
+        <div className="flex items-center justify-center w-10 h-10 bg-white border border-slate-200 rounded">
+          <FileText className="w-5 h-5 text-slate-500" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-slate-900 truncate" data-testid="file-name">
+            {file.name}
+          </p>
+          <p className="text-xs text-slate-500">
+            {getFileExtension(file.name)} - {formatFileSize(file.size)}
+          </p>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleRemoveFile}
+          className="text-slate-400 hover:text-slate-600"
+          data-testid="button-remove-file"
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`flex items-center justify-center gap-2 p-4 border border-dashed rounded transition-colors ${
+        isDragging
+          ? "border-[#266c92] bg-[#266c92]/5"
+          : "border-slate-300 bg-slate-50"
+      }`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      data-testid="file-dropzone"
+    >
+      <Upload className="w-3.5 h-3.5 text-slate-500" />
+      <span className="text-xs text-slate-900">Drag and drop file or</span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleBrowseClick}
+        className="h-[30px] px-2.5 text-xs border-slate-200"
+        data-testid="button-browse-files"
+      >
+        Browse Files
+      </Button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={ACCEPTED_FILE_TYPES}
+        onChange={handleFileChange}
+        className="hidden"
+        data-testid="input-file-upload"
+      />
+    </div>
+  );
+}
+
 function LeftNavbar() {
   return (
     <aside
@@ -215,6 +343,7 @@ export function BCPWizardPage() {
   );
   const [planOwner, setPlanOwner] = useState<string>(defaultOwnerValue);
   const [planType, setPlanType] = useState<"create" | "import">("create");
+  const [importFile, setImportFile] = useState<File | null>(null);
 
   const handleClose = () => {
     if (processId) {
@@ -228,7 +357,7 @@ export function BCPWizardPage() {
     if (currentStep < 3) {
       setCurrentStep((prev) => (prev + 1) as WizardStep);
     } else {
-      console.log("Complete wizard", { planName, planOwner, planType });
+      console.log("Complete wizard", { planName, planOwner, planType, importFile: importFile?.name });
       handleClose();
     }
   };
@@ -293,6 +422,21 @@ export function BCPWizardPage() {
                 onSelect={() => setPlanType("import")}
               />
             </div>
+
+            {planType === "import" && (
+              <div className="flex flex-col gap-2">
+                <Label className="text-sm font-medium text-slate-900">
+                  Upload Document
+                </Label>
+                <FileDropZone
+                  file={importFile}
+                  onFileSelect={setImportFile}
+                />
+                <p className="text-xs text-slate-500">
+                  Supported formats: PDF, Word (.doc, .docx), Excel (.xls, .xlsx)
+                </p>
+              </div>
+            )}
           </div>
         );
 
