@@ -27,15 +27,6 @@ import {
   type Location,
   type BusinessUnit
 } from "../data/inventoryData";
-import { 
-  getProcessById,
-  type ImpactLevel,
-  type ITAssetItem,
-  type VendorItem,
-  type BusinessProcessItem,
-  type BranchItem,
-  type Dependencies
-} from "../data/businessProcessData";
 
 interface ProcessDetailProps {
   processId: string;
@@ -65,7 +56,68 @@ const navigationIcons: NavigationIcon[] = [
   { type: "image", src: "/figmaAssets/module-settings-.svg", alt: "Module settings", active: false },
 ];
 
-const REMOVE_OLD_DATA_MARKER = "REMOVE_ME";
+type ImpactLevel = "High" | "Medium" | "Low";
+
+interface ITAssetItem {
+  name: string;
+  description: string;
+  recoveryTimeframe: string;
+  recoveryGap: "met" | "gap";
+  assetOwner: string;
+}
+
+interface VendorItem {
+  name: string;
+  description: string;
+  vendorContact: string;
+}
+
+interface BusinessProcessItem {
+  name: string;
+  description: string;
+  rto: string;
+  processOwner: string;
+}
+
+interface BranchItem {
+  name: string;
+  type: string;
+}
+
+interface Dependencies {
+  itAssets: ITAssetItem[];
+  vendors: VendorItem[];
+  businessProcesses: BusinessProcessItem[];
+  branches: BranchItem[];
+}
+
+const processData: Record<string, {
+  name: string;
+  description: string;
+  processOwner: string;
+  criticality: "High" | "Low";
+  rto: string;
+  rpo: string;
+  biaLastUpdated: string;
+  businessUnits: string;
+  ownerTeam: string;
+  relatedRisks: string;
+  frameworks: string;
+  controls: string;
+  bia: {
+    financialImpact: ImpactLevel;
+    operationalImpact: ImpactLevel;
+    reputationalImpact: ImpactLevel;
+    legalImpact: ImpactLevel;
+    regulatoryImpact: ImpactLevel;
+    mtd: string;
+    rto: string;
+    rpo: string;
+  };
+  dependencies: Dependencies;
+}> = {
+  "1": {
+    name: "Account Management",
     description: "Account Management ensures the smooth and secure management of customer accounts, including account creation, updates, and closures. This process is critical to daily banking operations and customer satisfaction.",
     processOwner: "Baylor Cruz",
     criticality: "High",
