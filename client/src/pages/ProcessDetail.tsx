@@ -15,6 +15,7 @@ function HelpIcon() {
 import { HeaderSection } from "./sections/HeaderSection";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
 import { KeyDependenciesImpactCanvas } from "@/components/KeyDependenciesImpactCanvas";
+import { BCPEmptyState } from "@/components/BCPEmptyState";
 import { getProcessById } from "../data/businessProcessData";
 import { 
   getApplicationsForTeam, 
@@ -744,7 +745,11 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
             )}
 
             {activeTab === "Business Continuity Plan" && (
-              <div className="text-sm text-gray-500">Business Continuity Plan content coming soon...</div>
+              <BCPEmptyState 
+                onCreateNew={() => {
+                  console.log("Create new BCP for process:", processId);
+                }} 
+              />
             )}
 
             {activeTab === "Issues" && (
