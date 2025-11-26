@@ -3,6 +3,15 @@ import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight, MoreHorizontal, Triangle, RefreshCcw, Check, Link2 } from "lucide-react";
+
+function HelpIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="12" height="12" rx="6" fill="#E2E8F0"/>
+      <path d="M3.521 4.23129C3.5337 3.92057 3.60853 3.61554 3.74105 3.33421C3.87358 3.05288 4.06112 2.80095 4.29261 2.5933C4.5241 2.38564 4.79484 2.22646 5.08886 2.12515C5.38287 2.02385 5.69421 1.98247 6.00448 2.00346C6.60623 1.96237 7.20045 2.15641 7.66199 2.54472C8.12353 2.93302 8.41636 3.48529 8.47883 4.0852C8.48239 4.46896 8.38675 4.84713 8.20119 5.18306C8.01563 5.51899 7.74643 5.80129 7.4197 6.00259C7.17194 6.16616 6.94504 6.35932 6.74404 6.57781C6.51511 6.85496 6.39214 7.20446 6.39709 7.5639H5.2923C5.24947 7.40904 5.22496 7.24969 5.21926 7.08912C5.21926 5.45477 7.20056 5.31781 7.20056 4.16737C7.19248 4.01937 7.15494 3.87446 7.09014 3.74115C7.02533 3.60784 6.93458 3.4888 6.82318 3.39101C6.71179 3.29322 6.582 3.21865 6.44141 3.17166C6.30083 3.12468 6.15228 3.10622 6.00448 3.11737C5.6759 3.12217 5.36241 3.25607 5.13176 3.49014C4.90111 3.72421 4.77183 4.03963 4.77187 4.36824C4.76287 4.46238 4.76287 4.55715 4.77187 4.65129H3.53926C3.53013 4.51433 3.521 4.36824 3.521 4.23129ZM5.84926 10.0017C6.05681 10.0018 6.25613 9.9206 6.40459 9.77556C6.55304 9.63052 6.63884 9.43313 6.64361 9.22564C6.6412 9.01655 6.55645 8.81684 6.40774 8.66984C6.25904 8.52284 6.05836 8.44041 5.84926 8.44042C5.74657 8.44042 5.6449 8.46079 5.55014 8.50036C5.45538 8.53993 5.36942 8.59792 5.29723 8.67095C5.22504 8.74399 5.16807 8.83062 5.12961 8.92584C5.09115 9.02106 5.07196 9.12296 5.07317 9.22564H5.09143C5.09022 9.32712 5.10917 9.42784 5.14717 9.52195C5.18517 9.61605 5.24148 9.70168 5.31281 9.77387C5.38415 9.84606 5.46911 9.90337 5.56276 9.94249C5.65641 9.9816 5.7569 10.0017 5.85839 10.0017H5.84926Z" fill="#64748B"/>
+    </svg>
+  );
+}
 import { HeaderSection } from "./sections/HeaderSection";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
 import { KeyDependenciesImpactCanvas } from "@/components/KeyDependenciesImpactCanvas";
@@ -1044,7 +1053,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1">
                         <span className="text-sm text-gray-500">Name</span>
-                        <span className="text-gray-400 text-xs">?</span>
+                        <HelpIcon />
                       </div>
                       <span className="text-sm text-gray-900" data-testid="detail-name">{process.name}</span>
                     </div>
@@ -1052,7 +1061,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1">
                         <span className="text-sm text-gray-500">Description</span>
-                        <span className="text-gray-400 text-xs">?</span>
+                        <HelpIcon />
                       </div>
                       <p className="text-sm text-gray-900 leading-relaxed" data-testid="detail-description">
                         {process.description}
@@ -1062,7 +1071,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1">
                         <span className="text-sm text-gray-500">Process Owner</span>
-                        <span className="text-gray-400 text-xs">?</span>
+                        <HelpIcon />
                       </div>
                       <span className="text-sm text-gray-900" data-testid="detail-owner">{process.processOwner}</span>
                     </div>
@@ -1072,7 +1081,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1">
                         <span className="text-sm text-gray-500">Business Units</span>
-                        <span className="text-gray-400 text-xs">?</span>
+                        <HelpIcon />
                       </div>
                       <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-business-units">
                         {process.businessUnits}
@@ -1082,7 +1091,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1">
                         <span className="text-sm text-gray-500">Related Risks</span>
-                        <span className="text-gray-400 text-xs">?</span>
+                        <HelpIcon />
                       </div>
                       <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-related-risks">
                         {process.relatedRisks}
@@ -1092,7 +1101,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1">
                         <span className="text-sm text-gray-500">Frameworks</span>
-                        <span className="text-gray-400 text-xs">?</span>
+                        <HelpIcon />
                       </div>
                       <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-frameworks">
                         {process.frameworks}
@@ -1102,7 +1111,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1">
                         <span className="text-sm text-gray-500">Controls</span>
-                        <span className="text-gray-400 text-xs">?</span>
+                        <HelpIcon />
                       </div>
                       <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="detail-controls">
                         {process.controls}
@@ -1119,7 +1128,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">Financial Impact</span>
-                      <span className="text-gray-400 text-xs">?</span>
+                      <HelpIcon />
                     </div>
                     <Badge className={`text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit ${
                       process.bia.financialImpact === "High" ? "bg-[#db3535] text-white hover:bg-[#db3535]" :
@@ -1132,7 +1141,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">Operational Impact</span>
-                      <span className="text-gray-400 text-xs">?</span>
+                      <HelpIcon />
                     </div>
                     <Badge className={`text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit ${
                       process.bia.operationalImpact === "High" ? "bg-[#db3535] text-white hover:bg-[#db3535]" :
@@ -1145,7 +1154,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">Reputational Impact</span>
-                      <span className="text-gray-400 text-xs">?</span>
+                      <HelpIcon />
                     </div>
                     <Badge className={`text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit ${
                       process.bia.reputationalImpact === "High" ? "bg-[#db3535] text-white hover:bg-[#db3535]" :
@@ -1158,7 +1167,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">Legal Impact</span>
-                      <span className="text-gray-400 text-xs">?</span>
+                      <HelpIcon />
                     </div>
                     <Badge className={`text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit ${
                       process.bia.legalImpact === "High" ? "bg-[#db3535] text-white hover:bg-[#db3535]" :
@@ -1171,7 +1180,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">Regulatory Impact</span>
-                      <span className="text-gray-400 text-xs">?</span>
+                      <HelpIcon />
                     </div>
                     <Badge className={`text-[10px] font-semibold px-1.5 py-0 rounded-full w-fit ${
                       process.bia.regulatoryImpact === "High" ? "bg-[#db3535] text-white hover:bg-[#db3535]" :
@@ -1184,21 +1193,21 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">Maximum Time Down (MTD)</span>
-                      <span className="text-gray-400 text-xs">?</span>
+                      <HelpIcon />
                     </div>
                     <span className="text-sm text-gray-900" data-testid="bia-mtd">{process.bia.mtd}</span>
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">Recovery Time Objective (RTO)</span>
-                      <span className="text-gray-400 text-xs">?</span>
+                      <HelpIcon />
                     </div>
                     <span className="text-sm text-gray-900" data-testid="bia-rto">{process.bia.rto}</span>
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">Recovery Point Objective (RPO)</span>
-                      <span className="text-gray-400 text-xs">?</span>
+                      <HelpIcon />
                     </div>
                     <span className="text-sm text-gray-900" data-testid="bia-rpo">{process.bia.rpo}</span>
                   </div>
@@ -1208,14 +1217,14 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">Last Updated</span>
-                      <span className="text-gray-400 text-xs">?</span>
+                      <HelpIcon />
                     </div>
                     <span className="text-sm text-gray-900" data-testid="bia-last-updated">{process.biaLastUpdated}</span>
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">Latest BIA Update</span>
-                      <span className="text-gray-400 text-xs">?</span>
+                      <HelpIcon />
                     </div>
                     <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="bia-latest-update">View</a>
                   </div>
