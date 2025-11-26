@@ -127,7 +127,7 @@ const getCategoryIcon = (category: CategoryType) => {
 };
 
 const getCategoryColors = (category: CategoryType, isHighlighted: boolean) => {
-  if (isHighlighted) return { border: "border-gray-400", bg: "bg-gray-100", iconBg: "bg-gray-200" };
+  if (isHighlighted) return { border: "border-blue-500", bg: "bg-blue-50", iconBg: "bg-blue-100" };
   switch (category) {
     case "root":
       return { border: "border-gray-300", bg: "bg-white", iconBg: "bg-gray-100" };
