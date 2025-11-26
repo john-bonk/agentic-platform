@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight, MoreHorizontal, Triangle, RefreshCcw, Check } from "lucide-react";
+import { ChevronDown, ChevronRight, MoreHorizontal, Triangle, RefreshCcw, Check, Link2 } from "lucide-react";
 import { HeaderSection } from "./sections/HeaderSection";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
+import { 
+  getApplicationsForTeam, 
+  getVendorsForApplications, 
+  getLocationsForApplications,
+  getTeamsUsingApplications,
+  getDepartmentForTeam,
+  getTeamByName,
+  type Application,
+  type Vendor,
+  type Location,
+  type BusinessUnit
+} from "../data/inventoryData";
 
 interface ProcessDetailProps {
   processId: string;
@@ -78,6 +90,7 @@ const processData: Record<string, {
   rpo: string;
   biaLastUpdated: string;
   businessUnits: string;
+  ownerTeam: string;
   relatedRisks: string;
   frameworks: string;
   controls: string;
@@ -102,6 +115,7 @@ const processData: Record<string, {
     rpo: "1 hour",
     biaLastUpdated: "June 20, 2024",
     businessUnits: "Retail Banking Operations",
+    ownerTeam: "Accounting",
     relatedRisks: "Credit Risk, System Outages, Data Breaches",
     frameworks: "PCI-DSS, SOX, Anti-Money Laundering (AML) regulations, Federal Reserve requirements",
     controls: "AC-01 Multi-Factor Authentication, AC-02 Customer Identity Verification, AC-03 Account Activity Monitoring, AC-04 Suspicious Activity Reporting, AC-05 Data Encryption at Rest",
@@ -145,6 +159,7 @@ const processData: Record<string, {
     rpo: "30 mins",
     biaLastUpdated: "June 20, 2024",
     businessUnits: "Retail Banking Operations",
+    ownerTeam: "Financial Planning",
     relatedRisks: "Credit Risk, Compliance Risk",
     frameworks: "SOX, Consumer Financial Protection Bureau (CFPB) regulations",
     controls: "LN-01 Credit Score Verification, LN-02 Income Documentation Review, LN-03 Dual Approval for Large Loans, LN-04 Automated Underwriting Validation, LN-05 Loan Document Retention",
@@ -186,6 +201,7 @@ const processData: Record<string, {
     rpo: "24 hours",
     biaLastUpdated: "June 20, 2024",
     businessUnits: "Retail Banking Operations",
+    ownerTeam: "Recruiting",
     relatedRisks: "Reputation Risk, Operational Risk",
     frameworks: "Consumer Protection regulations",
     controls: "CS-01 Call Recording and Monitoring, CS-02 Customer Authentication Protocol, CS-03 Complaint Escalation Procedures, CS-04 Service Level Agreement Tracking, CS-05 Quality Assurance Reviews",
@@ -228,6 +244,7 @@ const processData: Record<string, {
     rpo: "1 hour",
     biaLastUpdated: "June 20, 2024",
     businessUnits: "Human Resources",
+    ownerTeam: "Recruiting",
     relatedRisks: "Access Control Risk, Compliance Risk",
     frameworks: "SOX, GDPR, Employment regulations",
     controls: "HR-01 Background Check Verification, HR-02 Access Provisioning Workflow, HR-03 Mandatory Security Training, HR-04 Same-Day Access Revocation, HR-05 Exit Interview Documentation",
@@ -270,6 +287,7 @@ const processData: Record<string, {
     rpo: "1 hour",
     biaLastUpdated: "June 20, 2024",
     businessUnits: "Human Resources",
+    ownerTeam: "Payroll",
     relatedRisks: "Financial Risk, Compliance Risk",
     frameworks: "Tax regulations, Labor laws",
     controls: "PR-01 Payroll Reconciliation Review, PR-02 Segregation of Duties, PR-03 Tax Withholding Validation, PR-04 Direct Deposit Verification, PR-05 Payroll Audit Trail",
@@ -311,6 +329,7 @@ const processData: Record<string, {
     rpo: "1 hour",
     biaLastUpdated: "June 20, 2024",
     businessUnits: "Human Resources",
+    ownerTeam: "Employee Relations",
     relatedRisks: "Compliance Risk, Financial Risk",
     frameworks: "ERISA, ACA regulations",
     controls: "BN-01 Eligibility Verification, BN-02 Open Enrollment Controls, BN-03 COBRA Compliance Tracking, BN-04 401k Contribution Limits, BN-05 Benefits Cost Reconciliation",
@@ -352,6 +371,7 @@ const processData: Record<string, {
     rpo: "1 hour",
     biaLastUpdated: "June 20, 2024",
     businessUnits: "Human Resources",
+    ownerTeam: "Recruiting",
     relatedRisks: "Compliance Risk, Skill Gap Risk",
     frameworks: "Industry training standards",
     controls: "TR-01 Mandatory Training Completion Tracking, TR-02 Annual Compliance Certification, TR-03 Training Effectiveness Assessment, TR-04 Skills Gap Analysis, TR-05 Training Record Retention",
@@ -392,6 +412,7 @@ const processData: Record<string, {
     rpo: "1 hour",
     biaLastUpdated: "June 20, 2024",
     businessUnits: "Treasury & Cash Management",
+    ownerTeam: "Treasury",
     relatedRisks: "Liquidity Risk, Market Risk",
     frameworks: "Basel III requirements, Internal treasury policies",
     controls: "CF-01 Daily Cash Position Reporting, CF-02 Variance Analysis Review, CF-03 Forecast Model Validation, CF-04 Management Approval for Projections, CF-05 Historical Data Integrity Checks",
@@ -433,6 +454,7 @@ const processData: Record<string, {
     rpo: "1 hour",
     biaLastUpdated: "June 20, 2024",
     businessUnits: "Treasury & Cash Management",
+    ownerTeam: "Treasury",
     relatedRisks: "Liquidity Risk, Credit Risk",
     frameworks: "Basel III requirements, Federal Reserve regulations",
     controls: "LQ-01 Liquidity Coverage Ratio Monitoring, LQ-02 Stress Testing Procedures, LQ-03 Counterparty Exposure Limits, LQ-04 Collateral Management, LQ-05 Intraday Liquidity Monitoring",
@@ -475,6 +497,7 @@ const processData: Record<string, {
     rpo: "4 hours",
     biaLastUpdated: "June 20, 2024",
     businessUnits: "Treasury & Cash Management",
+    ownerTeam: "Treasury",
     relatedRisks: "Credit Risk, System Outages, Data Breaches",
     frameworks: "PCI-DSS, SOX, Anti-Money Laundering (AML) regulations, Federal Reserve requirements",
     controls: "PP-01 Transaction Authorization Limits, PP-02 Dual Approval for Wire Transfers, PP-03 OFAC Sanctions Screening, PP-04 Fraud Detection Algorithms, PP-05 End-of-Day Reconciliation",
@@ -519,6 +542,7 @@ const processData: Record<string, {
     rpo: "1 hour",
     biaLastUpdated: "June 20, 2024",
     businessUnits: "Treasury & Cash Management",
+    ownerTeam: "Treasury",
     relatedRisks: "Financial Risk, Compliance Risk",
     frameworks: "Treasury management standards",
     controls: "TB-01 Deferred Compensation Tracking, TB-02 Executive Benefits Approval, TB-03 Investment Option Monitoring, TB-04 Vesting Schedule Compliance, TB-05 Tax Reporting Accuracy",
@@ -553,13 +577,38 @@ const processData: Record<string, {
 
 const tabs = ["Overview", "Business Impact Analysis", "Key Dependencies", "Business Continuity Plan", "Issues"];
 
-function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }) {
+interface SemanticRelationships {
+  itSystems: Application[];
+  semanticVendors: Vendor[];
+  relatedTeams: BusinessUnit[];
+  deploymentLocations: Location[];
+}
+
+function KeyDependenciesContent({ dependencies, ownerTeam }: { dependencies: Dependencies; ownerTeam: string }) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     itAssets: true,
     vendors: false,
     businessProcesses: false,
     branches: false,
+    semanticItSystems: false,
+    semanticVendors: false,
+    semanticTeams: false,
+    semanticLocations: false,
   });
+
+  const semanticRelationships = useMemo<SemanticRelationships>(() => {
+    const apps = getApplicationsForTeam(ownerTeam);
+    const vendorsList = getVendorsForApplications(apps);
+    const locationsList = getLocationsForApplications(apps);
+    const teamsList = getTeamsUsingApplications(apps).filter(t => t.name !== ownerTeam);
+    
+    return {
+      itSystems: apps,
+      semanticVendors: vendorsList,
+      relatedTeams: teamsList,
+      deploymentLocations: locationsList,
+    };
+  }, [ownerTeam]);
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
@@ -795,6 +844,239 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
                       </a>
                     </td>
                     <td className="py-2 text-sm text-[#64748b]">{item.type}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Semantic Relationships Section Header */}
+      <div className="mt-6 mb-4 flex items-center gap-2">
+        <Link2 className="w-4 h-4 text-[#266c92]" />
+        <span className="text-sm font-semibold text-[#0f172a]">Semantic Relationships</span>
+        <span className="text-xs text-[#64748b]">(Derived from {ownerTeam} team inventory)</span>
+      </div>
+
+      {/* Semantic IT Systems Section */}
+      <div className="w-full">
+        <button
+          onClick={() => toggleSection("semanticItSystems")}
+          className={`w-full flex items-center h-10 border border-[#e2e8f0] ${
+            expandedSections.semanticItSystems 
+              ? "bg-[#f0fdf4] rounded-t" 
+              : "bg-white rounded"
+          }`}
+          data-testid="accordion-semanticItSystems"
+        >
+          {expandedSections.semanticItSystems && (
+            <div className="w-1 h-10 bg-[#22c55e] rounded-tl" />
+          )}
+          <div className={`flex items-center gap-4 ${expandedSections.semanticItSystems ? "pl-3" : "pl-4"} pr-3 flex-1`}>
+            <ChevronDown
+              className={`w-3 h-3 text-[#64748b] transition-transform ${
+                !expandedSections.semanticItSystems ? "-rotate-90" : ""
+              }`}
+            />
+            <span className="font-bold text-sm text-[#0f172a]">IT Systems</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#dcfce7] text-[#166534]">{semanticRelationships.itSystems.length}</span>
+          </div>
+        </button>
+        {expandedSections.semanticItSystems && (
+          <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white">
+            <table className="w-full table-fixed">
+              <thead>
+                <tr className="text-left text-xs text-gray-500 border-b">
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Name</th>
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Vendor</th>
+                  <th className="pb-2 font-medium" style={{ width: "120px" }}>Risk Level</th>
+                  <th className="pb-2 font-medium">Deployed Locations</th>
+                </tr>
+              </thead>
+              <tbody>
+                {semanticRelationships.itSystems.map((app, idx) => (
+                  <tr key={idx} className="border-b last:border-b-0">
+                    <td className="py-2 text-sm" style={{ width: "180px" }}>
+                      <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-semanticItSystems-${idx}`}>
+                        {app.name}
+                      </a>
+                    </td>
+                    <td className="py-2 text-sm text-[#64748b]" style={{ width: "180px" }}>{app.vendor}</td>
+                    <td className="py-2 text-sm" style={{ width: "120px" }}>
+                      <Badge variant={app.residualRisk === "High" ? "destructive" : app.residualRisk === "Medium" ? "secondary" : "outline"} className="text-xs">
+                        {app.residualRisk}
+                      </Badge>
+                    </td>
+                    <td className="py-2 text-sm text-[#64748b]">{app.deployedInLocations.length > 0 ? app.deployedInLocations.slice(0, 3).join(", ") + (app.deployedInLocations.length > 3 ? "..." : "") : "Cloud-based"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Semantic Vendors Section */}
+      <div className="w-full mt-4">
+        <button
+          onClick={() => toggleSection("semanticVendors")}
+          className={`w-full flex items-center h-10 border border-[#e2e8f0] ${
+            expandedSections.semanticVendors 
+              ? "bg-[#f0fdf4] rounded-t" 
+              : "bg-white rounded"
+          }`}
+          data-testid="accordion-semanticVendors"
+        >
+          {expandedSections.semanticVendors && (
+            <div className="w-1 h-10 bg-[#22c55e] rounded-tl" />
+          )}
+          <div className={`flex items-center gap-4 ${expandedSections.semanticVendors ? "pl-3" : "pl-4"} pr-3 flex-1`}>
+            <ChevronDown
+              className={`w-3 h-3 text-[#64748b] transition-transform ${
+                !expandedSections.semanticVendors ? "-rotate-90" : ""
+              }`}
+            />
+            <span className="font-bold text-sm text-[#0f172a]">Vendors</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#dcfce7] text-[#166534]">{semanticRelationships.semanticVendors.length}</span>
+          </div>
+        </button>
+        {expandedSections.semanticVendors && (
+          <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white">
+            <table className="w-full table-fixed">
+              <thead>
+                <tr className="text-left text-xs text-gray-500 border-b">
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Name</th>
+                  <th className="pb-2 font-medium" style={{ width: "280px" }}>Products</th>
+                  <th className="pb-2 font-medium">Risk Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                {semanticRelationships.semanticVendors.map((vendor, idx) => (
+                  <tr key={idx} className="border-b last:border-b-0">
+                    <td className="py-2 text-sm" style={{ width: "180px" }}>
+                      <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-semanticVendors-${idx}`}>
+                        {vendor.name}
+                      </a>
+                    </td>
+                    <td className="py-2 text-sm text-[#64748b]" style={{ width: "280px" }}>{vendor.products.slice(0, 3).join(", ")}{vendor.products.length > 3 ? "..." : ""}</td>
+                    <td className="py-2 text-sm">
+                      <Badge variant={vendor.residualRisk === "High" ? "destructive" : vendor.residualRisk === "Medium" ? "secondary" : "outline"} className="text-xs">
+                        {vendor.residualRisk}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Semantic Business Units Section */}
+      <div className="w-full mt-4">
+        <button
+          onClick={() => toggleSection("semanticTeams")}
+          className={`w-full flex items-center h-10 border border-[#e2e8f0] ${
+            expandedSections.semanticTeams 
+              ? "bg-[#f0fdf4] rounded-t" 
+              : "bg-white rounded"
+          }`}
+          data-testid="accordion-semanticTeams"
+        >
+          {expandedSections.semanticTeams && (
+            <div className="w-1 h-10 bg-[#22c55e] rounded-tl" />
+          )}
+          <div className={`flex items-center gap-4 ${expandedSections.semanticTeams ? "pl-3" : "pl-4"} pr-3 flex-1`}>
+            <ChevronDown
+              className={`w-3 h-3 text-[#64748b] transition-transform ${
+                !expandedSections.semanticTeams ? "-rotate-90" : ""
+              }`}
+            />
+            <span className="font-bold text-sm text-[#0f172a]">Business Units</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#dcfce7] text-[#166534]">{semanticRelationships.relatedTeams.length}</span>
+          </div>
+        </button>
+        {expandedSections.semanticTeams && (
+          <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white">
+            <table className="w-full table-fixed">
+              <thead>
+                <tr className="text-left text-xs text-gray-500 border-b">
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Name</th>
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Type</th>
+                  <th className="pb-2 font-medium">Risk Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                {semanticRelationships.relatedTeams.map((team, idx) => (
+                  <tr key={idx} className="border-b last:border-b-0">
+                    <td className="py-2 text-sm" style={{ width: "180px" }}>
+                      <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-semanticTeams-${idx}`}>
+                        {team.name}
+                      </a>
+                    </td>
+                    <td className="py-2 text-sm text-[#64748b]" style={{ width: "180px" }}>{team.type}</td>
+                    <td className="py-2 text-sm">
+                      <Badge variant={team.residualRisk === "High" ? "destructive" : team.residualRisk === "Medium" ? "secondary" : "outline"} className="text-xs">
+                        {team.residualRisk}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Semantic Locations Section */}
+      <div className="w-full mt-4">
+        <button
+          onClick={() => toggleSection("semanticLocations")}
+          className={`w-full flex items-center h-10 border border-[#e2e8f0] ${
+            expandedSections.semanticLocations 
+              ? "bg-[#f0fdf4] rounded-t" 
+              : "bg-white rounded"
+          }`}
+          data-testid="accordion-semanticLocations"
+        >
+          {expandedSections.semanticLocations && (
+            <div className="w-1 h-10 bg-[#22c55e] rounded-tl" />
+          )}
+          <div className={`flex items-center gap-4 ${expandedSections.semanticLocations ? "pl-3" : "pl-4"} pr-3 flex-1`}>
+            <ChevronDown
+              className={`w-3 h-3 text-[#64748b] transition-transform ${
+                !expandedSections.semanticLocations ? "-rotate-90" : ""
+              }`}
+            />
+            <span className="font-bold text-sm text-[#0f172a]">Locations</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#dcfce7] text-[#166534]">{semanticRelationships.deploymentLocations.length}</span>
+          </div>
+        </button>
+        {expandedSections.semanticLocations && (
+          <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white">
+            <table className="w-full table-fixed">
+              <thead>
+                <tr className="text-left text-xs text-gray-500 border-b">
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Name</th>
+                  <th className="pb-2 font-medium" style={{ width: "180px" }}>Type</th>
+                  <th className="pb-2 font-medium">Risk Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                {semanticRelationships.deploymentLocations.map((loc, idx) => (
+                  <tr key={idx} className="border-b last:border-b-0">
+                    <td className="py-2 text-sm" style={{ width: "180px" }}>
+                      <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-semanticLocations-${idx}`}>
+                        {loc.name}
+                      </a>
+                    </td>
+                    <td className="py-2 text-sm text-[#64748b]" style={{ width: "180px" }}>{loc.type}</td>
+                    <td className="py-2 text-sm">
+                      <Badge variant={loc.residualRisk === "High" ? "destructive" : loc.residualRisk === "Medium" ? "secondary" : "outline"} className="text-xs">
+                        {loc.residualRisk}
+                      </Badge>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -1151,7 +1433,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
             )}
 
             {activeTab === "Key Dependencies" && process.dependencies && (
-              <KeyDependenciesContent dependencies={process.dependencies} />
+              <KeyDependenciesContent dependencies={process.dependencies} ownerTeam={process.ownerTeam} />
             )}
 
             {activeTab === "Business Continuity Plan" && (
