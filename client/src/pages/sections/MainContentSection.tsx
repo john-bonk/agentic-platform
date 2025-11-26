@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -83,6 +83,34 @@ export const MainContentSection = (): JSX.Element => {
       return newSet;
     });
   };
+
+  const filteredData = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return businessProcessData;
+    }
+    
+    const query = searchQuery.toLowerCase();
+    
+    return businessProcessData
+      .map((category) => {
+        const categoryMatches = category.name.toLowerCase().includes(query);
+        const filteredProcesses = category.processes.filter(
+          (process) =>
+            process.name.toLowerCase().includes(query) ||
+            process.processOwner.toLowerCase().includes(query) ||
+            process.criticality.toLowerCase().includes(query)
+        );
+        
+        if (categoryMatches || filteredProcesses.length > 0) {
+          return {
+            ...category,
+            processes: categoryMatches ? category.processes : filteredProcesses,
+          };
+        }
+        return null;
+      })
+      .filter((category): category is Category => category !== null);
+  }, [searchQuery]);
 
   return (
     <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white min-w-0">
@@ -173,7 +201,7 @@ export const MainContentSection = (): JSX.Element => {
           </div>
 
           <div className="flex flex-col mx-4">
-            {businessProcessData.map((category) => (
+            {filteredData.map((category) => (
               <div key={category.id}>
                 <div
                   className="flex items-center h-12 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
