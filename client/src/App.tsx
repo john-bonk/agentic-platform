@@ -10,6 +10,7 @@ import { ProcessDetail } from "@/pages/ProcessDetail";
 import { VulnerabilityImportWizard } from "@/pages/wizard/VulnerabilityImportWizard";
 import { PlaceholderPage } from "@/pages/PlaceholderPage";
 import { IssuesPage } from "@/pages/IssuesPage";
+import { BCPWizardPage } from "@/pages/BCPWizardPage";
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/process/:id">
         {(params) => <ProcessDetail processId={params.id} />}
       </Route>
+      <Route path="/create-bcp/:processId" component={BCPWizardPage} />
       <Route path="/vulnerability-import-wizard" component={VulnerabilityImportWizard} />
       
       {/* Dashboard */}

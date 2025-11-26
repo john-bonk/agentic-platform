@@ -1,5 +1,7 @@
+import { useLocation } from "wouter";
+
 interface BCPEmptyStateProps {
-  onCreateNew: () => void;
+  processId: string;
 }
 
 function DocumentIcon() {
@@ -35,7 +37,13 @@ function DocumentIcon() {
   );
 }
 
-export function BCPEmptyState({ onCreateNew }: BCPEmptyStateProps) {
+export function BCPEmptyState({ processId }: BCPEmptyStateProps) {
+  const [, navigate] = useLocation();
+
+  const handleCreatePlan = () => {
+    navigate(`/create-bcp/${processId}`);
+  };
+
   return (
     <div 
       className="flex flex-col items-center gap-2 p-4 w-full"
@@ -68,7 +76,7 @@ export function BCPEmptyState({ onCreateNew }: BCPEmptyStateProps) {
               data-testid="button-view-template"
             >Import</button>
             <button
-              onClick={onCreateNew}
+              onClick={handleCreatePlan}
               className="h-7 px-2 bg-[#266c92] border border-[#266c92] rounded text-[13px] text-white leading-[1.35] hover:bg-[#1e5a7a] transition-colors"
               data-testid="button-create-bcp"
             >
