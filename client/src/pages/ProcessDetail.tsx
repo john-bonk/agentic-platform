@@ -476,7 +476,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
       <LeftNavbar />
       <div className="flex flex-col items-start relative flex-1 grow">
         <HeaderSection activeProcess={{ id: processId, name: process.name }} />
-        <div className="flex items-start relative flex-1 self-stretch w-full grow">
+        <div className="flex items-stretch relative flex-1 self-stretch w-full grow">
           <SideNavigationSection />
           <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white min-w-0 overflow-y-auto" style={{ maxHeight: "calc(100vh - 60px)" }}>
           <header className="flex flex-col gap-4 py-6 px-8 w-full bg-white">
