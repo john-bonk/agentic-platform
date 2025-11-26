@@ -811,37 +811,39 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
               ))}
             </div>
 
-            <div className="flex gap-8 items-start flex-wrap py-4 pb-6 border-b border-gray-200">
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-gray-500 uppercase">Criticality</span>
-                <Badge
-                  className={`text-[10px] font-semibold px-1.5 py-0 rounded-full ${
-                    process.criticality === "High"
-                      ? "bg-[#db3535] text-white hover:bg-[#db3535]"
-                      : "bg-[#36844a] text-white hover:bg-[#36844a]"
-                  }`}
-                  data-testid="criticality-value"
-                >
-                  {process.criticality}
-                </Badge>
+            {activeTab === "Overview" && (
+              <div className="flex gap-8 items-start flex-wrap py-4 pb-6 border-b border-gray-200">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-gray-500 uppercase">Criticality</span>
+                  <Badge
+                    className={`text-[10px] font-semibold px-1.5 py-0 rounded-full ${
+                      process.criticality === "High"
+                        ? "bg-[#db3535] text-white hover:bg-[#db3535]"
+                        : "bg-[#36844a] text-white hover:bg-[#36844a]"
+                    }`}
+                    data-testid="criticality-value"
+                  >
+                    {process.criticality}
+                  </Badge>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-gray-500 uppercase">RTO</span>
+                  <span className="text-sm text-gray-900" data-testid="rto-value">{process.rto}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-gray-500 uppercase">RPO</span>
+                  <span className="text-sm text-gray-500" data-testid="rpo-value">{process.rpo}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-gray-500 uppercase">Process Owner</span>
+                  <span className="text-sm text-gray-900" data-testid="owner-value">{process.processOwner}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-gray-500 uppercase">BIA Last Updated</span>
+                  <span className="text-sm text-gray-900" data-testid="bia-updated-value">{process.biaLastUpdated}</span>
+                </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-gray-500 uppercase">RTO</span>
-                <span className="text-sm text-gray-900" data-testid="rto-value">{process.rto}</span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-gray-500 uppercase">RPO</span>
-                <span className="text-sm text-gray-500" data-testid="rpo-value">{process.rpo}</span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-gray-500 uppercase">Process Owner</span>
-                <span className="text-sm text-gray-900" data-testid="owner-value">{process.processOwner}</span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-gray-500 uppercase">BIA Last Updated</span>
-                <span className="text-sm text-gray-900" data-testid="bia-updated-value">{process.biaLastUpdated}</span>
-              </div>
-            </div>
+            )}
           </header>
 
           <main className="flex flex-col flex-1 w-full px-8 py-6">
