@@ -456,16 +456,10 @@ function ProcessSelectionTable({
                       />
                     </div>
                     <div className="flex-1 max-w-[315px] px-3 pl-12 flex items-center gap-2">
-                      <span className="text-slate-400">-</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400 flex-shrink-0" />
                       <span className="text-sm text-[#3172e3]">
                         {process.name}
                       </span>
-                      {isAiSuggested && (
-                        <div className="flex items-center gap-1 px-1.5 py-0.5 bg-purple-100 rounded text-purple-700">
-                          <Sparkles className="w-3 h-3" />
-                          <span className="text-[10px] font-medium">AI Suggested</span>
-                        </div>
-                      )}
                       {isCurrentProcess && (
                         <Badge variant="outline" className="text-[10px] h-4 px-1.5 border-teal-500 text-teal-700">
                           Current
@@ -477,8 +471,14 @@ function ProcessSelectionTable({
                         {process.processOwner}
                       </span>
                     </div>
-                    <div className="flex-1 max-w-[200px] px-3">
+                    <div className="flex-1 max-w-[200px] px-3 flex items-center justify-between gap-2">
                       {getCriticalityBadge(process.criticality)}
+                      {isAiSuggested && (
+                        <div className="flex items-center gap-1 px-1.5 py-0.5 bg-purple-100 rounded text-purple-700">
+                          <Sparkles className="w-3 h-3" />
+                          <span className="text-[10px] font-medium">AI Suggested</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
