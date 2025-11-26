@@ -129,8 +129,8 @@ export const MainContentSection = (): JSX.Element => {
 
         <div className="flex items-center gap-2">
           <div className="flex items-center border border-gray-200 rounded overflow-hidden">
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none border-r border-gray-200" data-testid="tree-view-button">
-              <GitBranch className="w-4 h-4 text-gray-500" />
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none border-r border-gray-200 bg-[#256c92] text-[#ffffff]" data-testid="tree-view-button">
+              <GitBranch className="w-4 h-4 text-white" />
             </Button>
             <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none" data-testid="list-view-button">
               <List className="w-4 h-4 text-gray-500" />
