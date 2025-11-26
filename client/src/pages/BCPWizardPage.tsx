@@ -1,9 +1,11 @@
 import { useState, useMemo, useRef } from "react";
 import { useLocation, useRoute, Link } from "wouter";
-import { X, PlusCircle, Download, Check, RefreshCcw, Upload, FileText, Trash2 } from "lucide-react";
+import { X, PlusCircle, Download, Check, RefreshCcw, Upload, FileText, Trash2, ChevronDown, ChevronRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -11,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getProcessById } from "@/data/businessProcessData";
+import { getProcessById, businessProcessData, type ProcessDetail, type Category } from "@/data/businessProcessData";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
 import { HeaderSection } from "./sections/HeaderSection";
 
@@ -263,6 +265,231 @@ function FileDropZone({ file, onFileSelect }: FileDropZoneProps) {
   );
 }
 
+interface ProcessSelectionTableProps {
+  selectedProcessIds: Set<string>;
+  onSelectionChange: (processIds: Set<string>) => void;
+  aiSuggestedProcessIds: Set<string>;
+  currentProcessId: string;
+}
+
+function ProcessSelectionTable({
+  selectedProcessIds,
+  onSelectionChange,
+  aiSuggestedProcessIds,
+  currentProcessId,
+}: ProcessSelectionTableProps) {
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    () => {
+      const expanded = new Set<string>();
+      businessProcessData.forEach((category) => {
+        if (category.processes.some((p) => p.id === currentProcessId)) {
+          expanded.add(category.id);
+        }
+      });
+      if (expanded.size === 0 && businessProcessData.length > 0) {
+        expanded.add(businessProcessData[0].id);
+      }
+      return expanded;
+    }
+  );
+
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(categoryId)) {
+        next.delete(categoryId);
+      } else {
+        next.add(categoryId);
+      }
+      return next;
+    });
+  };
+
+  const toggleProcess = (processId: string) => {
+    const next = new Set(selectedProcessIds);
+    if (next.has(processId)) {
+      next.delete(processId);
+    } else {
+      next.add(processId);
+    }
+    onSelectionChange(next);
+  };
+
+  const toggleAllInCategory = (category: Category) => {
+    const categoryProcessIds = category.processes.map((p) => p.id);
+    const allSelected = categoryProcessIds.every((id) =>
+      selectedProcessIds.has(id)
+    );
+
+    const next = new Set(selectedProcessIds);
+    if (allSelected) {
+      categoryProcessIds.forEach((id) => next.delete(id));
+    } else {
+      categoryProcessIds.forEach((id) => next.add(id));
+    }
+    onSelectionChange(next);
+  };
+
+  const getCriticalityBadge = (criticality: "High" | "Low") => {
+    if (criticality === "High") {
+      return (
+        <Badge className="bg-red-500 hover:bg-red-500 text-white text-[11px] h-4 px-1.5">
+          High
+        </Badge>
+      );
+    }
+    return (
+      <Badge className="bg-green-600 hover:bg-green-600 text-white text-[11px] h-4 px-1.5">
+        Low
+      </Badge>
+    );
+  };
+
+  return (
+    <div className="w-full max-w-[755px]" data-testid="process-selection-table">
+      {/* Header */}
+      <div className="flex items-center border-b border-slate-200 py-3">
+        <div className="w-10 flex items-center justify-center">
+          <Checkbox
+            checked={
+              businessProcessData.every((cat) =>
+                cat.processes.every((p) => selectedProcessIds.has(p.id))
+              )
+            }
+            onCheckedChange={() => {
+              const allProcessIds = businessProcessData.flatMap((cat) =>
+                cat.processes.map((p) => p.id)
+              );
+              const allSelected = allProcessIds.every((id) =>
+                selectedProcessIds.has(id)
+              );
+              if (allSelected) {
+                onSelectionChange(new Set());
+              } else {
+                onSelectionChange(new Set(allProcessIds));
+              }
+            }}
+            data-testid="checkbox-select-all"
+          />
+        </div>
+        <div className="flex-1 max-w-[315px] px-3">
+          <span className="text-xs font-bold text-[rgba(24,49,83,0.67)] uppercase">
+            Name
+          </span>
+        </div>
+        <div className="flex-1 max-w-[200px] px-3">
+          <span className="text-xs font-bold text-[rgba(24,49,83,0.67)] uppercase">
+            Process Owner
+          </span>
+        </div>
+        <div className="flex-1 max-w-[200px] px-3">
+          <span className="text-xs font-bold text-[rgba(24,49,83,0.67)] uppercase">
+            Criticality
+          </span>
+        </div>
+      </div>
+
+      {/* Categories and Processes */}
+      {businessProcessData.map((category) => {
+        const isExpanded = expandedCategories.has(category.id);
+        const categoryProcessIds = category.processes.map((p) => p.id);
+        const someSelected = categoryProcessIds.some((id) =>
+          selectedProcessIds.has(id)
+        );
+        const allSelected = categoryProcessIds.every((id) =>
+          selectedProcessIds.has(id)
+        );
+
+        return (
+          <div key={category.id}>
+            {/* Category Row */}
+            <div
+              className="flex items-center h-12 border-b border-slate-200 bg-white"
+              data-testid={`category-row-${category.id}`}
+            >
+              <div className="w-10 flex items-center justify-center">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={() => toggleAllInCategory(category)}
+                  data-testid={`checkbox-category-${category.id}`}
+                />
+              </div>
+              <div className="flex-1 max-w-[315px] px-3 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => toggleCategory(category.id)}
+                  className="p-0.5"
+                  data-testid={`toggle-category-${category.id}`}
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="w-4 h-4 text-slate-700" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-slate-700" />
+                  )}
+                </button>
+                <span className="text-sm text-[#3172e3]">{category.name}</span>
+              </div>
+            </div>
+
+            {/* Process Rows */}
+            {isExpanded &&
+              category.processes.map((process) => {
+                const isSelected = selectedProcessIds.has(process.id);
+                const isAiSuggested = aiSuggestedProcessIds.has(process.id);
+                const isCurrentProcess = process.id === currentProcessId;
+
+                return (
+                  <div
+                    key={process.id}
+                    className={`flex items-center h-12 border-b border-slate-200 ${
+                      isAiSuggested
+                        ? "bg-purple-50"
+                        : "bg-white"
+                    }`}
+                    data-testid={`process-row-${process.id}`}
+                  >
+                    <div className="w-10 flex items-center justify-center">
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => toggleProcess(process.id)}
+                        data-testid={`checkbox-process-${process.id}`}
+                      />
+                    </div>
+                    <div className="flex-1 max-w-[315px] px-3 pl-12 flex items-center gap-2">
+                      <span className="text-slate-400">-</span>
+                      <span className="text-sm text-[#3172e3]">
+                        {process.name}
+                      </span>
+                      {isAiSuggested && (
+                        <div className="flex items-center gap-1 px-1.5 py-0.5 bg-purple-100 rounded text-purple-700">
+                          <Sparkles className="w-3 h-3" />
+                          <span className="text-[10px] font-medium">AI Suggested</span>
+                        </div>
+                      )}
+                      {isCurrentProcess && (
+                        <Badge variant="outline" className="text-[10px] h-4 px-1.5 border-teal-500 text-teal-700">
+                          Current
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex-1 max-w-[200px] px-3">
+                      <span className="text-sm text-slate-900">
+                        {process.processOwner}
+                      </span>
+                    </div>
+                    <div className="flex-1 max-w-[200px] px-3">
+                      {getCriticalityBadge(process.criticality)}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function LeftNavbar() {
   return (
     <aside
@@ -344,6 +571,34 @@ export function BCPWizardPage() {
   const [planOwner, setPlanOwner] = useState<string>(defaultOwnerValue);
   const [planType, setPlanType] = useState<"create" | "import">("create");
   const [importFile, setImportFile] = useState<File | null>(null);
+  
+  // Step 2: Process selection state
+  const [selectedProcessIds, setSelectedProcessIds] = useState<Set<string>>(() => {
+    const initial = new Set<string>();
+    if (processId) {
+      initial.add(processId);
+    }
+    return initial;
+  });
+  
+  // AI Suggested processes based on dependencies.businessProcesses
+  const aiSuggestedProcessIds = useMemo(() => {
+    const suggestions = new Set<string>();
+    if (!process?.dependencies?.businessProcesses) return suggestions;
+    
+    // Find process IDs that match the names in dependencies.businessProcesses
+    process.dependencies.businessProcesses.forEach((dep) => {
+      businessProcessData.forEach((category) => {
+        category.processes.forEach((p) => {
+          if (p.name === dep.name && p.id !== processId) {
+            suggestions.add(p.id);
+          }
+        });
+      });
+    });
+    
+    return suggestions;
+  }, [process?.dependencies?.businessProcesses, processId]);
 
   const handleClose = () => {
     if (processId) {
