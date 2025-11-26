@@ -61,10 +61,6 @@ export const MainContentSection = (): JSX.Element => {
         <div className="flex gap-3 items-start w-full">
           {/* Text Section */}
           <div className="flex flex-col flex-1 gap-1 items-start justify-center">
-            {/* Subhead */}
-            <span className="text-[13px] font-semibold text-gray-500 leading-[1.35]">
-              Installed Service
-            </span>
             {/* Heading with Badge */}
             <div className="flex items-center gap-2 w-full">
               <h1 className="text-xl font-semibold text-gray-900 leading-[1.2]">
