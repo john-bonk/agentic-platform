@@ -79,10 +79,9 @@ const navigationIcons: NavigationIcon[] = [
 
 export const Integrations = (): JSX.Element => {
   return (
-    <div className="flex items-start relative">
+    <div className="flex items-start relative h-screen overflow-hidden">
       <aside
-        className="flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 relative bg-gray-900"
-        style={{ minHeight: "100vh" }}
+        className="flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 bg-gray-900 sticky top-0 h-screen z-50 flex-shrink-0"
         data-testid="side-navbar"
       >
         <nav className="flex flex-col items-center gap-1 relative flex-[0_0_auto]">
@@ -125,9 +124,9 @@ export const Integrations = (): JSX.Element => {
         </div>
       </aside>
 
-      <div className="flex flex-col items-start relative flex-1 grow">
+      <div className="flex flex-col flex-1 min-w-0 h-screen overflow-hidden">
         <HeaderSection />
-        <div className="flex items-start relative flex-1 self-stretch w-full grow">
+        <div className="flex flex-1 overflow-hidden">
           <SideNavigationSection />
           <MainContentSection />
         </div>
