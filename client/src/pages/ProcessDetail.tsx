@@ -518,7 +518,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
 
             {activeTab === "Overview" && (
               <div className="flex gap-8 items-start flex-wrap py-4 pb-6 border-b border-gray-200">
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 items-start">
                   <span className="text-xs text-gray-500 uppercase">Criticality</span>
                   <Badge
                     className={`text-[10px] font-semibold px-1.5 py-0 rounded-full ${
