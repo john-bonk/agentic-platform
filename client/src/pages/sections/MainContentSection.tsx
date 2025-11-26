@@ -1,48 +1,95 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { importJobStore, type ImportJob } from "@/lib/importJobStore";
-import { useToast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { ChevronDown, ChevronRight, Search, Filter, List, GitBranch, Columns, MoreHorizontal } from "lucide-react";
+
+interface Process {
+  id: string;
+  name: string;
+  processOwner: string;
+  criticality: "High" | "Low";
+  rto: string;
+  rpo: string;
+  latestBia: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  processes: Process[];
+}
+
+const businessProcessData: Category[] = [
+  {
+    id: "retail-banking",
+    name: "Retail Banking Operations",
+    processes: [
+      { id: "1", name: "Account Management", processOwner: "Baylor Cruz", criticality: "High", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "2", name: "Loan Origination and Servicing", processOwner: "Baylor Cruz", criticality: "Low", rto: "30 mins", rpo: "30 mins", latestBia: "2024" },
+      { id: "3", name: "Customer Service and Support", processOwner: "Baylor Cruz", criticality: "Low", rto: "24 hours", rpo: "24 hours", latestBia: "2024" },
+    ],
+  },
+  {
+    id: "human-resources",
+    name: "Human Resources",
+    processes: [
+      { id: "4", name: "Employee Onboarding and Offboarding", processOwner: "Dante Bradford", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "5", name: "Payroll Processing", processOwner: "Dante Bradford", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "6", name: "Benefits Administration", processOwner: "Dante Bradford", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "7", name: "Training & Development", processOwner: "Dante Bradford", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+    ],
+  },
+  {
+    id: "treasury",
+    name: "Treasury & Cash Management",
+    processes: [
+      { id: "8", name: "Cash Flow Forecasting", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "9", name: "Liquidity Management", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "10", name: "Payment Processing", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "11", name: "Benefits Administration", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+    ],
+  },
+];
 
 const tableHeaders = [
-  { label: "ENABLED", width: "w-20" },
-  { label: "AUDITBOARD INVENTORY TYPE", width: "flex-1" },
-  { label: "TENABLE ASSET TYPE", width: "flex-1" },
-  { label: "FREQUENCY", width: "flex-1" },
-  { label: "STATUS", width: "flex-1" },
-  { label: "LAST IMPORT", width: "flex-1" },
-  { label: "NEXT IMPORT", width: "flex-1" },
+  { label: "NAME", width: "w-[295px]" },
+  { label: "PROCESS OWNER", width: "w-[200px]" },
+  { label: "CRITICALITY", width: "w-[200px]" },
+  { label: "RTO", width: "w-[200px]" },
+  { label: "RPO", width: "w-[200px]" },
+  { label: "LATEST BIA", width: "w-[200px]" },
 ];
 
 export const MainContentSection = (): JSX.Element => {
-  const [, setLocation] = useLocation();
-  const [importJobs, setImportJobs] = useState<ImportJob[]>([]);
-  const [showLiabilityCard, setShowLiabilityCard] = useState(true);
-  const { toast } = useToast();
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set(businessProcessData.map((cat) => cat.id))
+  );
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    setImportJobs(importJobStore.getJobs());
-    const unsubscribe = importJobStore.subscribe(() => {
-      setImportJobs(importJobStore.getJobs());
-    });
-    return unsubscribe;
-  }, []);
-
-  const handleAcceptLiability = () => {
-    setShowLiabilityCard(false);
-    toast({
-      title: "Liability Accepted",
-      description: "You have accepted the liability statement for Tenable Vulnerability Import Jobs.",
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
     });
   };
 
-  const handleDeclineLiability = () => {
-    setShowLiabilityCard(false);
-    toast({
-      title: "Liability Declined",
-      description: "You have declined the liability statement. Some features may be limited.",
+  const toggleRowSelection = (rowId: string) => {
+    setSelectedRows((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId);
+      } else {
+        newSet.add(rowId);
+      }
+      return newSet;
     });
   };
 
@@ -50,14 +97,12 @@ export const MainContentSection = (): JSX.Element => {
     <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white">
       <header className="flex flex-col gap-2 py-8 px-8 w-full bg-white border-b border-[rgba(1,55,126,0.11)]">
         <div className="flex gap-4 items-start w-full">
-          {/* Title */}
           <div className="flex flex-1 flex-col justify-center">
             <h1 className="text-[32px] font-semibold text-gray-900 leading-[1.33]" data-testid="page-title">
               Business Processes
             </h1>
           </div>
 
-          {/* Action Bar */}
           <div className="flex gap-1 items-start">
             <Button
               className="h-[38px] gap-2 px-4 bg-teal-600 hover:bg-teal-600/90 border border-teal-600 text-white text-sm font-normal rounded"
@@ -73,197 +118,152 @@ export const MainContentSection = (): JSX.Element => {
         </div>
       </header>
 
-      <main className="flex items-start relative flex-1 self-stretch w-full grow overflow-y-scroll">
-        <div className="flex items-start justify-between relative flex-1 self-stretch grow">
-          <div className="flex flex-col items-start gap-6 pt-6 pb-0 px-8 relative flex-1 self-stretch grow">
-            {showLiabilityCard && (
-              <Card className="self-stretch w-full rounded-lg border border-gray-200 [background:radial-gradient(50%_50%_at_115%_-44%,rgba(1,51,101,0.03)_0%,rgba(1,51,101,0.03)_100%)]" data-testid="liability-card">
-                <CardContent className="flex flex-col items-start gap-6 p-6">
-                  <div className="gap-1 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-                    <h2 className="relative self-stretch mt-[-1.00px] font-font-400-18px-semibold font-[number:var(--font-400-18px-semibold-font-weight)] text-gray-900 text-[length:var(--font-400-18px-semibold-font-size)] tracking-[var(--font-400-18px-semibold-letter-spacing)] leading-[var(--font-400-18px-semibold-line-height)] [font-style:var(--font-400-18px-semibold-font-style)]" data-testid="liability-card-title">
-                      Liability Statement for Tenable Vulnerability Import Jobs
-                    </h2>
+      <div className="flex items-center justify-between px-8 py-3 w-full border-b border-gray-200 bg-white">
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-9 w-[240px] text-sm"
+              data-testid="search-input"
+            />
+          </div>
+          <Button variant="outline" size="sm" className="h-9 gap-1.5 text-gray-600" data-testid="add-filter-button">
+            <Filter className="w-4 h-4" />
+            Add Filter
+          </Button>
+        </div>
 
-                    <p className="relative self-stretch font-font-200-14px-light font-[number:var(--font-200-14px-light-font-weight)] text-gray-900 text-[length:var(--font-200-14px-light-font-size)] tracking-[var(--font-200-14px-light-letter-spacing)] leading-[var(--font-200-14px-light-line-height)] [font-style:var(--font-200-14px-light-font-style)]" data-testid="liability-card-content">
-                      AuditBoard may make certain content available through the
-                      Service, Customer retains sole responsibility for verifying
-                      such content prior to use. The content is provided on an
-                      &quot;as is&quot; basis and all warranties, conditions,
-                      representations, indemnities and guarantees with respect to
-                      the content, and all components thereof, whether express or
-                      implied, arising by law, custom, or prior oral or written
-                      statements made by AuditBoard, their representatives, third
-                      parties, or otherwise, including but not limited to its
-                      accuracy, completeness, fitness for any particular purpose,
-                      non-infringement, or that the use of or reliance upon any
-                      content will cause Customer or any of its Affiliates to
-                      achieve compliance with any laws, regulations, or authority
-                      documents are hereby excluded and disclaimed to the fullest
-                      extent permitted by applicable law.
-                    </p>
-                  </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center border border-gray-200 rounded overflow-hidden">
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none border-r border-gray-200" data-testid="tree-view-button">
+              <GitBranch className="w-4 h-4 text-gray-500" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none" data-testid="list-view-button">
+              <List className="w-4 h-4 text-gray-500" />
+            </Button>
+          </div>
+          <Button variant="outline" size="sm" className="h-9 gap-1.5 text-gray-600" data-testid="manage-columns-button">
+            <Columns className="w-4 h-4" />
+            Manage Columns
+          </Button>
+          <Button variant="ghost" size="icon" className="h-9 w-9" data-testid="more-options-button">
+            <MoreHorizontal className="w-4 h-4 text-gray-500" />
+          </Button>
+        </div>
+      </div>
 
-                  <footer className="inline-flex items-center gap-1 relative flex-[0_0_auto] bg-transparent">
-                    <Button 
-                      onClick={handleAcceptLiability}
-                      className="h-[34px] gap-2 px-[10.4px] bg-teal-500 hover:bg-teal-500/90 rounded border border-solid shadow-shadow-100"
-                      data-testid="liability-accept-button"
-                    >
-                      <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-white text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
-                        Accept
-                      </span>
-                    </Button>
+      <main className="flex flex-col relative flex-1 self-stretch w-full overflow-y-auto">
+        <div className="flex items-center h-10 border-b border-gray-200 bg-white sticky top-0 z-10">
+          <div className="w-10 flex items-center justify-center">
+            <Checkbox data-testid="select-all-checkbox" />
+          </div>
+          {tableHeaders.map((header, index) => (
+            <div
+              key={index}
+              className={`flex items-center px-3 ${header.width}`}
+            >
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {header.label}
+              </span>
+            </div>
+          ))}
+        </div>
 
-                    <Button
-                      variant="secondary"
-                      onClick={handleDeclineLiability}
-                      className="h-[34px] gap-2 px-[10.4px] bg-gray-100 hover:bg-gray-200 rounded"
-                      data-testid="liability-decline-button"
-                    >
-                      <span className="font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-gray-900 text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
-                        Decline
-                      </span>
-                    </Button>
-                  </footer>
-                </CardContent>
-              </Card>
-            )}
+        <div className="flex flex-col">
+          {businessProcessData.map((category) => (
+            <div key={category.id}>
+              <div
+                className="flex items-center h-12 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+                onClick={() => toggleCategory(category.id)}
+                data-testid={`category-row-${category.id}`}
+              >
+                <div className="w-10 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={selectedRows.has(category.id)}
+                    onCheckedChange={() => toggleRowSelection(category.id)}
+                    data-testid={`checkbox-category-${category.id}`}
+                  />
+                </div>
+                <div className="flex items-center gap-2 w-[295px] px-3">
+                  <button className="flex items-center justify-center w-4 h-4" data-testid={`toggle-${category.id}`}>
+                    {expandedCategories.has(category.id) ? (
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-gray-500" />
+                    )}
+                  </button>
+                  <span className="text-sm font-medium text-gray-900">{category.name}</span>
+                </div>
+                <div className="w-[200px] px-3"></div>
+                <div className="w-[200px] px-3"></div>
+                <div className="w-[200px] px-3"></div>
+                <div className="w-[200px] px-3"></div>
+                <div className="w-[200px] px-3"></div>
+              </div>
 
-            <section className="flex flex-col items-start gap-1 relative self-stretch w-full flex-[0_0_auto]">
-              <h2 className="relative self-stretch mt-[-1.00px] font-font-400-18px-semibold font-[number:var(--font-400-18px-semibold-font-weight)] text-gray-900 text-[length:var(--font-400-18px-semibold-font-size)] tracking-[var(--font-400-18px-semibold-letter-spacing)] leading-[var(--font-400-18px-semibold-line-height)] [font-style:var(--font-400-18px-semibold-font-style)]">
-                Vulnerability Import Jobs
-              </h2>
-
-              <p className="relative self-stretch font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-gray-700 text-[length:var(--font-200-14px-regular-font-size)] tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
-                Import vulnerability assets (both findings and details) from
-                Tenable. Match them to existing AuditBoard inventory, map
-                specific fields, and filter for critical vulnerabilities. Please
-                note, this product uses the NVD API but is not endorsed or
-                certified by the NVD.
-              </p>
-            </section>
-
-            <div className="flex flex-col items-center relative self-stretch w-full flex-[0_0_auto]">
-              <div className="self-stretch w-full flex-[0_0_auto] border-b border-[#01377e1c] flex items-start relative">
-                {tableHeaders.map((header, index) => (
+              {expandedCategories.has(category.id) &&
+                category.processes.map((process) => (
                   <div
-                    key={index}
-                    className={`flex flex-col ${header.width} justify-center gap-2 p-3 items-start relative`}
+                    key={process.id}
+                    className="flex items-center h-12 border-b border-gray-100 hover:bg-gray-50"
+                    data-testid={`process-row-${process.id}`}
                   >
-                    <div className="flex items-center gap-1 relative self-stretch w-full flex-[0_0_auto]">
-                      <div className="inline-flex flex-[0_0_auto] items-start relative">
-                        <div className="relative w-fit mt-[-1.00px] [font-family:'SF_Pro_Display-Medium',Helvetica] font-medium text-gray-700 text-xs tracking-[0.35px] leading-[18px] whitespace-nowrap">
-                          {header.label}
-                        </div>
-                      </div>
+                    <div className="w-10 flex items-center justify-center">
+                      <Checkbox
+                        checked={selectedRows.has(process.id)}
+                        onCheckedChange={() => toggleRowSelection(process.id)}
+                        data-testid={`checkbox-process-${process.id}`}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 w-[295px] px-3 pl-10">
+                      <span className="text-gray-400 mr-1">-</span>
+                      <a
+                        href="#"
+                        className="text-sm text-blue-600 hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                        data-testid={`process-link-${process.id}`}
+                      >
+                        {process.name}
+                      </a>
+                    </div>
+                    <div className="w-[200px] px-3">
+                      <span className="text-sm text-gray-900">{process.processOwner}</span>
+                    </div>
+                    <div className="w-[200px] px-3">
+                      <Badge
+                        className={`text-xs font-medium px-2 py-0.5 rounded ${
+                          process.criticality === "High"
+                            ? "bg-red-100 text-red-700 hover:bg-red-100"
+                            : "bg-green-100 text-green-700 hover:bg-green-100"
+                        }`}
+                        data-testid={`criticality-badge-${process.id}`}
+                      >
+                        {process.criticality}
+                      </Badge>
+                    </div>
+                    <div className="w-[200px] px-3">
+                      <span className="text-sm text-gray-900">{process.rto}</span>
+                    </div>
+                    <div className="w-[200px] px-3">
+                      <span className="text-sm text-gray-900">{process.rpo}</span>
+                    </div>
+                    <div className="w-[200px] px-3">
+                      <a
+                        href="#"
+                        className="text-sm text-blue-600 hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                        data-testid={`bia-link-${process.id}`}
+                      >
+                        {process.latestBia}
+                      </a>
                     </div>
                   </div>
                 ))}
-              </div>
-
-              {importJobs.length === 0 ? (
-                <div className="flex flex-col max-w-[400px] items-center gap-2 px-4 py-12 relative w-full flex-[0_0_auto] rounded">
-                  <div className="gap-4 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-                    <div className="gap-2 pt-2 pb-0 px-0 flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
-                      <h3 className="relative flex items-center justify-center self-stretch mt-[-1.00px] font-font-400-18px-medium font-[number:var(--font-400-18px-medium-font-weight)] text-gray-900 text-[length:var(--font-400-18px-medium-font-size)] text-center tracking-[var(--font-400-18px-medium-letter-spacing)] leading-[var(--font-400-18px-medium-line-height)] [font-style:var(--font-400-18px-medium-font-style)]">
-                        No vulnerability import jobs found
-                      </h3>
-
-                      <p className="relative self-stretch font-font-200-14px-regular font-[number:var(--font-200-14px-regular-font-weight)] text-gray-700 text-[length:var(--font-200-14px-regular-font-size)] text-center tracking-[var(--font-200-14px-regular-letter-spacing)] leading-[var(--font-200-14px-regular-line-height)] [font-style:var(--font-200-14px-regular-font-style)]">
-                        Currently there are no import jobs between Tenable and
-                        AuditBoard. Add one below.
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-center gap-2 relative self-stretch w-full flex-[0_0_auto]">
-                      <Button
-                        variant="outline"
-                        className="h-8 gap-1.5 px-2.5 bg-white border border-gray-300 text-gray-900 text-[13px] font-normal rounded"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-70">
-                          <path d="M2 3.5C2 2.67157 2.67157 2 3.5 2H12.5C13.3284 2 14 2.67157 14 3.5V12.5C14 13.3284 13.3284 14 12.5 14H3.5C2.67157 14 2 13.3284 2 12.5V3.5Z" stroke="currentColor" strokeWidth="1.25" />
-                          <path d="M5 5H11" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-                          <path d="M5 8H11" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-                          <path d="M5 11H8" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-                        </svg>
-                        Vulnerability Import Documentation
-                      </Button>
-
-                      <Button 
-                        onClick={() => setLocation("/vulnerability-import-wizard")}
-                        className="h-8 gap-1.5 px-2.5 bg-teal-500 hover:bg-teal-500/90 border-teal-500 text-[13px] font-normal rounded"
-                        data-testid="add-vulnerability-import-job-button"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M8 3V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                          <path d="M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                        </svg>
-                        <span className="text-white">Vulnerability Import Job</span>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col w-full" data-testid="import-jobs-table">
-                  {importJobs.map((job, index) => (
-                    <div
-                      key={job.id}
-                      className="flex items-start self-stretch w-full bg-white border-b border-gray-200"
-                      data-testid={`import-job-row-${index}`}
-                    >
-                      <div className="flex flex-col w-20 justify-center gap-2 p-3 items-start relative">
-                        <div className="flex items-center justify-center w-9 h-5 bg-teal-500 rounded-full relative">
-                          <div className="w-3 h-3 bg-white rounded-full" />
-                        </div>
-                      </div>
-                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
-                        <span className="text-sm text-gray-900" data-testid={`job-auditboard-type-${index}`}>
-                          {job.auditboardType}
-                        </span>
-                      </div>
-                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
-                        <span className="text-sm text-gray-900" data-testid={`job-tenable-type-${index}`}>
-                          {job.tenableType}
-                        </span>
-                      </div>
-                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
-                        <span className="text-sm text-gray-900" data-testid={`job-frequency-${index}`}>
-                          {job.frequency}
-                        </span>
-                      </div>
-                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
-                        <Badge className="h-5 bg-green-100 text-green-800 hover:bg-green-100" data-testid={`job-status-${index}`}>
-                          <span className="text-xs">{job.status}</span>
-                        </Badge>
-                      </div>
-                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
-                        <span className="text-sm text-gray-900" data-testid={`job-last-import-${index}`}>
-                          {job.lastImport}
-                        </span>
-                      </div>
-                      <div className="flex flex-col flex-1 justify-center gap-2 p-3 items-start relative">
-                        <span className="text-sm text-gray-900" data-testid={`job-next-import-${index}`}>
-                          {job.nextImport}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                  <div className="flex items-center justify-center gap-1 py-6 relative self-stretch w-full flex-[0_0_auto]">
-                    <Button 
-                      onClick={() => setLocation("/vulnerability-import-wizard")}
-                      className="h-[30px] gap-2 px-[10.4px] bg-teal-500 hover:bg-teal-500/90 border-teal-500 shadow-shadow-100"
-                      data-testid="add-another-vulnerability-import-job-button"
-                    >
-                      <div className="w-3.5 h-3.5 bg-[url(/figmaAssets/plus-lg.svg)] bg-[100%_100%]" />
-                      <span className="font-font-100-12px-regular font-[number:var(--font-100-12px-regular-font-weight)] text-[#e3f0f2] text-[length:var(--font-100-12px-regular-font-size)] tracking-[var(--font-100-12px-regular-letter-spacing)] leading-[var(--font-100-12px-regular-line-height)] [font-style:var(--font-100-12px-regular-font-style)]">
-                        Vulnerability Import Job
-                      </span>
-                    </Button>
-                  </div>
-                </div>
-              )}
             </div>
-          </div>
+          ))}
         </div>
       </main>
     </div>
