@@ -36,18 +36,37 @@ const navigationIcons: NavigationIcon[] = [
 
 type ImpactLevel = "High" | "Medium" | "Low";
 
-interface DependencyItem {
+interface ITAssetItem {
   name: string;
-  type?: string;
-  criticality?: "Critical" | "Important" | "Standard";
+  description: string;
+  recoveryTimeframe: string;
+  recoveryGap: "met" | "gap";
+  assetOwner: string;
+}
+
+interface VendorItem {
+  name: string;
+  description: string;
+  vendorContact: string;
+}
+
+interface BusinessProcessItem {
+  name: string;
+  description: string;
+  rto: string;
+  processOwner: string;
+}
+
+interface BranchItem {
+  name: string;
+  type: string;
 }
 
 interface Dependencies {
-  itSystems: DependencyItem[];
-  businessUnits: DependencyItem[];
-  vendors: DependencyItem[];
-  locations: DependencyItem[];
-  otherProcesses: DependencyItem[];
+  itAssets: ITAssetItem[];
+  vendors: VendorItem[];
+  businessProcesses: BusinessProcessItem[];
+  branches: BranchItem[];
 }
 
 const processData: Record<string, {
@@ -97,28 +116,23 @@ const processData: Record<string, {
       rpo: "30 minutes",
     },
     dependencies: {
-      itSystems: [
-        { name: "Core Banking System (CBS)", type: "Application", criticality: "Critical" },
-        { name: "Customer Relationship Management (CRM)", type: "Application", criticality: "Critical" },
-        { name: "Identity Management System", type: "Security", criticality: "Critical" },
-        { name: "Document Management System", type: "Application", criticality: "Important" },
-      ],
-      businessUnits: [
-        { name: "Retail Banking Operations", type: "Department", criticality: "Critical" },
-        { name: "Customer Experience", type: "Department", criticality: "Important" },
-        { name: "Compliance", type: "Department", criticality: "Important" },
+      itAssets: [
+        { name: "Core Banking System (CBS)", description: "Primary account management platform", recoveryTimeframe: "1 hour", recoveryGap: "met", assetOwner: "John Smith" },
+        { name: "Customer Relationship Management", description: "Customer data and interaction tracking", recoveryTimeframe: "2 hours", recoveryGap: "gap", assetOwner: "John Smith" },
+        { name: "Identity Management System", description: "Authentication and access control", recoveryTimeframe: "4 hours", recoveryGap: "gap", assetOwner: "John Smith" },
       ],
       vendors: [
-        { name: "Fiserv", type: "Core Banking Provider", criticality: "Critical" },
-        { name: "Experian", type: "Credit Bureau", criticality: "Important" },
+        { name: "Fiserv", description: "Core Banking Provider", vendorContact: "Jane Smith" },
+        { name: "Experian", description: "Credit Bureau", vendorContact: "Jane Smith" },
+        { name: "AWS", description: "Cloud Hosting Provider", vendorContact: "Jane Smith" },
       ],
-      locations: [
-        { name: "Main Data Center - Dallas", type: "Primary", criticality: "Critical" },
-        { name: "Backup Data Center - Phoenix", type: "Secondary", criticality: "Critical" },
+      businessProcesses: [
+        { name: "Customer Service and Support", description: "Ensures payment processing is tied to correct customer accounts.", rto: "4 hours", processOwner: "Maria Silver" },
+        { name: "Payment Processing", description: "Alerts and flags for suspicious transactions.", rto: "2 hours", processOwner: "Jay Li" },
       ],
-      otherProcesses: [
-        { name: "Customer Service and Support", criticality: "Important" },
-        { name: "Payment Processing", criticality: "Critical" },
+      branches: [
+        { name: "Main Data Center - Dallas", type: "Primary" },
+        { name: "Backup Data Center - Phoenix", type: "Secondary" },
       ],
     },
   },
@@ -145,26 +159,21 @@ const processData: Record<string, {
       rpo: "1 hour",
     },
     dependencies: {
-      itSystems: [
-        { name: "Loan Origination System (LOS)", type: "Application", criticality: "Critical" },
-        { name: "Credit Decision Engine", type: "Application", criticality: "Critical" },
-        { name: "Document Management System", type: "Application", criticality: "Important" },
-      ],
-      businessUnits: [
-        { name: "Retail Banking Operations", type: "Department", criticality: "Critical" },
-        { name: "Credit Risk Management", type: "Department", criticality: "Critical" },
-        { name: "Loan Servicing", type: "Department", criticality: "Important" },
+      itAssets: [
+        { name: "Loan Origination System (LOS)", description: "End-to-end loan processing", recoveryTimeframe: "2 hours", recoveryGap: "met", assetOwner: "Sarah Chen" },
+        { name: "Credit Decision Engine", description: "Automated credit scoring", recoveryTimeframe: "1 hour", recoveryGap: "met", assetOwner: "Sarah Chen" },
+        { name: "Document Management System", description: "Loan document storage", recoveryTimeframe: "4 hours", recoveryGap: "gap", assetOwner: "Sarah Chen" },
       ],
       vendors: [
-        { name: "Equifax", type: "Credit Bureau", criticality: "Critical" },
-        { name: "TransUnion", type: "Credit Bureau", criticality: "Critical" },
+        { name: "Equifax", description: "Credit Bureau", vendorContact: "Mike Johnson" },
+        { name: "TransUnion", description: "Credit Bureau", vendorContact: "Mike Johnson" },
       ],
-      locations: [
-        { name: "Loan Processing Center - Chicago", type: "Primary", criticality: "Critical" },
+      businessProcesses: [
+        { name: "Account Management", description: "Links loan accounts to customer profiles.", rto: "1 hour", processOwner: "Baylor Cruz" },
+        { name: "Payment Processing", description: "Processes loan payment transactions.", rto: "2 hours", processOwner: "Jay Li" },
       ],
-      otherProcesses: [
-        { name: "Account Management", criticality: "Important" },
-        { name: "Payment Processing", criticality: "Critical" },
+      branches: [
+        { name: "Loan Processing Center - Chicago", type: "Primary" },
       ],
     },
   },
@@ -191,28 +200,22 @@ const processData: Record<string, {
       rpo: "4 hours",
     },
     dependencies: {
-      itSystems: [
-        { name: "Contact Center Platform", type: "Application", criticality: "Critical" },
-        { name: "CRM System", type: "Application", criticality: "Critical" },
-        { name: "Knowledge Base", type: "Application", criticality: "Important" },
-        { name: "Ticketing System", type: "Application", criticality: "Important" },
-      ],
-      businessUnits: [
-        { name: "Retail Banking Operations", type: "Department", criticality: "Critical" },
-        { name: "Customer Experience", type: "Department", criticality: "Critical" },
-        { name: "Quality Assurance", type: "Department", criticality: "Standard" },
+      itAssets: [
+        { name: "Contact Center Platform", description: "Customer call handling system", recoveryTimeframe: "1 hour", recoveryGap: "met", assetOwner: "Tom Wilson" },
+        { name: "CRM System", description: "Customer relationship management", recoveryTimeframe: "2 hours", recoveryGap: "met", assetOwner: "Tom Wilson" },
+        { name: "Knowledge Base", description: "Support documentation portal", recoveryTimeframe: "8 hours", recoveryGap: "gap", assetOwner: "Tom Wilson" },
       ],
       vendors: [
-        { name: "Genesys", type: "Contact Center Provider", criticality: "Critical" },
-        { name: "Salesforce", type: "CRM Provider", criticality: "Critical" },
+        { name: "Genesys", description: "Contact Center Provider", vendorContact: "Lisa Park" },
+        { name: "Salesforce", description: "CRM Provider", vendorContact: "Lisa Park" },
       ],
-      locations: [
-        { name: "Call Center - Tampa", type: "Primary", criticality: "Critical" },
-        { name: "Call Center - Manila", type: "Secondary", criticality: "Important" },
+      businessProcesses: [
+        { name: "Account Management", description: "Access customer account information.", rto: "1 hour", processOwner: "Baylor Cruz" },
+        { name: "Loan Origination and Servicing", description: "Handle loan-related inquiries.", rto: "30 mins", processOwner: "Baylor Cruz" },
       ],
-      otherProcesses: [
-        { name: "Account Management", criticality: "Critical" },
-        { name: "Loan Origination and Servicing", criticality: "Important" },
+      branches: [
+        { name: "Call Center - Tampa", type: "Primary" },
+        { name: "Call Center - Manila", type: "Secondary" },
       ],
     },
   },
@@ -239,28 +242,22 @@ const processData: Record<string, {
       rpo: "8 hours",
     },
     dependencies: {
-      itSystems: [
-        { name: "HR Information System (HRIS)", type: "Application", criticality: "Critical" },
-        { name: "Active Directory", type: "Security", criticality: "Critical" },
-        { name: "Learning Management System", type: "Application", criticality: "Important" },
-        { name: "Background Check System", type: "Application", criticality: "Important" },
-      ],
-      businessUnits: [
-        { name: "Human Resources", type: "Department", criticality: "Critical" },
-        { name: "Information Technology", type: "Department", criticality: "Critical" },
-        { name: "All Departments", type: "Cross-functional", criticality: "Important" },
+      itAssets: [
+        { name: "HR Information System (HRIS)", description: "Employee records and workflow", recoveryTimeframe: "4 hours", recoveryGap: "met", assetOwner: "Emily Davis" },
+        { name: "Active Directory", description: "Identity and access management", recoveryTimeframe: "1 hour", recoveryGap: "met", assetOwner: "Emily Davis" },
+        { name: "Learning Management System", description: "Training platform", recoveryTimeframe: "24 hours", recoveryGap: "gap", assetOwner: "Emily Davis" },
       ],
       vendors: [
-        { name: "Workday", type: "HRIS Provider", criticality: "Critical" },
-        { name: "Sterling", type: "Background Check Provider", criticality: "Important" },
+        { name: "Workday", description: "HRIS Provider", vendorContact: "David Brown" },
+        { name: "Sterling", description: "Background Check Provider", vendorContact: "David Brown" },
       ],
-      locations: [
-        { name: "Corporate Headquarters - New York", type: "Primary", criticality: "Critical" },
+      businessProcesses: [
+        { name: "Payroll Processing", description: "Setup payroll for new hires.", rto: "1 hour", processOwner: "Dante Bradford" },
+        { name: "Benefits Administration", description: "Enroll new hires in benefits.", rto: "1 hour", processOwner: "Dante Bradford" },
+        { name: "Training & Development", description: "Assign required training courses.", rto: "1 hour", processOwner: "Dante Bradford" },
       ],
-      otherProcesses: [
-        { name: "Payroll Processing", criticality: "Critical" },
-        { name: "Benefits Administration", criticality: "Important" },
-        { name: "Training & Development", criticality: "Important" },
+      branches: [
+        { name: "Corporate Headquarters - New York", type: "Primary" },
       ],
     },
   },
@@ -287,27 +284,21 @@ const processData: Record<string, {
       rpo: "1 hour",
     },
     dependencies: {
-      itSystems: [
-        { name: "Payroll System", type: "Application", criticality: "Critical" },
-        { name: "Time & Attendance System", type: "Application", criticality: "Critical" },
-        { name: "General Ledger", type: "Application", criticality: "Critical" },
-        { name: "Tax Filing System", type: "Application", criticality: "Important" },
-      ],
-      businessUnits: [
-        { name: "Human Resources", type: "Department", criticality: "Critical" },
-        { name: "Finance", type: "Department", criticality: "Critical" },
-        { name: "All Departments", type: "Cross-functional", criticality: "Important" },
+      itAssets: [
+        { name: "Payroll System", description: "Salary and deduction processing", recoveryTimeframe: "1 hour", recoveryGap: "met", assetOwner: "Rachel Kim" },
+        { name: "Time & Attendance System", description: "Employee time tracking", recoveryTimeframe: "2 hours", recoveryGap: "met", assetOwner: "Rachel Kim" },
+        { name: "General Ledger", description: "Financial accounting system", recoveryTimeframe: "4 hours", recoveryGap: "gap", assetOwner: "Rachel Kim" },
       ],
       vendors: [
-        { name: "ADP", type: "Payroll Provider", criticality: "Critical" },
-        { name: "Bank of America", type: "Direct Deposit Provider", criticality: "Critical" },
+        { name: "ADP", description: "Payroll Provider", vendorContact: "Chris Lee" },
+        { name: "Bank of America", description: "Direct Deposit Provider", vendorContact: "Chris Lee" },
       ],
-      locations: [
-        { name: "Finance Center - Atlanta", type: "Primary", criticality: "Critical" },
+      businessProcesses: [
+        { name: "Employee Onboarding and Offboarding", description: "New hire payroll setup.", rto: "1 hour", processOwner: "Dante Bradford" },
+        { name: "Benefits Administration", description: "Deduction processing coordination.", rto: "1 hour", processOwner: "Dante Bradford" },
       ],
-      otherProcesses: [
-        { name: "Employee Onboarding and Offboarding", criticality: "Critical" },
-        { name: "Benefits Administration", criticality: "Important" },
+      branches: [
+        { name: "Finance Center - Atlanta", type: "Primary" },
       ],
     },
   },
@@ -334,25 +325,21 @@ const processData: Record<string, {
       rpo: "12 hours",
     },
     dependencies: {
-      itSystems: [
-        { name: "Benefits Administration System", type: "Application", criticality: "Critical" },
-        { name: "401k Portal", type: "Application", criticality: "Important" },
-        { name: "Health Insurance Portal", type: "Application", criticality: "Important" },
-      ],
-      businessUnits: [
-        { name: "Human Resources", type: "Department", criticality: "Critical" },
-        { name: "All Departments", type: "Cross-functional", criticality: "Important" },
+      itAssets: [
+        { name: "Benefits Administration System", description: "Benefits enrollment and management", recoveryTimeframe: "4 hours", recoveryGap: "met", assetOwner: "Karen White" },
+        { name: "401k Portal", description: "Retirement plan management", recoveryTimeframe: "24 hours", recoveryGap: "gap", assetOwner: "Karen White" },
+        { name: "Health Insurance Portal", description: "Health benefits portal", recoveryTimeframe: "8 hours", recoveryGap: "gap", assetOwner: "Karen White" },
       ],
       vendors: [
-        { name: "Cigna", type: "Health Insurance Provider", criticality: "Critical" },
-        { name: "Fidelity", type: "401k Administrator", criticality: "Critical" },
+        { name: "Cigna", description: "Health Insurance Provider", vendorContact: "Amy Zhang" },
+        { name: "Fidelity", description: "401k Administrator", vendorContact: "Amy Zhang" },
       ],
-      locations: [
-        { name: "HR Services Center - Denver", type: "Primary", criticality: "Critical" },
+      businessProcesses: [
+        { name: "Payroll Processing", description: "Benefits deduction coordination.", rto: "1 hour", processOwner: "Dante Bradford" },
+        { name: "Employee Onboarding and Offboarding", description: "Benefits enrollment/termination.", rto: "1 hour", processOwner: "Dante Bradford" },
       ],
-      otherProcesses: [
-        { name: "Payroll Processing", criticality: "Critical" },
-        { name: "Employee Onboarding and Offboarding", criticality: "Important" },
+      branches: [
+        { name: "HR Services Center - Denver", type: "Primary" },
       ],
     },
   },
@@ -379,25 +366,20 @@ const processData: Record<string, {
       rpo: "24 hours",
     },
     dependencies: {
-      itSystems: [
-        { name: "Learning Management System (LMS)", type: "Application", criticality: "Critical" },
-        { name: "Video Conferencing Platform", type: "Application", criticality: "Important" },
-        { name: "Training Content Repository", type: "Application", criticality: "Important" },
-      ],
-      businessUnits: [
-        { name: "Human Resources", type: "Department", criticality: "Critical" },
-        { name: "Learning & Development", type: "Department", criticality: "Critical" },
-        { name: "All Departments", type: "Cross-functional", criticality: "Important" },
+      itAssets: [
+        { name: "Learning Management System (LMS)", description: "Training course delivery", recoveryTimeframe: "8 hours", recoveryGap: "met", assetOwner: "Steve Martin" },
+        { name: "Video Conferencing Platform", description: "Virtual training sessions", recoveryTimeframe: "2 hours", recoveryGap: "met", assetOwner: "Steve Martin" },
+        { name: "Training Content Repository", description: "Course content storage", recoveryTimeframe: "24 hours", recoveryGap: "gap", assetOwner: "Steve Martin" },
       ],
       vendors: [
-        { name: "Cornerstone OnDemand", type: "LMS Provider", criticality: "Critical" },
-        { name: "LinkedIn Learning", type: "Content Provider", criticality: "Standard" },
+        { name: "Cornerstone OnDemand", description: "LMS Provider", vendorContact: "Nina Patel" },
+        { name: "LinkedIn Learning", description: "Content Provider", vendorContact: "Nina Patel" },
       ],
-      locations: [
-        { name: "Training Center - Boston", type: "Primary", criticality: "Important" },
+      businessProcesses: [
+        { name: "Employee Onboarding and Offboarding", description: "Mandatory training assignments.", rto: "1 hour", processOwner: "Dante Bradford" },
       ],
-      otherProcesses: [
-        { name: "Employee Onboarding and Offboarding", criticality: "Critical" },
+      branches: [
+        { name: "Training Center - Boston", type: "Primary" },
       ],
     },
   },
@@ -424,26 +406,21 @@ const processData: Record<string, {
       rpo: "2 hours",
     },
     dependencies: {
-      itSystems: [
-        { name: "Treasury Management System", type: "Application", criticality: "Critical" },
-        { name: "Financial Planning & Analysis Tool", type: "Application", criticality: "Critical" },
-        { name: "ERP System", type: "Application", criticality: "Important" },
-      ],
-      businessUnits: [
-        { name: "Treasury & Cash Management", type: "Department", criticality: "Critical" },
-        { name: "Finance", type: "Department", criticality: "Critical" },
-        { name: "Financial Planning & Analysis", type: "Department", criticality: "Important" },
+      itAssets: [
+        { name: "Treasury Management System", description: "Cash position and forecasting", recoveryTimeframe: "2 hours", recoveryGap: "met", assetOwner: "Michael Chen" },
+        { name: "Financial Planning & Analysis Tool", description: "Financial modeling platform", recoveryTimeframe: "4 hours", recoveryGap: "met", assetOwner: "Michael Chen" },
+        { name: "ERP System", description: "Enterprise resource planning", recoveryTimeframe: "8 hours", recoveryGap: "gap", assetOwner: "Michael Chen" },
       ],
       vendors: [
-        { name: "Kyriba", type: "Treasury System Provider", criticality: "Critical" },
-        { name: "Bloomberg", type: "Market Data Provider", criticality: "Important" },
+        { name: "Kyriba", description: "Treasury System Provider", vendorContact: "Robert Taylor" },
+        { name: "Bloomberg", description: "Market Data Provider", vendorContact: "Robert Taylor" },
       ],
-      locations: [
-        { name: "Treasury Operations Center - New York", type: "Primary", criticality: "Critical" },
+      businessProcesses: [
+        { name: "Liquidity Management", description: "Cash position optimization.", rto: "1 hour", processOwner: "Leah Sullivan" },
+        { name: "Payment Processing", description: "Fund disbursement planning.", rto: "4 hours", processOwner: "Leah Sullivan" },
       ],
-      otherProcesses: [
-        { name: "Liquidity Management", criticality: "Critical" },
-        { name: "Payment Processing", criticality: "Important" },
+      branches: [
+        { name: "Treasury Operations Center - New York", type: "Primary" },
       ],
     },
   },
@@ -470,27 +447,22 @@ const processData: Record<string, {
       rpo: "30 minutes",
     },
     dependencies: {
-      itSystems: [
-        { name: "Treasury Management System", type: "Application", criticality: "Critical" },
-        { name: "Real-time Cash Position Monitor", type: "Application", criticality: "Critical" },
-        { name: "Investment Portfolio System", type: "Application", criticality: "Important" },
-      ],
-      businessUnits: [
-        { name: "Treasury & Cash Management", type: "Department", criticality: "Critical" },
-        { name: "Risk Management", type: "Department", criticality: "Critical" },
-        { name: "Finance", type: "Department", criticality: "Important" },
+      itAssets: [
+        { name: "Treasury Management System", description: "Real-time liquidity tracking", recoveryTimeframe: "1 hour", recoveryGap: "met", assetOwner: "Jennifer Adams" },
+        { name: "Real-time Cash Position Monitor", description: "Live cash position dashboard", recoveryTimeframe: "30 mins", recoveryGap: "met", assetOwner: "Jennifer Adams" },
+        { name: "Investment Portfolio System", description: "Short-term investment tracking", recoveryTimeframe: "4 hours", recoveryGap: "gap", assetOwner: "Jennifer Adams" },
       ],
       vendors: [
-        { name: "Federal Reserve Bank", type: "Central Bank", criticality: "Critical" },
-        { name: "JP Morgan", type: "Correspondent Bank", criticality: "Critical" },
+        { name: "Federal Reserve Bank", description: "Central Bank", vendorContact: "Daniel Moore" },
+        { name: "JP Morgan", description: "Correspondent Bank", vendorContact: "Daniel Moore" },
       ],
-      locations: [
-        { name: "Treasury Operations Center - New York", type: "Primary", criticality: "Critical" },
-        { name: "Backup Trading Floor - London", type: "Secondary", criticality: "Critical" },
+      businessProcesses: [
+        { name: "Cash Flow Forecasting", description: "Liquidity requirement projections.", rto: "1 hour", processOwner: "Leah Sullivan" },
+        { name: "Payment Processing", description: "Fund availability coordination.", rto: "4 hours", processOwner: "Leah Sullivan" },
       ],
-      otherProcesses: [
-        { name: "Cash Flow Forecasting", criticality: "Critical" },
-        { name: "Payment Processing", criticality: "Critical" },
+      branches: [
+        { name: "Treasury Operations Center - New York", type: "Primary" },
+        { name: "Backup Trading Floor - London", type: "Secondary" },
       ],
     },
   },
@@ -517,29 +489,24 @@ const processData: Record<string, {
       rpo: "15 minutes",
     },
     dependencies: {
-      itSystems: [
-        { name: "Payment Gateway", type: "Application", criticality: "Critical" },
-        { name: "ACH Processing System", type: "Application", criticality: "Critical" },
-        { name: "Wire Transfer System", type: "Application", criticality: "Critical" },
-        { name: "Fraud Detection System", type: "Security", criticality: "Critical" },
-      ],
-      businessUnits: [
-        { name: "Treasury & Cash Management", type: "Department", criticality: "Critical" },
-        { name: "Fraud Prevention", type: "Department", criticality: "Critical" },
-        { name: "Operations", type: "Department", criticality: "Important" },
+      itAssets: [
+        { name: "Payment Gateway", description: "Transaction routing system", recoveryTimeframe: "30 mins", recoveryGap: "met", assetOwner: "Alex Thompson" },
+        { name: "ACH Processing System", description: "Automated Clearing House", recoveryTimeframe: "1 hour", recoveryGap: "met", assetOwner: "Alex Thompson" },
+        { name: "Wire Transfer System", description: "Wire payment processing", recoveryTimeframe: "1 hour", recoveryGap: "met", assetOwner: "Alex Thompson" },
+        { name: "Fraud Detection System", description: "Real-time fraud monitoring", recoveryTimeframe: "30 mins", recoveryGap: "met", assetOwner: "Alex Thompson" },
       ],
       vendors: [
-        { name: "Visa/Mastercard", type: "Card Network", criticality: "Critical" },
-        { name: "SWIFT", type: "Payment Network", criticality: "Critical" },
-        { name: "The Clearing House", type: "ACH Operator", criticality: "Critical" },
+        { name: "Visa/Mastercard", description: "Card Network", vendorContact: "Patricia Williams" },
+        { name: "SWIFT", description: "Payment Network", vendorContact: "Patricia Williams" },
+        { name: "The Clearing House", description: "ACH Operator", vendorContact: "Patricia Williams" },
       ],
-      locations: [
-        { name: "Payment Operations Center - Charlotte", type: "Primary", criticality: "Critical" },
-        { name: "Disaster Recovery Site - Dallas", type: "Secondary", criticality: "Critical" },
+      businessProcesses: [
+        { name: "Account Management", description: "Customer account fund transfers.", rto: "1 hour", processOwner: "Baylor Cruz" },
+        { name: "Liquidity Management", description: "Fund availability verification.", rto: "1 hour", processOwner: "Leah Sullivan" },
       ],
-      otherProcesses: [
-        { name: "Account Management", criticality: "Critical" },
-        { name: "Liquidity Management", criticality: "Critical" },
+      branches: [
+        { name: "Payment Operations Center - Charlotte", type: "Primary" },
+        { name: "Disaster Recovery Site - Dallas", type: "Secondary" },
       ],
     },
   },
@@ -566,23 +533,19 @@ const processData: Record<string, {
       rpo: "8 hours",
     },
     dependencies: {
-      itSystems: [
-        { name: "Deferred Compensation System", type: "Application", criticality: "Critical" },
-        { name: "Executive Benefits Portal", type: "Application", criticality: "Important" },
-      ],
-      businessUnits: [
-        { name: "Treasury & Cash Management", type: "Department", criticality: "Critical" },
-        { name: "Executive Leadership", type: "Department", criticality: "Important" },
+      itAssets: [
+        { name: "Deferred Compensation System", description: "Executive compensation tracking", recoveryTimeframe: "8 hours", recoveryGap: "met", assetOwner: "Linda Garcia" },
+        { name: "Executive Benefits Portal", description: "Executive benefits management", recoveryTimeframe: "24 hours", recoveryGap: "gap", assetOwner: "Linda Garcia" },
       ],
       vendors: [
-        { name: "Northern Trust", type: "Executive Benefits Provider", criticality: "Critical" },
+        { name: "Northern Trust", description: "Executive Benefits Provider", vendorContact: "James Wilson" },
       ],
-      locations: [
-        { name: "Treasury Operations Center - New York", type: "Primary", criticality: "Critical" },
+      businessProcesses: [
+        { name: "Payroll Processing", description: "Deferred compensation disbursement.", rto: "1 hour", processOwner: "Dante Bradford" },
+        { name: "Cash Flow Forecasting", description: "Benefits liability projections.", rto: "1 hour", processOwner: "Leah Sullivan" },
       ],
-      otherProcesses: [
-        { name: "Payroll Processing", criticality: "Important" },
-        { name: "Cash Flow Forecasting", criticality: "Standard" },
+      branches: [
+        { name: "Treasury Operations Center - New York", type: "Primary" },
       ],
     },
   },
@@ -592,11 +555,10 @@ const tabs = ["Overview", "Business Impact Analysis", "Key Dependencies", "Busin
 
 function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    itSystems: true,
-    personnel: false,
+    itAssets: true,
     vendors: false,
-    locations: false,
-    otherProcesses: false,
+    businessProcesses: false,
+    branches: false,
   });
 
   const toggleSection = (section: string) => {
@@ -606,104 +568,240 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
     }));
   };
 
-  const getCriticalityBadge = (criticality?: "Critical" | "Important" | "Standard") => {
-    if (!criticality) return null;
-    
-    const colors = {
-      Critical: "bg-[#db3535] text-white",
-      Important: "bg-[#f59e0b] text-white",
-      Standard: "bg-[#6b7280] text-white",
-    };
-
+  const RecoveryGapIcon = ({ gap }: { gap: "met" | "gap" }) => {
+    if (gap === "met") {
+      return (
+        <div className="w-5 h-5 rounded-full bg-[#dcfce7] flex items-center justify-center">
+          <Check className="w-3 h-3 text-[#36844a]" />
+        </div>
+      );
+    }
     return (
-      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${colors[criticality]}`}>
-        {criticality}
-      </span>
+      <Triangle className="w-4 h-4 text-[#f59e0b] fill-[#f59e0b]" />
     );
   };
 
-  const sections = [
-    { key: "itSystems", label: "IT Systems", items: dependencies.itSystems },
-    { key: "businessUnits", label: "Business Units", items: dependencies.businessUnits },
-    { key: "vendors", label: "Vendors", items: dependencies.vendors },
-    { key: "locations", label: "Locations", items: dependencies.locations },
-    { key: "otherProcesses", label: "Other Processes", items: dependencies.otherProcesses },
-  ];
-
   return (
     <div className="flex flex-col gap-4">
-      {sections.map((section) => {
-        const isExpanded = expandedSections[section.key];
-        
-        return (
-          <div
-            key={section.key}
-            className="w-full"
-          >
-            <button
-              onClick={() => toggleSection(section.key)}
-              className={`w-full flex items-center h-10 border border-[#e2e8f0] ${
-                isExpanded 
-                  ? "bg-[#f3fafb] rounded-t" 
-                  : "bg-white rounded"
+      {/* IT Assets Section */}
+      <div className="w-full">
+        <button
+          onClick={() => toggleSection("itAssets")}
+          className={`w-full flex items-center h-10 border border-[#e2e8f0] ${
+            expandedSections.itAssets 
+              ? "bg-[#f3fafb] rounded-t" 
+              : "bg-white rounded"
+          }`}
+          data-testid="accordion-itAssets"
+        >
+          {expandedSections.itAssets && (
+            <div className="w-1 h-10 bg-[#266c92] rounded-tl" />
+          )}
+          <div className={`flex items-center gap-4 ${expandedSections.itAssets ? "pl-3" : "pl-4"} pr-3 flex-1`}>
+            <ChevronDown
+              className={`w-3 h-3 text-[#64748b] transition-transform ${
+                !expandedSections.itAssets ? "-rotate-90" : ""
               }`}
-              data-testid={`accordion-${section.key}`}
-            >
-              {isExpanded && (
-                <div className="w-1 h-10 bg-[#266c92] rounded-tl" />
-              )}
-              <div className={`flex items-center gap-4 ${isExpanded ? "pl-3" : "pl-4"} pr-3 flex-1`}>
-                <ChevronDown
-                  className={`w-3 h-3 text-[#64748b] transition-transform ${
-                    !isExpanded ? "-rotate-90" : ""
-                  }`}
-                />
-                <span className="font-bold text-sm text-[#0f172a]">{section.label}</span>
-                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#e2e8f0] text-[#64748b]">{section.items.length}</span>
-              </div>
-            </button>
-
-            {isExpanded && (
-              <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white">
-                {section.items.length > 0 ? (
-                  <table className="w-full table-fixed">
-                    <thead>
-                      <tr className="text-left text-xs text-gray-500 border-b">
-                        <th className="pb-2 font-medium w-[45%]">Name</th>
-                        {section.key !== "otherProcesses" && (
-                          <th className="pb-2 font-medium w-[35%]">Type</th>
-                        )}
-                        <th className={`pb-2 font-medium ${section.key === "otherProcesses" ? "w-[55%]" : "w-[20%]"}`}>Criticality</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {section.items.map((item, idx) => (
-                        <tr key={idx} className="border-b last:border-b-0">
-                          <td className="py-2 text-sm w-[45%]">
-                            <a 
-                              href="#" 
-                              className="text-[#266c92] hover:underline"
-                              data-testid={`link-${section.key}-${idx}`}
-                            >
-                              {item.name}
-                            </a>
-                          </td>
-                          {section.key !== "otherProcesses" && (
-                            <td className="py-2 text-sm text-[#64748b] w-[35%]">{item.type || "-"}</td>
-                          )}
-                          <td className={`py-2 ${section.key === "otherProcesses" ? "w-[55%]" : "w-[20%]"}`}>{getCriticalityBadge(item.criticality)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <div className="text-sm text-gray-500">No items in this category</div>
-                )}
-              </div>
-            )}
+            />
+            <span className="font-bold text-sm text-[#0f172a]">IT Assets</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#e2e8f0] text-[#64748b]">{dependencies.itAssets.length}</span>
           </div>
-        );
-      })}
+        </button>
+        {expandedSections.itAssets && (
+          <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white">
+            <table className="w-full table-fixed">
+              <thead>
+                <tr className="text-left text-xs text-gray-500 border-b">
+                  <th className="pb-2 font-medium w-[20%]">Name</th>
+                  <th className="pb-2 font-medium w-[30%]">Description</th>
+                  <th className="pb-2 font-medium w-[18%]">Recovery Timeframe Capability</th>
+                  <th className="pb-2 font-medium w-[14%]">Recovery Time Gap</th>
+                  <th className="pb-2 font-medium w-[18%]">Asset Owner</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dependencies.itAssets.map((item, idx) => (
+                  <tr key={idx} className="border-b last:border-b-0">
+                    <td className="py-2 text-sm">
+                      <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-itAssets-${idx}`}>
+                        {item.name}
+                      </a>
+                    </td>
+                    <td className="py-2 text-sm text-[#64748b]">{item.description}</td>
+                    <td className="py-2 text-sm text-[#64748b]">{item.recoveryTimeframe}</td>
+                    <td className="py-2"><RecoveryGapIcon gap={item.recoveryGap} /></td>
+                    <td className="py-2 text-sm">
+                      <a href="#" className="text-[#266c92] hover:underline">{item.assetOwner}</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Vendors Section */}
+      <div className="w-full">
+        <button
+          onClick={() => toggleSection("vendors")}
+          className={`w-full flex items-center h-10 border border-[#e2e8f0] ${
+            expandedSections.vendors 
+              ? "bg-[#f3fafb] rounded-t" 
+              : "bg-white rounded"
+          }`}
+          data-testid="accordion-vendors"
+        >
+          {expandedSections.vendors && (
+            <div className="w-1 h-10 bg-[#266c92] rounded-tl" />
+          )}
+          <div className={`flex items-center gap-4 ${expandedSections.vendors ? "pl-3" : "pl-4"} pr-3 flex-1`}>
+            <ChevronDown
+              className={`w-3 h-3 text-[#64748b] transition-transform ${
+                !expandedSections.vendors ? "-rotate-90" : ""
+              }`}
+            />
+            <span className="font-bold text-sm text-[#0f172a]">Vendors</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#e2e8f0] text-[#64748b]">{dependencies.vendors.length}</span>
+          </div>
+        </button>
+        {expandedSections.vendors && (
+          <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white">
+            <table className="w-full table-fixed">
+              <thead>
+                <tr className="text-left text-xs text-gray-500 border-b">
+                  <th className="pb-2 font-medium w-[25%]">Name</th>
+                  <th className="pb-2 font-medium w-[50%]">Description</th>
+                  <th className="pb-2 font-medium w-[25%]">Vendor Contact</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dependencies.vendors.map((item, idx) => (
+                  <tr key={idx} className="border-b last:border-b-0">
+                    <td className="py-2 text-sm">
+                      <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-vendors-${idx}`}>
+                        {item.name}
+                      </a>
+                    </td>
+                    <td className="py-2 text-sm text-[#64748b]">{item.description}</td>
+                    <td className="py-2 text-sm">
+                      <a href="#" className="text-[#266c92] hover:underline">{item.vendorContact}</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Business Processes Section */}
+      <div className="w-full">
+        <button
+          onClick={() => toggleSection("businessProcesses")}
+          className={`w-full flex items-center h-10 border border-[#e2e8f0] ${
+            expandedSections.businessProcesses 
+              ? "bg-[#f3fafb] rounded-t" 
+              : "bg-white rounded"
+          }`}
+          data-testid="accordion-businessProcesses"
+        >
+          {expandedSections.businessProcesses && (
+            <div className="w-1 h-10 bg-[#266c92] rounded-tl" />
+          )}
+          <div className={`flex items-center gap-4 ${expandedSections.businessProcesses ? "pl-3" : "pl-4"} pr-3 flex-1`}>
+            <ChevronDown
+              className={`w-3 h-3 text-[#64748b] transition-transform ${
+                !expandedSections.businessProcesses ? "-rotate-90" : ""
+              }`}
+            />
+            <span className="font-bold text-sm text-[#0f172a]">Business Processes</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#e2e8f0] text-[#64748b]">{dependencies.businessProcesses.length}</span>
+          </div>
+        </button>
+        {expandedSections.businessProcesses && (
+          <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white">
+            <table className="w-full table-fixed">
+              <thead>
+                <tr className="text-left text-xs text-gray-500 border-b">
+                  <th className="pb-2 font-medium w-[25%]">Name</th>
+                  <th className="pb-2 font-medium w-[40%]">Description</th>
+                  <th className="pb-2 font-medium w-[15%]">RTO</th>
+                  <th className="pb-2 font-medium w-[20%]">Process Owner</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dependencies.businessProcesses.map((item, idx) => (
+                  <tr key={idx} className="border-b last:border-b-0">
+                    <td className="py-2 text-sm">
+                      <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-businessProcesses-${idx}`}>
+                        {item.name}
+                      </a>
+                    </td>
+                    <td className="py-2 text-sm text-[#64748b]">{item.description}</td>
+                    <td className="py-2 text-sm">
+                      <a href="#" className="text-[#266c92] hover:underline">{item.rto}</a>
+                    </td>
+                    <td className="py-2 text-sm">
+                      <a href="#" className="text-[#266c92] hover:underline">{item.processOwner}</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Branches Section */}
+      <div className="w-full">
+        <button
+          onClick={() => toggleSection("branches")}
+          className={`w-full flex items-center h-10 border border-[#e2e8f0] ${
+            expandedSections.branches 
+              ? "bg-[#f3fafb] rounded-t" 
+              : "bg-white rounded"
+          }`}
+          data-testid="accordion-branches"
+        >
+          {expandedSections.branches && (
+            <div className="w-1 h-10 bg-[#266c92] rounded-tl" />
+          )}
+          <div className={`flex items-center gap-4 ${expandedSections.branches ? "pl-3" : "pl-4"} pr-3 flex-1`}>
+            <ChevronDown
+              className={`w-3 h-3 text-[#64748b] transition-transform ${
+                !expandedSections.branches ? "-rotate-90" : ""
+              }`}
+            />
+            <span className="font-bold text-sm text-[#0f172a]">Branches</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#e2e8f0] text-[#64748b]">{dependencies.branches.length}</span>
+          </div>
+        </button>
+        {expandedSections.branches && (
+          <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white">
+            <table className="w-full table-fixed">
+              <thead>
+                <tr className="text-left text-xs text-gray-500 border-b">
+                  <th className="pb-2 font-medium w-[60%]">Name</th>
+                  <th className="pb-2 font-medium w-[40%]">Type</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dependencies.branches.map((item, idx) => (
+                  <tr key={idx} className="border-b last:border-b-0">
+                    <td className="py-2 text-sm">
+                      <a href="#" className="text-[#266c92] hover:underline" data-testid={`link-branches-${idx}`}>
+                        {item.name}
+                      </a>
+                    </td>
+                    <td className="py-2 text-sm text-[#64748b]">{item.type}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
