@@ -1,4 +1,4 @@
-import { RefreshCcw } from "lucide-react";
+import { RefreshCcw, Check } from "lucide-react";
 import { HeaderSection } from "./sections/HeaderSection";
 import { MainContentSection } from "./sections/MainContentSection";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
@@ -103,9 +103,12 @@ export const Integrations = (): JSX.Element => {
               data-testid={`navbar-icon-${index}`}
             >
               {icon.type === "lucide" ? (
-                <RefreshCcw className="w-4 h-4 text-white" />
+                <div className="relative w-4 h-4 flex items-center justify-center">
+                  <RefreshCcw className="w-4 h-4 text-white absolute" />
+                  <Check className="w-2 h-2 text-white" strokeWidth={3} />
+                </div>
               ) : (
-                <img className="w-4 h-4" alt={icon.alt} src={icon.src} />
+                <img className={`w-4 h-4 ${icon.alt === "Plug" ? "opacity-50" : ""}`} alt={icon.alt} src={icon.src} />
               )}
             </div>
           ))}
