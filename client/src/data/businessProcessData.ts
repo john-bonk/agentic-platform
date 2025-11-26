@@ -26,6 +26,13 @@ export interface BranchItem {
   type: string;
 }
 
+export interface IssueItem {
+  id: string;
+  title: string;
+  location: string;
+  status: "Pending remediation" | "In progress" | "Resolved" | "Open";
+}
+
 export interface Dependencies {
   itAssets: ITAssetItem[];
   vendors: VendorItem[];
@@ -61,6 +68,7 @@ export interface ProcessDetail {
     costPerDay?: string;
   };
   dependencies: Dependencies;
+  issues?: IssueItem[];
 }
 
 export interface Category {
@@ -119,6 +127,10 @@ export const businessProcessData: Category[] = [
             { name: "Backup Data Center - Phoenix", type: "Secondary" },
           ],
         },
+        issues: [
+          { id: "1#228", title: "Lack of Baseline of Network Operations & Expected Data Flows", location: "Cerritos", status: "Pending remediation" },
+          { id: "1#229", title: "Insufficient Access Control Monitoring", location: "Los Angeles", status: "Pending remediation" },
+        ],
       },
       {
         id: "2",
@@ -163,6 +175,9 @@ export const businessProcessData: Category[] = [
             { name: "Loan Processing Center - Chicago", type: "Primary" },
           ],
         },
+        issues: [
+          { id: "2#145", title: "Credit Decision Engine Response Time Degradation", location: "Chicago", status: "In progress" },
+        ],
       },
       {
         id: "3",

@@ -16,7 +16,7 @@ import { HeaderSection } from "./sections/HeaderSection";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
 import { KeyDependenciesImpactCanvas } from "@/components/KeyDependenciesImpactCanvas";
 import { BCPEmptyState } from "@/components/BCPEmptyState";
-import { getProcessById } from "../data/businessProcessData";
+import { getProcessById, type IssueItem } from "../data/businessProcessData";
 import { 
   getApplicationsForTeam, 
   getVendorsForApplications, 
@@ -396,6 +396,91 @@ function KeyDependenciesContent({ dependencies, ownerTeam, processName }: { depe
   );
 }
 
+function IssueIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5.13397 1.5C5.51888 0.833333 6.48113 0.833333 6.86603 1.5L11.1962 9C11.5811 9.66667 11.0999 10.5 10.3301 10.5H1.66987C0.900073 10.5 0.418948 9.66667 0.803848 9L5.13397 1.5Z" fill="#BA2A2A"/>
+      <path d="M6 4V6.5M6 8.5V8" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
+function IssuesContent({ issues }: { issues: IssueItem[] }) {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const getStatusBadgeStyle = (status: IssueItem["status"]) => {
+    switch (status) {
+      case "Pending remediation":
+        return "bg-[#3172e3] text-white";
+      case "In progress":
+        return "bg-[#f59e0b] text-white";
+      case "Resolved":
+        return "bg-[#36844a] text-white";
+      case "Open":
+        return "bg-[#db3535] text-white";
+      default:
+        return "bg-[#64748b] text-white";
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Issues Accordion */}
+      <div className="w-full">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={`w-full flex items-center h-10 border border-[#e2e8f0] ${
+            isExpanded 
+              ? "bg-[#f3fafb] rounded-t" 
+              : "bg-white rounded"
+          }`}
+          data-testid="accordion-issues"
+        >
+          {isExpanded && (
+            <div className="w-1 h-10 bg-[#266c92] rounded-tl" />
+          )}
+          <div className={`flex items-center gap-4 ${isExpanded ? "pl-3" : "pl-4"} pr-3 flex-1`}>
+            <ChevronDown
+              className={`w-3 h-3 text-[#64748b] transition-transform ${
+                !isExpanded ? "-rotate-90" : ""
+              }`}
+            />
+            <span className="font-bold text-sm text-[#0f172a]">Issues</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-[rgba(24,49,83,0.67)] text-white">{issues.length}</span>
+          </div>
+        </button>
+        {isExpanded && (
+          <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white flex flex-col gap-2">
+            {issues.map((issue, idx) => (
+              <div 
+                key={idx}
+                className="flex items-center justify-between px-4 py-2 bg-[#fff5e8] border border-[#ffeacf] rounded"
+                data-testid={`issue-row-${idx}`}
+              >
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <IssueIcon />
+                  <span className="font-bold text-sm text-[#0f172a]">
+                    {issue.id} - {issue.title}
+                  </span>
+                  <span className="text-sm text-[#0f172a]">
+                    {issue.location}
+                  </span>
+                </div>
+                <Badge 
+                  className={`text-[11px] font-semibold px-1.5 py-0 rounded-full ${getStatusBadgeStyle(issue.status)}`}
+                  data-testid={`issue-status-${idx}`}
+                >
+                  {issue.status}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ProcessDetail({ processId }: ProcessDetailProps) {
   const [activeTab, setActiveTab] = useState("Overview");
   const process = getProcessById(processId);
@@ -753,7 +838,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
             )}
 
             {activeTab === "Issues" && (
-              <div className="text-sm text-gray-500">Issues content coming soon...</div>
+              <IssuesContent issues={process.issues || []} />
             )}
           </main>
           </div>
