@@ -2,13 +2,37 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, MoreHorizontal, Triangle } from "lucide-react";
+import { ChevronDown, MoreHorizontal, Triangle, RefreshCcw, Check } from "lucide-react";
 import { HeaderSection } from "./sections/HeaderSection";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
 
 interface ProcessDetailProps {
   processId: string;
 }
+
+type NavigationIcon = 
+  | { type: "image"; src: string; alt: string; active: boolean }
+  | { type: "lucide"; icon: "refresh-ccw"; alt: string; active: boolean };
+
+const navigationIcons: NavigationIcon[] = [
+  { type: "image", src: "/figmaAssets/module-dashboard-.svg", alt: "Module dashboard", active: false },
+  { type: "image", src: "/figmaAssets/module-controls-.svg", alt: "Module controls", active: false },
+  { type: "image", src: "/figmaAssets/module-risk-.svg", alt: "Module risk", active: false },
+  { type: "image", src: "/figmaAssets/module-esg-.svg", alt: "Module esg", active: false },
+  { type: "image", src: "/figmaAssets/module-crosscomply-.svg", alt: "Module crosscomply", active: false },
+  { type: "image", src: "/figmaAssets/module-opsaudit.svg", alt: "Module opsaudit", active: false },
+  { type: "image", src: "/figmaAssets/module-tprm.svg", alt: "Module tprm", active: false },
+  { type: "lucide", icon: "refresh-ccw", alt: "BCM", active: true },
+  { type: "image", src: "/figmaAssets/files.svg", alt: "Files", active: false },
+  { type: "image", src: "/figmaAssets/module-report-.svg", alt: "Module report", active: false },
+  { type: "image", src: "/figmaAssets/module-workstream-.svg", alt: "Module workstream", active: false },
+  { type: "image", src: "/figmaAssets/module-automations-.svg", alt: "Module automations", active: false },
+  { type: "image", src: "/figmaAssets/plug.svg", alt: "Plug", active: false },
+  { type: "image", src: "/figmaAssets/module-issues.svg", alt: "Module issues", active: false },
+  { type: "image", src: "/figmaAssets/module-files.svg", alt: "Module files", active: false },
+  { type: "image", src: "/figmaAssets/module-timesheets.svg", alt: "Module timesheets", active: false },
+  { type: "image", src: "/figmaAssets/module-settings-.svg", alt: "Module settings", active: false },
+];
 
 const processData: Record<string, {
   name: string;
@@ -174,19 +198,71 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
   const [activeTab, setActiveTab] = useState("Overview");
   const process = processData[processId];
 
+  const LeftNavbar = () => (
+    <aside
+      className="flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 relative bg-gray-900"
+      style={{ minHeight: "100vh" }}
+      data-testid="side-navbar"
+    >
+      <nav className="flex flex-col items-center gap-1 relative flex-[0_0_auto]">
+        <Link href="/">
+          <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-logo">
+            <img
+              className="w-7 h-auto"
+              alt="AuditBoard Logo"
+              src="/figmaAssets/auditboard-logo.png?v=2"
+            />
+          </div>
+        </Link>
+
+        {navigationIcons.map((icon, index) => (
+          <div
+            key={index}
+            className={`w-10 h-10 rounded flex items-center justify-center ${
+              icon.active ? "bg-teal-500" : ""
+            }`}
+            data-testid={`navbar-icon-${index}`}
+          >
+            {icon.type === "lucide" ? (
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                <RefreshCcw className="w-4 h-4 text-white absolute" />
+                <Check className="w-2 h-2 text-white" strokeWidth={3} />
+              </div>
+            ) : (
+              <img className={`w-4 h-4 ${icon.alt === "Plug" ? "opacity-50" : ""}`} alt={icon.alt} src={icon.src} />
+            )}
+          </div>
+        ))}
+      </nav>
+
+      <div className="flex flex-col items-center gap-1">
+        <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-support">
+          <img
+            className="w-4 h-4"
+            alt="Support"
+            src="/figmaAssets/circle-question-.svg"
+          />
+        </div>
+      </div>
+    </aside>
+  );
+
   if (!process) {
     return (
-      <div className="flex h-screen items-start bg-gray-50 w-full">
-        <HeaderSection />
-        <div className="flex items-start relative flex-1 self-stretch w-full grow pt-[60px]">
-          <SideNavigationSection />
-          <div className="flex flex-col items-center justify-center flex-1 self-stretch bg-white p-8">
-            <h1 className="text-2xl font-semibold text-gray-900">Process not found</h1>
-            <Link href="/">
-              <Button variant="link" className="mt-4 text-blue-600">
-                Back to Business Processes
-              </Button>
-            </Link>
+      <div className="flex items-start relative">
+        <LeftNavbar />
+        <div className="flex flex-col items-start relative flex-1 grow">
+          <HeaderSection />
+          <div className="flex items-start relative flex-1 self-stretch w-full grow">
+            <SideNavigationSection />
+            <div className="flex flex-col items-center justify-center flex-1 self-stretch bg-white p-8">
+              <h1 className="text-2xl font-semibold text-gray-900">Process not found</h1>
+              <Link href="/">
+                <Button variant="link" className="mt-4 text-blue-600">
+                  Back to Business Processes
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -194,11 +270,13 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
   }
 
   return (
-    <div className="flex h-screen items-start bg-gray-50 w-full">
-      <HeaderSection />
-      <div className="flex items-start relative flex-1 self-stretch w-full grow pt-[60px]">
-        <SideNavigationSection />
-        <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white min-w-0 overflow-y-auto">
+    <div className="flex items-start relative">
+      <LeftNavbar />
+      <div className="flex flex-col items-start relative flex-1 grow">
+        <HeaderSection />
+        <div className="flex items-start relative flex-1 self-stretch w-full grow">
+          <SideNavigationSection />
+          <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white min-w-0 overflow-y-auto" style={{ maxHeight: "calc(100vh - 60px)" }}>
           <header className="flex flex-col gap-4 py-6 px-8 w-full bg-white">
             <div className="flex gap-4 items-start w-full flex-wrap">
               <div className="flex flex-1 flex-col justify-center min-w-0">
@@ -366,6 +444,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
               </div>
             </div>
           </main>
+          </div>
         </div>
       </div>
     </div>
