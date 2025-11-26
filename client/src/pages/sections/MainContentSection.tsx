@@ -118,7 +118,7 @@ export const MainContentSection = (): JSX.Element => {
       <header className="flex flex-col gap-2 py-8 px-8 w-full bg-white pt-[24px] pb-[24px]">
         <div className="flex gap-4 items-start w-full flex-wrap">
           <div className="flex flex-1 flex-col justify-center min-w-0">
-            <h1 className="text-[32px] font-semibold text-gray-900 leading-[1.33]" data-testid="page-title">
+            <h1 className="font-semibold text-gray-900 text-[28px]" data-testid="page-title">
               Business Processes
             </h1>
           </div>
