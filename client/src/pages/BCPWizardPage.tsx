@@ -62,26 +62,30 @@ function StepIndicator({ step, currentStep, label }: StepIndicatorProps) {
   const isCompleted = step < currentStep;
 
   return (
-    <div className="flex flex-col gap-4 items-start w-[160px]">
+    <div className="flex flex-col gap-4 items-start w-40">
       <div
-        className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
+        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
           isCompleted
             ? "bg-[#266c92] text-white"
             : isActive
-            ? "bg-white border border-[rgba(24,49,83,0.67)] p-1"
-            : "bg-white border border-[rgba(1,55,126,0.11)]"
+            ? "bg-white border-2 border-[#183153] p-1"
+            : "bg-white border border-[rgba(1,55,126,0.11)] text-[rgba(24,49,83,0.67)]"
         }`}
         data-testid={`step-indicator-${step}`}
       >
         {isCompleted ? (
           <Check className="w-3 h-3" />
         ) : isActive ? (
-          <div className="w-full h-full rounded-full bg-[rgba(24,49,83,0.67)]" />
-        ) : null}
+          <div className="w-full h-full rounded-full bg-[#183153]" />
+        ) : (
+          step
+        )}
       </div>
       <span
-        className={`text-sm leading-[1.35] ${
-          isActive || isCompleted
+        className={`text-sm ${
+          isActive
+            ? "text-[rgba(1,8,24,0.93)]"
+            : isCompleted
             ? "text-[rgba(1,8,24,0.93)]"
             : "text-[rgba(24,49,83,0.67)]"
         }`}
@@ -329,42 +333,36 @@ export function BCPWizardPage() {
         <div className="flex items-stretch relative flex-1 self-stretch w-full grow">
           <SideNavigationSection />
           <div className="flex flex-col relative flex-1 self-stretch grow bg-white min-w-0" style={{ maxHeight: "calc(100vh - 60px)" }}>
-            {/* Wizard Header - Multi Step Header */}
-            <div className="flex flex-col gap-8 pt-8 px-8 bg-white isolate">
-              {/* Header Row */}
-              <div className="flex gap-4 items-start w-full">
-                <p className="flex-1 font-semibold text-2xl leading-[1.2] text-[rgba(1,8,24,0.93)]">
+            {/* Wizard Header */}
+            <div className="flex flex-col gap-8 pt-8 px-8 bg-white border-b border-gray-200">
+              <div className="flex items-start justify-between gap-4">
+                <h1 className="text-2xl font-semibold text-[rgba(1,8,24,0.93)]">
                   Create new Business Continuity Plan
-                </p>
-                <div className="flex gap-3 items-center justify-end">
-                  <div className="flex gap-2 items-start">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={handleClose}
-                      className="h-[38px] w-[38px] rounded text-slate-500 hover:text-slate-700"
-                      data-testid="button-close-wizard"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
+                </h1>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleClose}
+                  className="text-slate-500 hover:text-slate-700"
+                  data-testid="button-close-wizard"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
 
               {/* Step Indicator */}
-              <div className="flex gap-8 items-start relative overflow-clip w-full">
-                {/* Connecting line - positioned at center of 24px circles (12px from top) */}
-                <div className="absolute h-0 left-0 right-0 top-[12px]">
-                  <div className="absolute left-0 right-0 h-px bg-[rgba(1,55,126,1)]" />
-                </div>
+              <div className="flex gap-8 items-start relative overflow-hidden pb-6">
+                {/* Connecting line */}
+                <div className="absolute top-3 left-0 right-0 h-px bg-[#01377e] z-0" />
                 
                 {STEP_LABELS.map((label, index) => (
-                  <StepIndicator
-                    key={label}
-                    step={(index + 1) as WizardStep}
-                    currentStep={currentStep}
-                    label={label}
-                  />
+                  <div key={label} className="z-10">
+                    <StepIndicator
+                      step={(index + 1) as WizardStep}
+                      currentStep={currentStep}
+                      label={label}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
