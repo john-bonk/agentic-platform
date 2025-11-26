@@ -334,7 +334,7 @@ function generateMindMapData(
       id: `edge-root-${categoryId}`,
       source: "root",
       target: categoryId,
-      type: "smoothstep",
+      type: "bezier",
       style: { stroke: "#94a3b8", strokeWidth: 2 },
     });
 
@@ -375,7 +375,7 @@ function generateMindMapData(
           id: `edge-${categoryId}-${itemId}`,
           source: categoryId,
           target: itemId,
-          type: "smoothstep",
+          type: "bezier",
           style: { stroke: "#cbd5e1", strokeWidth: 1.5 },
         });
       });
@@ -401,7 +401,7 @@ function generateMindMapData(
           id: `edge-${categoryId}-${moreId}`,
           source: categoryId,
           target: moreId,
-          type: "smoothstep",
+          type: "bezier",
           style: { stroke: "#e2e8f0", strokeWidth: 1.5, strokeDasharray: "4 2" },
         });
       }
