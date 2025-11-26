@@ -5,54 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, ChevronRight, Search, Filter, List, GitBranch, Columns, MoreHorizontal } from "lucide-react";
-
-interface Process {
-  id: string;
-  name: string;
-  processOwner: string;
-  criticality: "High" | "Low";
-  rto: string;
-  rpo: string;
-  latestBia: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  processes: Process[];
-}
-
-const businessProcessData: Category[] = [
-  {
-    id: "retail-banking",
-    name: "Retail Banking Operations",
-    processes: [
-      { id: "1", name: "Account Management", processOwner: "Baylor Cruz", criticality: "High", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "2", name: "Loan Origination and Servicing", processOwner: "Baylor Cruz", criticality: "Low", rto: "30 mins", rpo: "30 mins", latestBia: "2024" },
-      { id: "3", name: "Customer Service and Support", processOwner: "Baylor Cruz", criticality: "Low", rto: "24 hours", rpo: "24 hours", latestBia: "2024" },
-    ],
-  },
-  {
-    id: "human-resources",
-    name: "Human Resources",
-    processes: [
-      { id: "4", name: "Employee Onboarding and Offboarding", processOwner: "Dante Bradford", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "5", name: "Payroll Processing", processOwner: "Dante Bradford", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "6", name: "Benefits Administration", processOwner: "Dante Bradford", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "7", name: "Training & Development", processOwner: "Dante Bradford", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-    ],
-  },
-  {
-    id: "treasury",
-    name: "Treasury & Cash Management",
-    processes: [
-      { id: "8", name: "Cash Flow Forecasting", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "9", name: "Liquidity Management", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "10", name: "Payment Processing", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "11", name: "Benefits Administration", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-    ],
-  },
-];
+import { businessProcessData, type Category } from "../../data/businessProcessData";
 
 export const MainContentSection = (): JSX.Element => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
@@ -289,7 +242,7 @@ export const MainContentSection = (): JSX.Element => {
                           onClick={(e) => e.stopPropagation()}
                           data-testid={`bia-link-${process.id}`}
                         >
-                          {process.latestBia}
+                          {process.biaLastUpdated.split(" ").pop()}
                         </a>
                       </div>
                     </div>
