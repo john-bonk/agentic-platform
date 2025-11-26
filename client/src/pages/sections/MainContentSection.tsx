@@ -136,7 +136,6 @@ export const MainContentSection = (): JSX.Element => {
           </div>
         </div>
       </header>
-
       <div className="flex items-center justify-between px-8 py-3 w-full bg-white flex-wrap gap-2">
         <div className="flex items-center gap-2 flex-wrap">
           <div className="relative">
@@ -173,7 +172,6 @@ export const MainContentSection = (): JSX.Element => {
           </Button>
         </div>
       </div>
-
       <main className="flex flex-col relative flex-1 self-stretch w-full overflow-x-auto overflow-y-auto">
         <div className="min-w-fit">
           <div className="flex items-center h-10 border-b border-gray-200 bg-white sticky top-0 z-10 mx-4">
@@ -225,7 +223,7 @@ export const MainContentSection = (): JSX.Element => {
                     </button>
                     <a
                       href="#"
-                      className="text-sm font-medium text-blue-600 hover:underline truncate"
+                      className="text-sm text-blue-600 hover:underline truncate font-normal"
                       onClick={(e) => e.stopPropagation()}
                       data-testid={`category-link-${category.id}`}
                     >

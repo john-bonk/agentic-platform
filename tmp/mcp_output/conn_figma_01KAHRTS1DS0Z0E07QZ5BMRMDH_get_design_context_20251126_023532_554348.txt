@@ -1,0 +1,1454 @@
+<mcp_external_output>
+
+### Content Block 1 (Text)
+<frame id="1932:912" name="BCM" x="1768" y="1437" width="1728" height="1117">
+  <instance id="1932:913" name="View Title Heading" x="284" y="57" width="1524" height="16" hidden="true" />
+  <text id="1932:914" name="Description" x="252" y="89" width="1756" height="21" hidden="true" />
+  <frame id="1932:915" name="cards" x="252" y="73" width="1483" height="96" hidden="true">
+    <frame id="1932:916" name="Card" x="0" y="0" width="184" height="96">
+      <frame id="1932:917" name="Frame 963890" x="12" y="12" width="76" height="72">
+        <frame id="1932:918" name="Frame 963889" x="0" y="0" width="76" height="21">
+          <frame id="1932:919" name="Frame 963896" x="0" y="0" width="76" height="21">
+            <text id="1932:920" name="Inherent Risk" x="0" y="0" width="76" height="21" />
+            <instance id="1932:921" name="Info" x="80" y="4.5" width="12" height="12" hidden="true" />
+            <vector id="1932:922" name="Vector" x="68" y="14.5" width="12.00000104907349" height="12.000001049073262" hidden="true" />
+          </frame>
+          <text id="1932:923" name="Inherited: LinkedIn" x="0" y="24" width="85" height="17" hidden="true" />
+        </frame>
+        <frame id="1932:924" name="Frame 964552" x="0" y="52" width="52" height="20">
+          <frame id="1932:925" name="risk score" x="0" y="0" width="51" height="24" hidden="true">
+            <frame id="1932:926" name="Frame 963897" x="0" y="0" width="22" height="24" hidden="true">
+              <regular-polygon id="1932:927" name="Polygon 2" x="-1" y="0" width="24" height="24" />
+              <text id="1932:928" name="C" x="6.333984375" y="3.5" width="10" height="16" />
+            </frame>
+            <frame id="1932:929" name="Color" x="0" y="8" width="8" height="8" />
+            <text id="1932:930" name="High" x="16" y="0" width="35" height="24" />
+          </frame>
+          <text id="1932:931" name="90% of All Vendors" x="0" y="21" width="87" height="17" hidden="true" />
+          <instance id="1932:932" name="Badges" x="0" y="0" width="52" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="1932:933" name="Card" x="200" y="0" width="184" height="96">
+      <frame id="1932:934" name="Frame 963890" x="12" y="12" width="78" height="72">
+        <frame id="1932:935" name="Frame 963889" x="0" y="0" width="78" height="21">
+          <frame id="1932:936" name="Frame 963896" x="0" y="0" width="78" height="21">
+            <text id="1932:937" name="Residual Risk" x="0" y="0" width="78" height="21" />
+            <instance id="1932:938" name="Info" x="82" y="4.5" width="12" height="12" hidden="true" />
+            <vector id="1932:939" name="Vector" x="68" y="14.5" width="12.00000104907349" height="12.000001049073262" hidden="true" />
+          </frame>
+          <text id="1932:940" name="Inherited: LinkedIn" x="0" y="24" width="85" height="17" hidden="true" />
+        </frame>
+        <frame id="1932:941" name="Frame 964552" x="0" y="52" width="33" height="20">
+          <frame id="1932:942" name="risk score" x="0" y="0" width="51" height="24" hidden="true">
+            <frame id="1932:943" name="Frame 963897" x="0" y="0" width="22" height="24" hidden="true">
+              <regular-polygon id="1932:944" name="Polygon 2" x="-1" y="0" width="24" height="24" />
+              <text id="1932:945" name="C" x="6.333984375" y="3.5" width="10" height="16" />
+            </frame>
+            <frame id="1932:946" name="Color" x="0" y="8" width="8" height="8" />
+            <text id="1932:947" name="High" x="16" y="0" width="35" height="24" />
+          </frame>
+          <text id="1932:948" name="90% of All Vendors" x="0" y="21" width="87" height="17" hidden="true" />
+          <instance id="1932:949" name="Badges" x="0" y="0" width="52" height="20" hidden="true" />
+          <instance id="1932:950" name="Badges" x="0" y="0" width="33" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="1932:951" name="Card" x="400" y="8" width="184" height="88" hidden="true">
+      <frame id="1932:952" name="Frame 963890" x="16" y="16" width="131" height="56">
+        <frame id="1932:953" name="Frame 963889" x="0" y="0" width="131" height="21">
+          <frame id="1932:954" name="Frame 963896" x="0" y="0" width="131" height="21">
+            <text id="1932:955" name="Reviewed by risk team" x="0" y="0" width="131" height="21" />
+            <instance id="1932:956" name="Info" x="135" y="4.5" width="12" height="12" hidden="true" />
+            <vector id="1932:957" name="Vector" x="68" y="14.5" width="12.00000104907349" height="12.000001049073262" hidden="true" />
+          </frame>
+          <text id="1932:958" name="Inherited: LinkedIn" x="0" y="24" width="85" height="17" hidden="true" />
+        </frame>
+        <frame id="1932:959" name="Frame 964552" x="0" y="22.5" width="16" height="16">
+          <frame id="1932:960" name="risk score" x="0" y="0" width="51" height="24" hidden="true">
+            <frame id="1932:961" name="Frame 963897" x="0" y="0" width="22" height="24" hidden="true">
+              <regular-polygon id="1932:962" name="Polygon 2" x="-1" y="0" width="24" height="24" />
+              <text id="1932:963" name="C" x="6.333984375" y="3.5" width="10" height="16" />
+            </frame>
+            <frame id="1932:964" name="Color" x="0" y="8" width="8" height="8" />
+            <text id="1932:965" name="High" x="16" y="0" width="35" height="24" />
+          </frame>
+          <text id="1932:966" name="90% of All Vendors" x="0" y="21" width="87" height="17" hidden="true" />
+          <instance id="1932:967" name="Badges" x="0" y="0" width="52" height="20" hidden="true" />
+          <instance id="1932:968" name="No" x="0" y="0" width="16" height="16" hidden="true" />
+        </frame>
+        <instance id="1932:969" name="Check" x="0" y="40" width="16" height="16" />
+      </frame>
+    </frame>
+    <frame id="1932:970" name="Card" x="400" y="0" width="184" height="96">
+      <frame id="1932:971" name="Frame 963890" x="12" y="12" width="86" height="72">
+        <frame id="1932:972" name="Frame 963889" x="0" y="0" width="86" height="21">
+          <frame id="1932:973" name="Frame 963896" x="0" y="0" width="86" height="21">
+            <text id="1932:974" name="Risk Response" x="0" y="0" width="86" height="21" />
+            <instance id="1932:975" name="Info" x="82" y="4.5" width="12" height="12" hidden="true" />
+            <vector id="1932:976" name="Vector" x="68" y="14.5" width="12.00000104907349" height="12.000001049073262" hidden="true" />
+          </frame>
+          <text id="1932:977" name="Inherited: LinkedIn" x="0" y="24" width="85" height="17" hidden="true" />
+        </frame>
+        <frame id="1932:978" name="Frame 964552" x="0" y="48" width="62" height="24">
+          <frame id="1932:979" name="risk score" x="0" y="0" width="51" height="24" hidden="true">
+            <frame id="1932:980" name="Frame 963897" x="0" y="0" width="22" height="24" hidden="true">
+              <regular-polygon id="1932:981" name="Polygon 2" x="-1" y="0" width="24" height="24" />
+              <text id="1932:982" name="C" x="6.333984375" y="3.5" width="10" height="16" />
+            </frame>
+            <frame id="1932:983" name="Color" x="0" y="8" width="8" height="8" />
+            <text id="1932:984" name="High" x="16" y="0" width="35" height="24" />
+          </frame>
+          <text id="1932:985" name="Mitigate" x="0" y="0" width="62" height="24" />
+          <instance id="1932:986" name="Badges" x="0" y="0" width="52" height="20" hidden="true" />
+          <instance id="1932:987" name="Badges" x="0" y="0" width="60" height="20" hidden="true" />
+        </frame>
+      </frame>
+    </frame>
+    <instance id="1932:988" name="Toolkit" x="600" y="64" width="1156" height="32" hidden="true" />
+  </frame>
+  <frame id="1932:989" name="View Actions" x="252" y="73" width="1483" height="40" hidden="true">
+    <frame id="1932:990" name="Frame 965261" x="0" y="8" width="174" height="24">
+      <text id="1932:991" name="Mitigation Status:" x="0" y="3" width="97" height="18" />
+      <instance id="1932:992" name="Tag" x="105" y="0" width="69" height="24" />
+    </frame>
+    <frame id="1932:993" name="Frame 965262" x="196" y="9.5" width="144" height="21">
+      <text id="1932:994" name="Exposure:" x="0" y="1.5" width="55" height="18" />
+      <text id="1932:995" name="$1,000,0000" x="63" y="0" width="81" height="21" />
+    </frame>
+    <instance id="1932:996" name="Flag" x="0" y="13" width="66" height="14" hidden="true" />
+    <frame id="1932:997" name="Frame 963969" x="364" y="0" width="1117" height="40">
+      <text id="1932:998" name="Last Updated by Aaron Clark 2023-Mar-01 18:00" x="116" y="0" width="249" height="40" hidden="true" />
+      <instance id="1932:999" name="Button" x="254" y="0" width="40" height="40" hidden="true" />
+    </frame>
+    <instance id="1932:1000" name="Toolkit" x="884" y="4" width="872" height="32" hidden="true" />
+  </frame>
+  <instance id="1932:1001" name="Tab Menu" x="284" y="321" width="1756" height="40" hidden="true" />
+  <instance id="1932:1002" name="Tab Menu" x="284" y="73" width="1483" height="40" hidden="true" />
+  <frame id="1932:1003" name="Nav Menu" x="56" y="50" width="276" height="1067">
+    <frame id="1932:1004" name="Frame 1960" x="0" y="0" width="272" height="1067">
+      <frame id="1932:1005" name="select-workspace" x="0" y="0" width="272" height="72">
+        <instance id="1932:1006" name="select-workspace" x="24" y="24" width="200" height="24" />
+        <instance id="1932:1007" name="Button" x="224" y="16" width="40" height="40" />
+      </frame>
+      <frame id="1932:1008" name="Frame 130" x="0" y="80" width="272" height="987">
+        <frame id="1932:1009" name="Section" x="0" y="0" width="272" height="76">
+          <instance id="1932:1010" name="Nav Menu Option" x="8" y="0" width="256" height="40" />
+          <instance id="1932:1011" name="Nav Menu Option" x="8" y="40" width="256" height="40" hidden="true" />
+          <instance id="1932:1012" name="Nav Menu Option" x="8" y="40" width="256" height="36" />
+          <instance id="1932:1013" name="Nav Menu Option" x="8" y="76" width="256" height="36" hidden="true" />
+          <instance id="1932:1014" name="Nav Menu Option" x="8" y="112" width="256" height="36" hidden="true" />
+          <instance id="1932:1015" name="Nav Menu Option" x="8" y="148" width="256" height="36" hidden="true" />
+          <instance id="1932:1016" name="Nav Menu Option" x="8" y="148" width="256" height="36" hidden="true" />
+          <instance id="1932:1017" name="Nav Menu Option" x="8" y="148" width="256" height="36" hidden="true" />
+          <instance id="1932:1018" name="Nav Menu Option" x="8" y="232" width="256" height="36" hidden="true" />
+          <instance id="1932:1019" name="Nav Menu Option" x="8" y="270" width="256" height="36" hidden="true" />
+          <frame id="1932:1020" name="Add Action" x="8" y="308" width="256" height="36" hidden="true">
+            <instance id="1932:1021" name="Nav Menu Option" x="0" y="0" width="268" height="36" />
+          </frame>
+        </frame>
+        <frame id="1932:1022" name="Section" x="0" y="100" width="272" height="220">
+          <instance id="1932:1023" name="Nav Menu Option" x="8" y="0" width="256" height="40" />
+          <instance id="1932:1024" name="Nav Menu Option" x="8" y="0" width="256" height="40" hidden="true" />
+          <instance id="1932:1025" name="Nav Menu Option" x="8" y="40" width="256" height="36" hidden="true" />
+          <instance id="1932:1026" name="Nav Menu Option" x="8" y="40" width="256" height="36" />
+          <instance id="1932:1027" name="Nav Menu Option" x="8" y="76" width="256" height="36" />
+          <instance id="1932:1028" name="Nav Menu Option" x="8" y="148" width="256" height="36" hidden="true" />
+          <instance id="1932:1029" name="Nav Menu Option" x="8" y="148" width="256" height="36" hidden="true" />
+          <instance id="1932:1030" name="Nav Menu Option" x="8" y="112" width="256" height="36" />
+          <instance id="1932:1031" name="Nav Menu Option" x="8" y="148" width="256" height="36" />
+          <instance id="1932:1032" name="Nav Menu Option" x="8" y="184" width="256" height="36" />
+          <instance id="1932:1033" name="Nav Menu Option" x="8" y="220" width="256" height="36" hidden="true" />
+          <instance id="1932:1034" name="Nav Menu Option" x="8" y="256" width="256" height="36" hidden="true" />
+          <frame id="1932:1035" name="Add Action" x="8" y="308" width="256" height="36" hidden="true">
+            <instance id="1932:1036" name="Nav Menu Option" x="0" y="0" width="268" height="36" />
+          </frame>
+        </frame>
+        <frame id="1932:1037" name="Section" x="0" y="416" width="272" height="76" hidden="true">
+          <instance id="1932:1038" name="Nav Menu Option" x="8" y="0" width="256" height="40" />
+          <instance id="1932:1039" name="Nav Menu Option" x="8" y="40" width="256" height="36" />
+        </frame>
+        <frame id="1932:1040" name="Section" x="0" y="524" width="272" height="220" hidden="true">
+          <instance id="1932:1041" name="Nav Menu Option" x="8" y="0" width="256" height="40" />
+          <instance id="1932:1042" name="Nav Menu Option" x="8" y="40" width="256" height="36" />
+          <instance id="1932:1043" name="Nav Menu Option" x="8" y="76" width="256" height="36" />
+          <instance id="1932:1044" name="Nav Menu Option" x="8" y="112" width="256" height="36" />
+          <instance id="1932:1045" name="Nav Menu Option" x="8" y="148" width="256" height="36" />
+          <instance id="1932:1046" name="Nav Menu Option" x="8" y="184" width="256" height="36" />
+          <instance id="1932:1047" name="Nav Menu Option" x="8" y="184" width="256" height="36" hidden="true" />
+          <instance id="1932:1048" name="Nav Menu Option" x="8" y="188" width="256" height="36" hidden="true" />
+          <instance id="1932:1049" name="Nav Menu Option" x="8" y="224" width="256" height="36" hidden="true" />
+          <instance id="1932:1050" name="Nav Menu Option" x="8" y="260" width="256" height="40" hidden="true" />
+          <instance id="1932:1051" name="Nav Menu Option" x="8" y="270" width="256" height="36" hidden="true" />
+          <frame id="1932:1052" name="Add Action" x="8" y="308" width="256" height="36" hidden="true">
+            <instance id="1932:1053" name="Nav Menu Option" x="0" y="0" width="268" height="36" />
+          </frame>
+        </frame>
+        <frame id="1932:1054" name="Section" x="0" y="344" width="272" height="184">
+          <instance id="1932:1055" name="Nav Menu Option" x="8" y="0" width="256" height="40" />
+          <instance id="1932:1056" name="Nav Menu Option" x="8" y="0" width="256" height="40" hidden="true" />
+          <instance id="1932:1057" name="Nav Menu Option" x="8" y="40" width="256" height="36" />
+          <instance id="1932:1058" name="Nav Menu Option" x="8" y="76" width="256" height="36" />
+          <instance id="1932:1059" name="Nav Menu Option" x="8" y="112" width="256" height="36" />
+          <instance id="1932:1060" name="Nav Menu Option" x="8" y="148" width="256" height="36" />
+          <instance id="1932:1061" name="Nav Menu Option" x="8" y="80" width="256" height="36" hidden="true" />
+          <instance id="1932:1062" name="Nav Menu Option" x="8" y="118" width="256" height="36" hidden="true" />
+          <instance id="1932:1063" name="Nav Menu Option" x="8" y="156" width="256" height="36" hidden="true" />
+          <instance id="1932:1064" name="Nav Menu Option" x="8" y="194" width="256" height="36" hidden="true" />
+          <instance id="1932:1065" name="Nav Menu Option" x="8" y="232" width="256" height="36" hidden="true" />
+          <instance id="1932:1066" name="Nav Menu Option" x="8" y="270" width="256" height="36" hidden="true" />
+          <frame id="1932:1067" name="Add Action" x="8" y="308" width="256" height="36" hidden="true">
+            <instance id="1932:1068" name="Nav Menu Option" x="0" y="0" width="268" height="36" />
+          </frame>
+        </frame>
+        <frame id="1932:1069" name="Section" x="0" y="552" width="272" height="112">
+          <instance id="1932:1070" name="Nav Menu Option" x="8" y="0" width="256" height="40" />
+          <instance id="1932:1071" name="Nav Menu Option" x="8" y="0" width="256" height="40" hidden="true" />
+          <instance id="1932:1072" name="Nav Menu Option" x="8" y="40" width="256" height="36" />
+          <instance id="1932:1073" name="Nav Menu Option" x="8" y="76" width="256" height="36" />
+          <instance id="1932:1074" name="Nav Menu Option" x="8" y="80" width="256" height="36" hidden="true" />
+          <instance id="1932:1075" name="Nav Menu Option" x="8" y="118" width="256" height="36" hidden="true" />
+          <instance id="1932:1076" name="Nav Menu Option" x="8" y="156" width="256" height="36" hidden="true" />
+          <instance id="1932:1077" name="Nav Menu Option" x="8" y="194" width="256" height="36" hidden="true" />
+          <instance id="1932:1078" name="Nav Menu Option" x="8" y="232" width="256" height="36" hidden="true" />
+          <instance id="1932:1079" name="Nav Menu Option" x="8" y="270" width="256" height="36" hidden="true" />
+          <frame id="1932:1080" name="Add Action" x="8" y="308" width="256" height="36" hidden="true">
+            <instance id="1932:1081" name="Nav Menu Option" x="0" y="0" width="268" height="36" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <frame id="1932:1082" name="Frame 1959" x="272" y="0" width="4" height="1067" />
+  </frame>
+  <frame id="1932:1115" name="Grandchild 1" x="367" y="407" width="1588" height="48" hidden="true">
+    <frame id="1932:1116" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1117" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1118" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1119" name="Spacer" x="48" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1120" name="Spacer" x="72" y="16" width="16" height="16" />
+      <frame id="1932:1121" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1122" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1123" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1124" name="Chevron Down" x="72" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:1125" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1126" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1127" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1128" name="Hover text" x="96" y="13.5" width="64" height="21" />
+      <instance id="1932:1129" name="Badge" x="154" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:1130" name="Badge" x="154" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1131" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1132" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1133" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1134" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1135" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1136" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1137" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1138" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1139" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1140" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1141" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1142" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1143" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1144" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1145" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1146" name="Grandchild 5" x="367" y="407" width="1588" height="48" hidden="true">
+    <frame id="1932:1147" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1148" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1149" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1150" name="Spacer" x="48" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1151" name="Spacer" x="72" y="16" width="16" height="16" />
+      <frame id="1932:1152" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1153" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1154" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1155" name="Chevron Down" x="72" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:1156" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1157" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1158" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1159" name="Hover text" x="96" y="13.5" width="64" height="21" />
+      <instance id="1932:1160" name="Badge" x="154" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:1161" name="Badge" x="154" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1162" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1163" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1164" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1165" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1166" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1167" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1168" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1169" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1170" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1171" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1172" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1173" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1174" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1175" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1176" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1177" name="Child 14" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1178" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1179" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1180" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1181" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:1182" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1183" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1184" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1185" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:1186" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1187" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1188" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1189" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1190" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:1191" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1192" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1193" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1194" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1195" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1196" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1197" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1198" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1199" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1200" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1201" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1202" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1203" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1204" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1205" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1206" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1207" name="Child 15" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1208" name="Frame 964676" x="8" y="0" width="1213.5999755859375" height="48">
+      <instance id="1932:1209" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1210" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:1211" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1212" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1213" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1214" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:1215" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1216" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1217" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1218" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1219" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:1220" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1221" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1222" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1223" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1224" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1225" name="Frame 964679" x="1221.5999755859375" y="0" width="300" height="48">
+      <instance id="1932:1226" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1227" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1228" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1229" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1230" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1231" name="right side btns" x="1521.5999755859375" y="14.800000190734863" width="34.400001525878906" height="18.399999618530273">
+      <instance id="1932:1232" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1233" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" />
+      <instance id="1932:1234" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1235" name="Add" x="22.399999618530273" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1236" name="Child 16" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1237" name="Frame 964676" x="8" y="0" width="1213.5999755859375" height="48">
+      <instance id="1932:1238" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1239" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:1240" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1241" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1242" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1243" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:1244" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1245" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1246" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1247" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1248" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:1249" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1250" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1251" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1252" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1253" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1254" name="Frame 964679" x="1221.5999755859375" y="0" width="300" height="48">
+      <instance id="1932:1255" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1256" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1257" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1258" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1259" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1260" name="right side btns" x="1521.5999755859375" y="14.800000190734863" width="34.400001525878906" height="18.399999618530273">
+      <instance id="1932:1261" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1262" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" />
+      <instance id="1932:1263" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1264" name="Add" x="22.399999618530273" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1265" name="Child 4" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1266" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1267" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1268" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1269" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:1270" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1271" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1272" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1273" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:1274" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1275" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1276" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1277" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1278" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:1279" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1280" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1281" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1282" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1283" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1284" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1285" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1286" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1287" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1288" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1289" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1290" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1291" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1292" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1293" name="Buttons" x="0" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1294" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1295" name="Child 5" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1296" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1297" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1298" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:1299" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1300" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1301" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1302" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:1303" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1304" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1305" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1306" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1307" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:1308" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1309" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1310" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1311" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1312" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1313" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1314" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1315" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1316" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1317" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1318" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1319" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1320" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1321" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1322" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1323" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1324" name="Child 6" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1325" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1326" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1327" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:1328" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1329" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1330" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1331" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:1332" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1333" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1334" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1335" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1336" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:1337" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1338" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1339" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1340" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1341" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1342" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1343" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1344" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1345" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1346" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1347" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1348" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1349" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1350" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1351" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1352" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1353" name="Child 7" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1354" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1355" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1356" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1357" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:1358" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1359" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1360" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1361" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:1362" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1363" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1364" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1365" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1366" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:1367" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1368" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1369" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1370" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1371" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1372" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1373" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1374" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1375" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1376" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1377" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1378" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1379" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1380" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1381" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1382" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1383" name="Child 8" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1384" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1385" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1386" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1387" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:1388" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1389" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1390" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1391" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:1392" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1393" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1394" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1395" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1396" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:1397" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1398" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1399" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1400" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1401" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1402" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1403" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1404" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1405" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1406" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1407" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1408" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1409" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1410" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1411" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1412" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1413" name="Child 9" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1414" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1415" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1416" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1417" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:1418" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1419" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1420" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1421" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:1422" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1423" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1424" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1425" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1426" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:1427" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1428" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1429" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1430" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1431" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1432" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1433" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1434" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1435" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1436" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1437" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1438" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1439" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1440" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1441" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1442" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1443" name="Child 10" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1444" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1445" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1446" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1447" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:1448" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1449" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1450" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1451" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:1452" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1453" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1454" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1455" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1456" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:1457" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1458" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1459" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1460" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1461" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1462" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1463" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1464" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1465" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1466" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1467" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1468" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1469" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1470" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1471" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1472" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1473" name="Child 12" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1474" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1475" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1476" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:1477" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1478" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1479" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1480" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:1481" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1482" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1483" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1484" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1485" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:1486" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1487" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1488" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1489" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1490" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1491" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1492" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1493" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1494" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1495" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1496" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1497" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1498" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1499" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1500" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1501" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1502" name="Child 13" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:1503" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:1504" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:1505" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:1506" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1507" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1508" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1509" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:1510" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1511" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1512" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1513" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:1514" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:1515" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1516" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:1517" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1518" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1519" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1520" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:1521" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1522" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:1523" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1524" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1525" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1526" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:1527" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1528" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:1529" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1530" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:1531" name="Grandgrandchild 2" x="367" y="551" width="1588" height="40" hidden="true">
+    <frame id="1932:1532" name="Frame 964676" x="8" y="0" width="642" height="40">
+      <instance id="1932:1533" name="Hover drag" x="0" y="12" width="16" height="16" />
+      <rounded-rectangle id="1932:1534" name="Spacer" x="24" y="12" width="16" height="16" />
+      <rounded-rectangle id="1932:1535" name="Spacer" x="48" y="12" width="16" height="16" />
+      <rounded-rectangle id="1932:1536" name="Spacer" x="72" y="12" width="16" height="16" />
+      <rounded-rectangle id="1932:1537" name="Spacer" x="96" y="12" width="16" height="16" />
+      <frame id="1932:1538" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:1539" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:1540" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:1541" name="Chevron Down" x="96" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:1542" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:1543" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:1544" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:1545" name="Hover text" x="120" y="9.5" width="64" height="21" />
+      <instance id="1932:1546" name="Badge" x="190" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:1547" name="Badge" x="190" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1548" name="Frame 964677" x="650" y="0" width="500" height="40">
+      <text id="1932:1549" name="Violet Cooper" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:1550" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:1551" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:1552" name="Frame 964678" x="1150" y="0" width="182" height="40">
+      <text id="1932:1553" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:1554" name="Frame 964679" x="1332" y="0" width="176" height="40">
+      <instance id="1932:1555" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:1556" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:1557" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:1558" name="right side btns" x="1508" y="10.800000190734863" width="80" height="18.399999618530273">
+      <instance id="1932:1559" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:1560" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" />
+      <instance id="1932:1561" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:1562" name="More Horizontal" x="26.399999618530273" y="0" width="16" height="16" hidden="true" />
+    </frame>
+  </frame>
+  <frame id="1932:2146" name="Grandchild 1" x="367" y="407" width="1588" height="48" hidden="true">
+    <frame id="1932:2147" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2148" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2149" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2150" name="Spacer" x="48" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2151" name="Spacer" x="72" y="16" width="16" height="16" />
+      <frame id="1932:2152" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2153" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2154" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2155" name="Chevron Down" x="72" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:2156" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2157" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2158" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2159" name="Hover text" x="96" y="13.5" width="64" height="21" />
+      <instance id="1932:2160" name="Badge" x="154" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:2161" name="Badge" x="154" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2162" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2163" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2164" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2165" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2166" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2167" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2168" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2169" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2170" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2171" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2172" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2173" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2174" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2175" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2176" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2177" name="Grandchild 5" x="367" y="407" width="1588" height="48" hidden="true">
+    <frame id="1932:2178" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2179" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2180" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2181" name="Spacer" x="48" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2182" name="Spacer" x="72" y="16" width="16" height="16" />
+      <frame id="1932:2183" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2184" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2185" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2186" name="Chevron Down" x="72" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:2187" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2188" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2189" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2190" name="Hover text" x="96" y="13.5" width="64" height="21" />
+      <instance id="1932:2191" name="Badge" x="154" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:2192" name="Badge" x="154" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2193" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2194" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2195" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2196" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2197" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2198" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2199" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2200" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2201" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2202" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2203" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2204" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2205" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2206" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2207" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2208" name="Child 14" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2209" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2210" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2211" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2212" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:2213" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2214" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2215" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2216" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:2217" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2218" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2219" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2220" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2221" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:2222" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2223" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2224" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2225" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2226" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2227" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2228" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2229" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2230" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2231" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2232" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2233" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2234" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2235" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2236" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2237" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2238" name="Child 15" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2239" name="Frame 964676" x="8" y="0" width="1213.5999755859375" height="48">
+      <instance id="1932:2240" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2241" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:2242" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2243" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2244" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2245" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:2246" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2247" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2248" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2249" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2250" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:2251" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2252" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2253" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2254" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2255" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2256" name="Frame 964679" x="1221.5999755859375" y="0" width="300" height="48">
+      <instance id="1932:2257" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2258" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2259" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2260" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2261" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2262" name="right side btns" x="1521.5999755859375" y="14.800000190734863" width="34.400001525878906" height="18.399999618530273">
+      <instance id="1932:2263" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2264" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" />
+      <instance id="1932:2265" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2266" name="Add" x="22.399999618530273" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2267" name="Child 16" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2268" name="Frame 964676" x="8" y="0" width="1213.5999755859375" height="48">
+      <instance id="1932:2269" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2270" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:2271" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2272" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2273" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2274" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:2275" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2276" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2277" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2278" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2279" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:2280" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2281" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2282" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2283" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2284" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2285" name="Frame 964679" x="1221.5999755859375" y="0" width="300" height="48">
+      <instance id="1932:2286" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2287" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2288" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2289" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2290" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2291" name="right side btns" x="1521.5999755859375" y="14.800000190734863" width="34.400001525878906" height="18.399999618530273">
+      <instance id="1932:2292" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2293" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" />
+      <instance id="1932:2294" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2295" name="Add" x="22.399999618530273" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2296" name="Child 4" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2297" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2298" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2299" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2300" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:2301" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2302" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2303" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2304" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:2305" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2306" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2307" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2308" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2309" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:2310" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2311" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2312" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2313" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2314" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2315" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2316" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2317" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2318" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2319" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2320" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2321" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2322" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2323" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2324" name="Buttons" x="0" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2325" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2326" name="Child 5" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2327" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2328" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2329" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:2330" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2331" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2332" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2333" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:2334" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2335" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2336" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2337" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2338" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:2339" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2340" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2341" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2342" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2343" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2344" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2345" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2346" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2347" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2348" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2349" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2350" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2351" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2352" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2353" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2354" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2355" name="Child 6" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2356" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2357" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2358" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:2359" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2360" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2361" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2362" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:2363" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2364" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2365" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2366" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2367" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:2368" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2369" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2370" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2371" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2372" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2373" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2374" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2375" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2376" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2377" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2378" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2379" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2380" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2381" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2382" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2383" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2384" name="Child 7" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2385" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2386" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2387" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2388" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:2389" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2390" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2391" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2392" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:2393" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2394" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2395" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2396" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2397" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:2398" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2399" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2400" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2401" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2402" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2403" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2404" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2405" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2406" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2407" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2408" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2409" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2410" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2411" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2412" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2413" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2414" name="Child 8" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2415" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2416" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2417" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2418" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:2419" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2420" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2421" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2422" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:2423" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2424" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2425" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2426" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2427" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:2428" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2429" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2430" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2431" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2432" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2433" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2434" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2435" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2436" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2437" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2438" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2439" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2440" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2441" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2442" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2443" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2444" name="Child 9" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2445" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2446" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2447" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2448" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:2449" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2450" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2451" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2452" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:2453" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2454" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2455" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2456" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2457" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:2458" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2459" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2460" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2461" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2462" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2463" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2464" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2465" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2466" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2467" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2468" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2469" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2470" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2471" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2472" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2473" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2474" name="Child 10" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2475" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2476" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2477" name="Spacer" x="24" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2478" name="Spacer" x="48" y="16" width="16" height="16" />
+      <frame id="1932:2479" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2480" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2481" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2482" name="Chevron Down" x="48" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:2483" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2484" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2485" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2486" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2487" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:2488" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2489" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2490" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2491" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2492" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2493" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2494" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2495" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2496" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2497" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2498" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2499" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2500" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2501" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2502" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2503" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2504" name="Child 12" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2505" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2506" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2507" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:2508" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2509" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2510" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2511" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:2512" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2513" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2514" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2515" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2516" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:2517" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2518" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2519" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2520" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2521" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2522" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2523" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2524" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2525" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2526" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2527" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2528" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2529" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2530" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2531" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2532" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2533" name="Child 13" x="367" y="551" width="1588" height="48" hidden="true">
+    <frame id="1932:2534" name="Frame 964676" x="8" y="0" width="1236" height="48">
+      <instance id="1932:2535" name="Hover drag" x="0" y="16" width="16" height="16" />
+      <rounded-rectangle id="1932:2536" name="Spacer" x="24" y="16" width="16" height="16" />
+      <frame id="1932:2537" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2538" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2539" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2540" name="Chevron Right →" x="48" y="16" width="16" height="16" />
+      <instance id="1932:2541" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2542" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2543" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2544" name="Hover text" x="72" y="13.5" width="64" height="21" />
+      <instance id="1932:2545" name="Badge" x="144" y="16" width="48" height="16" />
+      <instance id="1932:2546" name="Badge" x="158" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2547" name="Frame 964677" x="908" y="0" width="300" height="40" hidden="true">
+      <text id="1932:2548" name="Aaron Clark" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2549" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2550" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2551" name="Frame 964679" x="1244" y="0" width="300" height="48">
+      <instance id="1932:2552" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2553" name="Frame 964678" x="1326" y="0" width="182" height="40" hidden="true">
+      <text id="1932:2554" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2555" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2556" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2557" name="right side btns" x="1544" y="18" width="12" height="12">
+      <instance id="1932:2558" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2559" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" hidden="true" />
+      <instance id="1932:2560" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2561" name="Add" x="0" y="0" width="12" height="12" />
+    </frame>
+  </frame>
+  <frame id="1932:2562" name="Grandgrandchild 2" x="367" y="551" width="1588" height="40" hidden="true">
+    <frame id="1932:2563" name="Frame 964676" x="8" y="0" width="642" height="40">
+      <instance id="1932:2564" name="Hover drag" x="0" y="12" width="16" height="16" />
+      <rounded-rectangle id="1932:2565" name="Spacer" x="24" y="12" width="16" height="16" />
+      <rounded-rectangle id="1932:2566" name="Spacer" x="48" y="12" width="16" height="16" />
+      <rounded-rectangle id="1932:2567" name="Spacer" x="72" y="12" width="16" height="16" />
+      <rounded-rectangle id="1932:2568" name="Spacer" x="96" y="12" width="16" height="16" />
+      <frame id="1932:2569" name="tree branches" x="24" y="0" width="16" height="37" hidden="true">
+        <frame id="1932:2570" name="leaf" x="0" y="0" width="16" height="37">
+          <vector id="1932:2571" name="Vector 24" x="4" y="0" width="8" height="19" />
+        </frame>
+      </frame>
+      <instance id="1932:2572" name="Chevron Down" x="96" y="12" width="16" height="16" hidden="true" />
+      <instance id="1932:2573" name="Checkbox" x="48" y="12" width="119" height="21" hidden="true" />
+      <frame id="1932:2574" name="Risk icon" x="48" y="10.5" width="16" height="16" hidden="true">
+        <vector id="1932:2575" name="Vector" x="2" y="2" width="12" height="12" />
+      </frame>
+      <instance id="1932:2576" name="Hover text" x="120" y="9.5" width="64" height="21" />
+      <instance id="1932:2577" name="Badge" x="190" y="12" width="48" height="16" hidden="true" />
+      <instance id="1932:2578" name="Badge" x="190" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2579" name="Frame 964677" x="650" y="0" width="500" height="40">
+      <text id="1932:2580" name="Violet Cooper" x="12" y="6" width="128" height="28" hidden="true" />
+      <instance id="1932:2581" name="Badge" x="12" y="12" width="48" height="16" />
+      <text id="1932:2582" name="2023-01-01" x="12" y="6" width="128" height="28" hidden="true" />
+    </frame>
+    <frame id="1932:2583" name="Frame 964678" x="1150" y="0" width="182" height="40">
+      <text id="1932:2584" name="2023-01-01" x="12" y="6" width="128" height="28" />
+    </frame>
+    <frame id="1932:2585" name="Frame 964679" x="1332" y="0" width="176" height="40">
+      <instance id="1932:2586" name="Badge" x="12" y="12" width="48" height="16" hidden="true" />
+    </frame>
+    <frame id="1932:2587" name="dotted guide" x="1080" y="0" width="97.5999984741211" height="40" hidden="true">
+      <line id="1932:2588" name="Line 161" x="0" y="20" width="97.5999984741211" height="0" />
+    </frame>
+    <frame id="1932:2589" name="right side btns" x="1508" y="10.800000190734863" width="80" height="18.399999618530273">
+      <instance id="1932:2590" name="More Horizontal" x="0" y="0" width="16" height="16" hidden="true" />
+      <instance id="1932:2591" name="Hover add" x="0" y="0" width="18.399999618530273" height="18.399999618530273" />
+      <instance id="1932:2592" name="Buttons" x="22.399999618530273" y="0" width="50.400001525878906" height="20" hidden="true" />
+      <instance id="1932:2593" name="More Horizontal" x="26.399999618530273" y="0" width="16" height="16" hidden="true" />
+    </frame>
+  </frame>
+  <instance id="1932:2602" name="Side Navigation" x="0" y="0" width="56" height="1117" />
+  <instance id="1932:2603" name="Top Navigation" x="56" y="0" width="1672" height="50" />
+  <instance id="1932:3373" name="View Header" x="332" y="51" width="1396" height="128" />
+  <frame id="1932:3374" name="Frame 965712" x="364" y="204" width="1327" height="76">
+    <frame id="1932:3375" name="Frame 965710" x="0" y="0" width="820" height="58">
+      <instance id="1932:3376" name="Input Vertical" x="0" y="0" width="156" height="58" />
+      <instance id="1932:3377" name="Input Vertical" x="166" y="0" width="156" height="54" />
+      <instance id="1932:3378" name="Input Vertical" x="332" y="0" width="156" height="54" />
+      <instance id="1932:3379" name="Input Vertical" x="498" y="0" width="156" height="54" />
+      <instance id="1932:3380" name="Input Vertical" x="664" y="0" width="156" height="54" />
+    </frame>
+  </frame>
+  <instance id="1932:3390" name="General Title" x="370" y="324" width="436" height="38" />
+  <frame id="1932:3391" name="Frame 965713" x="370" y="372" width="1329" height="219">
+    <frame id="1932:3392" name="Frame 965715" x="0" y="0" width="660.5" height="201">
+      <frame id="1932:3393" name="Frame 965710" x="0" y="0" width="660.5" height="34">
+        <instance id="1932:3394" name="Input Horizontal" x="0" y="0" width="660.5" height="34" />
+      </frame>
+      <instance id="1932:3397" name="Input Horizontal" x="0" y="42" width="660.5" height="117" />
+      <instance id="1932:3395" name="Input Horizontal" x="0" y="167" width="660.5" height="34" />
+    </frame>
+    <frame id="1932:3401" name="Frame 965718" x="668.5" y="0" width="660.5" height="177">
+      <frame id="1932:3408" name="Frame 965717" x="0" y="0" width="660.5" height="177">
+        <instance id="1932:4503" name="Input Horizontal" x="0" y="0" width="660.5" height="33" />
+        <instance id="1932:4521" name="Input Horizontal" x="0" y="41" width="660.5" height="33" />
+        <instance id="1932:4539" name="Input Horizontal" x="0" y="82" width="660.5" height="54" />
+        <instance id="1932:4557" name="Input Horizontal" x="0" y="144" width="660.5" height="33" />
+      </frame>
+    </frame>
+  </frame>
+</frame>
+
+### Content Block 2 (Text)
+IMPORTANT: The design was too large to fit into context with get_design_context. Instead you have received a sparse metadata response, you MUST call get_design_context on the IDs of the sublayers to get the full code. Split up the calls to ensure the sublayers do not also exceed the context limit.
+
+</mcp_external_output>
