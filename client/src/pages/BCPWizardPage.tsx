@@ -697,13 +697,16 @@ export function BCPWizardPage() {
 
       case 2:
         return (
-          <div className="flex flex-col gap-4 w-[700px]">
-            <div className="text-center py-20">
-              <h3 className="text-lg font-medium text-slate-900 dark:text-white">Plan Data</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                Configure the data and content for your Business Continuity Plan
-              </p>
-            </div>
+          <div className="flex flex-col gap-4">
+            <h3 className="text-lg font-medium text-slate-900">
+              What processes does this plan cover?
+            </h3>
+            <ProcessSelectionTable
+              selectedProcessIds={selectedProcessIds}
+              onSelectionChange={setSelectedProcessIds}
+              aiSuggestedProcessIds={aiSuggestedProcessIds}
+              currentProcessId={processId}
+            />
           </div>
         );
 
