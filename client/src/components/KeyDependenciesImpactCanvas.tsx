@@ -256,14 +256,18 @@ function generateMindMapData(
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
-  const ITEM_HEIGHT = 48;
-  const ITEM_GAP = 8;
-  const CATEGORY_GAP = 40;
+  const ROOT_NODE_WIDTH = 200;
+  const ROOT_NODE_HEIGHT = 72;
+  const CATEGORY_NODE_HEIGHT = 52;
+  const ITEM_NODE_HEIGHT = 48;
+  const ITEM_GAP = 10;
+  const CATEGORY_GAP = 50;
+  const COLUMN_GAP = 140;
   const MAX_ITEMS = 5;
   
   const ROOT_X = 0;
-  const CATEGORY_X = 220;
-  const ITEM_X = 420;
+  const CATEGORY_X = ROOT_X + ROOT_NODE_WIDTH + COLUMN_GAP;
+  const ITEM_X = CATEGORY_X + 160 + COLUMN_GAP;
 
   const allCategories = [
     { key: "itAssets", label: "IT Assets", items: (dependencies.itAssets || []) as unknown as GenericItem[], childCategory: "itAsset" },
@@ -282,10 +286,10 @@ function generateMindMapData(
     const totalRows = visibleItems + (hasMore ? 1 : 0);
     
     const blockHeight = isExpanded && totalRows > 0 
-      ? totalRows * ITEM_HEIGHT + (totalRows - 1) * ITEM_GAP
-      : ITEM_HEIGHT;
+      ? totalRows * ITEM_NODE_HEIGHT + (totalRows - 1) * ITEM_GAP
+      : CATEGORY_NODE_HEIGHT;
 
-    const categoryY = currentY + blockHeight / 2 - ITEM_HEIGHT / 2;
+    const categoryY = currentY + blockHeight / 2 - CATEGORY_NODE_HEIGHT / 2;
     
     categoryPositions.push({
       key: cat.key,
@@ -298,7 +302,7 @@ function generateMindMapData(
   });
 
   const totalHeight = currentY - CATEGORY_GAP;
-  const rootY = totalHeight / 2 - ITEM_HEIGHT / 2;
+  const rootY = totalHeight / 2 - ROOT_NODE_HEIGHT / 2;
 
   nodes.push({
     id: "root",
@@ -340,7 +344,7 @@ function generateMindMapData(
 
       itemsToShow.forEach((item, itemIdx) => {
         const itemId = `${cat.key}-${itemIdx}`;
-        const itemY = pos.itemsStartY + itemIdx * (ITEM_HEIGHT + ITEM_GAP);
+        const itemY = pos.itemsStartY + itemIdx * (ITEM_NODE_HEIGHT + ITEM_GAP);
 
         let subLabel = "";
         if (cat.childCategory === "branch" && "type" in item) {
@@ -378,7 +382,7 @@ function generateMindMapData(
 
       if (hasMore) {
         const moreId = `${cat.key}-more`;
-        const moreY = pos.itemsStartY + itemsToShow.length * (ITEM_HEIGHT + ITEM_GAP);
+        const moreY = pos.itemsStartY + itemsToShow.length * (ITEM_NODE_HEIGHT + ITEM_GAP);
         
         nodes.push({
           id: moreId,
