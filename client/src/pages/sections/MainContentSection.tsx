@@ -127,7 +127,7 @@ export const MainContentSection = (): JSX.Element => {
         </div>
       </div>
       <main className="flex flex-col relative flex-1 self-stretch w-full overflow-x-auto overflow-y-auto">
-        <div className="min-w-fit">
+        <div className="min-w-fit overflow-y-auto">
           <div className="flex items-center h-10 border-b border-gray-200 bg-white sticky top-0 z-10 mx-4">
             <div className="w-10 flex-shrink-0 flex items-center justify-center">
               <Checkbox data-testid="select-all-checkbox" />
