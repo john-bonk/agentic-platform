@@ -44,7 +44,7 @@ interface DependencyItem {
 
 interface Dependencies {
   itSystems: DependencyItem[];
-  personnel: DependencyItem[];
+  businessUnits: DependencyItem[];
   vendors: DependencyItem[];
   locations: DependencyItem[];
   otherProcesses: DependencyItem[];
@@ -103,10 +103,10 @@ const processData: Record<string, {
         { name: "Identity Management System", type: "Security", criticality: "Critical" },
         { name: "Document Management System", type: "Application", criticality: "Important" },
       ],
-      personnel: [
-        { name: "Account Managers", type: "Role", criticality: "Critical" },
-        { name: "Customer Service Representatives", type: "Role", criticality: "Important" },
-        { name: "Compliance Officers", type: "Role", criticality: "Important" },
+      businessUnits: [
+        { name: "Retail Banking Operations", type: "Department", criticality: "Critical" },
+        { name: "Customer Experience", type: "Department", criticality: "Important" },
+        { name: "Compliance", type: "Department", criticality: "Important" },
       ],
       vendors: [
         { name: "Fiserv", type: "Core Banking Provider", criticality: "Critical" },
@@ -150,10 +150,10 @@ const processData: Record<string, {
         { name: "Credit Decision Engine", type: "Application", criticality: "Critical" },
         { name: "Document Management System", type: "Application", criticality: "Important" },
       ],
-      personnel: [
-        { name: "Loan Officers", type: "Role", criticality: "Critical" },
-        { name: "Underwriters", type: "Role", criticality: "Critical" },
-        { name: "Credit Analysts", type: "Role", criticality: "Important" },
+      businessUnits: [
+        { name: "Retail Banking Operations", type: "Department", criticality: "Critical" },
+        { name: "Credit Risk Management", type: "Department", criticality: "Critical" },
+        { name: "Loan Servicing", type: "Department", criticality: "Important" },
       ],
       vendors: [
         { name: "Equifax", type: "Credit Bureau", criticality: "Critical" },
@@ -197,10 +197,10 @@ const processData: Record<string, {
         { name: "Knowledge Base", type: "Application", criticality: "Important" },
         { name: "Ticketing System", type: "Application", criticality: "Important" },
       ],
-      personnel: [
-        { name: "Customer Service Representatives", type: "Role", criticality: "Critical" },
-        { name: "Team Supervisors", type: "Role", criticality: "Important" },
-        { name: "Quality Assurance Analysts", type: "Role", criticality: "Standard" },
+      businessUnits: [
+        { name: "Retail Banking Operations", type: "Department", criticality: "Critical" },
+        { name: "Customer Experience", type: "Department", criticality: "Critical" },
+        { name: "Quality Assurance", type: "Department", criticality: "Standard" },
       ],
       vendors: [
         { name: "Genesys", type: "Contact Center Provider", criticality: "Critical" },
@@ -245,10 +245,10 @@ const processData: Record<string, {
         { name: "Learning Management System", type: "Application", criticality: "Important" },
         { name: "Background Check System", type: "Application", criticality: "Important" },
       ],
-      personnel: [
-        { name: "HR Specialists", type: "Role", criticality: "Critical" },
-        { name: "IT Support Staff", type: "Role", criticality: "Critical" },
-        { name: "Hiring Managers", type: "Role", criticality: "Important" },
+      businessUnits: [
+        { name: "Human Resources", type: "Department", criticality: "Critical" },
+        { name: "Information Technology", type: "Department", criticality: "Critical" },
+        { name: "All Departments", type: "Cross-functional", criticality: "Important" },
       ],
       vendors: [
         { name: "Workday", type: "HRIS Provider", criticality: "Critical" },
@@ -293,10 +293,10 @@ const processData: Record<string, {
         { name: "General Ledger", type: "Application", criticality: "Critical" },
         { name: "Tax Filing System", type: "Application", criticality: "Important" },
       ],
-      personnel: [
-        { name: "Payroll Specialists", type: "Role", criticality: "Critical" },
-        { name: "Payroll Manager", type: "Role", criticality: "Critical" },
-        { name: "Finance Analysts", type: "Role", criticality: "Important" },
+      businessUnits: [
+        { name: "Human Resources", type: "Department", criticality: "Critical" },
+        { name: "Finance", type: "Department", criticality: "Critical" },
+        { name: "All Departments", type: "Cross-functional", criticality: "Important" },
       ],
       vendors: [
         { name: "ADP", type: "Payroll Provider", criticality: "Critical" },
@@ -339,9 +339,9 @@ const processData: Record<string, {
         { name: "401k Portal", type: "Application", criticality: "Important" },
         { name: "Health Insurance Portal", type: "Application", criticality: "Important" },
       ],
-      personnel: [
-        { name: "Benefits Administrators", type: "Role", criticality: "Critical" },
-        { name: "HR Business Partners", type: "Role", criticality: "Important" },
+      businessUnits: [
+        { name: "Human Resources", type: "Department", criticality: "Critical" },
+        { name: "All Departments", type: "Cross-functional", criticality: "Important" },
       ],
       vendors: [
         { name: "Cigna", type: "Health Insurance Provider", criticality: "Critical" },
@@ -384,10 +384,10 @@ const processData: Record<string, {
         { name: "Video Conferencing Platform", type: "Application", criticality: "Important" },
         { name: "Training Content Repository", type: "Application", criticality: "Important" },
       ],
-      personnel: [
-        { name: "Training Coordinators", type: "Role", criticality: "Critical" },
-        { name: "Subject Matter Experts", type: "Role", criticality: "Important" },
-        { name: "L&D Manager", type: "Role", criticality: "Important" },
+      businessUnits: [
+        { name: "Human Resources", type: "Department", criticality: "Critical" },
+        { name: "Learning & Development", type: "Department", criticality: "Critical" },
+        { name: "All Departments", type: "Cross-functional", criticality: "Important" },
       ],
       vendors: [
         { name: "Cornerstone OnDemand", type: "LMS Provider", criticality: "Critical" },
@@ -429,10 +429,10 @@ const processData: Record<string, {
         { name: "Financial Planning & Analysis Tool", type: "Application", criticality: "Critical" },
         { name: "ERP System", type: "Application", criticality: "Important" },
       ],
-      personnel: [
-        { name: "Treasury Analysts", type: "Role", criticality: "Critical" },
-        { name: "Cash Manager", type: "Role", criticality: "Critical" },
-        { name: "Financial Planners", type: "Role", criticality: "Important" },
+      businessUnits: [
+        { name: "Treasury & Cash Management", type: "Department", criticality: "Critical" },
+        { name: "Finance", type: "Department", criticality: "Critical" },
+        { name: "Financial Planning & Analysis", type: "Department", criticality: "Important" },
       ],
       vendors: [
         { name: "Kyriba", type: "Treasury System Provider", criticality: "Critical" },
@@ -475,10 +475,10 @@ const processData: Record<string, {
         { name: "Real-time Cash Position Monitor", type: "Application", criticality: "Critical" },
         { name: "Investment Portfolio System", type: "Application", criticality: "Important" },
       ],
-      personnel: [
-        { name: "Liquidity Manager", type: "Role", criticality: "Critical" },
-        { name: "Treasury Operations Team", type: "Role", criticality: "Critical" },
-        { name: "Risk Analysts", type: "Role", criticality: "Important" },
+      businessUnits: [
+        { name: "Treasury & Cash Management", type: "Department", criticality: "Critical" },
+        { name: "Risk Management", type: "Department", criticality: "Critical" },
+        { name: "Finance", type: "Department", criticality: "Important" },
       ],
       vendors: [
         { name: "Federal Reserve Bank", type: "Central Bank", criticality: "Critical" },
@@ -523,10 +523,10 @@ const processData: Record<string, {
         { name: "Wire Transfer System", type: "Application", criticality: "Critical" },
         { name: "Fraud Detection System", type: "Security", criticality: "Critical" },
       ],
-      personnel: [
-        { name: "Payment Operations Team", type: "Role", criticality: "Critical" },
-        { name: "Fraud Analysts", type: "Role", criticality: "Critical" },
-        { name: "Reconciliation Specialists", type: "Role", criticality: "Important" },
+      businessUnits: [
+        { name: "Treasury & Cash Management", type: "Department", criticality: "Critical" },
+        { name: "Fraud Prevention", type: "Department", criticality: "Critical" },
+        { name: "Operations", type: "Department", criticality: "Important" },
       ],
       vendors: [
         { name: "Visa/Mastercard", type: "Card Network", criticality: "Critical" },
@@ -570,9 +570,9 @@ const processData: Record<string, {
         { name: "Deferred Compensation System", type: "Application", criticality: "Critical" },
         { name: "Executive Benefits Portal", type: "Application", criticality: "Important" },
       ],
-      personnel: [
-        { name: "Treasury Benefits Coordinator", type: "Role", criticality: "Critical" },
-        { name: "Executive Compensation Manager", type: "Role", criticality: "Important" },
+      businessUnits: [
+        { name: "Treasury & Cash Management", type: "Department", criticality: "Critical" },
+        { name: "Executive Leadership", type: "Department", criticality: "Important" },
       ],
       vendors: [
         { name: "Northern Trust", type: "Executive Benefits Provider", criticality: "Critical" },
@@ -624,7 +624,7 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
 
   const sections = [
     { key: "itSystems", label: "IT Systems", items: dependencies.itSystems },
-    { key: "personnel", label: "Personnel", items: dependencies.personnel },
+    { key: "businessUnits", label: "Business Units", items: dependencies.businessUnits },
     { key: "vendors", label: "Vendors", items: dependencies.vendors },
     { key: "locations", label: "Locations", items: dependencies.locations },
     { key: "otherProcesses", label: "Other Processes", items: dependencies.otherProcesses },
@@ -678,7 +678,15 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
                     <tbody>
                       {section.items.map((item, idx) => (
                         <tr key={idx} className="border-b last:border-b-0">
-                          <td className="py-2 text-sm text-[#0f172a]">{item.name}</td>
+                          <td className="py-2 text-sm">
+                            <a 
+                              href="#" 
+                              className="text-[#266c92] hover:underline"
+                              data-testid={`link-${section.key}-${idx}`}
+                            >
+                              {item.name}
+                            </a>
+                          </td>
                           {section.key !== "otherProcesses" && (
                             <td className="py-2 text-sm text-[#64748b]">{item.type || "-"}</td>
                           )}
