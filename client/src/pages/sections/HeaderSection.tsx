@@ -107,14 +107,13 @@ export const HeaderSection = ({ activeProcess }: HeaderSectionProps): JSX.Elemen
               data-testid="header-tab-process"
             >
               <BcmIcon className="w-4 h-4 text-gray-700" />
-              <span className="text-left font-semibold text-base text-gray-900 whitespace-nowrap">
+              <span className="text-left font-semibold text-gray-900 whitespace-nowrap text-[14px]">
                 {activeProcess.name}
               </span>
             </Button>
           </Link>
         )}
       </nav>
-
       <div className="inline-flex items-center justify-end gap-3 h-full flex-[0_0_auto]">
         <div className="inline-flex items-center gap-1 flex-[0_0_auto]">
           {utilityIcons.map((item, index) => (
