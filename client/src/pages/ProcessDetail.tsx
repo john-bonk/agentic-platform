@@ -659,26 +659,27 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
                   }`}
                 />
                 <span className="font-bold text-sm text-[#0f172a]">{section.label}</span>
+                <span className="text-sm text-[#64748b]">({section.items.length})</span>
               </div>
             </button>
 
             {isExpanded && (
               <div className="border border-t-0 border-[#e2e8f0] rounded-b p-4 bg-white">
                 {section.items.length > 0 ? (
-                  <table className="w-full">
+                  <table className="w-full table-fixed">
                     <thead>
                       <tr className="text-left text-xs text-gray-500 border-b">
-                        <th className="pb-2 font-medium">Name</th>
+                        <th className="pb-2 font-medium w-[45%]">Name</th>
                         {section.key !== "otherProcesses" && (
-                          <th className="pb-2 font-medium">Type</th>
+                          <th className="pb-2 font-medium w-[35%]">Type</th>
                         )}
-                        <th className="pb-2 font-medium">Criticality</th>
+                        <th className={`pb-2 font-medium ${section.key === "otherProcesses" ? "w-[55%]" : "w-[20%]"}`}>Criticality</th>
                       </tr>
                     </thead>
                     <tbody>
                       {section.items.map((item, idx) => (
                         <tr key={idx} className="border-b last:border-b-0">
-                          <td className="py-2 text-sm">
+                          <td className="py-2 text-sm w-[45%]">
                             <a 
                               href="#" 
                               className="text-[#266c92] hover:underline"
@@ -688,9 +689,9 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
                             </a>
                           </td>
                           {section.key !== "otherProcesses" && (
-                            <td className="py-2 text-sm text-[#64748b]">{item.type || "-"}</td>
+                            <td className="py-2 text-sm text-[#64748b] w-[35%]">{item.type || "-"}</td>
                           )}
-                          <td className="py-2">{getCriticalityBadge(item.criticality)}</td>
+                          <td className={`py-2 ${section.key === "otherProcesses" ? "w-[55%]" : "w-[20%]"}`}>{getCriticalityBadge(item.criticality)}</td>
                         </tr>
                       ))}
                     </tbody>
