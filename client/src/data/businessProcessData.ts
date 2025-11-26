@@ -223,6 +223,9 @@ export const businessProcessData: Category[] = [
             { name: "Call Center - Manila", type: "Secondary" },
           ],
         },
+        issues: [
+          { id: "3#301", title: "Customer Data Validation Gaps in CRM System", location: "Tampa", status: "Open" },
+        ],
       },
     ],
   },
@@ -318,6 +321,10 @@ export const businessProcessData: Category[] = [
             { name: "Finance Center - Atlanta", type: "Primary" },
           ],
         },
+        issues: [
+          { id: "5#412", title: "Time & Attendance System Integration Failure", location: "Atlanta", status: "Pending remediation" },
+          { id: "5#413", title: "Tax Calculation Module Requires Update for Q4 Regulations", location: "Atlanta", status: "In progress" },
+        ],
       },
       {
         id: "6",
@@ -545,6 +552,10 @@ export const businessProcessData: Category[] = [
             { name: "Backup Payment Center - Dallas", type: "Secondary" },
           ],
         },
+        issues: [
+          { id: "10#501", title: "OFAC Screening List Update Delay - Compliance Gap", location: "Jacksonville", status: "Open" },
+          { id: "10#502", title: "Payment Reconciliation System Nightly Batch Failures", location: "Dallas", status: "In progress" },
+        ],
       },
       {
         id: "11",

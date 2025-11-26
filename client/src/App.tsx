@@ -9,6 +9,7 @@ import { Integrations } from "@/pages/Integrations";
 import { ProcessDetail } from "@/pages/ProcessDetail";
 import { VulnerabilityImportWizard } from "@/pages/wizard/VulnerabilityImportWizard";
 import { PlaceholderPage } from "@/pages/PlaceholderPage";
+import { IssuesPage } from "@/pages/IssuesPage";
 
 function Router() {
   return (
@@ -35,9 +36,7 @@ function Router() {
       <Route path="/scenario-tests">
         {() => <PlaceholderPage title="Scenario Tests" />}
       </Route>
-      <Route path="/issues">
-        {() => <PlaceholderPage title="Issues" />}
-      </Route>
+      <Route path="/issues" component={IssuesPage} />
       
       {/* Inventory */}
       <Route path="/business-units">
