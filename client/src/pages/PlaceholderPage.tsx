@@ -1,0 +1,117 @@
+import { Link } from "wouter";
+import { RefreshCcw, Check, Search, Bell, Settings, ChevronDown, MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SideNavigationSection } from "./sections/SideNavigationSection";
+import { HeaderSection } from "./sections/HeaderSection";
+
+interface PlaceholderPageProps {
+  title: string;
+}
+
+const navigationIcons = [
+  { type: "lucide", icon: "refresh-ccw", alt: "BCM", active: true },
+  { type: "image", src: "/figmaAssets/files.svg", alt: "Files", active: false },
+  { type: "image", src: "/figmaAssets/module-report-.svg", alt: "Module report", active: false },
+  { type: "image", src: "/figmaAssets/module-workstream-.svg", alt: "Module workstream", active: false },
+  { type: "image", src: "/figmaAssets/module-automations-.svg", alt: "Module automations", active: false },
+  { type: "image", src: "/figmaAssets/plug.svg", alt: "Plug", active: false },
+  { type: "image", src: "/figmaAssets/module-issues.svg", alt: "Module issues", active: false },
+  { type: "image", src: "/figmaAssets/module-files.svg", alt: "Module files", active: false },
+  { type: "image", src: "/figmaAssets/module-timesheets.svg", alt: "Module timesheets", active: false },
+  { type: "image", src: "/figmaAssets/module-settings-.svg", alt: "Module settings", active: false },
+];
+
+export function PlaceholderPage({ title }: PlaceholderPageProps) {
+  const LeftNavbar = () => (
+    <aside
+      className="flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 relative bg-gray-900"
+      style={{ minHeight: "100vh" }}
+      data-testid="side-navbar"
+    >
+      <nav className="flex flex-col items-center gap-1 relative flex-[0_0_auto]">
+        <Link href="/">
+          <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-logo">
+            <img
+              className="w-7 h-auto"
+              alt="AuditBoard Logo"
+              src="/figmaAssets/auditboard-logo.png?v=2"
+            />
+          </div>
+        </Link>
+
+        {navigationIcons.map((icon, index) => (
+          <div
+            key={index}
+            className={`w-10 h-10 rounded flex items-center justify-center ${
+              icon.active ? "bg-teal-500" : ""
+            }`}
+            data-testid={`navbar-icon-${index}`}
+          >
+            {icon.type === "lucide" ? (
+              <div className="relative w-5 h-5">
+                <RefreshCcw className="w-5 h-5 text-white" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-teal-500 rounded-full flex items-center justify-center">
+                  <Check className="w-1.5 h-1.5 text-white" />
+                </div>
+              </div>
+            ) : (
+              <img
+                className="w-5 h-5 opacity-60"
+                alt={icon.alt}
+                src={icon.src}
+              />
+            )}
+          </div>
+        ))}
+      </nav>
+
+      <nav className="flex flex-col items-center gap-2 relative flex-[0_0_auto]">
+        <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-search">
+          <Search className="w-5 h-5 text-gray-400" />
+        </div>
+        <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-notifications">
+          <Bell className="w-5 h-5 text-gray-400" />
+        </div>
+        <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-settings">
+          <Settings className="w-5 h-5 text-gray-400" />
+        </div>
+        <Avatar className="w-8 h-8" data-testid="navbar-avatar">
+          <AvatarImage src="/figmaAssets/avatar-image.png" alt="User" />
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
+      </nav>
+    </aside>
+  );
+
+  return (
+    <div className="flex h-screen w-full bg-background" data-testid="placeholder-page">
+      <LeftNavbar />
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <HeaderSection />
+        <div className="flex items-start relative flex-1 self-stretch w-full grow">
+          <SideNavigationSection />
+          <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white min-w-0 overflow-y-auto" style={{ maxHeight: "calc(100vh - 60px)" }}>
+            <header className="flex flex-col gap-4 py-6 px-8 w-full bg-white border-b border-gray-200">
+              <div className="flex gap-4 items-start w-full flex-wrap">
+                <div className="flex flex-1 flex-col justify-center min-w-0">
+                  <h1 className="text-[28px] font-semibold text-gray-900 leading-[1.33]" data-testid="page-title">
+                    {title}
+                  </h1>
+                </div>
+              </div>
+            </header>
+
+            <main className="flex flex-col flex-1 w-full px-8 py-6">
+              <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+                <p className="text-lg">This page is under construction</p>
+                <p className="text-sm mt-2">Content for {title} will be available soon.</p>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
