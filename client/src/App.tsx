@@ -12,13 +12,12 @@ import { PlaceholderPage } from "@/pages/PlaceholderPage";
 import { IssuesPage } from "@/pages/IssuesPage";
 import { BCPWizardPage } from "@/pages/BCPWizardPage";
 import { BCPDetailPage } from "@/pages/BCPDetailPage";
-import BCPListPage from "@/pages/BCPListPage";
-
 function Router() {
   return (
     <Switch>
       {/* Add pages below */}
       <Route path="/" component={Integrations} />
+      <Route path="/business-continuity-plans" component={Integrations} />
       <Route path="/process/:id">
         {(params) => <ProcessDetail processId={params.id} />}
       </Route>
@@ -35,7 +34,6 @@ function Router() {
       <Route path="/business-impact-analyses">
         {() => <PlaceholderPage title="Business Impact Analyses" />}
       </Route>
-      <Route path="/business-continuity-plans" component={BCPListPage} />
       <Route path="/scenario-tests">
         {() => <PlaceholderPage title="Scenario Tests" />}
       </Route>
