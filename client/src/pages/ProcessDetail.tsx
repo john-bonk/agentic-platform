@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, MoreHorizontal, Triangle, RefreshCcw, Check } from "lucide-react";
+import { ChevronDown, ChevronRight, MoreHorizontal, Triangle, RefreshCcw, Check } from "lucide-react";
 import { HeaderSection } from "./sections/HeaderSection";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
 
@@ -36,6 +36,20 @@ const navigationIcons: NavigationIcon[] = [
 
 type ImpactLevel = "High" | "Medium" | "Low";
 
+interface DependencyItem {
+  name: string;
+  type?: string;
+  criticality?: "Critical" | "Important" | "Standard";
+}
+
+interface Dependencies {
+  itSystems: DependencyItem[];
+  personnel: DependencyItem[];
+  vendors: DependencyItem[];
+  locations: DependencyItem[];
+  otherProcesses: DependencyItem[];
+}
+
 const processData: Record<string, {
   name: string;
   description: string;
@@ -58,6 +72,7 @@ const processData: Record<string, {
     rto: string;
     rpo: string;
   };
+  dependencies: Dependencies;
 }> = {
   "1": {
     name: "Account Management",
@@ -80,6 +95,31 @@ const processData: Record<string, {
       mtd: "2 hours",
       rto: "1 hour",
       rpo: "30 minutes",
+    },
+    dependencies: {
+      itSystems: [
+        { name: "Core Banking System (CBS)", type: "Application", criticality: "Critical" },
+        { name: "Customer Relationship Management (CRM)", type: "Application", criticality: "Critical" },
+        { name: "Identity Management System", type: "Security", criticality: "Critical" },
+        { name: "Document Management System", type: "Application", criticality: "Important" },
+      ],
+      personnel: [
+        { name: "Account Managers", type: "Role", criticality: "Critical" },
+        { name: "Customer Service Representatives", type: "Role", criticality: "Important" },
+        { name: "Compliance Officers", type: "Role", criticality: "Important" },
+      ],
+      vendors: [
+        { name: "Fiserv", type: "Core Banking Provider", criticality: "Critical" },
+        { name: "Experian", type: "Credit Bureau", criticality: "Important" },
+      ],
+      locations: [
+        { name: "Main Data Center - Dallas", type: "Primary", criticality: "Critical" },
+        { name: "Backup Data Center - Phoenix", type: "Secondary", criticality: "Critical" },
+      ],
+      otherProcesses: [
+        { name: "Customer Service and Support", criticality: "Important" },
+        { name: "Payment Processing", criticality: "Critical" },
+      ],
     },
   },
   "2": {
@@ -104,6 +144,29 @@ const processData: Record<string, {
       rto: "2 hours",
       rpo: "1 hour",
     },
+    dependencies: {
+      itSystems: [
+        { name: "Loan Origination System (LOS)", type: "Application", criticality: "Critical" },
+        { name: "Credit Decision Engine", type: "Application", criticality: "Critical" },
+        { name: "Document Management System", type: "Application", criticality: "Important" },
+      ],
+      personnel: [
+        { name: "Loan Officers", type: "Role", criticality: "Critical" },
+        { name: "Underwriters", type: "Role", criticality: "Critical" },
+        { name: "Credit Analysts", type: "Role", criticality: "Important" },
+      ],
+      vendors: [
+        { name: "Equifax", type: "Credit Bureau", criticality: "Critical" },
+        { name: "TransUnion", type: "Credit Bureau", criticality: "Critical" },
+      ],
+      locations: [
+        { name: "Loan Processing Center - Chicago", type: "Primary", criticality: "Critical" },
+      ],
+      otherProcesses: [
+        { name: "Account Management", criticality: "Important" },
+        { name: "Payment Processing", criticality: "Critical" },
+      ],
+    },
   },
   "3": {
     name: "Customer Service and Support",
@@ -126,6 +189,31 @@ const processData: Record<string, {
       mtd: "24 hours",
       rto: "8 hours",
       rpo: "4 hours",
+    },
+    dependencies: {
+      itSystems: [
+        { name: "Contact Center Platform", type: "Application", criticality: "Critical" },
+        { name: "CRM System", type: "Application", criticality: "Critical" },
+        { name: "Knowledge Base", type: "Application", criticality: "Important" },
+        { name: "Ticketing System", type: "Application", criticality: "Important" },
+      ],
+      personnel: [
+        { name: "Customer Service Representatives", type: "Role", criticality: "Critical" },
+        { name: "Team Supervisors", type: "Role", criticality: "Important" },
+        { name: "Quality Assurance Analysts", type: "Role", criticality: "Standard" },
+      ],
+      vendors: [
+        { name: "Genesys", type: "Contact Center Provider", criticality: "Critical" },
+        { name: "Salesforce", type: "CRM Provider", criticality: "Critical" },
+      ],
+      locations: [
+        { name: "Call Center - Tampa", type: "Primary", criticality: "Critical" },
+        { name: "Call Center - Manila", type: "Secondary", criticality: "Important" },
+      ],
+      otherProcesses: [
+        { name: "Account Management", criticality: "Critical" },
+        { name: "Loan Origination and Servicing", criticality: "Important" },
+      ],
     },
   },
   "4": {
@@ -150,6 +238,31 @@ const processData: Record<string, {
       rto: "24 hours",
       rpo: "8 hours",
     },
+    dependencies: {
+      itSystems: [
+        { name: "HR Information System (HRIS)", type: "Application", criticality: "Critical" },
+        { name: "Active Directory", type: "Security", criticality: "Critical" },
+        { name: "Learning Management System", type: "Application", criticality: "Important" },
+        { name: "Background Check System", type: "Application", criticality: "Important" },
+      ],
+      personnel: [
+        { name: "HR Specialists", type: "Role", criticality: "Critical" },
+        { name: "IT Support Staff", type: "Role", criticality: "Critical" },
+        { name: "Hiring Managers", type: "Role", criticality: "Important" },
+      ],
+      vendors: [
+        { name: "Workday", type: "HRIS Provider", criticality: "Critical" },
+        { name: "Sterling", type: "Background Check Provider", criticality: "Important" },
+      ],
+      locations: [
+        { name: "Corporate Headquarters - New York", type: "Primary", criticality: "Critical" },
+      ],
+      otherProcesses: [
+        { name: "Payroll Processing", criticality: "Critical" },
+        { name: "Benefits Administration", criticality: "Important" },
+        { name: "Training & Development", criticality: "Important" },
+      ],
+    },
   },
   "5": {
     name: "Payroll Processing",
@@ -172,6 +285,30 @@ const processData: Record<string, {
       mtd: "24 hours",
       rto: "4 hours",
       rpo: "1 hour",
+    },
+    dependencies: {
+      itSystems: [
+        { name: "Payroll System", type: "Application", criticality: "Critical" },
+        { name: "Time & Attendance System", type: "Application", criticality: "Critical" },
+        { name: "General Ledger", type: "Application", criticality: "Critical" },
+        { name: "Tax Filing System", type: "Application", criticality: "Important" },
+      ],
+      personnel: [
+        { name: "Payroll Specialists", type: "Role", criticality: "Critical" },
+        { name: "Payroll Manager", type: "Role", criticality: "Critical" },
+        { name: "Finance Analysts", type: "Role", criticality: "Important" },
+      ],
+      vendors: [
+        { name: "ADP", type: "Payroll Provider", criticality: "Critical" },
+        { name: "Bank of America", type: "Direct Deposit Provider", criticality: "Critical" },
+      ],
+      locations: [
+        { name: "Finance Center - Atlanta", type: "Primary", criticality: "Critical" },
+      ],
+      otherProcesses: [
+        { name: "Employee Onboarding and Offboarding", criticality: "Critical" },
+        { name: "Benefits Administration", criticality: "Important" },
+      ],
     },
   },
   "6": {
@@ -196,6 +333,28 @@ const processData: Record<string, {
       rto: "24 hours",
       rpo: "12 hours",
     },
+    dependencies: {
+      itSystems: [
+        { name: "Benefits Administration System", type: "Application", criticality: "Critical" },
+        { name: "401k Portal", type: "Application", criticality: "Important" },
+        { name: "Health Insurance Portal", type: "Application", criticality: "Important" },
+      ],
+      personnel: [
+        { name: "Benefits Administrators", type: "Role", criticality: "Critical" },
+        { name: "HR Business Partners", type: "Role", criticality: "Important" },
+      ],
+      vendors: [
+        { name: "Cigna", type: "Health Insurance Provider", criticality: "Critical" },
+        { name: "Fidelity", type: "401k Administrator", criticality: "Critical" },
+      ],
+      locations: [
+        { name: "HR Services Center - Denver", type: "Primary", criticality: "Critical" },
+      ],
+      otherProcesses: [
+        { name: "Payroll Processing", criticality: "Critical" },
+        { name: "Employee Onboarding and Offboarding", criticality: "Important" },
+      ],
+    },
   },
   "7": {
     name: "Training & Development",
@@ -218,6 +377,28 @@ const processData: Record<string, {
       mtd: "1 week",
       rto: "72 hours",
       rpo: "24 hours",
+    },
+    dependencies: {
+      itSystems: [
+        { name: "Learning Management System (LMS)", type: "Application", criticality: "Critical" },
+        { name: "Video Conferencing Platform", type: "Application", criticality: "Important" },
+        { name: "Training Content Repository", type: "Application", criticality: "Important" },
+      ],
+      personnel: [
+        { name: "Training Coordinators", type: "Role", criticality: "Critical" },
+        { name: "Subject Matter Experts", type: "Role", criticality: "Important" },
+        { name: "L&D Manager", type: "Role", criticality: "Important" },
+      ],
+      vendors: [
+        { name: "Cornerstone OnDemand", type: "LMS Provider", criticality: "Critical" },
+        { name: "LinkedIn Learning", type: "Content Provider", criticality: "Standard" },
+      ],
+      locations: [
+        { name: "Training Center - Boston", type: "Primary", criticality: "Important" },
+      ],
+      otherProcesses: [
+        { name: "Employee Onboarding and Offboarding", criticality: "Critical" },
+      ],
     },
   },
   "8": {
@@ -242,6 +423,29 @@ const processData: Record<string, {
       rto: "4 hours",
       rpo: "2 hours",
     },
+    dependencies: {
+      itSystems: [
+        { name: "Treasury Management System", type: "Application", criticality: "Critical" },
+        { name: "Financial Planning & Analysis Tool", type: "Application", criticality: "Critical" },
+        { name: "ERP System", type: "Application", criticality: "Important" },
+      ],
+      personnel: [
+        { name: "Treasury Analysts", type: "Role", criticality: "Critical" },
+        { name: "Cash Manager", type: "Role", criticality: "Critical" },
+        { name: "Financial Planners", type: "Role", criticality: "Important" },
+      ],
+      vendors: [
+        { name: "Kyriba", type: "Treasury System Provider", criticality: "Critical" },
+        { name: "Bloomberg", type: "Market Data Provider", criticality: "Important" },
+      ],
+      locations: [
+        { name: "Treasury Operations Center - New York", type: "Primary", criticality: "Critical" },
+      ],
+      otherProcesses: [
+        { name: "Liquidity Management", criticality: "Critical" },
+        { name: "Payment Processing", criticality: "Important" },
+      ],
+    },
   },
   "9": {
     name: "Liquidity Management",
@@ -264,6 +468,30 @@ const processData: Record<string, {
       mtd: "4 hours",
       rto: "2 hours",
       rpo: "30 minutes",
+    },
+    dependencies: {
+      itSystems: [
+        { name: "Treasury Management System", type: "Application", criticality: "Critical" },
+        { name: "Real-time Cash Position Monitor", type: "Application", criticality: "Critical" },
+        { name: "Investment Portfolio System", type: "Application", criticality: "Important" },
+      ],
+      personnel: [
+        { name: "Liquidity Manager", type: "Role", criticality: "Critical" },
+        { name: "Treasury Operations Team", type: "Role", criticality: "Critical" },
+        { name: "Risk Analysts", type: "Role", criticality: "Important" },
+      ],
+      vendors: [
+        { name: "Federal Reserve Bank", type: "Central Bank", criticality: "Critical" },
+        { name: "JP Morgan", type: "Correspondent Bank", criticality: "Critical" },
+      ],
+      locations: [
+        { name: "Treasury Operations Center - New York", type: "Primary", criticality: "Critical" },
+        { name: "Backup Trading Floor - London", type: "Secondary", criticality: "Critical" },
+      ],
+      otherProcesses: [
+        { name: "Cash Flow Forecasting", criticality: "Critical" },
+        { name: "Payment Processing", criticality: "Critical" },
+      ],
     },
   },
   "10": {
@@ -288,6 +516,32 @@ const processData: Record<string, {
       rto: "1 hour",
       rpo: "15 minutes",
     },
+    dependencies: {
+      itSystems: [
+        { name: "Payment Gateway", type: "Application", criticality: "Critical" },
+        { name: "ACH Processing System", type: "Application", criticality: "Critical" },
+        { name: "Wire Transfer System", type: "Application", criticality: "Critical" },
+        { name: "Fraud Detection System", type: "Security", criticality: "Critical" },
+      ],
+      personnel: [
+        { name: "Payment Operations Team", type: "Role", criticality: "Critical" },
+        { name: "Fraud Analysts", type: "Role", criticality: "Critical" },
+        { name: "Reconciliation Specialists", type: "Role", criticality: "Important" },
+      ],
+      vendors: [
+        { name: "Visa/Mastercard", type: "Card Network", criticality: "Critical" },
+        { name: "SWIFT", type: "Payment Network", criticality: "Critical" },
+        { name: "The Clearing House", type: "ACH Operator", criticality: "Critical" },
+      ],
+      locations: [
+        { name: "Payment Operations Center - Charlotte", type: "Primary", criticality: "Critical" },
+        { name: "Disaster Recovery Site - Dallas", type: "Secondary", criticality: "Critical" },
+      ],
+      otherProcesses: [
+        { name: "Account Management", criticality: "Critical" },
+        { name: "Liquidity Management", criticality: "Critical" },
+      ],
+    },
   },
   "11": {
     name: "Benefits Administration",
@@ -311,10 +565,131 @@ const processData: Record<string, {
       rto: "24 hours",
       rpo: "8 hours",
     },
+    dependencies: {
+      itSystems: [
+        { name: "Deferred Compensation System", type: "Application", criticality: "Critical" },
+        { name: "Executive Benefits Portal", type: "Application", criticality: "Important" },
+      ],
+      personnel: [
+        { name: "Treasury Benefits Coordinator", type: "Role", criticality: "Critical" },
+        { name: "Executive Compensation Manager", type: "Role", criticality: "Important" },
+      ],
+      vendors: [
+        { name: "Northern Trust", type: "Executive Benefits Provider", criticality: "Critical" },
+      ],
+      locations: [
+        { name: "Treasury Operations Center - New York", type: "Primary", criticality: "Critical" },
+      ],
+      otherProcesses: [
+        { name: "Payroll Processing", criticality: "Important" },
+        { name: "Cash Flow Forecasting", criticality: "Standard" },
+      ],
+    },
   },
 };
 
 const tabs = ["Overview", "Business Impact Analysis", "Key Dependencies", "Business Continuity Plan", "Issues"];
+
+function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }) {
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    itSystems: true,
+    personnel: false,
+    vendors: false,
+    locations: false,
+    otherProcesses: false,
+  });
+
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
+  const getCriticalityBadge = (criticality?: "Critical" | "Important" | "Standard") => {
+    if (!criticality) return null;
+    
+    const colors = {
+      Critical: "bg-[#db3535] text-white",
+      Important: "bg-[#f59e0b] text-white",
+      Standard: "bg-[#6b7280] text-white",
+    };
+
+    return (
+      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${colors[criticality]}`}>
+        {criticality}
+      </span>
+    );
+  };
+
+  const sections = [
+    { key: "itSystems", label: "IT Systems", icon: "monitor", items: dependencies.itSystems },
+    { key: "personnel", label: "Personnel", icon: "users", items: dependencies.personnel },
+    { key: "vendors", label: "Vendors", icon: "building", items: dependencies.vendors },
+    { key: "locations", label: "Locations", icon: "map-pin", items: dependencies.locations },
+    { key: "otherProcesses", label: "Other Processes", icon: "git-branch", items: dependencies.otherProcesses },
+  ];
+
+  return (
+    <div className="space-y-2">
+      {sections.map((section) => (
+        <div
+          key={section.key}
+          className={`border rounded-md overflow-hidden ${
+            expandedSections[section.key] ? "border-l-2 border-l-teal-500" : ""
+          }`}
+        >
+          <button
+            onClick={() => toggleSection(section.key)}
+            className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors"
+            data-testid={`accordion-${section.key}`}
+          >
+            <div className="flex items-center gap-3">
+              <ChevronRight
+                className={`w-4 h-4 text-gray-400 transition-transform ${
+                  expandedSections[section.key] ? "rotate-90" : ""
+                }`}
+              />
+              <span className="font-medium text-sm">{section.label}</span>
+              <span className="text-xs text-gray-500">({section.items.length})</span>
+            </div>
+          </button>
+
+          {expandedSections[section.key] && (
+            <div className="border-t bg-gray-50">
+              {section.items.length > 0 ? (
+                <table className="w-full">
+                  <thead>
+                    <tr className="text-left text-xs text-gray-500 border-b">
+                      <th className="px-4 py-2 font-medium">Name</th>
+                      {section.key !== "otherProcesses" && (
+                        <th className="px-4 py-2 font-medium">Type</th>
+                      )}
+                      <th className="px-4 py-2 font-medium">Criticality</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {section.items.map((item, idx) => (
+                      <tr key={idx} className="border-b last:border-b-0 bg-white">
+                        <td className="px-4 py-3 text-sm">{item.name}</td>
+                        {section.key !== "otherProcesses" && (
+                          <td className="px-4 py-3 text-sm text-gray-500">{item.type || "-"}</td>
+                        )}
+                        <td className="px-4 py-3">{getCriticalityBadge(item.criticality)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="px-4 py-3 text-sm text-gray-500">No items in this category</div>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function ProcessDetail({ processId }: ProcessDetailProps) {
   const [activeTab, setActiveTab] = useState("Overview");
@@ -658,8 +1033,8 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
               </div>
             )}
 
-            {activeTab === "Key Dependencies" && (
-              <div className="text-sm text-gray-500">Key Dependencies content coming soon...</div>
+            {activeTab === "Key Dependencies" && process.dependencies && (
+              <KeyDependenciesContent dependencies={process.dependencies} />
             )}
 
             {activeTab === "Business Continuity Plan" && (
