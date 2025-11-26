@@ -12,8 +12,10 @@ import {
   RefreshCcw,
   Check,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useTabStore, ProcessTab } from "@/lib/tabStore";
+import { useEffect } from "react";
 
 interface HeaderSectionProps {
   activeProcess?: {
@@ -27,13 +29,11 @@ const baseTabs = [
     icon: "x",
     width: "w-10",
     text: null,
-    active: false,
   },
   {
     icon: "pin",
     width: "w-10",
     text: null,
-    active: false,
   },
 ];
 
@@ -45,6 +45,15 @@ const utilityIcons = [
 ];
 
 export const HeaderSection = ({ activeProcess }: HeaderSectionProps): JSX.Element => {
+  const [, setLocation] = useLocation();
+  const { openTabs, activeTabId, openTab, closeTab, setActiveTab } = useTabStore();
+  
+  useEffect(() => {
+    if (activeProcess) {
+      openTab(activeProcess);
+    }
+  }, [activeProcess?.id]);
+  
   const getTabIcon = (iconName: string, isActive: boolean) => {
     const colorClass = isActive ? "text-gray-700" : "text-gray-400";
     switch (iconName) {
@@ -85,6 +94,28 @@ export const HeaderSection = ({ activeProcess }: HeaderSectionProps): JSX.Elemen
     </div>
   );
 
+  const handleCloseTab = (e: React.MouseEvent, tabId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeTab(tabId);
+    
+    const remainingTabs = openTabs.filter(t => t.id !== tabId);
+    if (remainingTabs.length === 0) {
+      setLocation('/');
+    } else if (activeTabId === tabId) {
+      const closedIndex = openTabs.findIndex(t => t.id === tabId);
+      const newActiveTab = remainingTabs[Math.min(closedIndex, remainingTabs.length - 1)];
+      if (newActiveTab) {
+        setLocation(`/process/${newActiveTab.id}`);
+      }
+    }
+  };
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    setLocation(`/process/${tabId}`);
+  };
+
   return (
     <header className="flex h-12 items-end justify-between pl-0 pr-2 py-0 w-full bg-gray-900 flex-shrink-0">
       <nav className="inline-flex items-end gap-1 flex-[0_0_auto] h-full">
@@ -99,20 +130,35 @@ export const HeaderSection = ({ activeProcess }: HeaderSectionProps): JSX.Elemen
           </Button>
         ))}
         
-        {activeProcess && (
-          <Link href={`/process/${activeProcess.id}`}>
-            <Button
-              variant="ghost"
-              className="flex h-10 items-center justify-start gap-2 px-3 py-0 bg-white rounded-t-[4px] rounded-b-none hover:bg-white"
-              data-testid="header-tab-process"
+        {openTabs.map((tab) => {
+          const isActive = tab.id === activeTabId;
+          return (
+            <div
+              key={tab.id}
+              onClick={() => handleTabClick(tab.id)}
+              className={`flex h-10 items-center justify-start gap-2 px-3 py-0 rounded-t-[4px] rounded-b-none cursor-pointer ${
+                isActive ? "bg-white" : "bg-gray-600"
+              }`}
+              data-testid={`header-tab-process-${tab.id}`}
             >
-              <BcmIcon className="w-4 h-4 text-gray-700" />
-              <span className="text-left font-semibold text-gray-900 whitespace-nowrap text-[14px]">
-                {activeProcess.name}
+              <BcmIcon className={`w-4 h-4 ${isActive ? "text-gray-700" : "text-white"}`} />
+              <span className={`text-left font-semibold text-[14px] whitespace-nowrap ${
+                isActive ? "text-gray-900" : "text-white"
+              }`}>
+                {tab.name}
               </span>
-            </Button>
-          </Link>
-        )}
+              <button
+                onClick={(e) => handleCloseTab(e, tab.id)}
+                className={`ml-1 p-0.5 rounded ${
+                  isActive ? "text-gray-500 hover:text-gray-700 hover:bg-gray-200" : "text-gray-300 hover:text-white hover:bg-gray-500"
+                }`}
+                data-testid={`header-tab-close-${tab.id}`}
+              >
+                <XIcon className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          );
+        })}
       </nav>
       <div className="inline-flex items-center justify-end gap-3 h-full flex-[0_0_auto]">
         <div className="inline-flex items-center gap-1 flex-[0_0_auto]">
