@@ -301,7 +301,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                   <ChevronDown className="w-4 h-4" />
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
                   className="h-[38px] w-[38px]"
                   data-testid="warning-button"
@@ -309,7 +309,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
                   <Triangle className="w-4 h-4 text-gray-500" />
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="icon"
                   className="h-[38px] w-[38px]"
                   data-testid="more-button"
