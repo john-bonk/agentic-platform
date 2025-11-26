@@ -12,6 +12,7 @@ import { PlaceholderPage } from "@/pages/PlaceholderPage";
 import { IssuesPage } from "@/pages/IssuesPage";
 import { BCPWizardPage } from "@/pages/BCPWizardPage";
 import { BCPDetailPage } from "@/pages/BCPDetailPage";
+import BCPListPage from "@/pages/BCPListPage";
 
 function Router() {
   return (
@@ -34,9 +35,7 @@ function Router() {
       <Route path="/business-impact-analyses">
         {() => <PlaceholderPage title="Business Impact Analyses" />}
       </Route>
-      <Route path="/business-continuity-plans">
-        {() => <PlaceholderPage title="Business Continuity Plans" />}
-      </Route>
+      <Route path="/business-continuity-plans" component={BCPListPage} />
       <Route path="/scenario-tests">
         {() => <PlaceholderPage title="Scenario Tests" />}
       </Route>

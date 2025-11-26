@@ -92,9 +92,22 @@ export interface BusinessContinuityPlan {
   originProcessId: string;
 }
 
-// In-memory storage for BCPs
+// In-memory storage for BCPs with subscription support
 let bcpStorage: BusinessContinuityPlan[] = [];
 let bcpIdCounter = 1;
+const bcpListeners = new Set<() => void>();
+
+export function subscribeToBCPs(listener: () => void): () => void {
+  bcpListeners.add(listener);
+  listener();
+  return () => {
+    bcpListeners.delete(listener);
+  };
+}
+
+function notifyBCPListeners() {
+  bcpListeners.forEach((listener) => listener());
+}
 
 export function createBCP(bcp: Omit<BusinessContinuityPlan, "id" | "createdAt" | "status">): BusinessContinuityPlan {
   const newBCP: BusinessContinuityPlan = {
@@ -104,6 +117,7 @@ export function createBCP(bcp: Omit<BusinessContinuityPlan, "id" | "createdAt" |
     createdAt: new Date().toISOString(),
   };
   bcpStorage.push(newBCP);
+  notifyBCPListeners();
   return newBCP;
 }
 

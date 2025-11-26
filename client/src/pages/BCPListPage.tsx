@@ -1,13 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
-import { useLocation, Link } from "wouter";
-import { getBCPsByProcessId, subscribeToBCPs, type BusinessContinuityPlan } from "@/data/businessProcessData";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { Link, useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
-
-interface BCPEmptyStateProps {
-  processId: string;
-}
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Search, Filter, List, Columns, MoreHorizontal, FileText } from "lucide-react";
+import { getAllBCPs, subscribeToBCPs, type BusinessContinuityPlan } from "@/data/businessProcessData";
 
 function DocumentIcon() {
   return (
@@ -42,91 +40,11 @@ function DocumentIcon() {
   );
 }
 
-function BCPTableView({ bcps, processId }: { bcps: BusinessContinuityPlan[]; processId: string }) {
-  const [, navigate] = useLocation();
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Draft":
-        return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 text-[11px] h-5">Draft</Badge>;
-      case "In Review":
-        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 text-[11px] h-5">In Review</Badge>;
-      case "Approved":
-        return <Badge className="bg-green-100 text-green-700 hover:bg-green-100 text-[11px] h-5">Approved</Badge>;
-      default:
-        return <Badge variant="outline" className="text-[11px] h-5">{status}</Badge>;
-    }
-  };
-
-  return (
-    <div className="flex flex-col gap-4 p-4 w-full" data-testid="bcp-table-view">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-slate-900">Business Continuity Plans</h3>
-        <Button 
-          onClick={() => navigate(`/create-bcp/${processId}`)}
-          className="h-[38px] gap-2 px-4 bg-teal-500 hover:bg-teal-500/90 border border-teal-500 text-white text-sm font-normal rounded"
-          data-testid="button-add-bcp"
-        >
-          <PlusCircle className="w-4 h-4" />
-          Add Plan
-        </Button>
-      </div>
-      
-      {/* Table Header */}
-      <div className="border border-slate-200 rounded-md overflow-hidden">
-        <div className="flex items-center bg-slate-50 border-b border-slate-200 py-2.5 px-4">
-          <div className="flex-1 min-w-[200px]">
-            <span className="text-xs font-bold text-[rgba(24,49,83,0.67)] uppercase">Plan Name</span>
-          </div>
-          <div className="w-[140px]">
-            <span className="text-xs font-bold text-[rgba(24,49,83,0.67)] uppercase">Owner</span>
-          </div>
-          <div className="w-[100px]">
-            <span className="text-xs font-bold text-[rgba(24,49,83,0.67)] uppercase">Status</span>
-          </div>
-          <div className="w-[120px]">
-            <span className="text-xs font-bold text-[rgba(24,49,83,0.67)] uppercase">Created</span>
-          </div>
-        </div>
-        
-        {/* Table Body */}
-        {bcps.map((bcp) => (
-          <Link key={bcp.id} href={`/bcp/${bcp.id}`}>
-            <div 
-              className="flex items-center py-3 px-4 border-b border-slate-200 last:border-b-0 hover:bg-slate-50 cursor-pointer transition-colors"
-              data-testid={`bcp-row-${bcp.id}`}
-            >
-              <div className="flex-1 min-w-[200px]">
-                <span className="text-sm text-[#3172e3]">{bcp.name}</span>
-              </div>
-              <div className="w-[140px]">
-                <span className="text-sm text-slate-900 capitalize">{bcp.planOwner.replace(/-/g, ' ')}</span>
-              </div>
-              <div className="w-[100px]">
-                {getStatusBadge(bcp.status)}
-              </div>
-              <div className="w-[120px]">
-                <span className="text-sm text-slate-500">{new Date(bcp.createdAt).toLocaleDateString()}</span>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function EmptyStateView({ processId }: { processId: string }) {
-  const [, navigate] = useLocation();
-
-  const handleCreatePlan = () => {
-    navigate(`/create-bcp/${processId}`);
-  };
-
+function EmptyState({ onCreatePlan }: { onCreatePlan: () => void }) {
   return (
     <div 
-      className="flex flex-col items-center gap-2 p-4 w-full"
-      data-testid="bcp-empty-state"
+      className="flex flex-col items-center justify-center gap-2 p-8 w-full h-full min-h-[400px]"
+      data-testid="bcp-list-empty-state"
     >
       <div className="flex flex-col items-center gap-2 w-full max-w-[320px]">
         <div className="overflow-clip relative shrink-0 w-[72px] h-[72px]">
@@ -137,27 +55,27 @@ function EmptyStateView({ processId }: { processId: string }) {
           <div className="flex flex-col gap-2 items-start pt-2 text-center w-full">
             <p 
               className="w-full text-[20px] font-medium text-[#0f172a] dark:text-slate-100 leading-[1.2]"
-              data-testid="text-bcp-empty-title"
+              data-testid="text-bcp-list-empty-title"
             >
-              No Business Continuity Plan
+              No Business Continuity Plans
             </p>
             <p 
               className="w-full text-[14px] font-normal text-[#475569] dark:text-slate-400 leading-[1.35]"
-              data-testid="text-bcp-empty-description"
+              data-testid="text-bcp-list-empty-description"
             >
-              This process doesn't have a Business Continuity Plan yet. Create one to define recovery procedures and ensure business resilience.
+              Create your first Business Continuity Plan to define recovery procedures and ensure business resilience.
             </p>
           </div>
           
           <div className="flex gap-1 items-center justify-center w-full">
             <button
               className="h-7 px-2 bg-white dark:bg-slate-800 border border-[#cbd5e1] dark:border-slate-600 rounded text-[13px] text-[#0f172a] dark:text-slate-100 leading-[1.35] hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-              data-testid="button-view-template"
+              data-testid="button-import-bcp"
             >Import</button>
             <button
-              onClick={handleCreatePlan}
+              onClick={onCreatePlan}
               className="h-7 px-2 bg-[#266c92] border border-[#266c92] rounded text-[13px] text-white leading-[1.35] hover:bg-[#1e5a7a] transition-colors"
-              data-testid="button-create-bcp"
+              data-testid="button-create-first-bcp"
             >
               Create Plan
             </button>
@@ -168,21 +86,242 @@ function EmptyStateView({ processId }: { processId: string }) {
   );
 }
 
-export function BCPEmptyState({ processId }: BCPEmptyStateProps) {
-  const [bcps, setBCPs] = useState<BusinessContinuityPlan[]>(() => getBCPsByProcessId(processId));
+const getStatusBadge = (status: string) => {
+  switch (status) {
+    case "Draft":
+      return (
+        <Badge
+          className="text-[10px] font-semibold px-1.5 py-0 rounded-full bg-slate-200 text-slate-700 hover:bg-slate-200"
+          data-testid="status-badge-draft"
+        >
+          Draft
+        </Badge>
+      );
+    case "In Review":
+      return (
+        <Badge
+          className="text-[10px] font-semibold px-1.5 py-0 rounded-full bg-amber-100 text-amber-700 hover:bg-amber-100"
+          data-testid="status-badge-review"
+        >
+          In Review
+        </Badge>
+      );
+    case "Approved":
+      return (
+        <Badge
+          className="text-[10px] font-semibold px-1.5 py-0 rounded-full bg-[#36844a] text-white hover:bg-[#36844a]"
+          data-testid="status-badge-approved"
+        >
+          Approved
+        </Badge>
+      );
+    default:
+      return (
+        <Badge variant="outline" className="text-[10px] h-5">
+          {status}
+        </Badge>
+      );
+  }
+};
+
+export default function BCPListPage() {
+  const [, navigate] = useLocation();
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
+  const [bcps, setBCPs] = useState<BusinessContinuityPlan[]>(getAllBCPs);
 
   const handleBCPChange = useCallback(() => {
-    setBCPs(getBCPsByProcessId(processId));
-  }, [processId]);
+    setBCPs(getAllBCPs());
+  }, []);
 
   useEffect(() => {
     const unsubscribe = subscribeToBCPs(handleBCPChange);
     return unsubscribe;
   }, [handleBCPChange]);
-  
-  if (bcps.length > 0) {
-    return <BCPTableView bcps={bcps} processId={processId} />;
+
+  const toggleRowSelection = (rowId: string) => {
+    setSelectedRows((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId);
+      } else {
+        newSet.add(rowId);
+      }
+      return newSet;
+    });
+  };
+
+  const filteredBCPs = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return bcps;
+    }
+    
+    const query = searchQuery.toLowerCase();
+    
+    return bcps.filter((bcp) =>
+      bcp.name.toLowerCase().includes(query) ||
+      bcp.planOwner.toLowerCase().includes(query) ||
+      bcp.status.toLowerCase().includes(query) ||
+      bcp.planType.toLowerCase().includes(query)
+    );
+  }, [bcps, searchQuery]);
+
+  const handleCreatePlan = () => {
+    navigate("/create-bcp/new");
+  };
+
+  if (bcps.length === 0) {
+    return (
+      <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white min-w-0">
+        <header className="flex flex-col gap-2 py-8 px-8 w-full bg-white pt-[24px] pb-[24px]">
+          <div className="flex gap-4 items-start w-full flex-wrap">
+            <div className="flex flex-1 flex-col justify-center min-w-0">
+              <h1 className="font-semibold text-gray-900 text-[28px]" data-testid="page-title">
+                Business Continuity Plans
+              </h1>
+            </div>
+          </div>
+        </header>
+        <main className="flex flex-col relative flex-1 self-stretch w-full items-center justify-center">
+          <EmptyState onCreatePlan={handleCreatePlan} />
+        </main>
+      </div>
+    );
   }
-  
-  return <EmptyStateView processId={processId} />;
+
+  return (
+    <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white min-w-0">
+      <header className="flex flex-col gap-2 py-8 px-8 w-full bg-white pt-[24px] pb-[24px]">
+        <div className="flex gap-4 items-start w-full flex-wrap">
+          <div className="flex flex-1 flex-col justify-center min-w-0">
+            <h1 className="font-semibold text-gray-900 text-[28px]" data-testid="page-title">
+              Business Continuity Plans
+            </h1>
+          </div>
+
+          <div className="flex gap-1 items-start flex-shrink-0">
+            <Button
+              onClick={handleCreatePlan}
+              className="h-[38px] gap-2 px-4 bg-teal-500 hover:bg-teal-500/90 border border-teal-500 text-white text-sm font-normal rounded"
+              data-testid="create-bcp-button"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 3V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                <path d="M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+              Create
+            </Button>
+          </div>
+        </div>
+      </header>
+      
+      <div className="flex items-center justify-between px-8 py-3 w-full bg-white flex-wrap gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-9 w-[200px] sm:w-[240px] text-sm"
+              data-testid="search-input"
+            />
+          </div>
+          <Button variant="outline" size="sm" className="h-9 gap-1.5 text-gray-600" data-testid="add-filter-button">
+            <Filter className="w-4 h-4" />
+            <span className="hidden sm:inline">Add Filter</span>
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="flex items-center border border-gray-200 rounded overflow-hidden">
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-none border-r border-gray-200 bg-[#256c92] text-[#ffffff]" data-testid="list-view-button">
+              <List className="w-4 h-4 text-white" />
+            </Button>
+          </div>
+          <Button variant="outline" size="sm" className="h-9 gap-1.5 text-gray-600 hidden md:flex" data-testid="manage-columns-button">
+            <Columns className="w-4 h-4" />
+            Manage Columns
+          </Button>
+          <Button variant="ghost" size="icon" className="h-9 w-9" data-testid="more-options-button">
+            <MoreHorizontal className="w-4 h-4 text-gray-500" />
+          </Button>
+        </div>
+      </div>
+      
+      <main className="flex flex-col relative flex-1 self-stretch w-full overflow-x-auto overflow-y-auto">
+        <div className="min-w-fit overflow-y-auto">
+          {/* Table Header */}
+          <div className="flex items-center h-10 border-b border-gray-200 bg-white sticky top-0 z-10 mx-4">
+            <div className="w-10 flex-shrink-0 flex items-center justify-center">
+              <Checkbox data-testid="select-all-checkbox" />
+            </div>
+            <div className="flex-1 min-w-[200px] flex items-center px-3">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">NAME</span>
+            </div>
+            <div className="w-[140px] lg:w-[180px] flex-shrink-0 flex items-center px-3">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">PLAN OWNER</span>
+            </div>
+            <div className="w-[100px] lg:w-[120px] flex-shrink-0 flex items-center px-3">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">STATUS</span>
+            </div>
+            <div className="w-[100px] lg:w-[120px] flex-shrink-0 flex items-center px-3">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">PLAN TYPE</span>
+            </div>
+            <div className="w-[90px] lg:w-[110px] flex-shrink-0 flex items-center px-3">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">CREATED</span>
+            </div>
+          </div>
+
+          {/* Table Body */}
+          <div className="flex flex-col mx-4">
+            {filteredBCPs.map((bcp) => (
+              <div
+                key={bcp.id}
+                className="flex items-center h-12 border-b border-gray-100 hover:bg-gray-50"
+                data-testid={`bcp-row-${bcp.id}`}
+              >
+                <div className="w-10 flex-shrink-0 flex items-center justify-center">
+                  <Checkbox
+                    checked={selectedRows.has(bcp.id)}
+                    onCheckedChange={() => toggleRowSelection(bcp.id)}
+                    data-testid={`checkbox-bcp-${bcp.id}`}
+                  />
+                </div>
+                <div className="flex-1 min-w-[200px] flex items-center gap-2 px-3">
+                  <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Link
+                    href={`/bcp/${bcp.id}`}
+                    className="text-sm text-blue-600 hover:underline truncate"
+                    onClick={(e) => e.stopPropagation()}
+                    data-testid={`bcp-link-${bcp.id}`}
+                  >
+                    {bcp.name}
+                  </Link>
+                </div>
+                <div className="w-[140px] lg:w-[180px] flex-shrink-0 px-3">
+                  <span className="text-sm text-gray-900 truncate block capitalize">
+                    {bcp.planOwner.replace(/-/g, ' ')}
+                  </span>
+                </div>
+                <div className="w-[100px] lg:w-[120px] flex-shrink-0 px-3">
+                  {getStatusBadge(bcp.status)}
+                </div>
+                <div className="w-[100px] lg:w-[120px] flex-shrink-0 px-3">
+                  <span className="text-sm text-gray-900 capitalize">
+                    {bcp.planType.replace(/-/g, ' ')}
+                  </span>
+                </div>
+                <div className="w-[90px] lg:w-[110px] flex-shrink-0 px-3">
+                  <span className="text-sm text-gray-500">
+                    {new Date(bcp.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
 }

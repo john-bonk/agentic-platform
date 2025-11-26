@@ -46,6 +46,11 @@ export const SideNavigationSection = (): JSX.Element => {
     if (path === "/") {
       return location === "/" || location.startsWith("/process/");
     }
+    if (path === "/business-continuity-plans") {
+      return location.startsWith("/business-continuity-plans") || 
+             location.startsWith("/bcp/") || 
+             location.startsWith("/create-bcp/");
+    }
     return location.startsWith(path);
   };
 
