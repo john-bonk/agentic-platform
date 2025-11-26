@@ -1,8 +1,5 @@
 import { Link } from "wouter";
-import { RefreshCcw, Check, Search, Bell, Settings, ChevronDown, MoreHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { RefreshCcw, Check } from "lucide-react";
 import { SideNavigationSection } from "./sections/SideNavigationSection";
 import { HeaderSection } from "./sections/HeaderSection";
 
@@ -10,7 +7,18 @@ interface PlaceholderPageProps {
   title: string;
 }
 
-const navigationIcons = [
+type NavigationIcon = 
+  | { type: "image"; src: string; alt: string; active: boolean }
+  | { type: "lucide"; icon: "refresh-ccw"; alt: string; active: boolean };
+
+const navigationIcons: NavigationIcon[] = [
+  { type: "image", src: "/figmaAssets/module-dashboard-.svg", alt: "Module dashboard", active: false },
+  { type: "image", src: "/figmaAssets/module-controls-.svg", alt: "Module controls", active: false },
+  { type: "image", src: "/figmaAssets/module-risk-.svg", alt: "Module risk", active: false },
+  { type: "image", src: "/figmaAssets/module-esg-.svg", alt: "Module esg", active: false },
+  { type: "image", src: "/figmaAssets/module-crosscomply-.svg", alt: "Module crosscomply", active: false },
+  { type: "image", src: "/figmaAssets/module-opsaudit.svg", alt: "Module opsaudit", active: false },
+  { type: "image", src: "/figmaAssets/module-tprm.svg", alt: "Module tprm", active: false },
   { type: "lucide", icon: "refresh-ccw", alt: "BCM", active: true },
   { type: "image", src: "/figmaAssets/files.svg", alt: "Files", active: false },
   { type: "image", src: "/figmaAssets/module-report-.svg", alt: "Module report", active: false },
@@ -26,8 +34,7 @@ const navigationIcons = [
 export function PlaceholderPage({ title }: PlaceholderPageProps) {
   const LeftNavbar = () => (
     <aside
-      className="flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 relative bg-gray-900"
-      style={{ minHeight: "100vh" }}
+      className="flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 bg-gray-900 sticky top-0 h-screen z-50 flex-shrink-0"
       data-testid="side-navbar"
     >
       <nav className="flex flex-col items-center gap-1 relative flex-[0_0_auto]">
@@ -50,38 +57,26 @@ export function PlaceholderPage({ title }: PlaceholderPageProps) {
             data-testid={`navbar-icon-${index}`}
           >
             {icon.type === "lucide" ? (
-              <div className="relative w-5 h-5">
-                <RefreshCcw className="w-5 h-5 text-white" />
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-teal-500 rounded-full flex items-center justify-center">
-                  <Check className="w-1.5 h-1.5 text-white" />
-                </div>
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                <RefreshCcw className="w-4 h-4 text-white absolute" />
+                <Check className="w-2 h-2 text-white" strokeWidth={3} />
               </div>
             ) : (
-              <img
-                className="w-5 h-5 opacity-60"
-                alt={icon.alt}
-                src={icon.src}
-              />
+              <img className={`w-4 h-4 ${icon.alt === "Plug" ? "opacity-50" : ""}`} alt={icon.alt} src={icon.src} />
             )}
           </div>
         ))}
       </nav>
 
-      <nav className="flex flex-col items-center gap-2 relative flex-[0_0_auto]">
-        <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-search">
-          <Search className="w-5 h-5 text-gray-400" />
+      <div className="flex flex-col items-center gap-1">
+        <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-support">
+          <img
+            className="w-4 h-4"
+            alt="Support"
+            src="/figmaAssets/circle-question-.svg"
+          />
         </div>
-        <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-notifications">
-          <Bell className="w-5 h-5 text-gray-400" />
-        </div>
-        <div className="w-10 h-10 rounded flex items-center justify-center" data-testid="navbar-settings">
-          <Settings className="w-5 h-5 text-gray-400" />
-        </div>
-        <Avatar className="w-8 h-8" data-testid="navbar-avatar">
-          <AvatarImage src="/figmaAssets/avatar-image.png" alt="User" />
-          <AvatarFallback>U</AvatarFallback>
-        </Avatar>
-      </nav>
+      </div>
     </aside>
   );
 
