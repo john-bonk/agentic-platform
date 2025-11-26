@@ -451,11 +451,11 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
 
   if (!process) {
     return (
-      <div className="flex items-start relative">
+      <div className="flex items-stretch relative h-screen overflow-hidden">
         <LeftNavbar />
-        <div className="flex flex-col items-start relative flex-1 grow">
+        <div className="flex flex-col items-start relative flex-1 grow min-h-0">
           <HeaderSection activeProcess={null} />
-          <div className="flex items-start relative flex-1 self-stretch w-full grow">
+          <div className="flex items-stretch relative flex-1 self-stretch w-full grow min-h-0">
             <SideNavigationSection />
             <div className="flex flex-col items-center justify-center flex-1 self-stretch bg-white p-8">
               <h1 className="text-2xl font-semibold text-gray-900">Process not found</h1>
@@ -472,13 +472,13 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
   }
 
   return (
-    <div className="flex items-start relative">
+    <div className="flex items-stretch relative h-screen overflow-hidden">
       <LeftNavbar />
-      <div className="flex flex-col items-start relative flex-1 grow">
+      <div className="flex flex-col items-start relative flex-1 grow min-h-0">
         <HeaderSection activeProcess={{ id: processId, name: process.name }} />
-        <div className="flex items-stretch relative flex-1 self-stretch w-full grow">
+        <div className="flex items-stretch relative flex-1 self-stretch w-full grow min-h-0">
           <SideNavigationSection />
-          <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white min-w-0 overflow-y-auto" style={{ maxHeight: "calc(100vh - 60px)" }}>
+          <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white min-w-0 overflow-y-auto">
           <header className="flex flex-col gap-4 py-6 px-8 w-full bg-white">
             <div className="flex gap-4 items-start w-full flex-wrap">
               <div className="flex flex-1 flex-col justify-center min-w-0">
