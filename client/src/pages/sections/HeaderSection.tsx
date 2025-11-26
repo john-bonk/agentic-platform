@@ -9,11 +9,20 @@ import {
   PlugIcon,
   SettingsIcon,
   XIcon,
+  RefreshCcw,
+  Check,
 } from "lucide-react";
-import React from "react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
-const tabs = [
+interface HeaderSectionProps {
+  activeProcess?: {
+    id: string;
+    name: string;
+  } | null;
+}
+
+const baseTabs = [
   {
     icon: "x",
     width: "w-10",
@@ -26,18 +35,6 @@ const tabs = [
     text: null,
     active: false,
   },
-  {
-    icon: "settings",
-    width: "w-10",
-    text: null,
-    active: false,
-  },
-  {
-    icon: "files",
-    width: "w-36",
-    text: "AS.IN.1.C18 Peachtree Invento",
-    active: false,
-  },
 ];
 
 const utilityIcons = [
@@ -47,7 +44,7 @@ const utilityIcons = [
   { icon: "bell", alt: "Bell" },
 ];
 
-export const HeaderSection = (): JSX.Element => {
+export const HeaderSection = ({ activeProcess }: HeaderSectionProps): JSX.Element => {
   const getTabIcon = (iconName: string, isActive: boolean) => {
     const colorClass = isActive ? "text-gray-700" : "text-gray-400";
     switch (iconName) {
@@ -81,34 +78,41 @@ export const HeaderSection = (): JSX.Element => {
     }
   };
 
+  const BcmIcon = ({ className }: { className?: string }) => (
+    <div className={`relative flex items-center justify-center ${className}`}>
+      <RefreshCcw className="w-full h-full absolute" />
+      <Check className="w-[50%] h-[50%]" strokeWidth={3} />
+    </div>
+  );
+
   return (
     <header className="flex h-12 items-end justify-between pl-0 pr-2 py-0 w-full bg-gray-900 flex-shrink-0">
       <nav className="inline-flex items-end gap-1 flex-[0_0_auto] h-full">
-        {tabs.map((tab, index) => (
+        {baseTabs.map((tab, index) => (
           <Button
             key={index}
             variant="ghost"
-            className={`flex ${tab.width} h-10 items-center justify-start ${
-              tab.text ? "gap-1.5" : "gap-1.5"
-            } px-3.5 py-0 ${
-              tab.active ? "bg-white" : "bg-gray-600"
-            } rounded-t-[4px] rounded-b-none hover:${
-              tab.active ? "bg-white" : "bg-gray-600"
-            }`}
+            className={`flex ${tab.width} h-10 items-center justify-center gap-1.5 px-2 py-0 bg-gray-600 rounded-t-[4px] rounded-b-none hover:bg-gray-600`}
             data-testid={`header-tab-${index}`}
           >
-            {getTabIcon(tab.icon, tab.active)}
-            {tab.text && (
-              <span
-                className={`text-left font-medium text-sm ${
-                  tab.active ? "text-gray-900" : "text-gray-400"
-                } truncate whitespace-nowrap overflow-hidden`}
-              >
-                {tab.text}
-              </span>
-            )}
+            {getTabIcon(tab.icon, false)}
           </Button>
         ))}
+        
+        {activeProcess && (
+          <Link href={`/process/${activeProcess.id}`}>
+            <Button
+              variant="ghost"
+              className="flex h-10 items-center justify-start gap-2 px-3 py-0 bg-white rounded-t-[4px] rounded-b-none hover:bg-white"
+              data-testid="header-tab-process"
+            >
+              <BcmIcon className="w-4 h-4 text-gray-700" />
+              <span className="text-left font-semibold text-base text-gray-900 whitespace-nowrap">
+                {activeProcess.name}
+              </span>
+            </Button>
+          </Link>
+        )}
       </nav>
 
       <div className="inline-flex items-center justify-end gap-3 h-full flex-[0_0_auto]">

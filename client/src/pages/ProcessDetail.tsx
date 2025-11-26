@@ -252,7 +252,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
       <div className="flex items-start relative">
         <LeftNavbar />
         <div className="flex flex-col items-start relative flex-1 grow">
-          <HeaderSection />
+          <HeaderSection activeProcess={null} />
           <div className="flex items-start relative flex-1 self-stretch w-full grow">
             <SideNavigationSection />
             <div className="flex flex-col items-center justify-center flex-1 self-stretch bg-white p-8">
@@ -273,7 +273,7 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
     <div className="flex items-start relative">
       <LeftNavbar />
       <div className="flex flex-col items-start relative flex-1 grow">
-        <HeaderSection />
+        <HeaderSection activeProcess={{ id: processId, name: process.name }} />
         <div className="flex items-start relative flex-1 self-stretch w-full grow">
           <SideNavigationSection />
           <div className="flex flex-col items-start relative flex-1 self-stretch grow bg-white min-w-0 overflow-y-auto" style={{ maxHeight: "calc(100vh - 60px)" }}>
