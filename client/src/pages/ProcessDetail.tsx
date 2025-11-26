@@ -659,7 +659,7 @@ function KeyDependenciesContent({ dependencies }: { dependencies: Dependencies }
                   }`}
                 />
                 <span className="font-bold text-sm text-[#0f172a]">{section.label}</span>
-                <span className="text-sm text-[#64748b]">({section.items.length})</span>
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#e2e8f0] text-[#64748b]">{section.items.length}</span>
               </div>
             </button>
 
