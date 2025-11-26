@@ -14,7 +14,15 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Button } from "@/components/ui/button";
-import { RefreshCcw, Server, Building2, Database, MapPin, Globe, ChevronDown, ChevronRight, Minus, Plus } from "lucide-react";
+import { RefreshCcw, Server, Building2, Database, MapPin, Globe, Minus, Plus } from "lucide-react";
+import { 
+  SiSlack, SiZoom, SiGithub, SiJira, SiConfluence, SiNotion, 
+  SiDatadog, SiPagerduty, SiTerraform, SiSplunk, SiOkta,
+  SiSalesforce, SiTableau, SiOracle,
+  SiAtlassian
+} from "react-icons/si";
+import { FaAws, FaGoogle, FaMicrosoft, FaBuilding, FaCloud } from "react-icons/fa";
+import { BsMicrosoftTeams } from "react-icons/bs";
 
 interface ITAsset {
   name: string;
@@ -49,6 +57,57 @@ interface ImpactCanvasProps {
 }
 
 type CategoryType = "root" | "category" | "itAsset" | "vendor" | "process" | "branch";
+
+const getProductLogo = (name: string) => {
+  const normalizedName = name.toLowerCase();
+  
+  if (normalizedName.includes("slack")) return <SiSlack className="w-4 h-4 text-[#4A154B]" />;
+  if (normalizedName.includes("zoom")) return <SiZoom className="w-4 h-4 text-[#2D8CFF]" />;
+  if (normalizedName.includes("github")) return <SiGithub className="w-4 h-4 text-[#181717]" />;
+  if (normalizedName.includes("jira")) return <SiJira className="w-4 h-4 text-[#0052CC]" />;
+  if (normalizedName.includes("confluence")) return <SiConfluence className="w-4 h-4 text-[#172B4D]" />;
+  if (normalizedName.includes("notion")) return <SiNotion className="w-4 h-4 text-[#000000]" />;
+  if (normalizedName.includes("datadog")) return <SiDatadog className="w-4 h-4 text-[#632CA6]" />;
+  if (normalizedName.includes("pagerduty")) return <SiPagerduty className="w-4 h-4 text-[#06AC38]" />;
+  if (normalizedName.includes("terraform")) return <SiTerraform className="w-4 h-4 text-[#7B42BC]" />;
+  if (normalizedName.includes("splunk")) return <SiSplunk className="w-4 h-4 text-[#000000]" />;
+  if (normalizedName.includes("okta")) return <SiOkta className="w-4 h-4 text-[#007DC1]" />;
+  if (normalizedName.includes("aws") || normalizedName.includes("amazon")) return <FaAws className="w-4 h-4 text-[#FF9900]" />;
+  if (normalizedName.includes("google cloud") || normalizedName.includes("gcp")) return <FaCloud className="w-4 h-4 text-[#4285F4]" />;
+  if (normalizedName.includes("google workspace") || normalizedName.includes("google")) return <FaGoogle className="w-4 h-4 text-[#4285F4]" />;
+  if (normalizedName.includes("azure")) return <FaCloud className="w-4 h-4 text-[#0078D4]" />;
+  if (normalizedName.includes("microsoft teams") || normalizedName.includes("teams")) return <BsMicrosoftTeams className="w-4 h-4 text-[#6264A7]" />;
+  if (normalizedName.includes("office 365") || normalizedName.includes("microsoft office")) return <FaMicrosoft className="w-4 h-4 text-[#D83B01]" />;
+  if (normalizedName.includes("microsoft")) return <FaMicrosoft className="w-4 h-4 text-[#00A4EF]" />;
+  if (normalizedName.includes("salesforce")) return <SiSalesforce className="w-4 h-4 text-[#00A1E0]" />;
+  if (normalizedName.includes("tableau")) return <SiTableau className="w-4 h-4 text-[#E97627]" />;
+  if (normalizedName.includes("netsuite") || normalizedName.includes("oracle")) return <SiOracle className="w-4 h-4 text-[#F80000]" />;
+  if (normalizedName.includes("atlassian")) return <SiAtlassian className="w-4 h-4 text-[#0052CC]" />;
+  
+  return null;
+};
+
+const getVendorLogo = (name: string) => {
+  const normalizedName = name.toLowerCase();
+  
+  if (normalizedName.includes("amazon") || normalizedName.includes("aws")) return <FaAws className="w-4 h-4 text-[#FF9900]" />;
+  if (normalizedName.includes("microsoft")) return <FaMicrosoft className="w-4 h-4 text-[#00A4EF]" />;
+  if (normalizedName.includes("google")) return <FaGoogle className="w-4 h-4 text-[#4285F4]" />;
+  if (normalizedName.includes("salesforce")) return <SiSalesforce className="w-4 h-4 text-[#00A1E0]" />;
+  if (normalizedName.includes("atlassian")) return <SiAtlassian className="w-4 h-4 text-[#0052CC]" />;
+  if (normalizedName.includes("slack")) return <SiSlack className="w-4 h-4 text-[#4A154B]" />;
+  if (normalizedName.includes("zoom")) return <SiZoom className="w-4 h-4 text-[#2D8CFF]" />;
+  if (normalizedName.includes("github")) return <SiGithub className="w-4 h-4 text-[#181717]" />;
+  if (normalizedName.includes("notion")) return <SiNotion className="w-4 h-4 text-[#000000]" />;
+  if (normalizedName.includes("datadog")) return <SiDatadog className="w-4 h-4 text-[#632CA6]" />;
+  if (normalizedName.includes("pagerduty")) return <SiPagerduty className="w-4 h-4 text-[#06AC38]" />;
+  if (normalizedName.includes("hashicorp")) return <SiTerraform className="w-4 h-4 text-[#7B42BC]" />;
+  if (normalizedName.includes("splunk")) return <SiSplunk className="w-4 h-4 text-[#000000]" />;
+  if (normalizedName.includes("okta")) return <SiOkta className="w-4 h-4 text-[#007DC1]" />;
+  if (normalizedName.includes("oracle")) return <SiOracle className="w-4 h-4 text-[#F80000]" />;
+  
+  return <FaBuilding className="w-4 h-4 text-purple-500" />;
+};
 
 const getCategoryIcon = (category: CategoryType) => {
   switch (category) {
@@ -144,17 +203,23 @@ const CategoryNode = ({ data }: NodeProps) => {
 
 const ItemNode = ({ data }: NodeProps) => {
   const colors = getCategoryColors(data.category as CategoryType, data.highlighted);
+  
+  const logo = data.category === "itAsset" 
+    ? getProductLogo(data.fullName || data.label)
+    : data.category === "vendor"
+    ? getVendorLogo(data.fullName || data.label)
+    : null;
 
   return (
     <div
       className={`px-3 py-2 rounded-md border shadow-sm transition-all ${colors.border} ${colors.bg}`}
-      style={{ minWidth: "130px", maxWidth: "160px" }}
+      style={{ minWidth: "130px", maxWidth: "170px" }}
       data-testid={`flow-node-${data.id}`}
     >
       <Handle type="target" position={Position.Left} className="!bg-gray-400 !w-2 !h-2" />
       <div className="flex items-center gap-2">
-        <div className={`p-1 rounded ${colors.iconBg}`}>
-          {getCategoryIcon(data.category as CategoryType)}
+        <div className={`p-1.5 rounded ${colors.iconBg} flex items-center justify-center`}>
+          {logo || getCategoryIcon(data.category as CategoryType)}
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-[11px] font-medium text-gray-900 truncate">{data.label}</div>
@@ -186,20 +251,9 @@ function generateMindMapData(
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
-  const categorySpacing = 85;
-  const itemSpacing = 55;
-  const horizontalGap = 180;
-
-  nodes.push({
-    id: "root",
-    type: "root",
-    position: { x: 0, y: 150 },
-    data: {
-      id: "root",
-      label: processName,
-      highlighted: false,
-    },
-  });
+  const itemSpacing = 52;
+  const horizontalGap = 200;
+  const categoryNodeHeight = 45;
 
   const categories = [
     { key: "itAssets", label: "IT Assets", items: dependencies.itAssets || [], childCategory: "itAsset" },
@@ -208,13 +262,44 @@ function generateMindMapData(
     { key: "branches", label: "Locations", items: dependencies.branches || [], childCategory: "branch" },
   ].filter(cat => cat.items.length > 0);
 
-  const totalCategories = categories.length;
-  const startY = 150 - ((totalCategories - 1) * categorySpacing) / 2;
+  let categoryYPositions: number[] = [];
+  let currentY = 0;
 
+  categories.forEach((cat, idx) => {
+    const isExpanded = expanded[cat.key as keyof ExpandedState];
+    const itemCount = Math.min(cat.items.length, 5);
+    const categoryHeight = isExpanded 
+      ? Math.max(categoryNodeHeight, itemCount * itemSpacing)
+      : categoryNodeHeight;
+    
+    categoryYPositions.push(currentY + categoryHeight / 2);
+    currentY += categoryHeight + 20;
+  });
+
+  const totalHeight = currentY - 20;
+  const rootY = totalHeight / 2;
+
+  nodes.push({
+    id: "root",
+    type: "root",
+    position: { x: 0, y: rootY - 25 },
+    data: {
+      id: "root",
+      label: processName,
+      highlighted: false,
+    },
+  });
+
+  currentY = 0;
   categories.forEach((cat, catIdx) => {
     const categoryId = `cat-${cat.key}`;
-    const categoryY = startY + catIdx * categorySpacing;
     const isExpanded = expanded[cat.key as keyof ExpandedState];
+    const itemCount = Math.min(cat.items.length, 5);
+    const categoryHeight = isExpanded 
+      ? Math.max(categoryNodeHeight, itemCount * itemSpacing)
+      : categoryNodeHeight;
+
+    const categoryY = currentY + categoryHeight / 2 - categoryNodeHeight / 2;
 
     nodes.push({
       id: categoryId,
@@ -235,12 +320,13 @@ function generateMindMapData(
       source: "root",
       target: categoryId,
       type: "smoothstep",
-      style: { stroke: "#cbd5e1", strokeWidth: 2 },
+      style: { stroke: "#94a3b8", strokeWidth: 2 },
     });
 
     if (isExpanded) {
-      const itemsToShow = cat.items.slice(0, 6);
-      const itemStartY = categoryY - ((itemsToShow.length - 1) * itemSpacing) / 2;
+      const itemsToShow = cat.items.slice(0, 5);
+      const itemBlockHeight = itemsToShow.length * itemSpacing;
+      const itemStartY = currentY + (categoryHeight - itemBlockHeight) / 2;
 
       itemsToShow.forEach((item, itemIdx) => {
         const itemId = `${cat.key}-${itemIdx}`;
@@ -251,15 +337,20 @@ function generateMindMapData(
           subLabel = (item as BranchItem).type;
         } else if (cat.childCategory === "process" && "rto" in item) {
           subLabel = `RTO: ${(item as BusinessProcessItem).rto}`;
+        } else if (cat.childCategory === "itAsset") {
+          subLabel = "IT Asset";
+        } else if (cat.childCategory === "vendor") {
+          subLabel = "Vendor";
         }
 
         nodes.push({
           id: itemId,
           type: "item",
-          position: { x: horizontalGap * 2, y: itemY },
+          position: { x: horizontalGap * 2 + 20, y: itemY },
           data: {
             id: itemId,
-            label: item.name.length > 18 ? item.name.substring(0, 16) + "..." : item.name,
+            label: item.name.length > 20 ? item.name.substring(0, 18) + "..." : item.name,
+            fullName: item.name,
             category: cat.childCategory,
             subLabel,
             highlighted: false,
@@ -271,19 +362,19 @@ function generateMindMapData(
           source: categoryId,
           target: itemId,
           type: "smoothstep",
-          style: { stroke: "#e2e8f0", strokeWidth: 1.5 },
+          style: { stroke: "#cbd5e1", strokeWidth: 1.5 },
         });
       });
 
-      if (cat.items.length > 6) {
+      if (cat.items.length > 5) {
         const moreId = `${cat.key}-more`;
         nodes.push({
           id: moreId,
           type: "item",
-          position: { x: horizontalGap * 2, y: itemStartY + 6 * itemSpacing },
+          position: { x: horizontalGap * 2 + 20, y: itemStartY + 5 * itemSpacing },
           data: {
             id: moreId,
-            label: `+${cat.items.length - 6} more`,
+            label: `+${cat.items.length - 5} more`,
             category: cat.childCategory,
             subLabel: "",
             highlighted: false,
@@ -298,6 +389,8 @@ function generateMindMapData(
         });
       }
     }
+
+    currentY += categoryHeight + 20;
   });
 
   return { nodes, edges };
@@ -323,7 +416,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
     const { nodes: newNodes, edges: newEdges } = generateMindMapData(processName, dependencies, expanded);
     setNodes(newNodes);
     setEdges(newEdges);
-    setTimeout(() => fitView({ padding: 0.25, duration: 300 }), 50);
+    setTimeout(() => fitView({ padding: 0.2, duration: 300 }), 50);
   }, [expanded, processName, dependencies, setNodes, setEdges, fitView]);
 
   const onNodeClick = useCallback(
@@ -359,9 +452,10 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
         setEdges((eds) =>
           eds.map((e) => ({
             ...e,
+            animated: connectedNodes.has(e.source) && connectedNodes.has(e.target),
             style: {
               ...e.style,
-              stroke: connectedNodes.has(e.source) && connectedNodes.has(e.target) ? "#3b82f6" : e.style?.stroke || "#cbd5e1",
+              stroke: connectedNodes.has(e.source) && connectedNodes.has(e.target) ? "#3b82f6" : e.style?.stroke || "#94a3b8",
               strokeWidth: connectedNodes.has(e.source) && connectedNodes.has(e.target) ? 2.5 : e.style?.strokeWidth || 1.5,
             },
           }))
@@ -378,14 +472,15 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
     setEdges((eds) =>
       eds.map((e) => ({
         ...e,
+        animated: false,
         style: {
           ...e.style,
-          stroke: e.id.includes("root") ? "#cbd5e1" : "#e2e8f0",
+          stroke: e.id.includes("root") ? "#94a3b8" : "#cbd5e1",
           strokeWidth: e.id.includes("root") ? 2 : 1.5,
         },
       }))
     );
-    setTimeout(() => fitView({ padding: 0.25 }), 50);
+    setTimeout(() => fitView({ padding: 0.2 }), 50);
   }, [fitView, setNodes, setEdges]);
 
   const handleExpandAll = useCallback(() => {
@@ -397,7 +492,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
   }, []);
 
   return (
-    <div className="relative w-full h-[320px] bg-gradient-to-br from-gray-50 to-white border border-[#e2e8f0] rounded-md mb-6" data-testid="impact-canvas">
+    <div className="relative w-full h-[340px] bg-gradient-to-br from-slate-50 to-white border border-[#e2e8f0] rounded-md mb-6" data-testid="impact-canvas">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -406,7 +501,7 @@ function ImpactCanvasInner({ processName, dependencies }: ImpactCanvasProps) {
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.25 }}
+        fitViewOptions={{ padding: 0.2 }}
         minZoom={0.4}
         maxZoom={1.5}
         proOptions={{ hideAttribution: true }}
