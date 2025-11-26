@@ -449,71 +449,110 @@ export function ProcessDetail({ processId }: ProcessDetailProps) {
             )}
 
             {activeTab === "Business Impact Analysis" && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-6">
-                <div className="flex flex-col gap-5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Financial Impact</span>
-                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full" data-testid="bia-financial-impact">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-6">
+                <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Financial Impact</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
+                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full w-fit" data-testid="bia-financial-impact">
                       High
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Operational Impact</span>
-                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full" data-testid="bia-operational-impact">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Operational Impact</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
+                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full w-fit" data-testid="bia-operational-impact">
                       High
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Reputational Impact</span>
-                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full" data-testid="bia-reputational-impact">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Reputational Impact</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
+                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full w-fit" data-testid="bia-reputational-impact">
                       High
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Legal Impact</span>
-                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full" data-testid="bia-legal-impact">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Legal Impact</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
+                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full w-fit" data-testid="bia-legal-impact">
                       High
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Regulatory Impact</span>
-                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full" data-testid="bia-regulatory-impact">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Regulatory Impact</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
+                    <Badge className="bg-red-500 text-white hover:bg-red-500 text-xs px-2.5 py-0.5 rounded-full w-fit" data-testid="bia-regulatory-impact">
                       High
                     </Badge>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Maximum Time Down (MTD)</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Maximum Time Down (MTD)</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
                     <span className="text-sm text-gray-900" data-testid="bia-mtd">2 hours</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Recovery Time Objective (RTO)</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Recovery Time Objective (RTO)</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
                     <span className="text-sm text-gray-900" data-testid="bia-rto">2 hours</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Recovery point Objective (RPO)</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Recovery point Objective (RPO)</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
                     <span className="text-sm text-gray-900" data-testid="bia-rpo">30 minutes</span>
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Last Updated</span>
+                <div className="flex flex-col gap-6">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Last Updated</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
                     <span className="text-sm text-gray-900" data-testid="bia-last-updated">{process.biaLastUpdated}</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Latest BIA Update</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Latest BIA Update</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
                     <a href="#" className="text-sm text-blue-600 hover:underline" data-testid="bia-latest-update">View</a>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Maximum Time Down (MTD)</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Maximum Time Down (MTD)</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
                     <span className="text-sm text-gray-900" data-testid="bia-mtd-right">2 hours</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Recovery Time Objective (RTO)</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Recovery Time Objective (RTO)</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
                     <span className="text-sm text-gray-900" data-testid="bia-rto-right">2 hours</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 font-medium">Recovery point Objective (RPO)</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">Recovery point Objective (RPO)</span>
+                      <span className="text-gray-400 text-xs">?</span>
+                    </div>
                     <span className="text-sm text-gray-900" data-testid="bia-rpo-right">30 minutes</span>
                   </div>
                 </div>
