@@ -11,7 +11,6 @@
 
 import { useState } from "react";
 import { AppLayout } from "@/components/layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
@@ -276,38 +275,30 @@ export function DashboardPage() {
         
         <div className="flex-1 p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="bg-gray-50 border-0 shadow-none">
-              <CardContent className="pt-4 text-center">
-                <div className="text-3xl font-bold text-gray-900" data-testid="metric-total-plans">{filteredProcesses.length}</div>
-                <div className="text-sm text-gray-500 mt-1">Total Active Plans</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gray-50 border-0 shadow-none">
-              <CardContent className="pt-4 text-center">
-                <div className="text-3xl font-bold text-gray-900" data-testid="metric-compliance">92%</div>
-                <div className="text-sm text-gray-500 mt-1">Exercise Compliance</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gray-50 border-0 shadow-none">
-              <CardContent className="pt-4 text-center">
-                <div className="text-3xl font-bold text-gray-900" data-testid="metric-findings">8</div>
-                <div className="text-sm text-gray-500 mt-1">Open Findings</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gray-50 border-0 shadow-none">
-              <CardContent className="pt-4 text-center">
-                <div className="text-3xl font-bold text-gray-900" data-testid="metric-incidents">1</div>
-                <div className="text-sm text-gray-500 mt-1">Vendor Incidents</div>
-              </CardContent>
-            </Card>
+            <div className="bg-white py-4 text-center">
+              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-total-plans">{filteredProcesses.length}</div>
+              <div className="text-sm text-gray-500 mt-1">Total Active Plans</div>
+            </div>
+            <div className="bg-white py-4 text-center">
+              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-compliance">92%</div>
+              <div className="text-sm text-gray-500 mt-1">Exercise Compliance</div>
+            </div>
+            <div className="bg-white py-4 text-center">
+              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-findings">8</div>
+              <div className="text-sm text-gray-500 mt-1">Open Findings</div>
+            </div>
+            <div className="bg-white py-4 text-center">
+              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-incidents">1</div>
+              <div className="text-sm text-gray-500 mt-1">Vendor Incidents</div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <Card className="border border-gray-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-700">RTO by Business Unit</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="border border-gray-200 rounded bg-white">
+              <div className="px-4 pt-4 pb-2">
+                <h3 className="text-sm font-medium text-gray-700">RTO by Business Unit</h3>
+              </div>
+              <div className="px-4 pb-4">
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={rtoData} layout="vertical" barGap={1} barSize={12}>
@@ -340,14 +331,14 @@ export function DashboardPage() {
                     <span>Q4</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card className="border border-gray-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-700">Risk Trend</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="border border-gray-200 rounded bg-white">
+              <div className="px-4 pt-4 pb-2">
+                <h3 className="text-sm font-medium text-gray-700">Risk Trend</h3>
+              </div>
+              <div className="px-4 pb-4">
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={riskTrendData}>
@@ -375,14 +366,14 @@ export function DashboardPage() {
                     <span>High</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card className="border border-gray-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-700">Plan Effectiveness</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="border border-gray-200 rounded bg-white">
+              <div className="px-4 pt-4 pb-2">
+                <h3 className="text-sm font-medium text-gray-700">Plan Effectiveness</h3>
+              </div>
+              <div className="px-4 pb-4">
                 <div className="h-48 relative">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -421,22 +412,22 @@ export function DashboardPage() {
                     <span>Effective</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
-          <Card className="border border-gray-200">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-700">Business Processes Overview</CardTitle>
+          <div className="border border-gray-200 rounded bg-white">
+            <div className="px-4 pt-4 pb-2">
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="text-sm font-medium text-gray-700">Business Processes Overview</h3>
                 <div className="text-xs text-gray-500">
                   <span className="font-medium">{filteredProcesses.length} processes</span>
                   <span className="mx-2">|</span>
                   <span>{highCriticalityCount} high criticality</span>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
+            </div>
+            <div className="px-0">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-50 hover:bg-gray-50">
@@ -501,30 +492,30 @@ export function DashboardPage() {
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="border border-gray-200">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-700">Business Process Dependency Map</CardTitle>
+          <div className="border border-gray-200 rounded bg-white">
+            <div className="px-4 pt-4 pb-2">
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="text-sm font-medium text-gray-700">Business Process Dependency Map</h3>
                 <div className="flex items-center gap-4">
                   <span className="text-xs text-gray-500">Click on any node to highlight connections</span>
                   <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <Button variant="ghost" size="icon">
                       <ZoomIn className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <Button variant="ghost" size="icon">
                       <ZoomOut className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <Button variant="ghost" size="icon">
                       <Maximize2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
+            </div>
+            <div className="px-4 pb-4">
               <div className="flex gap-4 mb-4">
                 <Badge variant="outline" className="text-xs bg-gray-100">
                   9 connected items
@@ -601,7 +592,7 @@ export function DashboardPage() {
 
               <div className="mt-4 p-3 bg-gray-50 rounded border border-gray-200">
                 <div className="text-xs font-medium text-gray-500 mb-2">Legend</div>
-                <div className="flex items-center gap-6 text-xs">
+                <div className="flex items-center gap-6 text-xs flex-wrap">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-1 bg-blue-600 rounded" />
                     <span className="text-gray-600">Frameworks</span>
@@ -623,8 +614,8 @@ export function DashboardPage() {
                   Click categories to expand/collapse. Click items to trace connections.
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </AppLayout>
