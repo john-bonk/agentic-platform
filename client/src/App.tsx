@@ -25,6 +25,7 @@ import {
   HomePage, 
   DashboardPage, 
   ProjectsPage, 
+  ItemDetailPage,
   DemoPage,
   FormExamplePage,
   SettingsPage,
@@ -50,6 +51,7 @@ function Router() {
       
       {/* Features */}
       <Route path="/projects" component={ProjectsPage} />
+      <Route path="/items/:id" component={ItemDetailPage} />
       <Route path="/tasks" component={ProjectsPage} />
       <Route path="/reports" component={DashboardPage} />
       

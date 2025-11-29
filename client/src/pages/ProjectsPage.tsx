@@ -2,14 +2,20 @@
  * Projects Page
  * 
  * Example list page with search, filtering, and data table.
- * Demonstrates common list page patterns.
+ * Item names are clickable links that open detail views in new tabs.
+ * 
+ * Features:
+ * - Working search filter
+ * - Clickable item names that open in header tabs
+ * - Checkbox selection
+ * - Status badges
  * 
  * TODO: Connect to your actual data source
  */
 
 import { useState, useMemo } from "react";
+import { useLocation } from "wouter";
 import { AppLayout, PageHeader } from "@/components/layout";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -20,8 +26,11 @@ import {
   Plus, 
   MoreHorizontal, 
   FileText,
-  ChevronDown 
+  ChevronDown,
+  List,
+  Columns
 } from "lucide-react";
+import { useTabStore } from "@/lib/tabStore";
 
 interface Project {
   id: string;
@@ -61,6 +70,8 @@ const getStatusBadge = (status: Project["status"]) => {
 };
 
 export function ProjectsPage() {
+  const [, setLocation] = useLocation();
+  const { openTab } = useTabStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
 
@@ -86,6 +97,15 @@ export function ProjectsPage() {
       }
       return newSet;
     });
+  };
+
+  const handleItemClick = (project: Project) => {
+    openTab({
+      id: project.id,
+      name: project.name,
+      path: `/items/${project.id}`
+    });
+    setLocation(`/items/${project.id}`);
   };
 
   return (
@@ -133,6 +153,22 @@ export function ProjectsPage() {
               variant="outline" 
               size="sm" 
               className="h-9 gap-1.5 text-gray-600"
+              data-testid="button-view-list"
+            >
+              <List className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-9 gap-1.5 text-gray-600"
+              data-testid="button-view-columns"
+            >
+              <Columns className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="h-9 gap-1.5 text-gray-600"
               data-testid="button-sort"
             >
               Sort
@@ -141,7 +177,6 @@ export function ProjectsPage() {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-9 w-9"
               data-testid="button-more"
             >
               <MoreHorizontal className="w-4 h-4 text-gray-500" />
@@ -151,7 +186,7 @@ export function ProjectsPage() {
 
         <div className="flex-1 overflow-auto">
           <div className="min-w-fit">
-            <div className="flex items-center h-10 border-b border-gray-200 bg-gray-50 sticky top-0 z-10 mx-8">
+            <div className="flex items-center h-10 border-b border-gray-200 bg-gray-50 sticky top-0 z-10 mx-4">
               <div className="w-10 flex-shrink-0 flex items-center justify-center">
                 <Checkbox data-testid="checkbox-select-all" />
               </div>
@@ -172,11 +207,11 @@ export function ProjectsPage() {
               </div>
             </div>
 
-            <div className="flex flex-col mx-8">
+            <div className="flex flex-col mx-4">
               {filteredProjects.map((project) => (
                 <div
                   key={project.id}
-                  className="flex items-center h-14 border-b border-gray-100 hover:bg-gray-50"
+                  className="flex items-center h-12 border-b border-gray-100 hover:bg-gray-50"
                   data-testid={`row-project-${project.id}`}
                 >
                   <div className="w-10 flex-shrink-0 flex items-center justify-center">
@@ -188,9 +223,13 @@ export function ProjectsPage() {
                   </div>
                   <div className="flex-1 min-w-[200px] flex items-center gap-2 px-3">
                     <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <span className="text-sm text-gray-900 font-medium truncate">
+                    <button
+                      onClick={() => handleItemClick(project)}
+                      className="text-sm text-teal-600 hover:text-teal-700 hover:underline font-medium truncate text-left"
+                      data-testid={`link-project-${project.id}`}
+                    >
                       {project.name}
-                    </span>
+                    </button>
                   </div>
                   <div className="w-[120px] flex-shrink-0 px-3">
                     {getStatusBadge(project.status)}
