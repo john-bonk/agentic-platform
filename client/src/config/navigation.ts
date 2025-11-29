@@ -45,7 +45,7 @@ export const sideNavSections: SideNavSection[] = [
   {
     title: "EXAMPLES",
     items: [
-      { id: "demo", label: "Demo Page", path: "/demo" },
+      { id: "demo", label: "Component Demo", path: "/demo" },
     ],
   },
   {
