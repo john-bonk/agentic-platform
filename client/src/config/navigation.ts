@@ -24,9 +24,6 @@ export interface SideNavSection {
  */
 export const iconNavItems: IconNavItem[] = [
   { type: "lucide", icon: "home", alt: "Dashboard", active: false, path: "/" },
-  { type: "lucide", icon: "list", alt: "List Page", active: false, path: "/list" },
-  { type: "lucide", icon: "git-branch", alt: "Hierarchy", active: true, path: "/hierarchy" },
-  { type: "lucide", icon: "settings", alt: "Settings", active: false, path: "/settings" },
 ];
 
 /**
