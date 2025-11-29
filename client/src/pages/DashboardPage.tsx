@@ -1,21 +1,17 @@
 /**
- * Dashboard Page
+ * Business Continuity Dashboard
  * 
- * Example dashboard with metrics cards, filter options, and charts.
- * Demonstrates card layouts with proper border radius and background colors.
- * 
- * Features:
- * - Filter dropdown options
- * - Metric cards with consistent styling
- * - Chart placeholder
- * - Activity feed
- * 
- * TODO: Replace placeholder data with real metrics
+ * Complete dashboard matching the Figma design with:
+ * - Filter bar with dropdowns
+ * - Metric cards
+ * - Charts (RTO, Risk Trend, Plan Effectiveness)
+ * - Business Processes Overview table
+ * - Dependency Map visualization
  */
 
 import { useState } from "react";
-import { AppLayout, PageHeader } from "@/components/layout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AppLayout } from "@/components/layout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
@@ -26,127 +22,251 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { 
-  ArrowUpRight, 
-  ArrowDownRight, 
-  Users, 
-  FileText, 
-  CheckCircle, 
-  Clock,
-  Filter,
-  Calendar,
-  RefreshCw
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { 
+  RefreshCw,
+  MoreHorizontal,
+  ArrowUpDown,
+  ChevronDown,
+  ZoomIn,
+  ZoomOut,
+  Maximize2
 } from "lucide-react";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip
+} from "recharts";
+import { useLocation } from "wouter";
+import { useTabStore } from "@/lib/tabStore";
 
-const stats = [
-  {
-    title: "Total Users",
-    value: "2,543",
-    change: "+12%",
-    trend: "up" as const,
-    icon: Users,
-    description: "vs last month",
+const rtoData = [
+  { name: "Retail Ban...", q1: 60, q2: 45, q3: 70, q4: 50 },
+  { name: "Human Reso...", q1: 40, q2: 35, q3: 55, q4: 40 },
+  { name: "Treasury &...", q1: 30, q2: 25, q3: 40, q4: 30 },
+  { name: "IT Operati...", q1: 20, q2: 15, q3: 25, q4: 20 },
+];
+
+const riskTrendData = [
+  { month: "Jan", low: 20, medium: 45, high: 70 },
+  { month: "Feb", low: 25, medium: 50, high: 65 },
+  { month: "Mar", low: 22, medium: 55, high: 60 },
+  { month: "Apr", low: 28, medium: 48, high: 55 },
+  { month: "May", low: 30, medium: 52, high: 50 },
+  { month: "Jun", low: 25, medium: 50, high: 45 },
+  { month: "Jul", low: 28, medium: 48, high: 40 },
+  { month: "Aug", low: 32, medium: 45, high: 38 },
+  { month: "Sep", low: 30, medium: 42, high: 35 },
+  { month: "Oct", low: 28, medium: 40, high: 32 },
+  { month: "Nov", low: 25, medium: 38, high: 30 },
+  { month: "Dec", low: 22, medium: 35, high: 28 },
+];
+
+const planEffectivenessData = [
+  { name: "Effective", value: 61, color: "#22c55e" },
+  { name: "Ineffective", value: 24, color: "#ef4444" },
+  { name: "Untested", value: 15, color: "#94a3b8" },
+];
+
+const businessProcesses = [
+  { 
+    id: "1",
+    name: "Account Management", 
+    businessUnit: "Retail Banking Operations", 
+    criticality: "High",
+    bcpStatus: "Not Started",
+    rto: "1 hour",
+    owner: "Baylor Cruz"
   },
-  {
-    title: "Active Projects",
-    value: "48",
-    change: "+5%",
-    trend: "up" as const,
-    icon: FileText,
-    description: "vs last month",
+  { 
+    id: "2",
+    name: "Loan Origination and Servicing", 
+    businessUnit: "Retail Banking Operations", 
+    criticality: "Low",
+    bcpStatus: "Not Started",
+    rto: "30 mins",
+    owner: "Baylor Cruz"
   },
-  {
-    title: "Completed Tasks",
-    value: "1,234",
-    change: "+23%",
-    trend: "up" as const,
-    icon: CheckCircle,
-    description: "vs last month",
+  { 
+    id: "3",
+    name: "Customer Service and Support", 
+    businessUnit: "Retail Banking Operations", 
+    criticality: "Low",
+    bcpStatus: "Not Started",
+    rto: "24 hours",
+    owner: "Baylor Cruz"
   },
-  {
-    title: "Pending Reviews",
-    value: "18",
-    change: "-8%",
-    trend: "down" as const,
-    icon: Clock,
-    description: "vs last month",
+  { 
+    id: "4",
+    name: "Employee Onboarding and Offboarding", 
+    businessUnit: "Human Resources", 
+    criticality: "Low",
+    bcpStatus: "Not Started",
+    rto: "1 hour",
+    owner: "Dante Bradford"
+  },
+  { 
+    id: "5",
+    name: "Payroll Processing", 
+    businessUnit: "Human Resources", 
+    criticality: "High",
+    bcpStatus: "Not Started",
+    rto: "4 hours",
+    owner: "Dante Bradford"
   },
 ];
 
-const recentActivity = [
-  { id: 1, action: "Created new project", user: "Alice Johnson", time: "2 minutes ago" },
-  { id: 2, action: "Completed task review", user: "Bob Smith", time: "15 minutes ago" },
-  { id: 3, action: "Updated documentation", user: "Carol Davis", time: "1 hour ago" },
-  { id: 4, action: "Added team member", user: "David Wilson", time: "2 hours ago" },
-  { id: 5, action: "Published report", user: "Eve Martinez", time: "3 hours ago" },
-];
+const dependencyNodes = {
+  frameworks: ["PCI-DSS", "SOX", "AML", "Fed Reserve", "CFPB"],
+  policies: [],
+  risks: [],
+  itSystems: ["Core Banking System (C...", "Customer Relationship ...", "Identity Management Sy...", "Loan Origination System...", "Credit Decision Engine", "Document Management ..."],
+  vendors: [],
+  locations: [],
+};
 
 export function DashboardPage() {
-  const [timeRange, setTimeRange] = useState("30d");
-  const [category, setCategory] = useState("all");
+  const [businessUnit, setBusinessUnit] = useState("all");
+  const [criticality, setCriticality] = useState("all");
+  const [bcpStatus, setBcpStatus] = useState("all");
+  const [, setLocation] = useLocation();
+  const { openTab } = useTabStore();
+
+  const clearFilters = () => {
+    setBusinessUnit("all");
+    setCriticality("all");
+    setBcpStatus("all");
+  };
+
+  const filteredProcesses = businessProcesses.filter(process => {
+    const matchesBusinessUnit = businessUnit === "all" || 
+      (businessUnit === "retail" && process.businessUnit === "Retail Banking Operations") ||
+      (businessUnit === "hr" && process.businessUnit === "Human Resources");
+    const matchesCriticality = criticality === "all" || 
+      process.criticality.toLowerCase() === criticality;
+    const matchesBcpStatus = bcpStatus === "all" || 
+      (bcpStatus === "not-started" && process.bcpStatus === "Not Started") ||
+      (bcpStatus === "in-progress" && process.bcpStatus === "In Progress") ||
+      (bcpStatus === "complete" && process.bcpStatus === "Complete");
+    return matchesBusinessUnit && matchesCriticality && matchesBcpStatus;
+  });
+
+  const totalActivePlans = filteredProcesses.length > 0 ? filteredProcesses.length : businessProcesses.length;
+  const highCriticalityCount = filteredProcesses.filter(p => p.criticality === "High").length;
+
+  const handleProcessClick = (process: typeof businessProcesses[0]) => {
+    const tab = {
+      id: `process-${process.id}`,
+      name: process.name,
+      path: `/items/${process.id}`,
+    };
+    openTab(tab);
+    setLocation(`/items/${process.id}`);
+  };
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-full overflow-y-auto bg-gray-50">
-        <PageHeader 
-          title="Dashboard" 
-          description="Overview of your workspace metrics and activity"
-          actions={
+      <div className="flex flex-col h-full overflow-y-auto bg-white">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <h1 className="text-xl font-semibold text-gray-900" data-testid="text-dashboard-title">
+            Business Continuity Dashboard
+          </h1>
+          <div className="flex items-center gap-2">
             <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-2"
+              variant="ghost" 
+              size="icon"
               data-testid="button-refresh"
             >
               <RefreshCw className="w-4 h-4" />
-              Refresh
             </Button>
-          }
-        />
-        
-        <div className="flex items-center justify-between px-8 py-3 bg-white border-b border-gray-200 flex-wrap gap-2">
-          <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-gray-600">Filters:</span>
-            </div>
-            
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger 
-                className="w-[140px] h-9 text-sm"
-                data-testid="select-time-range"
-              >
-                <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                <SelectValue placeholder="Time Range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7d">Last 7 days</SelectItem>
-                <SelectItem value="30d">Last 30 days</SelectItem>
-                <SelectItem value="90d">Last 90 days</SelectItem>
-                <SelectItem value="1y">Last year</SelectItem>
-              </SelectContent>
-            </Select>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              data-testid="button-more"
+            >
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
 
-            <Select value={category} onValueChange={setCategory}>
+        <div className="flex items-center gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200 flex-wrap">
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-gray-500">Business Unit</span>
+            <Select value={businessUnit} onValueChange={setBusinessUnit}>
               <SelectTrigger 
-                className="w-[140px] h-9 text-sm"
-                data-testid="select-category"
+                className="w-[200px] h-9 text-sm bg-white"
+                data-testid="select-business-unit"
               >
-                <SelectValue placeholder="Category" />
+                <SelectValue placeholder="All Business Units" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="projects">Projects</SelectItem>
-                <SelectItem value="tasks">Tasks</SelectItem>
-                <SelectItem value="users">Users</SelectItem>
+                <SelectItem value="all">All Business Units</SelectItem>
+                <SelectItem value="retail">Retail Banking Operations</SelectItem>
+                <SelectItem value="hr">Human Resources</SelectItem>
+                <SelectItem value="treasury">Treasury</SelectItem>
+                <SelectItem value="it">IT Operations</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-gray-500">Criticality</span>
+            <Select value={criticality} onValueChange={setCriticality}>
+              <SelectTrigger 
+                className="w-[200px] h-9 text-sm bg-white"
+                data-testid="select-criticality"
+              >
+                <SelectValue placeholder="All Criticalities" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Criticalities</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-gray-500">BCP Status</span>
+            <Select value={bcpStatus} onValueChange={setBcpStatus}>
+              <SelectTrigger 
+                className="w-[200px] h-9 text-sm bg-white"
+                data-testid="select-bcp-status"
+              >
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="not-started">Not Started</SelectItem>
+                <SelectItem value="in-progress">In Progress</SelectItem>
+                <SelectItem value="complete">Complete</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-end h-full ml-auto">
             <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-9 text-gray-600"
+              variant="ghost" 
+              size="sm"
+              onClick={clearFilters}
+              className="text-gray-600"
               data-testid="button-clear-filters"
             >
               Clear Filters
@@ -154,204 +274,357 @@ export function DashboardPage() {
           </div>
         </div>
         
-        <div className="flex-1 p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {stats.map((stat) => (
-              <Card 
-                key={stat.title} 
-                className="bg-white border border-gray-200 rounded-lg shadow-sm"
-                data-testid={`stat-card-${stat.title.toLowerCase().replace(/\s/g, "-")}`}
-              >
-                <CardHeader className="flex flex-row items-center justify-between gap-1 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">
-                    {stat.title}
-                  </CardTitle>
-                  <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center">
-                    <stat.icon className="w-4 h-4 text-gray-500" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div 
-                    className="text-2xl font-bold text-gray-900" 
-                    data-testid={`stat-value-${stat.title.toLowerCase().replace(/\s/g, "-")}`}
-                  >
-                    {stat.value}
-                  </div>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Badge 
-                      variant="outline" 
-                      className={`text-xs px-1.5 py-0 ${
-                        stat.trend === "up" 
-                          ? "text-green-600 border-green-200 bg-green-50" 
-                          : "text-red-600 border-red-200 bg-red-50"
-                      }`}
-                    >
-                      {stat.trend === "up" ? (
-                        <ArrowUpRight className="w-3 h-3 mr-0.5" />
-                      ) : (
-                        <ArrowDownRight className="w-3 h-3 mr-0.5" />
-                      )}
-                      {stat.change}
-                    </Badge>
-                    <span className="text-xs text-gray-500">{stat.description}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+        <div className="flex-1 p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="bg-gray-50 border-0 shadow-none">
+              <CardContent className="pt-4 text-center">
+                <div className="text-3xl font-bold text-gray-900" data-testid="metric-total-plans">{filteredProcesses.length}</div>
+                <div className="text-sm text-gray-500 mt-1">Total Active Plans</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gray-50 border-0 shadow-none">
+              <CardContent className="pt-4 text-center">
+                <div className="text-3xl font-bold text-gray-900" data-testid="metric-compliance">92%</div>
+                <div className="text-sm text-gray-500 mt-1">Exercise Compliance</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gray-50 border-0 shadow-none">
+              <CardContent className="pt-4 text-center">
+                <div className="text-3xl font-bold text-gray-900" data-testid="metric-findings">8</div>
+                <div className="text-sm text-gray-500 mt-1">Open Findings</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gray-50 border-0 shadow-none">
+              <CardContent className="pt-4 text-center">
+                <div className="text-3xl font-bold text-gray-900" data-testid="metric-incidents">1</div>
+                <div className="text-sm text-gray-500 mt-1">Vendor Incidents</div>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <Card className="lg:col-span-2 bg-white border border-gray-200 rounded-lg shadow-sm">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Analytics Overview</CardTitle>
-                    <CardDescription>
-                      Your performance metrics over time
-                    </CardDescription>
-                  </div>
-                  <Select defaultValue="projects">
-                    <SelectTrigger className="w-[120px] h-8 text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="projects">Projects</SelectItem>
-                      <SelectItem value="tasks">Tasks</SelectItem>
-                      <SelectItem value="users">Users</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            <Card className="border border-gray-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-700">RTO by Business Unit</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-md bg-gray-50">
-                  <div className="text-center text-gray-500">
-                    <p className="text-sm font-medium">Chart Placeholder</p>
-                    <p className="text-xs mt-1">
-                      TODO: Add your preferred charting library
-                    </p>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={rtoData} layout="vertical" barGap={1} barSize={12}>
+                      <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                      <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => v} fontSize={10} />
+                      <YAxis type="category" dataKey="name" width={80} fontSize={10} />
+                      <Tooltip />
+                      <Bar dataKey="q1" fill="#3b82f6" name="Q1" />
+                      <Bar dataKey="q2" fill="#1d4ed8" name="Q2" />
+                      <Bar dataKey="q3" fill="#60a5fa" name="Q3" />
+                      <Bar dataKey="q4" fill="#93c5fd" name="Q4" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-2 text-xs">
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-blue-500" />
+                    <span>Q1</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-blue-700" />
+                    <span>Q2</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-blue-400" />
+                    <span>Q3</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-blue-300" />
+                    <span>Q4</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Recent Activity</CardTitle>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-xs text-gray-500"
-                  >
-                    View All
-                  </Button>
-                </div>
-                <CardDescription>
-                  Latest actions in your workspace
-                </CardDescription>
+            <Card className="border border-gray-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-700">Risk Trend</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {recentActivity.map((activity) => (
-                    <div 
-                      key={activity.id} 
-                      className="flex flex-col gap-1 pb-3 border-b border-gray-100 last:border-0 last:pb-0"
-                      data-testid={`activity-item-${activity.id}`}
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={riskTrendData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" fontSize={10} />
+                      <YAxis domain={[0, 100]} fontSize={10} />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="low" stroke="#22c55e" strokeWidth={2} dot={false} name="Low" />
+                      <Line type="monotone" dataKey="medium" stroke="#f59e0b" strokeWidth={2} dot={false} name="Medium" />
+                      <Line type="monotone" dataKey="high" stroke="#ef4444" strokeWidth={2} dot={false} name="High" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-2 text-xs">
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <span>Low</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-amber-500" />
+                    <span>Medium</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <span>High</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border border-gray-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-gray-700">Plan Effectiveness</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-48 relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={planEffectivenessData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={70}
+                        dataKey="value"
+                        startAngle={90}
+                        endAngle={-270}
+                      >
+                        {planEffectivenessData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-gray-900">61%</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-2 text-xs">
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-sm bg-gray-400" />
+                    <span>Untested</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-sm bg-red-500" />
+                    <span>Ineffective</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-sm bg-green-500" />
+                    <span>Effective</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="border border-gray-200">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-gray-700">Business Processes Overview</CardTitle>
+                <div className="text-xs text-gray-500">
+                  <span className="font-medium">{filteredProcesses.length} processes</span>
+                  <span className="mx-2">|</span>
+                  <span>{highCriticalityCount} high criticality</span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50 hover:bg-gray-50">
+                    <TableHead className="font-medium text-gray-600">
+                      <div className="flex items-center gap-1">
+                        Name
+                        <ArrowUpDown className="w-3 h-3" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="font-medium text-gray-600">Business Unit</TableHead>
+                    <TableHead className="font-medium text-gray-600">Criticality</TableHead>
+                    <TableHead className="font-medium text-gray-600">BCP Status</TableHead>
+                    <TableHead className="font-medium text-gray-600">
+                      <div className="flex items-center gap-1">
+                        RTO
+                        <ArrowUpDown className="w-3 h-3" />
+                      </div>
+                    </TableHead>
+                    <TableHead className="font-medium text-gray-600">Process Owner</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredProcesses.map((process) => (
+                    <TableRow 
+                      key={process.id} 
+                      className="hover:bg-gray-50 cursor-pointer"
+                      data-testid={`row-process-${process.id}`}
                     >
-                      <p className="text-sm text-gray-900">{activity.action}</p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <span>{activity.user}</span>
-                        <span>-</span>
-                        <span>{activity.time}</span>
-                      </div>
-                    </div>
+                      <TableCell>
+                        <button
+                          onClick={() => handleProcessClick(process)}
+                          className="text-blue-600 hover:underline text-left font-medium"
+                          data-testid={`link-process-${process.id}`}
+                        >
+                          {process.name}
+                        </button>
+                      </TableCell>
+                      <TableCell className="text-gray-600">{process.businessUnit}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs ${
+                            process.criticality === "High" 
+                              ? "text-red-600 border-red-200 bg-red-50" 
+                              : "text-blue-600 border-blue-200 bg-blue-50"
+                          }`}
+                        >
+                          {process.criticality}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant="outline" 
+                          className="text-xs text-gray-600 border-gray-300 bg-gray-100"
+                        >
+                          {process.bcpStatus}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-gray-600">{process.rto}</TableCell>
+                      <TableCell className="text-gray-600">{process.owner}</TableCell>
+                    </TableRow>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
 
-          <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
-              <CardHeader>
-                <CardTitle>Quick Stats</CardTitle>
-                <CardDescription>
-                  Key performance indicators
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Completion Rate</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 bg-gray-200 rounded-full h-2">
-                        <div className="bg-teal-500 h-2 rounded-full" style={{ width: "78%" }} />
-                      </div>
-                      <span className="text-sm font-medium text-gray-900">78%</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">On-Time Delivery</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: "92%" }} />
-                      </div>
-                      <span className="text-sm font-medium text-gray-900">92%</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Team Utilization</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 bg-gray-200 rounded-full h-2">
-                        <div className="bg-purple-500 h-2 rounded-full" style={{ width: "65%" }} />
-                      </div>
-                      <span className="text-sm font-medium text-gray-900">65%</span>
-                    </div>
+          <Card className="border border-gray-200">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-gray-700">Business Process Dependency Map</CardTitle>
+                <div className="flex items-center gap-4">
+                  <span className="text-xs text-gray-500">Click on any node to highlight connections</span>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <ZoomIn className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <ZoomOut className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                      <Maximize2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 mb-4">
+                <Badge variant="outline" className="text-xs bg-gray-100">
+                  9 connected items
+                </Badge>
+              </div>
+              
+              <div className="relative h-[300px] bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                <div className="absolute left-4 top-4 bottom-4 w-32 flex flex-col gap-2">
+                  <div className="bg-white border border-gray-200 rounded p-2">
+                    <div className="text-xs font-medium text-gray-500 mb-2">Frameworks</div>
+                    <div className="text-xs text-gray-400">5 items</div>
+                    {dependencyNodes.frameworks.map((item, idx) => (
+                      <div 
+                        key={idx} 
+                        className={`text-xs py-1 px-2 mt-1 rounded ${idx === 0 ? "bg-blue-600 text-white" : "bg-white border border-gray-200 text-gray-600"}`}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-white border border-gray-200 rounded p-2">
+                    <div className="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
+                      Policies <ChevronDown className="w-3 h-3" />
+                    </div>
+                    <div className="text-xs text-gray-400">4 items</div>
+                  </div>
+                  <div className="bg-white border border-gray-200 rounded p-2">
+                    <div className="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
+                      Risks <ChevronDown className="w-3 h-3" />
+                    </div>
+                    <div className="text-xs text-gray-400">5 items</div>
+                  </div>
+                </div>
 
-            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
-              <CardHeader>
-                <CardTitle>Upcoming Deadlines</CardTitle>
-                <CardDescription>
-                  Tasks due in the next 7 days
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-red-500" />
-                      <span className="text-sm text-gray-900">Website launch review</span>
-                    </div>
-                    <Badge variant="outline" className="text-xs text-red-600 border-red-200 bg-red-50">
-                      Tomorrow
-                    </Badge>
+                <div className="absolute right-4 top-4 bottom-4 w-40 flex flex-col gap-2">
+                  <div className="bg-white border border-gray-200 rounded p-2">
+                    <div className="text-xs font-medium text-gray-500 mb-2">IT Systems</div>
+                    <div className="text-xs text-gray-400 mb-1">6 items</div>
+                    {dependencyNodes.itSystems.map((item, idx) => (
+                      <div 
+                        key={idx} 
+                        className="text-xs py-1 px-2 mt-1 rounded bg-teal-600 text-white truncate"
+                      >
+                        {item}
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-amber-500" />
-                      <span className="text-sm text-gray-900">API documentation update</span>
+                  <div className="bg-white border border-gray-200 rounded p-2">
+                    <div className="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
+                      Vendors <ChevronDown className="w-3 h-3" />
                     </div>
-                    <Badge variant="outline" className="text-xs text-amber-600 border-amber-200 bg-amber-50">
-                      3 days
-                    </Badge>
+                    <div className="text-xs text-gray-400">6 items</div>
                   </div>
-                  <div className="flex items-center justify-between py-2">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-green-500" />
-                      <span className="text-sm text-gray-900">Team retrospective</span>
+                  <div className="bg-white border border-gray-200 rounded p-2">
+                    <div className="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
+                      Locations <ChevronDown className="w-3 h-3" />
                     </div>
-                    <Badge variant="outline" className="text-xs text-green-600 border-green-200 bg-green-50">
-                      5 days
-                    </Badge>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+                  <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+                    </marker>
+                  </defs>
+                  <path d="M 150 60 Q 280 60 400 60" stroke="#94a3b8" strokeWidth="1" fill="none" strokeDasharray="4 2" />
+                  <path d="M 150 80 Q 280 100 400 80" stroke="#94a3b8" strokeWidth="1" fill="none" strokeDasharray="4 2" />
+                  <path d="M 150 100 Q 280 130 400 100" stroke="#94a3b8" strokeWidth="1" fill="none" strokeDasharray="4 2" />
+                  <path d="M 150 120 Q 280 150 400 120" stroke="#94a3b8" strokeWidth="1" fill="none" strokeDasharray="4 2" />
+                  <path d="M 150 140 Q 280 170 400 140" stroke="#94a3b8" strokeWidth="1" fill="none" strokeDasharray="4 2" />
+                </svg>
+              </div>
+
+              <div className="mt-4 p-3 bg-gray-50 rounded border border-gray-200">
+                <div className="text-xs font-medium text-gray-500 mb-2">Legend</div>
+                <div className="flex items-center gap-6 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-1 bg-blue-600 rounded" />
+                    <span className="text-gray-600">Frameworks</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-1 bg-purple-600 rounded" />
+                    <span className="text-gray-600">Policies</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-1 bg-red-500 rounded" />
+                    <span className="text-gray-600">Risks</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-1 bg-teal-600 rounded" />
+                    <span className="text-gray-600">Controls</span>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-400 mt-2">
+                  Click categories to expand/collapse. Click items to trace connections.
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </AppLayout>
