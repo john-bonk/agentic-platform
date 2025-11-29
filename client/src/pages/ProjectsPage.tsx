@@ -224,7 +224,7 @@ export function ProjectsPage() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto bg-white">
+        <div className="flex-1 overflow-auto bg-white pl-[16px] pr-[16px]">
           <div className="min-w-fit">
             <div className="flex items-center h-10 border-b border-gray-200 sticky top-0 z-10 bg-white">
               <div className="w-10 flex-shrink-0 flex items-center justify-center">
