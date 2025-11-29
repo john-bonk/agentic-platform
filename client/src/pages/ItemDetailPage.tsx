@@ -147,249 +147,251 @@ export function ItemDetailPage() {
         path: `/items/${item.id}` 
       }}
     >
-      <div className="flex flex-col h-full overflow-hidden bg-white">
-        <div className="flex items-center justify-between px-8 py-5 bg-white">
-          <h1 className="text-xl font-semibold text-gray-900">{item.name}</h1>
-          <div className="flex items-center gap-2">
-            <Button 
-              className="bg-teal-600 hover:bg-teal-700"
-              data-testid="button-primary-action"
-            >
-              Submit for Review
-            </Button>
-            <Button 
-              variant="outline" 
-              className="gap-2"
-              data-testid="button-status"
-            >
-              {item.status}
-              <ChevronDown className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="icon" data-testid="button-alert">
-              <AlertTriangle className="w-4 h-4 text-gray-500" />
-            </Button>
-            <Button variant="ghost" size="icon" data-testid="button-more">
-              <MoreHorizontal className="w-4 h-4 text-gray-500" />
-            </Button>
+      <div className="flex flex-col h-full overflow-auto bg-gray-100">
+        <div className="p-6">
+          <div className="bg-white rounded-md">
+            <div className="flex items-center justify-between px-8 py-5">
+              <h1 className="text-xl font-semibold text-gray-900">{item.name}</h1>
+              <div className="flex items-center gap-2">
+                <Button 
+                  className="bg-teal-600 hover:bg-teal-700"
+                  data-testid="button-primary-action"
+                >
+                  Submit for Review
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="gap-2"
+                  data-testid="button-status"
+                >
+                  {item.status}
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="icon" data-testid="button-alert">
+                  <AlertTriangle className="w-4 h-4 text-gray-500" />
+                </Button>
+                <Button variant="ghost" size="icon" data-testid="button-more">
+                  <MoreHorizontal className="w-4 h-4 text-gray-500" />
+                </Button>
+              </div>
+            </div>
+
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <div className="border-b border-gray-200 px-8">
+                <TabsList className="h-auto p-0 bg-transparent border-0">
+                  <TabsTrigger 
+                    value="overview"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
+                    data-testid="tab-overview"
+                  >
+                    Overview
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="details"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
+                    data-testid="tab-details"
+                  >
+                    Details
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="dependencies"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
+                    data-testid="tab-dependencies"
+                  >
+                    Dependencies
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="activity"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
+                    data-testid="tab-activity"
+                  >
+                    Activity
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="attachments"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
+                    data-testid="tab-attachments"
+                  >
+                    Attachments
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="overview" className="m-0">
+                <div className="px-8 py-4 border-b border-gray-100">
+                  <div className="flex items-center gap-12 flex-wrap">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-gray-500">Priority</span>
+                      <div className="mt-1">
+                        {getPriorityBadge(item.priority)}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-gray-500">Target Date</span>
+                      <span className="text-sm text-gray-900 mt-1">{item.targetDate}</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-gray-500">Estimated Time</span>
+                      <span className="text-sm text-gray-400 mt-1">{item.estimatedTime}</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-gray-500">Owner</span>
+                      <span className="text-sm text-gray-900 mt-1">{item.owner}</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs text-gray-500">Last Updated</span>
+                      <span className="text-sm text-gray-900 mt-1">{item.lastUpdated}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="px-8 py-6">
+                  <h2 className="text-base font-semibold text-gray-900 mb-6">Details</h2>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-6">
+                    <div className="space-y-6">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-500">Name</span>
+                          <Info className="w-3 h-3 text-gray-400" />
+                        </div>
+                        <span className="text-sm text-gray-900">{item.name}</span>
+                      </div>
+                      
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-500">Description</span>
+                          <Info className="w-3 h-3 text-gray-400" />
+                        </div>
+                        <p className="text-sm text-gray-900 leading-relaxed">{item.description}</p>
+                      </div>
+                      
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-500">Owner</span>
+                          <Info className="w-3 h-3 text-gray-400" />
+                        </div>
+                        <span className="text-sm text-gray-900">{item.owner}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-500">Categories</span>
+                          <Info className="w-3 h-3 text-gray-400" />
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {item.categories.map((category, idx) => (
+                            <span key={idx}>
+                              <a 
+                                href="#" 
+                                className="text-sm text-blue-600 hover:underline"
+                                data-testid={`link-category-${idx}`}
+                              >
+                                {category}
+                              </a>
+                              {idx < item.categories.length - 1 && <span className="text-gray-400">, </span>}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-500">Related Items</span>
+                          <Info className="w-3 h-3 text-gray-400" />
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {item.relatedItems.map((relatedItem, idx) => (
+                            <span key={idx}>
+                              <a 
+                                href="#" 
+                                className="text-sm text-blue-600 hover:underline"
+                                data-testid={`link-related-${idx}`}
+                              >
+                                {relatedItem}
+                              </a>
+                              {idx < item.relatedItems.length - 1 && <span className="text-gray-400">, </span>}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-500">Tags</span>
+                          <Info className="w-3 h-3 text-gray-400" />
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {item.tags.map((tag, idx) => (
+                            <span key={idx}>
+                              <a 
+                                href="#" 
+                                className="text-sm text-blue-600 hover:underline"
+                                data-testid={`link-tag-${idx}`}
+                              >
+                                {tag}
+                              </a>
+                              {idx < item.tags.length - 1 && <span className="text-gray-400">, </span>}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-500">Attachments</span>
+                          <Info className="w-3 h-3 text-gray-400" />
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {item.attachments.map((attachment, idx) => (
+                            <a 
+                              key={idx} 
+                              href="#" 
+                              className="text-sm text-blue-600 hover:underline"
+                              data-testid={`link-attachment-${idx}`}
+                            >
+                              {attachment}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="details" className="p-8 m-0">
+                <div className="text-center py-16 text-gray-500">
+                  <p className="text-sm font-medium">Additional Details</p>
+                  <p className="text-xs mt-1">More details will be displayed here</p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="dependencies" className="p-8 m-0">
+                <div className="text-center py-16 text-gray-500">
+                  <p className="text-sm font-medium">Dependencies</p>
+                  <p className="text-xs mt-1">Dependencies will be displayed here</p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="activity" className="p-8 m-0">
+                <div className="text-center py-16 text-gray-500">
+                  <p className="text-sm font-medium">Activity Log</p>
+                  <p className="text-xs mt-1">Activity history will be displayed here</p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="attachments" className="p-8 m-0">
+                <div className="text-center py-16 text-gray-500">
+                  <p className="text-sm font-medium">Attachments</p>
+                  <p className="text-xs mt-1">File attachments will be displayed here</p>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-          <div className="border-b border-gray-200 bg-white px-8">
-            <TabsList className="h-auto p-0 bg-transparent border-0">
-              <TabsTrigger 
-                value="overview"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
-                data-testid="tab-overview"
-              >
-                Overview
-              </TabsTrigger>
-              <TabsTrigger 
-                value="details"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
-                data-testid="tab-details"
-              >
-                Details
-              </TabsTrigger>
-              <TabsTrigger 
-                value="dependencies"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
-                data-testid="tab-dependencies"
-              >
-                Dependencies
-              </TabsTrigger>
-              <TabsTrigger 
-                value="activity"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
-                data-testid="tab-activity"
-              >
-                Activity
-              </TabsTrigger>
-              <TabsTrigger 
-                value="attachments"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
-                data-testid="tab-attachments"
-              >
-                Attachments
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <div className="flex-1 overflow-auto bg-white">
-            <TabsContent value="overview" className="m-0">
-              <div className="px-8 py-4 border-b border-gray-100">
-                <div className="flex items-center gap-12 flex-wrap">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">Priority</span>
-                    <div className="mt-1">
-                      {getPriorityBadge(item.priority)}
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">Target Date</span>
-                    <span className="text-sm text-gray-900 mt-1">{item.targetDate}</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">Estimated Time</span>
-                    <span className="text-sm text-gray-400 mt-1">{item.estimatedTime}</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">Owner</span>
-                    <span className="text-sm text-gray-900 mt-1">{item.owner}</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">Last Updated</span>
-                    <span className="text-sm text-gray-900 mt-1">{item.lastUpdated}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="px-8 py-6">
-                <h2 className="text-base font-semibold text-gray-900 mb-6">Details</h2>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-6">
-                  <div className="space-y-6">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Name</span>
-                        <Info className="w-3 h-3 text-gray-400" />
-                      </div>
-                      <span className="text-sm text-gray-900">{item.name}</span>
-                    </div>
-                    
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Description</span>
-                        <Info className="w-3 h-3 text-gray-400" />
-                      </div>
-                      <p className="text-sm text-gray-900 leading-relaxed">{item.description}</p>
-                    </div>
-                    
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Owner</span>
-                        <Info className="w-3 h-3 text-gray-400" />
-                      </div>
-                      <span className="text-sm text-gray-900">{item.owner}</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Categories</span>
-                        <Info className="w-3 h-3 text-gray-400" />
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {item.categories.map((category, idx) => (
-                          <span key={idx}>
-                            <a 
-                              href="#" 
-                              className="text-sm text-blue-600 hover:underline"
-                              data-testid={`link-category-${idx}`}
-                            >
-                              {category}
-                            </a>
-                            {idx < item.categories.length - 1 && <span className="text-gray-400">, </span>}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Related Items</span>
-                        <Info className="w-3 h-3 text-gray-400" />
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {item.relatedItems.map((relatedItem, idx) => (
-                          <span key={idx}>
-                            <a 
-                              href="#" 
-                              className="text-sm text-blue-600 hover:underline"
-                              data-testid={`link-related-${idx}`}
-                            >
-                              {relatedItem}
-                            </a>
-                            {idx < item.relatedItems.length - 1 && <span className="text-gray-400">, </span>}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Tags</span>
-                        <Info className="w-3 h-3 text-gray-400" />
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {item.tags.map((tag, idx) => (
-                          <span key={idx}>
-                            <a 
-                              href="#" 
-                              className="text-sm text-blue-600 hover:underline"
-                              data-testid={`link-tag-${idx}`}
-                            >
-                              {tag}
-                            </a>
-                            {idx < item.tags.length - 1 && <span className="text-gray-400">, </span>}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Attachments</span>
-                        <Info className="w-3 h-3 text-gray-400" />
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {item.attachments.map((attachment, idx) => (
-                          <a 
-                            key={idx} 
-                            href="#" 
-                            className="text-sm text-blue-600 hover:underline"
-                            data-testid={`link-attachment-${idx}`}
-                          >
-                            {attachment}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="details" className="p-8 m-0">
-              <div className="text-center py-16 text-gray-500">
-                <p className="text-sm font-medium">Additional Details</p>
-                <p className="text-xs mt-1">More details will be displayed here</p>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="dependencies" className="p-8 m-0">
-              <div className="text-center py-16 text-gray-500">
-                <p className="text-sm font-medium">Dependencies</p>
-                <p className="text-xs mt-1">Dependencies will be displayed here</p>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="activity" className="p-8 m-0">
-              <div className="text-center py-16 text-gray-500">
-                <p className="text-sm font-medium">Activity Log</p>
-                <p className="text-xs mt-1">Activity history will be displayed here</p>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="attachments" className="p-8 m-0">
-              <div className="text-center py-16 text-gray-500">
-                <p className="text-sm font-medium">Attachments</p>
-                <p className="text-xs mt-1">File attachments will be displayed here</p>
-              </div>
-            </TabsContent>
-          </div>
-        </Tabs>
       </div>
     </AppLayout>
   );
