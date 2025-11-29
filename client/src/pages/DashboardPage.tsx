@@ -273,7 +273,7 @@ export function DashboardPage() {
           </div>
         </div>
         
-        <div className="flex-1 p-6 space-y-6">
+        <div className="flex-1 p-6 space-y-6 bg-[#f9fafb]">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white py-4 text-center">
               <div className="text-2xl font-semibold text-gray-900" data-testid="metric-total-plans">{filteredProcesses.length}</div>
@@ -492,128 +492,6 @@ export function DashboardPage() {
                   ))}
                 </TableBody>
               </Table>
-            </div>
-          </div>
-
-          <div className="border border-gray-200 rounded bg-white">
-            <div className="px-4 pt-4 pb-2">
-              <div className="flex items-center justify-between gap-4">
-                <h3 className="text-sm font-medium text-gray-700">Business Process Dependency Map</h3>
-                <div className="flex items-center gap-4">
-                  <span className="text-xs text-gray-500">Click on any node to highlight connections</span>
-                  <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon">
-                      <ZoomIn className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <ZoomOut className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Maximize2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="px-4 pb-4">
-              <div className="flex gap-4 mb-4">
-                <Badge variant="outline" className="text-xs bg-gray-100">
-                  9 connected items
-                </Badge>
-              </div>
-              
-              <div className="relative h-[300px] bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
-                <div className="absolute left-4 top-4 bottom-4 w-32 flex flex-col gap-2">
-                  <div className="bg-white border border-gray-200 rounded p-2">
-                    <div className="text-xs font-medium text-gray-500 mb-2">Frameworks</div>
-                    <div className="text-xs text-gray-400">5 items</div>
-                    {dependencyNodes.frameworks.map((item, idx) => (
-                      <div 
-                        key={idx} 
-                        className={`text-xs py-1 px-2 mt-1 rounded ${idx === 0 ? "bg-blue-600 text-white" : "bg-white border border-gray-200 text-gray-600"}`}
-                      >
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="bg-white border border-gray-200 rounded p-2">
-                    <div className="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
-                      Policies <ChevronDown className="w-3 h-3" />
-                    </div>
-                    <div className="text-xs text-gray-400">4 items</div>
-                  </div>
-                  <div className="bg-white border border-gray-200 rounded p-2">
-                    <div className="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
-                      Risks <ChevronDown className="w-3 h-3" />
-                    </div>
-                    <div className="text-xs text-gray-400">5 items</div>
-                  </div>
-                </div>
-
-                <div className="absolute right-4 top-4 bottom-4 w-40 flex flex-col gap-2">
-                  <div className="bg-white border border-gray-200 rounded p-2">
-                    <div className="text-xs font-medium text-gray-500 mb-2">IT Systems</div>
-                    <div className="text-xs text-gray-400 mb-1">6 items</div>
-                    {dependencyNodes.itSystems.map((item, idx) => (
-                      <div 
-                        key={idx} 
-                        className="text-xs py-1 px-2 mt-1 rounded bg-teal-600 text-white truncate"
-                      >
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="bg-white border border-gray-200 rounded p-2">
-                    <div className="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
-                      Vendors <ChevronDown className="w-3 h-3" />
-                    </div>
-                    <div className="text-xs text-gray-400">6 items</div>
-                  </div>
-                  <div className="bg-white border border-gray-200 rounded p-2">
-                    <div className="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1">
-                      Locations <ChevronDown className="w-3 h-3" />
-                    </div>
-                  </div>
-                </div>
-
-                <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
-                  <defs>
-                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
-                    </marker>
-                  </defs>
-                  <path d="M 150 60 Q 280 60 400 60" stroke="#94a3b8" strokeWidth="1" fill="none" strokeDasharray="4 2" />
-                  <path d="M 150 80 Q 280 100 400 80" stroke="#94a3b8" strokeWidth="1" fill="none" strokeDasharray="4 2" />
-                  <path d="M 150 100 Q 280 130 400 100" stroke="#94a3b8" strokeWidth="1" fill="none" strokeDasharray="4 2" />
-                  <path d="M 150 120 Q 280 150 400 120" stroke="#94a3b8" strokeWidth="1" fill="none" strokeDasharray="4 2" />
-                  <path d="M 150 140 Q 280 170 400 140" stroke="#94a3b8" strokeWidth="1" fill="none" strokeDasharray="4 2" />
-                </svg>
-              </div>
-
-              <div className="mt-4 p-3 bg-gray-50 rounded border border-gray-200">
-                <div className="text-xs font-medium text-gray-500 mb-2">Legend</div>
-                <div className="flex items-center gap-6 text-xs flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-1 bg-blue-600 rounded" />
-                    <span className="text-gray-600">Frameworks</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-1 bg-purple-600 rounded" />
-                    <span className="text-gray-600">Policies</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-1 bg-red-500 rounded" />
-                    <span className="text-gray-600">Risks</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-1 bg-teal-600 rounded" />
-                    <span className="text-gray-600">Controls</span>
-                  </div>
-                </div>
-                <div className="text-xs text-gray-400 mt-2">
-                  Click categories to expand/collapse. Click items to trace connections.
-                </div>
-              </div>
             </div>
           </div>
         </div>
