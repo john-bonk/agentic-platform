@@ -261,19 +261,19 @@ export function DashboardPage() {
         
         <div className="flex-1 p-6 space-y-6 bg-[#f9fafb]">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white py-4 text-center">
+            <div className="bg-white py-4 text-center border border-gray-200 rounded">
               <div className="text-2xl font-semibold text-gray-900" data-testid="metric-total-plans">{filteredProcesses.length}</div>
               <div className="text-sm text-gray-500 mt-1">Total Active Plans</div>
             </div>
-            <div className="bg-white py-4 text-center">
+            <div className="bg-white py-4 text-center border border-gray-200 rounded">
               <div className="text-2xl font-semibold text-gray-900" data-testid="metric-compliance">92%</div>
               <div className="text-sm text-gray-500 mt-1">Exercise Compliance</div>
             </div>
-            <div className="bg-white py-4 text-center">
+            <div className="bg-white py-4 text-center border border-gray-200 rounded">
               <div className="text-2xl font-semibold text-gray-900" data-testid="metric-findings">8</div>
               <div className="text-sm text-gray-500 mt-1">Open Findings</div>
             </div>
-            <div className="bg-white py-4 text-center">
+            <div className="bg-white py-4 text-center border border-gray-200 rounded">
               <div className="text-2xl font-semibold text-gray-900" data-testid="metric-incidents">1</div>
               <div className="text-sm text-gray-500 mt-1">Vendor Incidents</div>
             </div>
