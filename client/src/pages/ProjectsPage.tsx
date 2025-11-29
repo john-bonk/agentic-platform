@@ -1,12 +1,16 @@
 /**
- * Projects Page
+ * List Page
  * 
- * Example list page with hierarchical data table matching Figma design.
- * Features expandable parent rows with children, status badges, and clickable links.
+ * Template list page with hierarchical data table.
+ * Features expandable parent rows (Category 1, 2, 3) with child items (Item 1, 2, 3...).
+ * Includes status badges, clickable links that open detail tabs, and search/filter controls.
  * 
  * Columns: NAME, PROCESS OWNER, CRITICALITY, RTO, RPO, LATEST BIA
  * 
- * TODO: Connect to your actual data source
+ * To customize:
+ * 1. Update the ProcessItem interface with your data fields
+ * 2. Replace exampleData with your actual data source
+ * 3. Modify column headers and cell content as needed
  */
 
 import { useState, useMemo } from "react";

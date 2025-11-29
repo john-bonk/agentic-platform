@@ -1,11 +1,17 @@
 /**
  * Item Detail Page
  * 
- * Detail view with Figma-style layout pattern:
+ * Template detail view with tabbed sections (Tab 1-5).
+ * Features:
  * - Title and action buttons header
  * - Quick info bar with key metrics
- * - Tab navigation
- * - Two-column Details section
+ * - Tab navigation (Tab 1-5)
+ * - Two-column details section with labels and values
+ * 
+ * To customize:
+ * 1. Update the DetailItem interface with your data fields
+ * 2. Replace detailItems with your actual data source
+ * 3. Modify tab names and content as needed
  */
 
 import { useState } from "react";

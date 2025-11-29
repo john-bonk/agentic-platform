@@ -4,14 +4,12 @@
  * This file exports all page components for easy importing.
  * 
  * Usage:
- * import { HomePage, DashboardPage, ProjectsPage, ItemDetailPage } from "@/pages";
+ * import { DashboardPage, ProjectsPage, ItemDetailPage } from "@/pages";
  */
 
-export { HomePage } from "./HomePage";
 export { DashboardPage } from "./DashboardPage";
 export { ProjectsPage } from "./ProjectsPage";
 export { ItemDetailPage } from "./ItemDetailPage";
 export { DemoPage } from "./DemoPage";
-export { FormExamplePage } from "./FormExamplePage";
 export { SettingsPage } from "./SettingsPage";
 export { default as NotFound } from "./not-found";

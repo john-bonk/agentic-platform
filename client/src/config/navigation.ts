@@ -23,7 +23,7 @@ export interface SideNavSection {
  * TODO: Customize these icons for your application
  */
 export const iconNavItems: IconNavItem[] = [
-  { type: "lucide", icon: "home", alt: "Home", active: false, path: "/" },
+  { type: "lucide", icon: "home", alt: "Dashboard", active: false, path: "/" },
   { type: "lucide", icon: "folder", alt: "List Page", active: true, path: "/projects" },
   { type: "lucide", icon: "settings", alt: "Settings", active: false, path: "/settings" },
 ];
@@ -38,13 +38,7 @@ export const sideNavSections: SideNavSection[] = [
   {
     title: "MAIN",
     items: [
-      { id: "home", label: "Home", path: "/" },
-      { id: "dashboard", label: "Dashboard", path: "/dashboard" },
-    ],
-  },
-  {
-    title: "FEATURES",
-    items: [
+      { id: "dashboard", label: "Dashboard", path: "/" },
       { id: "projects", label: "List Page", path: "/projects" },
     ],
   },
@@ -52,7 +46,6 @@ export const sideNavSections: SideNavSection[] = [
     title: "EXAMPLES",
     items: [
       { id: "demo", label: "Demo Page", path: "/demo" },
-      { id: "form-example", label: "Form Example", path: "/form-example" },
     ],
   },
   {

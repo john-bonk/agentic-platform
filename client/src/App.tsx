@@ -22,12 +22,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { 
-  HomePage, 
   DashboardPage, 
   ProjectsPage, 
   ItemDetailPage,
   DemoPage,
-  FormExamplePage,
   SettingsPage,
   NotFound 
 } from "@/pages";
@@ -45,9 +43,8 @@ function Router() {
         - Catch-all: <Route path="/docs/:rest*" component={DocsPage} />
       */}
       
-      {/* Home and Dashboard */}
-      <Route path="/" component={HomePage} />
-      <Route path="/dashboard" component={DashboardPage} />
+      {/* Dashboard - Main landing page */}
+      <Route path="/" component={DashboardPage} />
       
       {/* Features */}
       <Route path="/projects" component={ProjectsPage} />
@@ -55,8 +52,6 @@ function Router() {
       
       {/* Examples - Demonstrating different UI patterns */}
       <Route path="/demo" component={DemoPage} />
-      <Route path="/form-example" component={FormExamplePage} />
-      <Route path="/data-table" component={ProjectsPage} />
       
       {/* Settings */}
       <Route path="/settings" component={SettingsPage} />

@@ -1,8 +1,12 @@
 # Overview
 
-This is a clean, well-structured React + Express full-stack starter template. It provides a professional UI foundation with organized code patterns that are easy to learn from and extend.
+A generic, well-structured React + Express full-stack starter template. This template provides professional UI patterns including:
+- Dashboard with metrics, charts, and filterable data tables
+- List Page with hierarchical expandable rows (parent/child structure)
+- Detail Page with tabbed sections
+- Config-driven navigation system
 
-The application is built with a modern TypeScript stack featuring React on the frontend and Express on the backend, with support for both development and production environments.
+All content uses generic naming (Item 1, Category 1, Tab 1, etc.) making it easy to customize for any use case.
 
 # User Preferences
 
@@ -47,13 +51,11 @@ Preferred communication style: Simple, everyday language.
 - `client/src/components/layout/SideNavigation.tsx` - Side navigation panel
 - `client/src/components/layout/LeftIconNavbar.tsx` - Icon navbar
 
-### Example Pages
-- `client/src/pages/HomePage.tsx` - Landing page with quick links
-- `client/src/pages/DashboardPage.tsx` - Example dashboard with metrics and filter controls
-- `client/src/pages/ProjectsPage.tsx` - Example list page with table (clickable items open tabs)
-- `client/src/pages/ItemDetailPage.tsx` - Detail page with tabbed sections and accordions
+### Template Pages
+- `client/src/pages/DashboardPage.tsx` - Dashboard with metrics, charts, and data table (default landing page)
+- `client/src/pages/ProjectsPage.tsx` - List Page with hierarchical expandable rows
+- `client/src/pages/ItemDetailPage.tsx` - Detail page with tabbed sections (Tab 1-5)
 - `client/src/pages/DemoPage.tsx` - Component showcase
-- `client/src/pages/FormExamplePage.tsx` - Form handling example
 - `client/src/pages/SettingsPage.tsx` - Settings page example
 
 ### Backend
