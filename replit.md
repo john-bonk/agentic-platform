@@ -28,7 +28,13 @@ Preferred communication style: Simple, everyday language.
 **Key Design Patterns**:
 - Reusable layout components (AppLayout, PageHeader, SideNavigation)
 - Config-driven navigation system
+- List-to-detail navigation with header tabs (click item → opens tab with detail view)
 - Component composition with separated concerns
+
+**Tab Management** (Zustand store in `client/src/lib/tabStore.ts`):
+- Open tabs appear in AppHeader as clickable navigation items
+- Click item in list → opens new tab → navigates to detail page
+- Tabs can be closed, preserving navigation state
 
 ## Key Files and Folders
 
@@ -43,8 +49,9 @@ Preferred communication style: Simple, everyday language.
 
 ### Example Pages
 - `client/src/pages/HomePage.tsx` - Landing page with quick links
-- `client/src/pages/DashboardPage.tsx` - Example dashboard with metrics
-- `client/src/pages/ProjectsPage.tsx` - Example list page with table
+- `client/src/pages/DashboardPage.tsx` - Example dashboard with metrics and filter controls
+- `client/src/pages/ProjectsPage.tsx` - Example list page with table (clickable items open tabs)
+- `client/src/pages/ItemDetailPage.tsx` - Detail page with tabbed sections and accordions
 - `client/src/pages/DemoPage.tsx` - Component showcase
 - `client/src/pages/FormExamplePage.tsx` - Form handling example
 - `client/src/pages/SettingsPage.tsx` - Settings page example
