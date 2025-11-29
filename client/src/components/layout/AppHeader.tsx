@@ -1,78 +1,53 @@
+/**
+ * App Header Component
+ * 
+ * The top header bar with tabs and utility icons.
+ * Supports dynamic tabs that can be opened/closed.
+ * 
+ * Usage:
+ * <AppHeader />
+ * 
+ * TODO: Customize utility icons and tab behavior as needed
+ */
+
 import {
   BellIcon,
   BotIcon,
   ChevronDownIcon,
   ClockIcon,
-  FilesIcon,
   MailIcon,
-  PinIcon,
-  PlugIcon,
-  SettingsIcon,
   XIcon,
-  RefreshCcw,
-  Check,
+  PinIcon,
+  User,
 } from "lucide-react";
-import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useTabStore, ProcessTab } from "@/lib/tabStore";
+import { useTabStore, type Tab } from "@/lib/tabStore";
+import { useLocation } from "wouter";
 import { useEffect } from "react";
 
-interface HeaderSectionProps {
-  activeProcess?: {
-    id: string;
-    name: string;
-  } | null;
+interface AppHeaderProps {
+  activeTab?: Tab | null;
+  className?: string;
 }
 
-const baseTabs = [
-  {
-    icon: "x",
-    width: "w-10",
-    text: null,
-  },
-  {
-    icon: "pin",
-    width: "w-10",
-    text: null,
-  },
-];
-
 const utilityIcons = [
-  { icon: "bot", alt: "AB Assistant" },
-  { icon: "clock", alt: "Clock" },
-  { icon: "mail", alt: "Envelope" },
-  { icon: "bell", alt: "Bell" },
+  { icon: "bot", alt: "AI Assistant" },
+  { icon: "clock", alt: "Recent Activity" },
+  { icon: "mail", alt: "Messages" },
+  { icon: "bell", alt: "Notifications" },
 ];
 
-export const HeaderSection = ({ activeProcess }: HeaderSectionProps): JSX.Element => {
+export function AppHeader({ activeTab, className = "" }: AppHeaderProps) {
   const [, setLocation] = useLocation();
   const { openTabs, activeTabId, openTab, closeTab, setActiveTab } = useTabStore();
   
   useEffect(() => {
-    if (activeProcess) {
-      openTab(activeProcess);
+    if (activeTab) {
+      openTab(activeTab);
     } else {
       setActiveTab(null);
     }
-  }, [activeProcess?.id]);
-  
-  const getTabIcon = (iconName: string, isActive: boolean) => {
-    const colorClass = isActive ? "text-gray-700" : "text-gray-400";
-    switch (iconName) {
-      case "x":
-        return <XIcon className={`w-3 h-3 ${colorClass}`} />;
-      case "pin":
-        return <PinIcon className={`w-3 h-3 ${colorClass}`} />;
-      case "settings":
-        return <SettingsIcon className={`w-3 h-3 ${colorClass}`} />;
-      case "files":
-        return <FilesIcon className={`w-3 h-3 ${colorClass}`} />;
-      case "plug":
-        return <PlugIcon className={`w-3 h-[12.5px] ${colorClass}`} />;
-      default:
-        return null;
-    }
-  };
+  }, [activeTab?.id]);
 
   const getUtilityIcon = (iconName: string) => {
     switch (iconName) {
@@ -89,13 +64,6 @@ export const HeaderSection = ({ activeProcess }: HeaderSectionProps): JSX.Elemen
     }
   };
 
-  const BcmIcon = ({ className }: { className?: string }) => (
-    <div className={`relative flex items-center justify-center ${className}`}>
-      <RefreshCcw className="w-full h-full absolute" />
-      <Check className="w-[50%] h-[50%]" strokeWidth={3} />
-    </div>
-  );
-
   const handleCloseTab = (e: React.MouseEvent, tabId: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -108,42 +76,51 @@ export const HeaderSection = ({ activeProcess }: HeaderSectionProps): JSX.Elemen
       const closedIndex = openTabs.findIndex(t => t.id === tabId);
       const newActiveTab = remainingTabs[Math.min(closedIndex, remainingTabs.length - 1)];
       if (newActiveTab) {
-        setLocation(`/process/${newActiveTab.id}`);
+        setLocation(newActiveTab.path || '/');
       }
     }
   };
 
-  const handleTabClick = (tabId: string) => {
-    setActiveTab(tabId);
-    setLocation(`/process/${tabId}`);
+  const handleTabClick = (tab: Tab) => {
+    setActiveTab(tab.id);
+    if (tab.path) {
+      setLocation(tab.path);
+    }
   };
 
   return (
-    <header className="flex h-12 items-end justify-between pl-0 pr-2 py-0 w-full bg-gray-900 flex-shrink-0 sticky top-0 z-40">
+    <header 
+      className={`flex h-12 items-end justify-between pl-0 pr-2 py-0 w-full bg-gray-900 flex-shrink-0 sticky top-0 z-40 ${className}`}
+      data-testid="app-header"
+    >
       <nav className="inline-flex items-end gap-1 flex-[0_0_auto] h-full">
-        {baseTabs.map((tab, index) => (
-          <Button
-            key={index}
-            variant="ghost"
-            className={`flex ${tab.width} h-10 items-center justify-center gap-1.5 px-2 py-0 bg-gray-600 rounded-t-[4px] rounded-b-none hover:bg-gray-600`}
-            data-testid={`header-tab-${index}`}
-          >
-            {getTabIcon(tab.icon, false)}
-          </Button>
-        ))}
+        <Button
+          variant="ghost"
+          className="flex w-10 h-10 items-center justify-center gap-1.5 px-2 py-0 bg-gray-600 rounded-t-[4px] rounded-b-none hover:bg-gray-600"
+          data-testid="header-tab-close"
+        >
+          <XIcon className="w-3 h-3 text-gray-400" />
+        </Button>
+        
+        <Button
+          variant="ghost"
+          className="flex w-10 h-10 items-center justify-center gap-1.5 px-2 py-0 bg-gray-600 rounded-t-[4px] rounded-b-none hover:bg-gray-600"
+          data-testid="header-tab-pin"
+        >
+          <PinIcon className="w-3 h-3 text-gray-400" />
+        </Button>
         
         {openTabs.map((tab) => {
           const isActive = tab.id === activeTabId;
           return (
             <div
               key={tab.id}
-              onClick={() => handleTabClick(tab.id)}
+              onClick={() => handleTabClick(tab)}
               className={`flex h-10 items-center justify-start gap-2 px-3 py-0 rounded-t-[4px] rounded-b-none cursor-pointer ${
                 isActive ? "bg-white" : "bg-gray-600"
               }`}
-              data-testid={`header-tab-process-${tab.id}`}
+              data-testid={`header-tab-${tab.id}`}
             >
-              <BcmIcon className={`w-4 h-4 ${isActive ? "text-gray-700" : "text-white"}`} />
               <span className={`text-left font-semibold text-[14px] whitespace-nowrap ${
                 isActive ? "text-gray-900" : "text-white"
               }`}>
@@ -162,6 +139,7 @@ export const HeaderSection = ({ activeProcess }: HeaderSectionProps): JSX.Elemen
           );
         })}
       </nav>
+
       <div className="inline-flex items-center justify-end gap-3 h-full flex-[0_0_auto]">
         <div className="inline-flex items-center gap-1 flex-[0_0_auto]">
           {utilityIcons.map((item, index) => (
@@ -179,15 +157,15 @@ export const HeaderSection = ({ activeProcess }: HeaderSectionProps): JSX.Elemen
 
         <Button
           variant="ghost"
-          className="inline-flex h-10 items-center justify-center gap-[3px] flex-[0_0_auto] rounded hover:bg-gray-800 h-auto px-0"
+          className="inline-flex h-10 items-center justify-center gap-[3px] flex-[0_0_auto] rounded hover:bg-gray-800 px-0"
           data-testid="header-avatar-menu"
         >
-          <div className="relative w-6 h-6 bg-white rounded-full">
-            <div className="h-full rounded-full bg-[url(/figmaAssets/-faces.png)] bg-cover bg-[50%_50%]" />
+          <div className="relative w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
+            <User className="w-4 h-4 text-gray-300" />
           </div>
           <ChevronDownIcon className="w-4 h-4 text-gray-400" />
         </Button>
       </div>
     </header>
   );
-};
+}

@@ -1,6 +1,6 @@
 # Overview
 
-This is a full-stack web application for managing vulnerability imports and integrations, specifically designed to work with Tenable security data and AuditBoard. The application provides a multi-step wizard interface for configuring vulnerability import jobs, mapping assets and findings between systems, and managing integration workflows.
+This is a clean, well-structured React + Express full-stack starter template. It provides a professional UI foundation with organized code patterns that are easy to learn from and extend.
 
 The application is built with a modern TypeScript stack featuring React on the frontend and Express on the backend, with support for both development and production environments.
 
@@ -14,115 +14,92 @@ Preferred communication style: Simple, everyday language.
 
 **Technology Stack**: React 18+ with TypeScript, using Vite as the build tool and development server.
 
-**UI Framework**: The application uses shadcn/ui components (New York style variant) built on top of Radix UI primitives. This provides a comprehensive set of accessible, customizable UI components including dialogs, forms, tables, tabs, tooltips, and more.
+**UI Framework**: Shadcn/ui components built on Radix UI primitives with Tailwind CSS styling.
 
-**Styling**: Tailwind CSS with custom design tokens defined in CSS variables. The theme uses a neutral base color with teal accents for primary actions. Custom fonts include SF Pro Display, DM Sans, Fira Code, Geist Mono, and Architects Daughter.
+**Styling**: Tailwind CSS with custom design tokens defined in CSS variables. The theme uses a neutral base color with teal accents for primary actions.
 
 **State Management**: 
-- React Query (@tanstack/react-query) for server state management with infinite stale time and disabled automatic refetching
-- Local state stores for specific features (e.g., `importJobStore` for managing import job subscriptions)
+- React Query (@tanstack/react-query) for server state management
+- Zustand for local UI state (tab management)
 - React Hook Form with Zod resolvers for form validation
 
-**Routing**: Wouter library for lightweight client-side routing with two main routes:
-- `/` - Main integrations page
-- `/vulnerability-import-wizard` - Multi-step import configuration wizard
+**Routing**: Wouter library for lightweight client-side routing.
 
 **Key Design Patterns**:
-- Component composition with separated concerns (Header, SideNavigation, MainContent sections)
-- Multi-step wizard pattern with step indicators and navigation
-- Custom hooks for mobile responsiveness and toast notifications
-- Query client with custom fetch wrapper handling 401 responses
+- Reusable layout components (AppLayout, PageHeader, SideNavigation)
+- Config-driven navigation system
+- Component composition with separated concerns
+
+## Key Files and Folders
+
+### Navigation Configuration
+- `client/src/config/navigation.ts` - Central navigation config for icon navbar and side navigation
+
+### Layout Components
+- `client/src/components/layout/AppLayout.tsx` - Main page wrapper
+- `client/src/components/layout/PageHeader.tsx` - Reusable page header
+- `client/src/components/layout/SideNavigation.tsx` - Side navigation panel
+- `client/src/components/layout/LeftIconNavbar.tsx` - Icon navbar
+
+### Example Pages
+- `client/src/pages/HomePage.tsx` - Landing page with quick links
+- `client/src/pages/DashboardPage.tsx` - Example dashboard with metrics
+- `client/src/pages/ProjectsPage.tsx` - Example list page with table
+- `client/src/pages/DemoPage.tsx` - Component showcase
+- `client/src/pages/FormExamplePage.tsx` - Form handling example
+- `client/src/pages/SettingsPage.tsx` - Settings page example
+
+### Backend
+- `server/routes.ts` - API route definitions
+- `server/storage.ts` - Data storage layer (in-memory)
+- `shared/schema.ts` - Database schemas and types
 
 ## Backend Architecture
 
-**Technology Stack**: Express.js with TypeScript running on Node.js, using ESM module format.
+**Technology Stack**: Express.js with TypeScript running on Node.js.
 
-**Development Server**: Custom Vite integration in development mode with:
-- Hot Module Replacement (HMR) over the HTTP server
-- Runtime error overlays
-- Replit-specific plugins (cartographer, dev-banner) in Replit environment
-- Custom logging middleware for API requests
-
-**API Structure**: RESTful API with `/api` prefix for all routes. The application uses a storage abstraction layer (`IStorage` interface) with an in-memory implementation (`MemStorage`) for development.
+**API Structure**: RESTful API with `/api` prefix for all routes.
 
 **Storage Layer**: 
 - Interface-based design allowing multiple storage implementations
-- Currently implements in-memory storage with Map-based data structures
-- Prepared for database integration with Drizzle ORM schema definitions
+- Currently implements in-memory storage
+- Prepared for database integration with Drizzle ORM
 
-**Build Process**:
-- Frontend: Vite build outputting to `dist/public`
-- Backend: ESBuild bundling server code to `dist/index.js`
-- Separate TypeScript compilation check via `tsc`
-
-**Key Design Patterns**:
-- Dependency injection via storage interface
-- Middleware-based request/response logging
-- Error handling middleware with status code normalization
-- Separate route registration abstraction
-
-## Data Storage Solutions
+## Data Storage
 
 **ORM**: Drizzle ORM configured for PostgreSQL with:
 - Schema location: `./shared/schema.ts`
-- Migrations directory: `./migrations`
 - Type-safe schema definitions using Drizzle's type inference
 
-**Database Schema** (Prepared):
-- `users` table with UUID primary keys (generated via PostgreSQL's `gen_random_uuid()`)
-- Unique username constraint
-- Password field (expects pre-hashed values)
-- Schema validation using Zod via `drizzle-zod`
+**Current State**: Application uses in-memory storage (`MemStorage`) but is prepared for PostgreSQL integration.
 
-**Current State**: Application uses in-memory storage (`MemStorage`) but is prepared to integrate with PostgreSQL via Neon serverless driver. The schema and configuration are ready, but database connection is not currently active.
+## How to Add a New Page
 
-**Migration Strategy**: Drizzle Kit push command (`npm run db:push`) configured for schema deployment.
+1. Create a component in `client/src/pages/`
+2. Import and add route in `client/src/App.tsx`
+3. Add navigation item in `client/src/config/navigation.ts`
 
-## Authentication and Authorization
+## How to Add an API Endpoint
 
-**Current State**: Authentication infrastructure is prepared but not actively implemented:
-- User schema exists with username/password fields
-- Storage interface includes user CRUD methods
-- No active authentication middleware or session management
-- Frontend query client has 401 response handling configured
-
-**Prepared Infrastructure**:
-- `connect-pg-simple` dependency suggests intention for PostgreSQL-backed sessions
-- User creation and retrieval methods in storage interface
+1. Define types in `shared/schema.ts`
+2. Add storage methods in `server/storage.ts`
+3. Create routes in `server/routes.ts`
 
 ## External Dependencies
 
-**Database Services**:
-- Neon Serverless PostgreSQL (via `@neondatabase/serverless` package)
-- Connection expected via `DATABASE_URL` environment variable
-
-**UI Component Libraries**:
-- Radix UI (comprehensive set of primitives for accessible components)
-- Embla Carousel for carousel functionality
-- Lucide React for icon components
-- Recharts for data visualization (prepared but not actively used)
+**UI Libraries**:
+- Radix UI primitives
+- Lucide React icons
+- React Hook Form + Zod
 
 **Development Tools**:
-- Replit-specific Vite plugins for development experience
-- TypeScript for type safety across the stack
-- PostCSS with Tailwind CSS and Autoprefixer
+- Vite for fast development
+- TypeScript across the stack
+- Tailwind CSS for styling
 
-**Form and Validation**:
-- React Hook Form for form state management
-- Zod for runtime type validation
-- @hookform/resolvers for integration between the two
+## Notable Decisions
 
-**Date Handling**:
-- date-fns library for date manipulation and formatting
-
-**Key Third-Party Integrations** (Application Domain):
-- Tenable (vulnerability scanning platform)
-- AuditBoard (compliance and audit management platform)
-- The application facilitates data synchronization between these systems
-
-**Notable Decisions**:
 - Uses wouter instead of React Router for smaller bundle size
-- Prefers Radix UI headless components with custom styling over pre-styled component libraries
-- Chooses Drizzle ORM over Prisma or TypeORM for lighter weight and better TypeScript inference
-- Uses Vite instead of webpack for faster development experience
-- Implements shared TypeScript types between client and server via `shared` directory
+- Prefers Radix UI headless components with Tailwind styling
+- Uses Drizzle ORM for type-safe database access
+- Implements shared types between client and server via `shared` directory

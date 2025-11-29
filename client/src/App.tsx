@@ -1,67 +1,74 @@
+/**
+ * Main Application Component
+ * 
+ * This is the root component that sets up:
+ * - React Query for data fetching
+ * - Routing configuration
+ * - Global providers (Tooltip, Toast)
+ * 
+ * To add a new page:
+ * 1. Create a component in src/pages/
+ * 2. Import it here
+ * 3. Add a Route below
+ * 4. Update navigation config in src/config/navigation.ts
+ * 
+ * TODO: Add your own routes and pages
+ */
+
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/not-found";
 
-import { Integrations } from "@/pages/Integrations";
-import { ProcessDetail } from "@/pages/ProcessDetail";
-import { VulnerabilityImportWizard } from "@/pages/wizard/VulnerabilityImportWizard";
-import { PlaceholderPage } from "@/pages/PlaceholderPage";
-import { IssuesPage } from "@/pages/IssuesPage";
-import { BCPWizardPage } from "@/pages/BCPWizardPage";
-import { BCPDetailPage } from "@/pages/BCPDetailPage";
+import { 
+  HomePage, 
+  DashboardPage, 
+  ProjectsPage, 
+  DemoPage,
+  FormExamplePage,
+  SettingsPage,
+  NotFound 
+} from "@/pages";
+
 function Router() {
   return (
     <Switch>
-      {/* Add pages below */}
-      <Route path="/" component={Integrations} />
-      <Route path="/business-continuity-plans" component={Integrations} />
-      <Route path="/process/:id">
-        {(params) => <ProcessDetail processId={params.id} />}
-      </Route>
-      <Route path="/create-bcp/:processId" component={BCPWizardPage} />
-      <Route path="/bcp/:bcpId" component={BCPDetailPage} />
-      <Route path="/vulnerability-import-wizard" component={VulnerabilityImportWizard} />
+      {/* 
+        Main Routes
+        Add your application routes here.
+        
+        Example route patterns:
+        - Static: <Route path="/about" component={AboutPage} />
+        - With params: <Route path="/items/:id">{(params) => <ItemDetail id={params.id} />}</Route>
+        - Catch-all: <Route path="/docs/:rest*" component={DocsPage} />
+      */}
       
-      {/* Dashboard */}
-      <Route path="/dashboard">
-        {() => <PlaceholderPage title="Dashboard" />}
-      </Route>
+      {/* Home and Dashboard */}
+      <Route path="/" component={HomePage} />
+      <Route path="/dashboard" component={DashboardPage} />
       
-      {/* Environment */}
-      <Route path="/business-impact-analyses">
-        {() => <PlaceholderPage title="Business Impact Analyses" />}
-      </Route>
-      <Route path="/scenario-tests">
-        {() => <PlaceholderPage title="Scenario Tests" />}
-      </Route>
-      <Route path="/issues" component={IssuesPage} />
+      {/* Features */}
+      <Route path="/projects" component={ProjectsPage} />
+      <Route path="/tasks" component={ProjectsPage} />
+      <Route path="/reports" component={DashboardPage} />
       
-      {/* Inventory */}
-      <Route path="/business-units">
-        {() => <PlaceholderPage title="Business Units" />}
-      </Route>
-      <Route path="/locations">
-        {() => <PlaceholderPage title="Locations" />}
-      </Route>
-      <Route path="/it-systems">
-        {() => <PlaceholderPage title="IT Systems" />}
-      </Route>
-      <Route path="/vendors">
-        {() => <PlaceholderPage title="Vendors" />}
-      </Route>
+      {/* Examples - Demonstrating different UI patterns */}
+      <Route path="/demo" component={DemoPage} />
+      <Route path="/form-example" component={FormExamplePage} />
+      <Route path="/data-table" component={ProjectsPage} />
       
-      {/* Administration */}
-      <Route path="/bia-templates">
-        {() => <PlaceholderPage title="BIA Templates" />}
-      </Route>
-      <Route path="/settings">
-        {() => <PlaceholderPage title="Settings" />}
-      </Route>
+      {/* Settings */}
+      <Route path="/settings" component={SettingsPage} />
+      <Route path="/profile" component={SettingsPage} />
       
-      {/* Fallback to 404 */}
+      {/* 
+        TODO: Add your custom routes here
+        Example:
+        <Route path="/my-feature" component={MyFeaturePage} />
+      */}
+      
+      {/* 404 - Must be last */}
       <Route component={NotFound} />
     </Switch>
   );
