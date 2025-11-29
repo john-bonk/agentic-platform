@@ -181,35 +181,35 @@ export function ItemDetailPage() {
                 <TabsList className="h-auto p-0 bg-transparent border-0">
                   <TabsTrigger 
                     value="overview"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
                     data-testid="tab-overview"
                   >
                     Overview
                   </TabsTrigger>
                   <TabsTrigger 
                     value="details"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
                     data-testid="tab-details"
                   >
                     Details
                   </TabsTrigger>
                   <TabsTrigger 
                     value="dependencies"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
                     data-testid="tab-dependencies"
                   >
                     Dependencies
                   </TabsTrigger>
                   <TabsTrigger 
                     value="activity"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
                     data-testid="tab-activity"
                   >
                     Activity
                   </TabsTrigger>
                   <TabsTrigger 
                     value="attachments"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
                     data-testid="tab-attachments"
                   >
                     Attachments
