@@ -39,7 +39,7 @@ interface SettingsSectionProps {
 
 function SettingsSection({ title, description, children }: SettingsSectionProps) {
   return (
-    <div className="flex gap-6 px-8 py-6">
+    <div className="flex gap-6 px-8 py-6 bg-[#F8FAFC]">
       <div className="flex flex-col gap-1.5 w-[350px] shrink-0">
         <h3 className="text-base font-semibold text-foreground">{title}</h3>
         <p className="text-sm text-muted-foreground">{description}</p>
