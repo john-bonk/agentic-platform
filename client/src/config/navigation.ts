@@ -36,34 +36,28 @@ export const iconNavItems: IconNavItem[] = [
  */
 export const sideNavSections: SideNavSection[] = [
   {
-    title: "DASHBOARDS",
+    title: "MAIN",
     items: [
+      { id: "home", label: "Home", path: "/" },
       { id: "dashboard", label: "Dashboard", path: "/dashboard" },
     ],
   },
   {
-    title: "ENVIRONMENT",
+    title: "FEATURES",
     items: [
-      { id: "business-processes", label: "Business Processes", path: "/projects" },
-      { id: "business-impact", label: "Business Impact Analyses", path: "/projects" },
-      { id: "continuity-plans", label: "Business Continuity Plans", path: "/projects" },
-      { id: "scenario-tests", label: "Scenario Tests", path: "/projects" },
-      { id: "issues", label: "Issues", path: "/projects" },
+      { id: "projects", label: "Projects", path: "/projects" },
     ],
   },
   {
-    title: "INVENTORY",
+    title: "EXAMPLES",
     items: [
-      { id: "business-units", label: "Business Units", path: "/projects" },
-      { id: "locations", label: "Locations", path: "/projects" },
-      { id: "it-systems", label: "IT Systems", path: "/projects" },
-      { id: "vendors", label: "Vendors", path: "/projects" },
+      { id: "demo", label: "Demo Page", path: "/demo" },
+      { id: "form-example", label: "Form Example", path: "/form-example" },
     ],
   },
   {
-    title: "ADMINISTRATION",
+    title: "SETTINGS",
     items: [
-      { id: "bia-templates", label: "BIA Templates", path: "/settings" },
       { id: "settings", label: "Settings", path: "/settings" },
     ],
   },
@@ -84,7 +78,7 @@ export const headerUtilityIcons = [
  * App Configuration
  */
 export const appConfig = {
-  name: "BCM",
-  shortName: "BCM",
+  name: "Starter Template",
+  shortName: "Template",
   logoPath: "/figmaAssets/auditboard-logo.png",
 };

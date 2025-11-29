@@ -1,10 +1,10 @@
 /**
- * Item Detail Page - Business Process Overview
+ * Item Detail Page
  * 
- * Detail view matching Figma design with:
+ * Detail view with Figma-style layout pattern:
  * - Title and action buttons header
- * - Quick info bar (Criticality, RTO, RPO, etc.)
- * - Tab navigation (Overview, BIA, Key Dependencies, BCP, Issues)
+ * - Quick info bar with key metrics
+ * - Tab navigation
  * - Two-column Details section
  */
 
@@ -21,101 +21,101 @@ import {
   Info
 } from "lucide-react";
 
-interface BusinessProcess {
+interface DetailItem {
   id: string;
   name: string;
-  criticality: "Low" | "Medium" | "High";
-  rto: string;
-  rpo: string;
-  processOwner: string;
-  biaLastUpdated: string;
+  priority: "Low" | "Medium" | "High";
+  targetDate: string;
+  estimatedTime: string;
+  owner: string;
+  lastUpdated: string;
   status: string;
   description: string;
-  businessUnits: string[];
-  relatedRisks: string[];
-  frameworks: string[];
-  controls: string[];
+  categories: string[];
+  relatedItems: string[];
+  tags: string[];
+  attachments: string[];
 }
 
-const businessProcesses: Record<string, BusinessProcess> = {
+const detailItems: Record<string, DetailItem> = {
   "1": {
     id: "1",
-    name: "Payment Processing",
-    criticality: "Low",
-    rto: "4 Hours",
-    rpo: "4 hours",
-    processOwner: "Dante Bradford",
-    biaLastUpdated: "June 20, 2024",
+    name: "Website Redesign",
+    priority: "High",
+    targetDate: "Q2 2024",
+    estimatedTime: "3 months",
+    owner: "Alice Johnson",
+    lastUpdated: "June 20, 2024",
     status: "Approved",
-    description: "Payment Processing ensures the smooth and secure transfer of funds between accounts, including customer payments, vendor transactions, and interbank transfers. This process is critical to daily banking operations and financial stability. The process includes automated clearinghouse (ACH) transactions, wire transfers, and card payment settlements.",
-    businessUnits: ["Treasury & Cash Management"],
-    relatedRisks: ["Credit Risk", "System Outages", "Data Breaches"],
-    frameworks: ["PCI-DSS", "SOX", "Anti-Money Laundering (AML) regulations", "Federal Reserve requirements"],
-    controls: ["Lorem Ipsum"],
+    description: "Complete overhaul of the company website with modern design and improved UX. This project includes updating the visual identity, improving navigation, optimizing for mobile devices, and implementing new features based on user feedback. The redesign will focus on conversion optimization and accessibility compliance.",
+    categories: ["Marketing", "Design"],
+    relatedItems: ["Brand Guidelines", "User Research", "Content Strategy"],
+    tags: ["Frontend", "UX", "Responsive Design", "Accessibility"],
+    attachments: ["Design Mockups"],
   },
   "2": {
     id: "2",
-    name: "Loan Origination",
-    criticality: "High",
-    rto: "2 Hours",
-    rpo: "1 hour",
-    processOwner: "Sarah Chen",
-    biaLastUpdated: "May 15, 2024",
+    name: "Mobile App Development",
+    priority: "High",
+    targetDate: "Q3 2024",
+    estimatedTime: "6 months",
+    owner: "Bob Smith",
+    lastUpdated: "May 15, 2024",
     status: "In Review",
-    description: "Loan Origination handles the end-to-end process of creating new loans, from application intake through approval and funding. This includes credit assessment, documentation verification, and regulatory compliance checks.",
-    businessUnits: ["Retail Banking Operations"],
-    relatedRisks: ["Credit Risk", "Compliance Risk", "Fraud Risk"],
-    frameworks: ["TILA", "RESPA", "Fair Lending Laws"],
-    controls: ["Credit Scoring Model", "Document Verification"],
+    description: "Native mobile application for iOS and Android platforms. This includes user authentication, push notifications, offline mode, and integration with existing backend services.",
+    categories: ["Engineering", "Mobile"],
+    relatedItems: ["API Documentation", "Security Audit"],
+    tags: ["iOS", "Android", "React Native"],
+    attachments: ["Technical Specs", "Wireframes"],
   },
   "3": {
     id: "3",
-    name: "Customer Service and Support",
-    criticality: "Medium",
-    rto: "24 Hours",
-    rpo: "4 hours",
-    processOwner: "Baylor Cruz",
-    biaLastUpdated: "April 10, 2024",
-    status: "Approved",
-    description: "Customer Service and Support provides assistance to customers through multiple channels including phone, email, and chat. This process handles inquiries, complaints, and service requests.",
-    businessUnits: ["Retail Banking Operations"],
-    relatedRisks: ["Reputation Risk", "Operational Risk"],
-    frameworks: ["Consumer Protection Act", "GDPR"],
-    controls: ["Call Recording", "Quality Monitoring"],
+    name: "API Integration",
+    priority: "Medium",
+    targetDate: "Q1 2024",
+    estimatedTime: "2 months",
+    owner: "Carol Davis",
+    lastUpdated: "April 10, 2024",
+    status: "Completed",
+    description: "Integration with third-party APIs for enhanced functionality including payment processing, analytics, and CRM synchronization.",
+    categories: ["Engineering", "Integration"],
+    relatedItems: ["Payment Gateway", "Analytics Dashboard"],
+    tags: ["API", "Backend", "Integration"],
+    attachments: ["API Docs"],
   },
   "4": {
     id: "4",
-    name: "Employee Onboarding",
-    criticality: "Low",
-    rto: "48 Hours",
-    rpo: "24 hours",
-    processOwner: "Dante Bradford",
-    biaLastUpdated: "March 5, 2024",
+    name: "Database Migration",
+    priority: "Low",
+    targetDate: "Q4 2024",
+    estimatedTime: "4 months",
+    owner: "David Wilson",
+    lastUpdated: "March 5, 2024",
     status: "Draft",
-    description: "Employee Onboarding manages the process of integrating new employees into the organization, including documentation, system access provisioning, and training coordination.",
-    businessUnits: ["Human Resources"],
-    relatedRisks: ["Compliance Risk", "Security Risk"],
-    frameworks: ["Employment Law", "Data Protection"],
-    controls: ["Background Checks", "Access Controls"],
+    description: "Migrate legacy database to modern cloud infrastructure with improved performance and scalability.",
+    categories: ["Infrastructure", "Database"],
+    relatedItems: ["Cloud Setup", "Data Backup"],
+    tags: ["PostgreSQL", "AWS", "Migration"],
+    attachments: ["Migration Plan"],
   },
   "5": {
     id: "5",
-    name: "Payroll Processing",
-    criticality: "High",
-    rto: "4 Hours",
-    rpo: "1 hour",
-    processOwner: "Dante Bradford",
-    biaLastUpdated: "June 1, 2024",
+    name: "Security Audit",
+    priority: "High",
+    targetDate: "Q2 2024",
+    estimatedTime: "1 month",
+    owner: "Eve Martinez",
+    lastUpdated: "June 1, 2024",
     status: "Approved",
-    description: "Payroll Processing handles the calculation and distribution of employee compensation, including salary, benefits, taxes, and deductions.",
-    businessUnits: ["Human Resources"],
-    relatedRisks: ["Financial Risk", "Compliance Risk"],
-    frameworks: ["Tax Regulations", "Labor Laws"],
-    controls: ["Segregation of Duties", "Audit Trail"],
+    description: "Comprehensive security assessment and vulnerability testing across all systems and applications.",
+    categories: ["Security", "Compliance"],
+    relatedItems: ["Penetration Test", "Compliance Report"],
+    tags: ["Security", "Audit", "Compliance"],
+    attachments: ["Security Checklist"],
   },
 };
 
-const getCriticalityBadge = (criticality: string) => {
+const getPriorityBadge = (priority: string) => {
   const styles: Record<string, string> = {
     Low: "bg-green-100 text-green-700 border-green-200",
     Medium: "bg-amber-100 text-amber-700 border-amber-200",
@@ -125,9 +125,9 @@ const getCriticalityBadge = (criticality: string) => {
   return (
     <Badge 
       variant="outline" 
-      className={`text-xs ${styles[criticality] || "bg-gray-100 text-gray-700 border-gray-200"}`}
+      className={`text-xs ${styles[priority] || "bg-gray-100 text-gray-700 border-gray-200"}`}
     >
-      {criticality}
+      {priority}
     </Badge>
   );
 };
@@ -135,34 +135,34 @@ const getCriticalityBadge = (criticality: string) => {
 export function ItemDetailPage() {
   const [, params] = useRoute("/items/:id");
   const itemId = params?.id || "1";
-  const process = businessProcesses[itemId] || businessProcesses["1"];
+  const item = detailItems[itemId] || detailItems["1"];
   
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
     <AppLayout 
       activeTab={{ 
-        id: process.id, 
-        name: process.name, 
-        path: `/items/${process.id}` 
+        id: item.id, 
+        name: item.name, 
+        path: `/items/${item.id}` 
       }}
     >
       <div className="flex flex-col h-full overflow-hidden bg-white">
         <div className="flex items-center justify-between px-8 py-5 bg-white">
-          <h1 className="text-xl font-semibold text-gray-900">{process.name}</h1>
+          <h1 className="text-xl font-semibold text-gray-900">{item.name}</h1>
           <div className="flex items-center gap-2">
             <Button 
               className="bg-teal-600 hover:bg-teal-700"
-              data-testid="button-send-questionnaire"
+              data-testid="button-primary-action"
             >
-              Send Questionnaire
+              Submit for Review
             </Button>
             <Button 
               variant="outline" 
               className="gap-2"
               data-testid="button-status"
             >
-              {process.status}
+              {item.status}
               <ChevronDown className="w-4 h-4" />
             </Button>
             <Button variant="ghost" size="icon" data-testid="button-alert">
@@ -185,32 +185,32 @@ export function ItemDetailPage() {
                 Overview
               </TabsTrigger>
               <TabsTrigger 
-                value="bia"
+                value="details"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
-                data-testid="tab-bia"
+                data-testid="tab-details"
               >
-                BIA
+                Details
               </TabsTrigger>
               <TabsTrigger 
                 value="dependencies"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
                 data-testid="tab-dependencies"
               >
-                Key Dependencies
+                Dependencies
               </TabsTrigger>
               <TabsTrigger 
-                value="bcp"
+                value="activity"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
-                data-testid="tab-bcp"
+                data-testid="tab-activity"
               >
-                BCP
+                Activity
               </TabsTrigger>
               <TabsTrigger 
-                value="issues"
+                value="attachments"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium px-4 py-3 text-gray-600"
-                data-testid="tab-issues"
+                data-testid="tab-attachments"
               >
-                Issues
+                Attachments
               </TabsTrigger>
             </TabsList>
           </div>
@@ -218,28 +218,28 @@ export function ItemDetailPage() {
           <div className="flex-1 overflow-auto bg-white">
             <TabsContent value="overview" className="m-0">
               <div className="px-8 py-4 border-b border-gray-100">
-                <div className="flex items-center gap-12">
+                <div className="flex items-center gap-12 flex-wrap">
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">Criticality</span>
+                    <span className="text-xs text-gray-500">Priority</span>
                     <div className="mt-1">
-                      {getCriticalityBadge(process.criticality)}
+                      {getPriorityBadge(item.priority)}
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">RTO</span>
-                    <span className="text-sm text-gray-900 mt-1">{process.rto}</span>
+                    <span className="text-xs text-gray-500">Target Date</span>
+                    <span className="text-sm text-gray-900 mt-1">{item.targetDate}</span>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">RPO</span>
-                    <span className="text-sm text-gray-400 mt-1">{process.rpo}</span>
+                    <span className="text-xs text-gray-500">Estimated Time</span>
+                    <span className="text-sm text-gray-400 mt-1">{item.estimatedTime}</span>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">Process Owner</span>
-                    <span className="text-sm text-gray-900 mt-1">{process.processOwner}</span>
+                    <span className="text-xs text-gray-500">Owner</span>
+                    <span className="text-sm text-gray-900 mt-1">{item.owner}</span>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-xs text-gray-500">BIA Last Updated</span>
-                    <span className="text-sm text-gray-900 mt-1">{process.biaLastUpdated}</span>
+                    <span className="text-xs text-gray-500">Last Updated</span>
+                    <span className="text-sm text-gray-900 mt-1">{item.lastUpdated}</span>
                   </div>
                 </div>
               </div>
@@ -247,14 +247,14 @@ export function ItemDetailPage() {
               <div className="px-8 py-6">
                 <h2 className="text-base font-semibold text-gray-900 mb-6">Details</h2>
                 
-                <div className="grid grid-cols-2 gap-x-16 gap-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-6">
                   <div className="space-y-6">
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-1">
                         <span className="text-sm text-gray-500">Name</span>
                         <Info className="w-3 h-3 text-gray-400" />
                       </div>
-                      <span className="text-sm text-gray-900">{process.name}</span>
+                      <span className="text-sm text-gray-900">{item.name}</span>
                     </div>
                     
                     <div className="flex flex-col gap-2">
@@ -262,54 +262,35 @@ export function ItemDetailPage() {
                         <span className="text-sm text-gray-500">Description</span>
                         <Info className="w-3 h-3 text-gray-400" />
                       </div>
-                      <p className="text-sm text-gray-900 leading-relaxed">{process.description}</p>
+                      <p className="text-sm text-gray-900 leading-relaxed">{item.description}</p>
                     </div>
                     
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Process Owner</span>
+                        <span className="text-sm text-gray-500">Owner</span>
                         <Info className="w-3 h-3 text-gray-400" />
                       </div>
-                      <span className="text-sm text-gray-900">{process.processOwner}</span>
+                      <span className="text-sm text-gray-900">{item.owner}</span>
                     </div>
                   </div>
 
                   <div className="space-y-6">
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Business Units</span>
+                        <span className="text-sm text-gray-500">Categories</span>
                         <Info className="w-3 h-3 text-gray-400" />
                       </div>
                       <div className="flex flex-wrap gap-1">
-                        {process.businessUnits.map((unit, idx) => (
-                          <a 
-                            key={idx} 
-                            href="#" 
-                            className="text-sm text-blue-600 hover:underline"
-                            data-testid={`link-business-unit-${idx}`}
-                          >
-                            {unit}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Related Risks</span>
-                        <Info className="w-3 h-3 text-gray-400" />
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {process.relatedRisks.map((risk, idx) => (
+                        {item.categories.map((category, idx) => (
                           <span key={idx}>
                             <a 
                               href="#" 
                               className="text-sm text-blue-600 hover:underline"
-                              data-testid={`link-risk-${idx}`}
+                              data-testid={`link-category-${idx}`}
                             >
-                              {risk}
+                              {category}
                             </a>
-                            {idx < process.relatedRisks.length - 1 && <span className="text-gray-400">, </span>}
+                            {idx < item.categories.length - 1 && <span className="text-gray-400">, </span>}
                           </span>
                         ))}
                       </div>
@@ -317,20 +298,20 @@ export function ItemDetailPage() {
                     
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Frameworks</span>
+                        <span className="text-sm text-gray-500">Related Items</span>
                         <Info className="w-3 h-3 text-gray-400" />
                       </div>
                       <div className="flex flex-wrap gap-1">
-                        {process.frameworks.map((framework, idx) => (
+                        {item.relatedItems.map((relatedItem, idx) => (
                           <span key={idx}>
                             <a 
                               href="#" 
                               className="text-sm text-blue-600 hover:underline"
-                              data-testid={`link-framework-${idx}`}
+                              data-testid={`link-related-${idx}`}
                             >
-                              {framework}
+                              {relatedItem}
                             </a>
-                            {idx < process.frameworks.length - 1 && <span className="text-gray-400">, </span>}
+                            {idx < item.relatedItems.length - 1 && <span className="text-gray-400">, </span>}
                           </span>
                         ))}
                       </div>
@@ -338,18 +319,39 @@ export function ItemDetailPage() {
                     
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-1">
-                        <span className="text-sm text-gray-500">Controls</span>
+                        <span className="text-sm text-gray-500">Tags</span>
                         <Info className="w-3 h-3 text-gray-400" />
                       </div>
                       <div className="flex flex-wrap gap-1">
-                        {process.controls.map((control, idx) => (
+                        {item.tags.map((tag, idx) => (
+                          <span key={idx}>
+                            <a 
+                              href="#" 
+                              className="text-sm text-blue-600 hover:underline"
+                              data-testid={`link-tag-${idx}`}
+                            >
+                              {tag}
+                            </a>
+                            {idx < item.tags.length - 1 && <span className="text-gray-400">, </span>}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm text-gray-500">Attachments</span>
+                        <Info className="w-3 h-3 text-gray-400" />
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {item.attachments.map((attachment, idx) => (
                           <a 
                             key={idx} 
                             href="#" 
                             className="text-sm text-blue-600 hover:underline"
-                            data-testid={`link-control-${idx}`}
+                            data-testid={`link-attachment-${idx}`}
                           >
-                            {control}
+                            {attachment}
                           </a>
                         ))}
                       </div>
@@ -359,31 +361,31 @@ export function ItemDetailPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="bia" className="p-8 m-0">
+            <TabsContent value="details" className="p-8 m-0">
               <div className="text-center py-16 text-gray-500">
-                <p className="text-sm font-medium">Business Impact Analysis</p>
-                <p className="text-xs mt-1">BIA content will be displayed here</p>
+                <p className="text-sm font-medium">Additional Details</p>
+                <p className="text-xs mt-1">More details will be displayed here</p>
               </div>
             </TabsContent>
 
             <TabsContent value="dependencies" className="p-8 m-0">
               <div className="text-center py-16 text-gray-500">
-                <p className="text-sm font-medium">Key Dependencies</p>
-                <p className="text-xs mt-1">Dependencies content will be displayed here</p>
+                <p className="text-sm font-medium">Dependencies</p>
+                <p className="text-xs mt-1">Dependencies will be displayed here</p>
               </div>
             </TabsContent>
 
-            <TabsContent value="bcp" className="p-8 m-0">
+            <TabsContent value="activity" className="p-8 m-0">
               <div className="text-center py-16 text-gray-500">
-                <p className="text-sm font-medium">Business Continuity Plan</p>
-                <p className="text-xs mt-1">BCP content will be displayed here</p>
+                <p className="text-sm font-medium">Activity Log</p>
+                <p className="text-xs mt-1">Activity history will be displayed here</p>
               </div>
             </TabsContent>
 
-            <TabsContent value="issues" className="p-8 m-0">
+            <TabsContent value="attachments" className="p-8 m-0">
               <div className="text-center py-16 text-gray-500">
-                <p className="text-sm font-medium">Issues</p>
-                <p className="text-xs mt-1">Issues will be displayed here</p>
+                <p className="text-sm font-medium">Attachments</p>
+                <p className="text-xs mt-1">File attachments will be displayed here</p>
               </div>
             </TabsContent>
           </div>
