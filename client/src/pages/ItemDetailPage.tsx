@@ -148,7 +148,7 @@ export function ItemDetailPage() {
       }}
     >
       <div className="flex flex-col h-full overflow-auto bg-[#ffffff]">
-        <div className="p-6">
+        <div className="p-6 pt-[0px] pb-[0px]">
           <div className="bg-white rounded-md">
             <div className="flex items-center justify-between px-8 py-5">
               <h1 className="text-xl font-semibold text-gray-900">{item.name}</h1>
