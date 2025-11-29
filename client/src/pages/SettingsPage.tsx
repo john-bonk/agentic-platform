@@ -44,7 +44,7 @@ function SettingsSection({ title, description, children }: SettingsSectionProps)
         <h3 className="text-base font-semibold text-foreground">{title}</h3>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
-      <div className="flex-1 bg-card border border-border rounded-md p-6">
+      <div className="flex-1 border border-border rounded-md p-6 bg-[#ffffff]">
         <div className="flex flex-col gap-4">
           {children}
         </div>
