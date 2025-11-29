@@ -46,14 +46,14 @@ interface HierarchyItem {
 
 const exampleData: HierarchyItem[] = [
   { 
-    id: "1", 
+    id: "hier-1", 
     name: "North America",
     type: "Region",
     dateCreated: "2023-01-15",
     allowedOn: ["Plans", "Exercises"],
     children: [
       { 
-        id: "1-1", 
+        id: "hier-1-1", 
         name: "United States", 
         parent: "North America",
         type: "Country", 
@@ -61,64 +61,64 @@ const exampleData: HierarchyItem[] = [
         allowedOn: ["Plans", "Exercises"],
         children: [
           { 
-            id: "1-1-1", 
+            id: "hier-1-1-1", 
             name: "California", 
             parent: "United States",
             type: "State", 
             dateCreated: "2023-03-05",
             allowedOn: ["Plans"],
             children: [
-              { id: "1-1-1-1", name: "Los Angeles", parent: "California", type: "City", dateCreated: "2023-04-01", allowedOn: ["Plans"] },
-              { id: "1-1-1-2", name: "San Francisco", parent: "California", type: "City", dateCreated: "2023-04-02", allowedOn: ["Plans"] },
+              { id: "hier-1-1-1-1", name: "Los Angeles", parent: "California", type: "City", dateCreated: "2023-04-01", allowedOn: ["Plans"] },
+              { id: "hier-1-1-1-2", name: "San Francisco", parent: "California", type: "City", dateCreated: "2023-04-02", allowedOn: ["Plans"] },
             ]
           },
           { 
-            id: "1-1-2", 
+            id: "hier-1-1-2", 
             name: "New York", 
             parent: "United States",
             type: "State", 
             dateCreated: "2023-03-10",
             allowedOn: ["Plans", "Exercises"],
             children: [
-              { id: "1-1-2-1", name: "New York City", parent: "New York", type: "City", dateCreated: "2023-04-05", allowedOn: ["Plans", "Exercises"] },
+              { id: "hier-1-1-2-1", name: "New York City", parent: "New York", type: "City", dateCreated: "2023-04-05", allowedOn: ["Plans", "Exercises"] },
             ]
           },
         ]
       },
       { 
-        id: "1-2", 
+        id: "hier-1-2", 
         name: "Canada", 
         parent: "North America",
         type: "Country", 
         dateCreated: "2023-02-15",
         allowedOn: ["Plans"],
         children: [
-          { id: "1-2-1", name: "Ontario", parent: "Canada", type: "State", dateCreated: "2023-03-20", allowedOn: ["Plans"] },
-          { id: "1-2-2", name: "British Columbia", parent: "Canada", type: "State", dateCreated: "2023-03-21", allowedOn: ["Plans"] },
+          { id: "hier-1-2-1", name: "Ontario", parent: "Canada", type: "State", dateCreated: "2023-03-20", allowedOn: ["Plans"] },
+          { id: "hier-1-2-2", name: "British Columbia", parent: "Canada", type: "State", dateCreated: "2023-03-21", allowedOn: ["Plans"] },
         ]
       },
     ]
   },
   { 
-    id: "2", 
+    id: "hier-2", 
     name: "Europe",
     type: "Region",
     dateCreated: "2023-01-20",
     allowedOn: ["Plans", "Exercises"],
     children: [
       { 
-        id: "2-1", 
+        id: "hier-2-1", 
         name: "United Kingdom", 
         parent: "Europe",
         type: "Country", 
         dateCreated: "2023-02-20",
         allowedOn: ["Plans", "Exercises"],
         children: [
-          { id: "2-1-1", name: "England", parent: "United Kingdom", type: "State", dateCreated: "2023-03-25", allowedOn: ["Plans"] },
+          { id: "hier-2-1-1", name: "England", parent: "United Kingdom", type: "State", dateCreated: "2023-03-25", allowedOn: ["Plans"] },
         ]
       },
       { 
-        id: "2-2", 
+        id: "hier-2-2", 
         name: "Germany", 
         parent: "Europe",
         type: "Country", 
@@ -128,14 +128,14 @@ const exampleData: HierarchyItem[] = [
     ]
   },
   { 
-    id: "3", 
+    id: "hier-3", 
     name: "Asia Pacific",
     type: "Region",
     dateCreated: "2023-01-25",
     allowedOn: ["Plans"],
     children: [
       { 
-        id: "3-1", 
+        id: "hier-3-1", 
         name: "Japan", 
         parent: "Asia Pacific",
         type: "Country", 
@@ -143,7 +143,7 @@ const exampleData: HierarchyItem[] = [
         allowedOn: ["Plans"],
       },
       { 
-        id: "3-2", 
+        id: "hier-3-2", 
         name: "Australia", 
         parent: "Asia Pacific",
         type: "Country", 
