@@ -9,7 +9,7 @@
 
 export type IconNavItem = 
   | { type: "image"; src: string; alt: string; active: boolean; path?: string }
-  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder"; alt: string; active: boolean; path?: string };
+  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch"; alt: string; active: boolean; path?: string };
 
 export interface SideNavSection {
   title: string;
@@ -24,7 +24,8 @@ export interface SideNavSection {
  */
 export const iconNavItems: IconNavItem[] = [
   { type: "lucide", icon: "home", alt: "Dashboard", active: false, path: "/" },
-  { type: "lucide", icon: "folder", alt: "List Page", active: true, path: "/projects" },
+  { type: "lucide", icon: "list", alt: "List Page", active: false, path: "/list" },
+  { type: "lucide", icon: "git-branch", alt: "Hierarchy", active: true, path: "/hierarchy" },
   { type: "lucide", icon: "settings", alt: "Settings", active: false, path: "/settings" },
 ];
 
@@ -39,7 +40,8 @@ export const sideNavSections: SideNavSection[] = [
     title: "MAIN",
     items: [
       { id: "dashboard", label: "Dashboard", path: "/" },
-      { id: "projects", label: "List Page", path: "/projects" },
+      { id: "list", label: "List Page", path: "/list" },
+      { id: "hierarchy", label: "Hierarchy", path: "/hierarchy" },
     ],
   },
   {

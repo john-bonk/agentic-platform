@@ -23,7 +23,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { 
   DashboardPage, 
-  ProjectsPage, 
+  ListPage,
+  HierarchyPage,
   ItemDetailPage,
   DemoPage,
   SettingsPage,
@@ -47,7 +48,8 @@ function Router() {
       <Route path="/" component={DashboardPage} />
       
       {/* Features */}
-      <Route path="/projects" component={ProjectsPage} />
+      <Route path="/list" component={ListPage} />
+      <Route path="/hierarchy" component={HierarchyPage} />
       <Route path="/items/:id" component={ItemDetailPage} />
       
       {/* Examples - Demonstrating different UI patterns */}

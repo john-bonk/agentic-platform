@@ -2,11 +2,12 @@
 
 A generic, well-structured React + Express full-stack starter template. This template provides professional UI patterns including:
 - Dashboard with metrics, charts, and filterable data tables
-- List Page with hierarchical expandable rows (parent/child structure)
+- List Page with flat table format (no nesting)
+- Hierarchy Page with multi-level expandable rows (Region > Country > State > City)
 - Detail Page with tabbed sections
 - Config-driven navigation system
 
-All content uses generic naming (Item 1, Category 1, Tab 1, etc.) making it easy to customize for any use case.
+All content uses generic naming making it easy to customize for any use case. Design uses #266C92 teal as the primary accent color.
 
 # User Preferences
 
@@ -53,7 +54,8 @@ Preferred communication style: Simple, everyday language.
 
 ### Template Pages
 - `client/src/pages/DashboardPage.tsx` - Dashboard with metrics, charts, and data table (default landing page)
-- `client/src/pages/ProjectsPage.tsx` - List Page with hierarchical expandable rows
+- `client/src/pages/ListPage.tsx` - Flat table with search, filters, and item selection
+- `client/src/pages/HierarchyPage.tsx` - Multi-level hierarchical data with expandable rows (NAME, PARENT, TYPE, DATE CREATED, ALLOWED ON columns)
 - `client/src/pages/ItemDetailPage.tsx` - Detail page with tabbed sections (Tab 1-5)
 - `client/src/pages/DemoPage.tsx` - Component showcase
 - `client/src/pages/SettingsPage.tsx` - Settings page example
