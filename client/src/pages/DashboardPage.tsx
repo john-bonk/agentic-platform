@@ -57,25 +57,25 @@ const metricByCategory = [
   { name: "Category 4", q1: 20, q2: 15, q3: 25, q4: 20 },
 ];
 
-const riskTrendData = [
-  { month: "Jan", low: 20, medium: 45, high: 70 },
-  { month: "Feb", low: 25, medium: 50, high: 65 },
-  { month: "Mar", low: 22, medium: 55, high: 60 },
-  { month: "Apr", low: 28, medium: 48, high: 55 },
-  { month: "May", low: 30, medium: 52, high: 50 },
-  { month: "Jun", low: 25, medium: 50, high: 45 },
-  { month: "Jul", low: 28, medium: 48, high: 40 },
-  { month: "Aug", low: 32, medium: 45, high: 38 },
-  { month: "Sep", low: 30, medium: 42, high: 35 },
-  { month: "Oct", low: 28, medium: 40, high: 32 },
-  { month: "Nov", low: 25, medium: 38, high: 30 },
-  { month: "Dec", low: 22, medium: 35, high: 28 },
+const trendData = [
+  { month: "Jan", series1: 20, series2: 45, series3: 70 },
+  { month: "Feb", series1: 25, series2: 50, series3: 65 },
+  { month: "Mar", series1: 22, series2: 55, series3: 60 },
+  { month: "Apr", series1: 28, series2: 48, series3: 55 },
+  { month: "May", series1: 30, series2: 52, series3: 50 },
+  { month: "Jun", series1: 25, series2: 50, series3: 45 },
+  { month: "Jul", series1: 28, series2: 48, series3: 40 },
+  { month: "Aug", series1: 32, series2: 45, series3: 38 },
+  { month: "Sep", series1: 30, series2: 42, series3: 35 },
+  { month: "Oct", series1: 28, series2: 40, series3: 32 },
+  { month: "Nov", series1: 25, series2: 38, series3: 30 },
+  { month: "Dec", series1: 22, series2: 35, series3: 28 },
 ];
 
 const distributionData = [
-  { name: "Complete", value: 61, color: "#22c55e" },
-  { name: "Pending", value: 24, color: "#ef4444" },
-  { name: "Not Started", value: 15, color: "#94a3b8" },
+  { name: "Complete", value: 61, color: "#266C92" },
+  { name: "Pending", value: 24, color: "#94a3b8" },
+  { name: "Not Started", value: 15, color: "#e2e8f0" },
 ];
 
 const dashboardItems = [
@@ -289,28 +289,28 @@ export function DashboardPage() {
                       <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => v} fontSize={10} />
                       <YAxis type="category" dataKey="name" width={80} fontSize={10} />
                       <Tooltip />
-                      <Bar dataKey="q1" fill="#3b82f6" name="Q1" />
-                      <Bar dataKey="q2" fill="#1d4ed8" name="Q2" />
-                      <Bar dataKey="q3" fill="#60a5fa" name="Q3" />
-                      <Bar dataKey="q4" fill="#93c5fd" name="Q4" />
+                      <Bar dataKey="q1" fill="#266C92" name="Q1" />
+                      <Bar dataKey="q2" fill="#1e5a7a" name="Q2" />
+                      <Bar dataKey="q3" fill="#5ba0c4" name="Q3" />
+                      <Bar dataKey="q4" fill="#94c8de" name="Q4" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="flex items-center justify-center gap-4 mt-2 text-xs">
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-blue-500" />
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#266C92" }} />
                     <span>Q1</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-blue-700" />
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#1e5a7a" }} />
                     <span>Q2</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-blue-400" />
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#5ba0c4" }} />
                     <span>Q3</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-blue-300" />
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#94c8de" }} />
                     <span>Q4</span>
                   </div>
                 </div>
@@ -324,29 +324,29 @@ export function DashboardPage() {
               <div className="px-4 pb-4">
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={riskTrendData}>
+                    <LineChart data={trendData}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" fontSize={10} />
                       <YAxis domain={[0, 100]} fontSize={10} />
                       <Tooltip />
-                      <Line type="monotone" dataKey="low" stroke="#22c55e" strokeWidth={2} dot={false} name="Low" />
-                      <Line type="monotone" dataKey="medium" stroke="#f59e0b" strokeWidth={2} dot={false} name="Medium" />
-                      <Line type="monotone" dataKey="high" stroke="#ef4444" strokeWidth={2} dot={false} name="High" />
+                      <Line type="monotone" dataKey="series1" stroke="#266C92" strokeWidth={2} dot={false} name="Series 1" />
+                      <Line type="monotone" dataKey="series2" stroke="#5ba0c4" strokeWidth={2} dot={false} name="Series 2" />
+                      <Line type="monotone" dataKey="series3" stroke="#94a3b8" strokeWidth={2} dot={false} name="Series 3" />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="flex items-center justify-center gap-4 mt-2 text-xs">
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span>Low</span>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#266C92" }} />
+                    <span>Series 1</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-amber-500" />
-                    <span>Medium</span>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#5ba0c4" }} />
+                    <span>Series 2</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <span>High</span>
+                    <div className="w-3 h-3 rounded-full bg-slate-400" />
+                    <span>Series 3</span>
                   </div>
                 </div>
               </div>
@@ -383,16 +383,16 @@ export function DashboardPage() {
                 </div>
                 <div className="flex items-center justify-center gap-4 mt-2 text-xs">
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-sm bg-gray-400" />
-                    <span>Not Started</span>
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#266C92" }} />
+                    <span>Complete</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-sm bg-red-500" />
+                    <div className="w-3 h-3 rounded-sm bg-slate-400" />
                     <span>Pending</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-sm bg-green-500" />
-                    <span>Complete</span>
+                    <div className="w-3 h-3 rounded-sm bg-slate-200" />
+                    <span>Not Started</span>
                   </div>
                 </div>
               </div>

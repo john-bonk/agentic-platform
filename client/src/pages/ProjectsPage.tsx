@@ -160,7 +160,7 @@ export function ProjectsPage() {
           description="Example list page with hierarchical data"
           actions={
             <Button 
-              className="gap-2 bg-teal-600 hover:bg-teal-700"
+              className="gap-2"
               data-testid="button-create-item"
             >
               <Plus className="w-4 h-4" />

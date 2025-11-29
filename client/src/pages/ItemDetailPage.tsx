@@ -160,7 +160,6 @@ export function ItemDetailPage() {
               <h1 className="text-xl font-semibold text-gray-900">{item.name}</h1>
               <div className="flex items-center gap-2">
                 <Button 
-                  className="bg-teal-600 hover:bg-teal-700"
                   data-testid="button-primary-action"
                 >
                   Submit for Review
@@ -183,45 +182,13 @@ export function ItemDetailPage() {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <div className="border-b border-gray-200 px-8 pl-[0px] pr-[0px]">
-                <TabsList className="h-auto p-0 bg-transparent border-0">
-                  <TabsTrigger 
-                    value="tab1"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-                    data-testid="tab-1"
-                  >
-                    Tab 1
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="tab2"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-                    data-testid="tab-2"
-                  >
-                    Tab 2
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="tab3"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-                    data-testid="tab-3"
-                  >
-                    Tab 3
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="tab4"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-                    data-testid="tab-4"
-                  >
-                    Tab 4
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="tab5"
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-                    data-testid="tab-5"
-                  >
-                    Tab 5
-                  </TabsTrigger>
-                </TabsList>
-              </div>
+              <TabsList>
+                <TabsTrigger value="tab1" data-testid="tab-1">Tab 1</TabsTrigger>
+                <TabsTrigger value="tab2" data-testid="tab-2">Tab 2</TabsTrigger>
+                <TabsTrigger value="tab3" data-testid="tab-3">Tab 3</TabsTrigger>
+                <TabsTrigger value="tab4" data-testid="tab-4">Tab 4</TabsTrigger>
+                <TabsTrigger value="tab5" data-testid="tab-5">Tab 5</TabsTrigger>
+              </TabsList>
 
               <TabsContent value="tab1" className="m-0">
                 <div className="px-8 py-4 border-b border-gray-100">

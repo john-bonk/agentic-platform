@@ -22,7 +22,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Calendar } from "@/components/ui/calendar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogBody, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from "@/components/ui/menubar";
@@ -100,31 +100,13 @@ export function DemoPage() {
         
         <div className="flex-1 p-8">
           <Tabs defaultValue="basic" className="max-w-5xl">
-            <TabsList className="mb-8 h-auto p-0 bg-transparent border-b border-slate-200 rounded-none flex-wrap gap-0" data-testid="demo-tabs">
-              <TabsTrigger 
-                value="basic"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-              >Basic</TabsTrigger>
-              <TabsTrigger 
-                value="forms"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-              >Forms</TabsTrigger>
-              <TabsTrigger 
-                value="data"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-              >Data Display</TabsTrigger>
-              <TabsTrigger 
-                value="feedback"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-              >Feedback</TabsTrigger>
-              <TabsTrigger 
-                value="overlays"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-              >Overlays</TabsTrigger>
-              <TabsTrigger 
-                value="navigation"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-              >Navigation</TabsTrigger>
+            <TabsList className="mb-8" data-testid="demo-tabs">
+              <TabsTrigger value="basic">Basic</TabsTrigger>
+              <TabsTrigger value="forms">Forms</TabsTrigger>
+              <TabsTrigger value="data">Data Display</TabsTrigger>
+              <TabsTrigger value="feedback">Feedback</TabsTrigger>
+              <TabsTrigger value="overlays">Overlays</TabsTrigger>
+              <TabsTrigger value="navigation">Navigation</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-10">
@@ -725,19 +707,19 @@ export function DemoPage() {
                   <DialogTrigger asChild>
                     <Button variant="outline">Open Modal</Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px] p-0 gap-0 overflow-hidden border-t-4 border-t-[#3f85b2] rounded-md shadow-lg">
-                    <div className="flex items-start justify-between px-4 pt-4 pb-0">
-                      <h2 className="text-xl font-semibold text-slate-900">Modal Title</h2>
-                    </div>
-                    <div className="p-4">
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Modal Title</DialogTitle>
+                    </DialogHeader>
+                    <DialogBody>
                       <div className="bg-purple-100 border border-purple-200 rounded p-6 min-h-[200px] flex items-center justify-center">
                         <span className="text-purple-500 text-lg">Content goes here</span>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-end gap-2 px-4 pt-2 pb-4">
+                    </DialogBody>
+                    <DialogFooter>
                       <Button variant="ghost" className="text-slate-900">Cancel</Button>
-                      <Button className="bg-[#266c92] hover:bg-[#1e5a7a] text-white border-[#266c92]">Save</Button>
-                    </div>
+                      <Button>Save</Button>
+                    </DialogFooter>
                   </DialogContent>
                 </Dialog>
               </div>
