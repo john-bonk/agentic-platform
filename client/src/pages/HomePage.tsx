@@ -19,8 +19,8 @@ const quickLinks = [
     path: "/dashboard",
   },
   {
-    title: "Projects",
-    description: "Manage your projects and tasks",
+    title: "List Page",
+    description: "Browse and manage items",
     path: "/projects",
   },
   {

@@ -1,11 +1,11 @@
 /**
- * Business Continuity Dashboard
+ * Dashboard Template
  * 
- * Complete dashboard matching the Figma design with:
+ * Example dashboard layout with:
  * - Filter bar with dropdowns
  * - Metric cards
- * - Charts (RTO, Risk Trend, Plan Effectiveness)
- * - Business Processes Overview table
+ * - Charts (Metric by Category, Trend, Distribution)
+ * - Items Overview table
  */
 
 import { useState } from "react";
@@ -50,11 +50,11 @@ import {
 import { useLocation } from "wouter";
 import { useTabStore } from "@/lib/tabStore";
 
-const rtoData = [
-  { name: "Retail Ban...", q1: 60, q2: 45, q3: 70, q4: 50 },
-  { name: "Human Reso...", q1: 40, q2: 35, q3: 55, q4: 40 },
-  { name: "Treasury &...", q1: 30, q2: 25, q3: 40, q4: 30 },
-  { name: "IT Operati...", q1: 20, q2: 15, q3: 25, q4: 20 },
+const metricByCategory = [
+  { name: "Category 1", q1: 60, q2: 45, q3: 70, q4: 50 },
+  { name: "Category 2", q1: 40, q2: 35, q3: 55, q4: 40 },
+  { name: "Category 3", q1: 30, q2: 25, q3: 40, q4: 30 },
+  { name: "Category 4", q1: 20, q2: 15, q3: 25, q4: 20 },
 ];
 
 const riskTrendData = [
@@ -72,97 +72,96 @@ const riskTrendData = [
   { month: "Dec", low: 22, medium: 35, high: 28 },
 ];
 
-const planEffectivenessData = [
-  { name: "Effective", value: 61, color: "#22c55e" },
-  { name: "Ineffective", value: 24, color: "#ef4444" },
-  { name: "Untested", value: 15, color: "#94a3b8" },
+const distributionData = [
+  { name: "Complete", value: 61, color: "#22c55e" },
+  { name: "Pending", value: 24, color: "#ef4444" },
+  { name: "Not Started", value: 15, color: "#94a3b8" },
 ];
 
-const businessProcesses = [
+const dashboardItems = [
   { 
-    id: "1",
-    name: "Account Management", 
-    businessUnit: "Retail Banking Operations", 
-    criticality: "High",
-    bcpStatus: "Not Started",
-    rto: "1 hour",
-    owner: "Baylor Cruz"
+    id: "1-1",
+    name: "Item 1", 
+    category: "Category 1", 
+    priority: "High",
+    status: "Not Started",
+    metric: "1 hour",
+    owner: "Owner A"
   },
   { 
-    id: "2",
-    name: "Loan Origination and Servicing", 
-    businessUnit: "Retail Banking Operations", 
-    criticality: "Low",
-    bcpStatus: "Not Started",
-    rto: "30 mins",
-    owner: "Baylor Cruz"
+    id: "1-2",
+    name: "Item 2", 
+    category: "Category 1", 
+    priority: "Low",
+    status: "Not Started",
+    metric: "30 mins",
+    owner: "Owner A"
   },
   { 
-    id: "3",
-    name: "Customer Service and Support", 
-    businessUnit: "Retail Banking Operations", 
-    criticality: "Low",
-    bcpStatus: "Not Started",
-    rto: "24 hours",
-    owner: "Baylor Cruz"
+    id: "1-3",
+    name: "Item 3", 
+    category: "Category 1", 
+    priority: "Low",
+    status: "Not Started",
+    metric: "24 hours",
+    owner: "Owner A"
   },
   { 
-    id: "4",
-    name: "Employee Onboarding and Offboarding", 
-    businessUnit: "Human Resources", 
-    criticality: "Low",
-    bcpStatus: "Not Started",
-    rto: "1 hour",
-    owner: "Dante Bradford"
+    id: "2-1",
+    name: "Item 4", 
+    category: "Category 2", 
+    priority: "Low",
+    status: "Not Started",
+    metric: "1 hour",
+    owner: "Owner B"
   },
   { 
-    id: "5",
-    name: "Payroll Processing", 
-    businessUnit: "Human Resources", 
-    criticality: "High",
-    bcpStatus: "Not Started",
-    rto: "4 hours",
-    owner: "Dante Bradford"
+    id: "2-2",
+    name: "Item 5", 
+    category: "Category 2", 
+    priority: "High",
+    status: "Not Started",
+    metric: "4 hours",
+    owner: "Owner B"
   },
 ];
 
 export function DashboardPage() {
-  const [businessUnit, setBusinessUnit] = useState("all");
-  const [criticality, setCriticality] = useState("all");
-  const [bcpStatus, setBcpStatus] = useState("all");
+  const [category, setCategory] = useState("all");
+  const [priority, setPriority] = useState("all");
+  const [status, setStatus] = useState("all");
   const [, setLocation] = useLocation();
   const { openTab } = useTabStore();
 
   const clearFilters = () => {
-    setBusinessUnit("all");
-    setCriticality("all");
-    setBcpStatus("all");
+    setCategory("all");
+    setPriority("all");
+    setStatus("all");
   };
 
-  const filteredProcesses = businessProcesses.filter(process => {
-    const matchesBusinessUnit = businessUnit === "all" || 
-      (businessUnit === "retail" && process.businessUnit === "Retail Banking Operations") ||
-      (businessUnit === "hr" && process.businessUnit === "Human Resources");
-    const matchesCriticality = criticality === "all" || 
-      process.criticality.toLowerCase() === criticality;
-    const matchesBcpStatus = bcpStatus === "all" || 
-      (bcpStatus === "not-started" && process.bcpStatus === "Not Started") ||
-      (bcpStatus === "in-progress" && process.bcpStatus === "In Progress") ||
-      (bcpStatus === "complete" && process.bcpStatus === "Complete");
-    return matchesBusinessUnit && matchesCriticality && matchesBcpStatus;
+  const filteredItems = dashboardItems.filter(item => {
+    const matchesCategory = category === "all" || 
+      (category === "cat1" && item.category === "Category 1") ||
+      (category === "cat2" && item.category === "Category 2");
+    const matchesPriority = priority === "all" || 
+      item.priority.toLowerCase() === priority;
+    const matchesStatus = status === "all" || 
+      (status === "not-started" && item.status === "Not Started") ||
+      (status === "in-progress" && item.status === "In Progress") ||
+      (status === "complete" && item.status === "Complete");
+    return matchesCategory && matchesPriority && matchesStatus;
   });
 
-  const totalActivePlans = filteredProcesses.length > 0 ? filteredProcesses.length : businessProcesses.length;
-  const highCriticalityCount = filteredProcesses.filter(p => p.criticality === "High").length;
+  const highPriorityCount = filteredItems.filter(p => p.priority === "High").length;
 
-  const handleProcessClick = (process: typeof businessProcesses[0]) => {
+  const handleItemClick = (item: typeof dashboardItems[0]) => {
     const tab = {
-      id: `process-${process.id}`,
-      name: process.name,
-      path: `/items/${process.id}`,
+      id: `item-${item.id}`,
+      name: item.name,
+      path: `/items/${item.id}`,
     };
     openTab(tab);
-    setLocation(`/items/${process.id}`);
+    setLocation(`/items/${item.id}`);
   };
 
   return (
@@ -190,35 +189,35 @@ export function DashboardPage() {
 
         <div className="flex items-center gap-4 px-6 py-4 bg-gray-50 flex-wrap">
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500">Business Unit</span>
-            <Select value={businessUnit} onValueChange={setBusinessUnit}>
+            <span className="text-xs text-gray-500">Category</span>
+            <Select value={category} onValueChange={setCategory}>
               <SelectTrigger 
                 className="w-[200px] h-9 text-sm bg-white"
-                data-testid="select-business-unit"
+                data-testid="select-category"
               >
-                <SelectValue placeholder="All Business Units" />
+                <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Business Units</SelectItem>
-                <SelectItem value="retail">Retail Banking Operations</SelectItem>
-                <SelectItem value="hr">Human Resources</SelectItem>
-                <SelectItem value="treasury">Treasury</SelectItem>
-                <SelectItem value="it">IT Operations</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="cat1">Category 1</SelectItem>
+                <SelectItem value="cat2">Category 2</SelectItem>
+                <SelectItem value="cat3">Category 3</SelectItem>
+                <SelectItem value="cat4">Category 4</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500">Criticality</span>
-            <Select value={criticality} onValueChange={setCriticality}>
+            <span className="text-xs text-gray-500">Priority</span>
+            <Select value={priority} onValueChange={setPriority}>
               <SelectTrigger 
                 className="w-[200px] h-9 text-sm bg-white"
-                data-testid="select-criticality"
+                data-testid="select-priority"
               >
-                <SelectValue placeholder="All Criticalities" />
+                <SelectValue placeholder="All Priorities" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Criticalities</SelectItem>
+                <SelectItem value="all">All Priorities</SelectItem>
                 <SelectItem value="high">High</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
                 <SelectItem value="low">Low</SelectItem>
@@ -227,11 +226,11 @@ export function DashboardPage() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500">BCP Status</span>
-            <Select value={bcpStatus} onValueChange={setBcpStatus}>
+            <span className="text-xs text-gray-500">Status</span>
+            <Select value={status} onValueChange={setStatus}>
               <SelectTrigger 
                 className="w-[200px] h-9 text-sm bg-white"
-                data-testid="select-bcp-status"
+                data-testid="select-status"
               >
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
@@ -260,32 +259,32 @@ export function DashboardPage() {
         <div className="flex-1 p-6 space-y-6 bg-[#f9fafb]">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white py-4 text-center border border-gray-200 rounded">
-              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-total-plans">{filteredProcesses.length}</div>
-              <div className="text-sm text-gray-500 mt-1">Total Active Plans</div>
+              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-total-items">{filteredItems.length}</div>
+              <div className="text-sm text-gray-500 mt-1">Total Items</div>
             </div>
             <div className="bg-white py-4 text-center border border-gray-200 rounded">
-              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-compliance">92%</div>
-              <div className="text-sm text-gray-500 mt-1">Exercise Compliance</div>
+              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-1">92%</div>
+              <div className="text-sm text-gray-500 mt-1">Metric 1</div>
             </div>
             <div className="bg-white py-4 text-center border border-gray-200 rounded">
-              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-findings">8</div>
-              <div className="text-sm text-gray-500 mt-1">Open Findings</div>
+              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-2">8</div>
+              <div className="text-sm text-gray-500 mt-1">Metric 2</div>
             </div>
             <div className="bg-white py-4 text-center border border-gray-200 rounded">
-              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-incidents">1</div>
-              <div className="text-sm text-gray-500 mt-1">Vendor Incidents</div>
+              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-3">1</div>
+              <div className="text-sm text-gray-500 mt-1">Metric 3</div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="border border-gray-200 rounded bg-white">
               <div className="px-4 pt-4 pb-2">
-                <h3 className="text-sm font-medium text-gray-700">RTO by Business Unit</h3>
+                <h3 className="text-sm font-medium text-gray-700">Metric by Category</h3>
               </div>
               <div className="px-4 pb-4">
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={rtoData} layout="vertical" barGap={1} barSize={12}>
+                    <BarChart data={metricByCategory} layout="vertical" barGap={1} barSize={12}>
                       <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
                       <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => v} fontSize={10} />
                       <YAxis type="category" dataKey="name" width={80} fontSize={10} />
@@ -320,7 +319,7 @@ export function DashboardPage() {
 
             <div className="border border-gray-200 rounded bg-white">
               <div className="px-4 pt-4 pb-2">
-                <h3 className="text-sm font-medium text-gray-700">Risk Trend</h3>
+                <h3 className="text-sm font-medium text-gray-700">Trend Chart</h3>
               </div>
               <div className="px-4 pb-4">
                 <div className="h-48">
@@ -355,14 +354,14 @@ export function DashboardPage() {
 
             <div className="border border-gray-200 rounded bg-white">
               <div className="px-4 pt-4 pb-2">
-                <h3 className="text-sm font-medium text-gray-700">Plan Effectiveness</h3>
+                <h3 className="text-sm font-medium text-gray-700">Distribution</h3>
               </div>
               <div className="px-4 pb-4">
                 <div className="h-48 relative">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={planEffectivenessData}
+                        data={distributionData}
                         cx="50%"
                         cy="50%"
                         innerRadius={50}
@@ -371,7 +370,7 @@ export function DashboardPage() {
                         startAngle={90}
                         endAngle={-270}
                       >
-                        {planEffectivenessData.map((entry, index) => (
+                        {distributionData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
@@ -385,15 +384,15 @@ export function DashboardPage() {
                 <div className="flex items-center justify-center gap-4 mt-2 text-xs">
                   <div className="flex items-center gap-1">
                     <div className="w-3 h-3 rounded-sm bg-gray-400" />
-                    <span>Untested</span>
+                    <span>Not Started</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="w-3 h-3 rounded-sm bg-red-500" />
-                    <span>Ineffective</span>
+                    <span>Pending</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="w-3 h-3 rounded-sm bg-green-500" />
-                    <span>Effective</span>
+                    <span>Complete</span>
                   </div>
                 </div>
               </div>
@@ -403,11 +402,11 @@ export function DashboardPage() {
           <div className="border border-gray-200 rounded bg-white">
             <div className="px-4 pt-4 pb-2">
               <div className="flex items-center justify-between gap-4">
-                <h3 className="text-sm font-medium text-gray-700">Business Processes Overview</h3>
+                <h3 className="text-sm font-medium text-gray-700">Items Overview</h3>
                 <div className="text-xs text-gray-500">
-                  <span className="font-medium">{filteredProcesses.length} processes</span>
+                  <span className="font-medium">{filteredItems.length} items</span>
                   <span className="mx-2">|</span>
-                  <span>{highCriticalityCount} high criticality</span>
+                  <span>{highPriorityCount} high priority</span>
                 </div>
               </div>
             </div>
@@ -421,45 +420,45 @@ export function DashboardPage() {
                         <ArrowUpDown className="w-3 h-3" />
                       </div>
                     </TableHead>
-                    <TableHead className="font-medium text-gray-600">Business Unit</TableHead>
-                    <TableHead className="font-medium text-gray-600">Criticality</TableHead>
-                    <TableHead className="font-medium text-gray-600">BCP Status</TableHead>
+                    <TableHead className="font-medium text-gray-600">Category</TableHead>
+                    <TableHead className="font-medium text-gray-600">Priority</TableHead>
+                    <TableHead className="font-medium text-gray-600">Status</TableHead>
                     <TableHead className="font-medium text-gray-600">
                       <div className="flex items-center gap-1">
-                        RTO
+                        Metric
                         <ArrowUpDown className="w-3 h-3" />
                       </div>
                     </TableHead>
-                    <TableHead className="font-medium text-gray-600">Process Owner</TableHead>
+                    <TableHead className="font-medium text-gray-600">Owner</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProcesses.map((process) => (
+                  {filteredItems.map((item) => (
                     <TableRow 
-                      key={process.id} 
+                      key={item.id} 
                       className="hover:bg-gray-50 cursor-pointer"
-                      data-testid={`row-process-${process.id}`}
+                      data-testid={`row-item-${item.id}`}
                     >
                       <TableCell>
                         <button
-                          onClick={() => handleProcessClick(process)}
-                          className="text-blue-600 hover:underline text-left font-medium"
-                          data-testid={`link-process-${process.id}`}
+                          onClick={() => handleItemClick(item)}
+                          className="text-teal-600 hover:underline text-left font-medium"
+                          data-testid={`link-item-${item.id}`}
                         >
-                          {process.name}
+                          {item.name}
                         </button>
                       </TableCell>
-                      <TableCell className="text-gray-600">{process.businessUnit}</TableCell>
+                      <TableCell className="text-gray-600">{item.category}</TableCell>
                       <TableCell>
                         <Badge 
                           variant="outline" 
                           className={`text-xs ${
-                            process.criticality === "High" 
+                            item.priority === "High" 
                               ? "text-red-600 border-red-200 bg-red-50" 
                               : "text-blue-600 border-blue-200 bg-blue-50"
                           }`}
                         >
-                          {process.criticality}
+                          {item.priority}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -467,11 +466,11 @@ export function DashboardPage() {
                           variant="outline" 
                           className="text-xs text-gray-600 border-gray-300 bg-gray-100"
                         >
-                          {process.bcpStatus}
+                          {item.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-gray-600">{process.rto}</TableCell>
-                      <TableCell className="text-gray-600">{process.owner}</TableCell>
+                      <TableCell className="text-gray-600">{item.metric}</TableCell>
+                      <TableCell className="text-gray-600">{item.owner}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
