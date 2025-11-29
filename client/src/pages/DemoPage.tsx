@@ -738,34 +738,27 @@ export function DemoPage() {
             <TabsContent value="overlays" className="space-y-6">
               <Card className="border border-gray-200">
                 <CardHeader>
-                  <CardTitle>Dialog</CardTitle>
-                  <CardDescription>A modal window that interrupts the user</CardDescription>
+                  <CardTitle>Modal</CardTitle>
+                  <CardDescription>A modal window styled with teal top border and action buttons</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline">Open Dialog</Button>
+                      <Button variant="outline">Open Modal</Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                      <DialogHeader>
-                        <DialogTitle>Edit profile</DialogTitle>
-                        <DialogDescription>
-                          Make changes to your profile here. Click save when you're done.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="name" className="text-right">Name</Label>
-                          <Input id="name" value="Pedro Duarte" className="col-span-3" />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="username" className="text-right">Username</Label>
-                          <Input id="username" value="@peduarte" className="col-span-3" />
+                    <DialogContent className="sm:max-w-[425px] p-0 gap-0 overflow-hidden border-t-4 border-t-[#3f85b2] rounded-md shadow-lg">
+                      <div className="flex items-start justify-between px-4 pt-4 pb-0">
+                        <h2 className="text-xl font-semibold text-slate-900">Modal Title</h2>
+                      </div>
+                      <div className="p-4">
+                        <div className="bg-purple-100 border border-purple-200 rounded p-6 min-h-[200px] flex items-center justify-center">
+                          <span className="text-purple-500 text-lg">Content goes here</span>
                         </div>
                       </div>
-                      <DialogFooter>
-                        <Button type="submit">Save changes</Button>
-                      </DialogFooter>
+                      <div className="flex items-center justify-end gap-2 px-4 pt-2 pb-4">
+                        <Button variant="ghost" className="text-slate-900">Cancel</Button>
+                        <Button className="bg-[#266c92] hover:bg-[#1e5a7a] text-white border-[#266c92]">Save</Button>
+                      </div>
                     </DialogContent>
                   </Dialog>
                 </CardContent>
