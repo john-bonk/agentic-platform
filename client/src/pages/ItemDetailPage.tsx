@@ -147,7 +147,7 @@ export function ItemDetailPage() {
         path: `/items/${item.id}` 
       }}
     >
-      <div className="flex flex-col h-full overflow-auto bg-gray-100">
+      <div className="flex flex-col h-full overflow-auto bg-[#ffffff]">
         <div className="p-6">
           <div className="bg-white rounded-md">
             <div className="flex items-center justify-between px-8 py-5">
