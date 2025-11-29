@@ -9,33 +9,28 @@
 
 import { AppLayout, PageHeader } from "@/components/layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { ArrowRight, Layers, FileText, Settings, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const quickLinks = [
   {
     title: "Dashboard",
     description: "View your analytics and metrics",
-    icon: Layers,
     path: "/dashboard",
   },
   {
     title: "Projects",
     description: "Manage your projects and tasks",
-    icon: FileText,
     path: "/projects",
   },
   {
     title: "Demo Page",
     description: "See example components in action",
-    icon: Zap,
     path: "/demo",
   },
   {
     title: "Settings",
     description: "Configure your preferences",
-    icon: Settings,
     path: "/settings",
   },
 ];
@@ -60,33 +55,20 @@ export function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {quickLinks.map((link) => (
                 <Link key={link.path} href={link.path}>
-                  <Card 
-                    className="hover-elevate cursor-pointer border border-gray-200 h-full"
+                  <div 
+                    className="bg-white py-4 px-4 text-center border border-gray-200 rounded cursor-pointer hover-elevate h-full"
                     data-testid={`link-card-${link.path.replace("/", "")}`}
                   >
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-teal-50 rounded-md">
-                          <link.icon className="w-5 h-5 text-teal-600" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-base">{link.title}</CardTitle>
-                          <CardDescription className="text-sm">
-                            {link.description}
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="flex items-center text-sm text-teal-600 font-medium">
-                        Go to {link.title}
-                        <ArrowRight className="w-4 h-4 ml-1" />
-                      </div>
-                    </CardContent>
-                  </Card>
+                    <div className="text-base font-semibold text-gray-900">{link.title}</div>
+                    <div className="text-sm text-gray-500 mt-1">{link.description}</div>
+                    <div className="flex items-center justify-center text-sm text-teal-600 font-medium mt-3">
+                      Go to {link.title}
+                      <ArrowRight className="w-4 h-4 ml-1" />
+                    </div>
+                  </div>
                 </Link>
               ))}
             </div>
