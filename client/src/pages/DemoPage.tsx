@@ -100,16 +100,34 @@ export function DemoPage() {
         
         <div className="flex-1 p-8">
           <Tabs defaultValue="basic" className="max-w-5xl">
-            <TabsList className="mb-6 flex-wrap" data-testid="demo-tabs">
-              <TabsTrigger value="basic">Basic</TabsTrigger>
-              <TabsTrigger value="forms">Forms</TabsTrigger>
-              <TabsTrigger value="data">Data Display</TabsTrigger>
-              <TabsTrigger value="feedback">Feedback</TabsTrigger>
-              <TabsTrigger value="overlays">Overlays</TabsTrigger>
-              <TabsTrigger value="navigation">Navigation</TabsTrigger>
+            <TabsList className="mb-8 h-auto p-0 bg-transparent border-b border-slate-200 rounded-none flex-wrap gap-0" data-testid="demo-tabs">
+              <TabsTrigger 
+                value="basic"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
+              >Basic</TabsTrigger>
+              <TabsTrigger 
+                value="forms"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
+              >Forms</TabsTrigger>
+              <TabsTrigger 
+                value="data"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
+              >Data Display</TabsTrigger>
+              <TabsTrigger 
+                value="feedback"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
+              >Feedback</TabsTrigger>
+              <TabsTrigger 
+                value="overlays"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
+              >Overlays</TabsTrigger>
+              <TabsTrigger 
+                value="navigation"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
+              >Navigation</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="basic" className="space-y-6">
+            <TabsContent value="basic" className="space-y-10">
               <div className="space-y-3">
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900">Accordion</h3>
@@ -354,7 +372,7 @@ export function DemoPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="forms" className="space-y-6">
+            <TabsContent value="forms" className="space-y-10">
               <div className="space-y-3">
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900">Checkbox</h3>
@@ -500,7 +518,7 @@ export function DemoPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="data" className="space-y-6">
+            <TabsContent value="data" className="space-y-10">
               <div className="space-y-3">
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900">Command</h3>
@@ -609,7 +627,7 @@ export function DemoPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="feedback" className="space-y-6">
+            <TabsContent value="feedback" className="space-y-10">
               <div className="space-y-3">
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900">Toast</h3>
@@ -697,7 +715,7 @@ export function DemoPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="overlays" className="space-y-6">
+            <TabsContent value="overlays" className="space-y-10">
               <div className="space-y-3">
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900">Modal</h3>
@@ -850,7 +868,7 @@ export function DemoPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="navigation" className="space-y-6">
+            <TabsContent value="navigation" className="space-y-10">
               <div className="space-y-3">
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900">Breadcrumb</h3>
