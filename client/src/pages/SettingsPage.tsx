@@ -39,13 +39,13 @@ interface SettingsSectionProps {
 
 function SettingsSection({ title, description, children }: SettingsSectionProps) {
   return (
-    <div className="flex gap-4 px-8 py-4">
-      <div className="flex flex-col gap-2 w-[400px] shrink-0">
-        <span className="text-[13px] font-medium text-slate-900">{title}</span>
-        <span className="text-xs text-slate-500 leading-[1.25]">{description}</span>
+    <div className="flex gap-6 px-8 py-6">
+      <div className="flex flex-col gap-1.5 w-[350px] shrink-0">
+        <h3 className="text-base font-semibold text-foreground">{title}</h3>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
-      <div className="flex-1 bg-white border border-slate-200 rounded p-4">
-        <div className="flex flex-col gap-3">
+      <div className="flex-1 bg-card border border-border rounded-md p-6">
+        <div className="flex flex-col gap-4">
           {children}
         </div>
       </div>
@@ -63,13 +63,13 @@ interface FormInputProps {
 
 function FormInput({ label, value, onChange, placeholder, testId }: FormInputProps) {
   return (
-    <div className="flex flex-col gap-1">
-      <Label className="text-[13px] font-medium text-slate-900">{label}</Label>
+    <div className="grid w-full gap-1.5">
+      <Label htmlFor={testId}>{label}</Label>
       <Input
+        id={testId}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
         placeholder={placeholder}
-        className="h-7 text-xs border-slate-300 rounded"
         data-testid={testId}
       />
     </div>
@@ -86,28 +86,26 @@ interface ToggleRowProps {
 
 function ToggleRow({ label, checked, onCheckedChange, tooltip, testId }: ToggleRowProps) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center space-x-2">
       <Switch
+        id={testId}
         checked={checked}
         onCheckedChange={onCheckedChange}
-        className="h-4 w-8 data-[state=unchecked]:bg-slate-300"
         data-testid={testId}
       />
-      <div className="flex-1 flex items-center gap-1">
-        <span className="text-[13px] font-medium text-slate-900">{label}</span>
+      <Label htmlFor={testId} className="flex items-center gap-1.5">
+        {label}
         {tooltip && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-3 h-3 rounded-full bg-slate-200 flex items-center justify-center cursor-help">
-                <HelpCircle className="w-2 h-2 text-slate-500" />
-              </div>
+              <HelpCircle className="w-4 h-4 text-muted-foreground cursor-help" />
             </TooltipTrigger>
             <TooltipContent>
-              <p className="text-xs">{tooltip}</p>
+              <p>{tooltip}</p>
             </TooltipContent>
           </Tooltip>
         )}
-      </div>
+      </Label>
     </div>
   );
 }
@@ -131,9 +129,9 @@ export function SettingsPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-full bg-slate-50">
-        <div className="bg-white px-8 pt-8 pb-4 border-b border-slate-200">
-          <h1 className="text-2xl font-semibold text-slate-900" data-testid="text-settings-title">
+      <div className="flex flex-col h-full bg-background">
+        <div className="bg-card px-8 pt-8 pb-4 border-b border-border">
+          <h1 className="text-2xl font-semibold text-foreground" data-testid="text-settings-title">
             Settings
           </h1>
         </div>
@@ -187,10 +185,10 @@ export function SettingsPage() {
             title="Appearance"
             description="Customize the visual appearance of the application."
           >
-            <div className="flex flex-col gap-1">
-              <Label className="text-[13px] font-medium text-slate-900">Theme</Label>
+            <div className="grid w-full gap-1.5">
+              <Label htmlFor="select-theme">Theme</Label>
               <Select value={theme} onValueChange={setTheme}>
-                <SelectTrigger className="h-7 text-xs border-slate-300 rounded" data-testid="select-theme">
+                <SelectTrigger id="select-theme" data-testid="select-theme">
                   <SelectValue placeholder="Select theme" />
                 </SelectTrigger>
                 <SelectContent>
@@ -200,10 +198,10 @@ export function SettingsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col gap-1">
-              <Label className="text-[13px] font-medium text-slate-900">Language</Label>
+            <div className="grid w-full gap-1.5">
+              <Label htmlFor="select-language">Language</Label>
               <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger className="h-7 text-xs border-slate-300 rounded" data-testid="select-language">
+                <SelectTrigger id="select-language" data-testid="select-language">
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>
                 <SelectContent>
