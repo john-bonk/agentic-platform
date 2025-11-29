@@ -838,24 +838,62 @@ export function DemoPage() {
 
               <Card className="border border-gray-200">
                 <CardHeader>
-                  <CardTitle>Sheet</CardTitle>
-                  <CardDescription>Extends the Dialog component to display content that complements the main content</CardDescription>
+                  <CardTitle>Sheet (Quick View Panel)</CardTitle>
+                  <CardDescription>A wider slide-out panel styled like the Item Detail page</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex gap-2">
                     <Sheet>
                       <SheetTrigger asChild>
-                        <Button variant="outline">Open Right Sheet</Button>
+                        <Button variant="outline">Open Quick View</Button>
                       </SheetTrigger>
-                      <SheetContent>
-                        <SheetHeader>
-                          <SheetTitle>Edit profile</SheetTitle>
-                          <SheetDescription>Make changes to your profile here.</SheetDescription>
-                        </SheetHeader>
-                        <div className="grid gap-4 py-4">
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="sheet-name" className="text-right">Name</Label>
-                            <Input id="sheet-name" value="Pedro Duarte" className="col-span-3" />
+                      <SheetContent className="sm:max-w-[500px] p-0 flex flex-col">
+                        <div className="flex flex-col h-full">
+                          <div className="px-8 pt-8 pb-0">
+                            <div className="flex flex-col gap-4">
+                              <div className="flex flex-col gap-1">
+                                <span className="text-sm text-slate-500 font-semibold">Inventory Item</span>
+                                <h2 className="text-2xl font-semibold text-slate-900">AWS</h2>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <Button variant="outline" size="sm">Create Entity Risk</Button>
+                                <Button variant="outline" size="sm">
+                                  Create Assessment
+                                  <ChevronDown className="ml-1 h-4 w-4" />
+                                </Button>
+                                <Button variant="outline" size="icon" className="h-9 w-9">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="flex gap-3 mt-5 border-b border-slate-200">
+                              <button className="pb-3 text-sm font-semibold text-slate-500">Overview</button>
+                              <button className="pb-3 text-sm font-semibold text-slate-500">Questionnaires</button>
+                              <button className="pb-3 text-sm font-semibold text-slate-500">Issues</button>
+                              <button className="pb-3 text-sm font-semibold text-teal-600 border-b-[3px] border-teal-600">Relationships</button>
+                              <button className="pb-3 text-sm font-semibold text-slate-500">Contracts</button>
+                            </div>
+                          </div>
+                          <div className="flex-1 px-8 py-6 overflow-y-auto">
+                            <h3 className="text-lg font-semibold text-slate-900 mb-4">Relationships</h3>
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-2">
+                                <span className="w-[140px] text-right text-xs text-slate-900">Vendor</span>
+                                <span className="text-sm text-blue-600">Amazon</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="w-[140px] text-right text-xs text-slate-900">Used by</span>
+                                <span className="text-sm text-blue-600">AuditBoard</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="w-[140px] text-right text-xs text-slate-900">Category</span>
+                                <span className="text-sm text-slate-700">Cloud Infrastructure</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="w-[140px] text-right text-xs text-slate-900">Status</span>
+                                <Badge className="bg-green-100 text-green-700 border-green-200" variant="outline">Active</Badge>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </SheetContent>
