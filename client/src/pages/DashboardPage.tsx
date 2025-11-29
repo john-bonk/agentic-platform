@@ -442,7 +442,7 @@ export function DashboardPage() {
                       <TableCell>
                         <button
                           onClick={() => handleItemClick(item)}
-                          className="text-teal-600 hover:underline text-left font-medium"
+                          className="hover:underline text-left font-medium text-[#3172E3]"
                           data-testid={`link-item-${item.id}`}
                         >
                           {item.name}
