@@ -38,80 +38,80 @@ interface DetailItem {
 }
 
 const detailItems: Record<string, DetailItem> = {
-  "1": {
-    id: "1",
-    name: "Website Redesign",
+  "1-1": {
+    id: "1-1",
+    name: "Item 1",
     priority: "High",
     targetDate: "Q2 2024",
     estimatedTime: "3 months",
-    owner: "Alice Johnson",
+    owner: "Owner A",
     lastUpdated: "June 20, 2024",
     status: "Approved",
-    description: "Complete overhaul of the company website with modern design and improved UX. This project includes updating the visual identity, improving navigation, optimizing for mobile devices, and implementing new features based on user feedback. The redesign will focus on conversion optimization and accessibility compliance.",
-    categories: ["Marketing", "Design"],
-    relatedItems: ["Brand Guidelines", "User Research", "Content Strategy"],
-    tags: ["Frontend", "UX", "Responsive Design", "Accessibility"],
-    attachments: ["Design Mockups"],
+    description: "This is the description for Item 1. It contains detailed information about this particular item, including its purpose, scope, and any relevant background context.",
+    categories: ["Category A", "Category B"],
+    relatedItems: ["Related Item 1", "Related Item 2", "Related Item 3"],
+    tags: ["Tag 1", "Tag 2", "Tag 3", "Tag 4"],
+    attachments: ["Attachment 1"],
   },
-  "2": {
-    id: "2",
-    name: "Mobile App Development",
-    priority: "High",
+  "1-2": {
+    id: "1-2",
+    name: "Item 2",
+    priority: "Low",
     targetDate: "Q3 2024",
     estimatedTime: "6 months",
-    owner: "Bob Smith",
+    owner: "Owner A",
     lastUpdated: "May 15, 2024",
     status: "In Review",
-    description: "Native mobile application for iOS and Android platforms. This includes user authentication, push notifications, offline mode, and integration with existing backend services.",
-    categories: ["Engineering", "Mobile"],
-    relatedItems: ["API Documentation", "Security Audit"],
-    tags: ["iOS", "Android", "React Native"],
-    attachments: ["Technical Specs", "Wireframes"],
+    description: "This is the description for Item 2. It provides comprehensive details about this item's requirements and specifications.",
+    categories: ["Category C", "Category D"],
+    relatedItems: ["Related Item 4", "Related Item 5"],
+    tags: ["Tag 5", "Tag 6", "Tag 7"],
+    attachments: ["Attachment 2", "Attachment 3"],
   },
-  "3": {
-    id: "3",
-    name: "API Integration",
+  "1-3": {
+    id: "1-3",
+    name: "Item 3",
     priority: "Medium",
     targetDate: "Q1 2024",
     estimatedTime: "2 months",
-    owner: "Carol Davis",
+    owner: "Owner A",
     lastUpdated: "April 10, 2024",
     status: "Completed",
-    description: "Integration with third-party APIs for enhanced functionality including payment processing, analytics, and CRM synchronization.",
-    categories: ["Engineering", "Integration"],
-    relatedItems: ["Payment Gateway", "Analytics Dashboard"],
-    tags: ["API", "Backend", "Integration"],
-    attachments: ["API Docs"],
+    description: "This is the description for Item 3. It outlines the key objectives and deliverables for this item.",
+    categories: ["Category E", "Category F"],
+    relatedItems: ["Related Item 6", "Related Item 7"],
+    tags: ["Tag 8", "Tag 9", "Tag 10"],
+    attachments: ["Attachment 4"],
   },
-  "4": {
-    id: "4",
-    name: "Database Migration",
+  "2-1": {
+    id: "2-1",
+    name: "Item 4",
     priority: "Low",
     targetDate: "Q4 2024",
     estimatedTime: "4 months",
-    owner: "David Wilson",
+    owner: "Owner B",
     lastUpdated: "March 5, 2024",
     status: "Draft",
-    description: "Migrate legacy database to modern cloud infrastructure with improved performance and scalability.",
-    categories: ["Infrastructure", "Database"],
-    relatedItems: ["Cloud Setup", "Data Backup"],
-    tags: ["PostgreSQL", "AWS", "Migration"],
-    attachments: ["Migration Plan"],
+    description: "This is the description for Item 4. It details the scope and expected outcomes.",
+    categories: ["Category G", "Category H"],
+    relatedItems: ["Related Item 8", "Related Item 9"],
+    tags: ["Tag 11", "Tag 12", "Tag 13"],
+    attachments: ["Attachment 5"],
   },
-  "5": {
-    id: "5",
-    name: "Security Audit",
-    priority: "High",
+  "2-2": {
+    id: "2-2",
+    name: "Item 5",
+    priority: "Low",
     targetDate: "Q2 2024",
     estimatedTime: "1 month",
-    owner: "Eve Martinez",
+    owner: "Owner B",
     lastUpdated: "June 1, 2024",
     status: "Approved",
-    description: "Comprehensive security assessment and vulnerability testing across all systems and applications.",
-    categories: ["Security", "Compliance"],
-    relatedItems: ["Penetration Test", "Compliance Report"],
-    tags: ["Security", "Audit", "Compliance"],
-    attachments: ["Security Checklist"],
+    description: "This is the description for Item 5. It provides an overview of the item's objectives.",
+    categories: ["Category I", "Category J"],
+    relatedItems: ["Related Item 10", "Related Item 11"],
+    tags: ["Tag 14", "Tag 15", "Tag 16"],
+    attachments: ["Attachment 6"],
   },
 };
 
@@ -134,10 +134,10 @@ const getPriorityBadge = (priority: string) => {
 
 export function ItemDetailPage() {
   const [, params] = useRoute("/items/:id");
-  const itemId = params?.id || "1";
-  const item = detailItems[itemId] || detailItems["1"];
+  const itemId = params?.id || "1-1";
+  const item = detailItems[itemId] || detailItems["1-1"];
   
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("tab1");
 
   return (
     <AppLayout 
@@ -180,44 +180,44 @@ export function ItemDetailPage() {
               <div className="border-b border-gray-200 px-8">
                 <TabsList className="h-auto p-0 bg-transparent border-0">
                   <TabsTrigger 
-                    value="overview"
+                    value="tab1"
                     className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-                    data-testid="tab-overview"
+                    data-testid="tab-1"
                   >
-                    Overview
+                    Tab 1
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="details"
+                    value="tab2"
                     className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-                    data-testid="tab-details"
+                    data-testid="tab-2"
                   >
-                    Details
+                    Tab 2
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="dependencies"
+                    value="tab3"
                     className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-                    data-testid="tab-dependencies"
+                    data-testid="tab-3"
                   >
-                    Dependencies
+                    Tab 3
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="activity"
+                    value="tab4"
                     className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-                    data-testid="tab-activity"
+                    data-testid="tab-4"
                   >
-                    Activity
+                    Tab 4
                   </TabsTrigger>
                   <TabsTrigger 
-                    value="attachments"
+                    value="tab5"
                     className="rounded-none border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent data-[state=active]:text-gray-900 data-[state=active]:font-medium data-[state=active]:shadow-none px-4 py-3 text-gray-600 shadow-none"
-                    data-testid="tab-attachments"
+                    data-testid="tab-5"
                   >
-                    Attachments
+                    Tab 5
                   </TabsTrigger>
                 </TabsList>
               </div>
 
-              <TabsContent value="overview" className="m-0">
+              <TabsContent value="tab1" className="m-0">
                 <div className="px-8 py-4 border-b border-gray-100">
                   <div className="flex items-center gap-12 flex-wrap">
                     <div className="flex flex-col gap-1">
@@ -362,31 +362,31 @@ export function ItemDetailPage() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="details" className="p-8 m-0">
+              <TabsContent value="tab2" className="p-8 m-0">
                 <div className="text-center py-16 text-gray-500">
-                  <p className="text-sm font-medium">Additional Details</p>
-                  <p className="text-xs mt-1">More details will be displayed here</p>
+                  <p className="text-sm font-medium">Tab 2 Content</p>
+                  <p className="text-xs mt-1">Content for Tab 2 will be displayed here</p>
                 </div>
               </TabsContent>
 
-              <TabsContent value="dependencies" className="p-8 m-0">
+              <TabsContent value="tab3" className="p-8 m-0">
                 <div className="text-center py-16 text-gray-500">
-                  <p className="text-sm font-medium">Dependencies</p>
-                  <p className="text-xs mt-1">Dependencies will be displayed here</p>
+                  <p className="text-sm font-medium">Tab 3 Content</p>
+                  <p className="text-xs mt-1">Content for Tab 3 will be displayed here</p>
                 </div>
               </TabsContent>
 
-              <TabsContent value="activity" className="p-8 m-0">
+              <TabsContent value="tab4" className="p-8 m-0">
                 <div className="text-center py-16 text-gray-500">
-                  <p className="text-sm font-medium">Activity Log</p>
-                  <p className="text-xs mt-1">Activity history will be displayed here</p>
+                  <p className="text-sm font-medium">Tab 4 Content</p>
+                  <p className="text-xs mt-1">Content for Tab 4 will be displayed here</p>
                 </div>
               </TabsContent>
 
-              <TabsContent value="attachments" className="p-8 m-0">
+              <TabsContent value="tab5" className="p-8 m-0">
                 <div className="text-center py-16 text-gray-500">
-                  <p className="text-sm font-medium">Attachments</p>
-                  <p className="text-xs mt-1">File attachments will be displayed here</p>
+                  <p className="text-sm font-medium">Tab 5 Content</p>
+                  <p className="text-xs mt-1">Content for Tab 5 will be displayed here</p>
                 </div>
               </TabsContent>
             </Tabs>

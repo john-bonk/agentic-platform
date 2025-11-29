@@ -169,9 +169,7 @@ export function DashboardPage() {
     <AppLayout>
       <div className="flex flex-col h-full overflow-y-auto bg-white">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h1 className="text-xl font-semibold text-gray-900" data-testid="text-dashboard-title">
-            Business Continuity Dashboard
-          </h1>
+          <h1 className="text-xl font-semibold text-gray-900" data-testid="text-dashboard-title">Dashboard Template</h1>
           <div className="flex items-center gap-2">
             <Button 
               variant="ghost" 

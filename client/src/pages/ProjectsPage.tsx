@@ -43,30 +43,30 @@ interface ProcessItem {
 const exampleData: ProcessItem[] = [
   { 
     id: "1", 
-    name: "Retail Banking Operations",
+    name: "Category 1",
     children: [
-      { id: "1-1", name: "Account Management", processOwner: "Baylor Cruz", criticality: "High", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "1-2", name: "Loan Origination and Servicing", processOwner: "Baylor Cruz", criticality: "Low", rto: "30 mins", rpo: "30 mins", latestBia: "2024" },
-      { id: "1-3", name: "Customer Service and Support", processOwner: "Baylor Cruz", criticality: "Low", rto: "24 hours", rpo: "24 hours", latestBia: "2024" },
+      { id: "1-1", name: "Item 1", processOwner: "Owner A", criticality: "High", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "1-2", name: "Item 2", processOwner: "Owner A", criticality: "Low", rto: "30 mins", rpo: "30 mins", latestBia: "2024" },
+      { id: "1-3", name: "Item 3", processOwner: "Owner A", criticality: "Low", rto: "24 hours", rpo: "24 hours", latestBia: "2024" },
     ]
   },
   { 
     id: "2", 
-    name: "Human Resources",
+    name: "Category 2",
     children: [
-      { id: "2-1", name: "Employee Onboarding and Offboarding", processOwner: "Dante Bradford", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "2-2", name: "Benefits Administration", processOwner: "Dante Bradford", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "2-3", name: "Training & Development", processOwner: "Dante Bradford", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "2-1", name: "Item 4", processOwner: "Owner B", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "2-2", name: "Item 5", processOwner: "Owner B", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "2-3", name: "Item 6", processOwner: "Owner B", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
     ]
   },
   { 
     id: "3", 
-    name: "Treasury & Cash Management",
+    name: "Category 3",
     children: [
-      { id: "3-1", name: "Cash Flow Forecasting", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "3-2", name: "Liquidity Management", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "3-3", name: "Payment Processing", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
-      { id: "3-4", name: "Benefits Administration", processOwner: "Leah Sullivan", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "3-1", name: "Item 7", processOwner: "Owner C", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "3-2", name: "Item 8", processOwner: "Owner C", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "3-3", name: "Item 9", processOwner: "Owner C", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
+      { id: "3-4", name: "Item 10", processOwner: "Owner C", criticality: "Low", rto: "1 hour", rpo: "1 hour", latestBia: "2024" },
     ]
   },
 ];
@@ -152,15 +152,15 @@ export function ProjectsPage() {
     <AppLayout>
       <div className="flex flex-col h-full overflow-hidden">
         <PageHeader 
-          title="Projects" 
-          description="Manage and track your business processes"
+          title="List Page" 
+          description="Example list page with hierarchical data"
           actions={
             <Button 
               className="gap-2 bg-teal-600 hover:bg-teal-700"
-              data-testid="button-create-project"
+              data-testid="button-create-item"
             >
               <Plus className="w-4 h-4" />
-              Create Process
+              Create Item
             </Button>
           }
         />
@@ -170,7 +170,7 @@ export function ProjectsPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
-                placeholder="Search processes..."
+                placeholder="Search items..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 h-9 w-[200px] sm:w-[280px] text-sm"
@@ -344,7 +344,7 @@ export function ProjectsPage() {
 
             {filteredData.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 text-gray-500">
-                <p className="text-lg font-medium">No processes found</p>
+                <p className="text-lg font-medium">No items found</p>
                 <p className="text-sm mt-1">Try adjusting your search or filters</p>
               </div>
             )}
