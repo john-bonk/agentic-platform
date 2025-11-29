@@ -183,7 +183,7 @@ export function ItemDetailPage() {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <div className="border-b border-gray-200 px-8">
+              <div className="border-b border-gray-200 px-8 pl-[0px] pr-[0px]">
                 <TabsList className="h-auto p-0 bg-transparent border-0">
                   <TabsTrigger 
                     value="tab1"
