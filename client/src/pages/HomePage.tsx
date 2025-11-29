@@ -49,7 +49,7 @@ export function HomePage() {
           description="A clean, well-structured React application template ready for customization"
         />
         
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-8 bg-[#f9fafb]">
           <div className="max-w-4xl">
             <div className="mb-8">
               <h2 className="text-lg font-semibold text-gray-900 mb-2">
