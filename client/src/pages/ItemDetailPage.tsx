@@ -26,6 +26,7 @@ import {
   MoreHorizontal,
   Info
 } from "lucide-react";
+import { useTabStore } from "@/lib/tabStore";
 
 interface DetailItem {
   id: string;
@@ -141,7 +142,16 @@ const getPriorityBadge = (priority: string) => {
 export function ItemDetailPage() {
   const [, params] = useRoute("/items/:id");
   const itemId = params?.id || "1-1";
-  const item = detailItems[itemId] || detailItems["1-1"];
+  const { openTabs } = useTabStore();
+  
+  const tabInfo = openTabs.find(t => t.id === itemId);
+  const staticItem = detailItems[itemId] || detailItems["1-1"];
+  
+  const item = {
+    ...staticItem,
+    id: itemId,
+    name: tabInfo?.name || staticItem.name,
+  };
   
   const [activeTab, setActiveTab] = useState("tab1");
 
