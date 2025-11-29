@@ -6,7 +6,6 @@
  * - Metric cards
  * - Charts (RTO, Risk Trend, Plan Effectiveness)
  * - Business Processes Overview table
- * - Dependency Map visualization
  */
 
 import { useState } from "react";
@@ -31,11 +30,7 @@ import {
 import { 
   RefreshCw,
   MoreHorizontal,
-  ArrowUpDown,
-  ChevronDown,
-  ZoomIn,
-  ZoomOut,
-  Maximize2
+  ArrowUpDown
 } from "lucide-react";
 import { 
   BarChart, 
@@ -131,15 +126,6 @@ const businessProcesses = [
   },
 ];
 
-const dependencyNodes = {
-  frameworks: ["PCI-DSS", "SOX", "AML", "Fed Reserve", "CFPB"],
-  policies: [],
-  risks: [],
-  itSystems: ["Core Banking System (C...", "Customer Relationship ...", "Identity Management Sy...", "Loan Origination System...", "Credit Decision Engine", "Document Management ..."],
-  vendors: [],
-  locations: [],
-};
-
 export function DashboardPage() {
   const [businessUnit, setBusinessUnit] = useState("all");
   const [criticality, setCriticality] = useState("all");
@@ -204,7 +190,7 @@ export function DashboardPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200 flex-wrap">
+        <div className="flex items-center gap-4 px-6 py-4 bg-gray-50 flex-wrap">
           <div className="flex flex-col gap-1">
             <span className="text-xs text-gray-500">Business Unit</span>
             <Select value={businessUnit} onValueChange={setBusinessUnit}>
