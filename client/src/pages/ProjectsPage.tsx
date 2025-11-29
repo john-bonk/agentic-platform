@@ -112,15 +112,15 @@ export function ProjectsPage() {
     <AppLayout>
       <div className="flex flex-col h-full overflow-hidden">
         <PageHeader 
-          title="Projects" 
-          description="Manage and track your projects"
+          title="Business Processes" 
+          description="Manage and track business processes"
           actions={
             <Button 
               className="gap-2 bg-teal-600 hover:bg-teal-700"
               data-testid="button-create-project"
             >
               <Plus className="w-4 h-4" />
-              Create Project
+              Create Process
             </Button>
           }
         />
