@@ -308,7 +308,7 @@ export function ProjectsPage() {
                         <GripVertical className="w-4 h-4 text-gray-300 flex-shrink-0 invisible group-hover:visible" />
                         <button
                           onClick={() => handleItemClick(child)}
-                          className="text-sm text-teal-600 hover:text-teal-700 hover:underline font-medium truncate text-left"
+                          className="text-sm hover:text-teal-700 hover:underline font-medium truncate text-left text-[#3172E3]"
                           data-testid={`link-child-${child.id}`}
                         >
                           {child.name}
