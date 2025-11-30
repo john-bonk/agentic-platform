@@ -82,7 +82,7 @@ function Wizard({
         isLastStep: currentStep === steps.length - 1,
       }}
     >
-      <div className={cn("flex flex-col bg-white dark:bg-gray-900", className)}>
+      <div className={cn("flex flex-col h-full bg-white dark:bg-gray-900", className)}>
         {children}
       </div>
     </WizardContext.Provider>

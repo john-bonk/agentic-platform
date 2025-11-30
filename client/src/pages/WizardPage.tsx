@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X, Upload } from "lucide-react";
+import { useLocation } from "wouter";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ import {
   WizardFooter,
   useWizard,
 } from "@/components/ui/wizard";
+import { useTabStore } from "@/lib/tabStore";
 
 interface WizardFormData {
   planName: string;
@@ -52,7 +54,7 @@ interface StepProps {
 
 function Step1Content({ formData, setFormData }: StepProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-2xl">
       <div className="space-y-2">
         <Label htmlFor="plan-name">Plan Name</Label>
         <Input
@@ -160,7 +162,7 @@ function Step1Content({ formData, setFormData }: StepProps) {
 
 function Step2Content({ formData, setFormData }: StepProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-2xl">
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
         <textarea
@@ -246,7 +248,7 @@ function Step3Content({ formData, setFormData }: StepProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-2xl">
       <div className="space-y-2">
         <Label>Add Reviewers</Label>
         <Select onValueChange={handleAddReviewer}>
@@ -324,71 +326,63 @@ function WizardStepContent({ formData, setFormData }: StepProps) {
 }
 
 export default function WizardPage() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [location, setLocation] = useLocation();
+  const { closeTab } = useTabStore();
   const [formData, setFormData] = useState<WizardFormData>(defaultFormData);
 
-  const handleClose = () => {
-    setIsOpen(false);
-  };
+  const isTemplate2 = location.startsWith("/template2");
+  const basePath = isTemplate2 ? "/template2" : "";
 
-  const handleReopen = () => {
-    setFormData(defaultFormData);
-    setIsOpen(true);
+  const handleClose = () => {
+    closeTab("wizard");
+    setLocation(basePath || "/");
   };
 
   const handleFinish = () => {
-    alert(`Plan "${formData.planName}" created successfully with ${formData.reviewers.length} reviewers!`);
-    setIsOpen(false);
+    alert(`Plan "${formData.planName || 'New Plan'}" created successfully with ${formData.reviewers.length} reviewers!`);
+    closeTab("wizard");
+    setLocation(basePath || "/");
   };
 
   return (
-    <AppLayout>
-      <div className="flex flex-col h-full overflow-auto bg-white dark:bg-gray-900">
-        {!isOpen ? (
-          <div className="flex flex-col items-center justify-center h-full gap-4">
-            <p className="text-slate-500 dark:text-slate-400">
-              Wizard closed. Click below to reopen.
-            </p>
-            <Button onClick={handleReopen} data-testid="button-reopen-wizard">
-              Open Wizard
+    <AppLayout
+      activeTab={{
+        id: "wizard",
+        name: "Create New Plan",
+        path: `${basePath}/wizard`
+      }}
+    >
+      <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-gray-900">
+        <Wizard
+          steps={[
+            { id: "details", label: "Plan Details" },
+            { id: "data", label: "Plan Data" },
+            { id: "reviewers", label: "Select Reviewers" },
+          ]}
+          defaultStep={0}
+        >
+          <WizardHeader title="Create new Business Continuity Plan">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleClose}
+              data-testid="button-close-wizard"
+            >
+              <X className="w-4 h-4" />
             </Button>
-          </div>
-        ) : (
-          <div className="p-6 h-full">
-            <div className="max-w-3xl mx-auto">
-              <Wizard
-                steps={[
-                  { id: "details", label: "Plan Details" },
-                  { id: "data", label: "Plan Data" },
-                  { id: "reviewers", label: "Select Reviewers" },
-                ]}
-                defaultStep={0}
-              >
-                <WizardHeader title="Create new Business Continuity Plan">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleClose}
-                    data-testid="button-close-wizard"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </WizardHeader>
-                <WizardContent className="min-h-[400px] py-6">
-                  <WizardStepContent formData={formData} setFormData={setFormData} />
-                </WizardContent>
-                <WizardFooter
-                  showTertiaryButton={false}
-                  secondaryLabel="Cancel"
-                  nextLabel="Next"
-                  finishLabel="Create Plan"
-                  onSecondary={handleClose}
-                  onFinish={handleFinish}
-                />
-              </Wizard>
-            </div>
-          </div>
-        )}
+          </WizardHeader>
+          <WizardContent className="flex-1 overflow-auto py-6 px-8">
+            <WizardStepContent formData={formData} setFormData={setFormData} />
+          </WizardContent>
+          <WizardFooter
+            showTertiaryButton={false}
+            secondaryLabel="Cancel"
+            nextLabel="Next"
+            finishLabel="Create Plan"
+            onSecondary={handleClose}
+            onFinish={handleFinish}
+          />
+        </Wizard>
       </div>
     </AppLayout>
   );
