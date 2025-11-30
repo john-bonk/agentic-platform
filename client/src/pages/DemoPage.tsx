@@ -43,6 +43,7 @@ import { Toggle } from "@/components/ui/toggle";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Wizard, WizardHeader, WizardContent, WizardFooter } from "@/components/ui/wizard";
 import { 
   Bell, 
   Check, 
@@ -284,6 +285,37 @@ export function DemoPage() {
                       <Badge variant="destructive">Destructive</Badge>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">Wizard</h3>
+                  <p className="text-sm text-slate-500">Multi-step wizard layout with step indicator</p>
+                </div>
+                <div className="border rounded-md overflow-hidden">
+                  <Wizard
+                    steps={[
+                      { id: "step1", label: "Account Setup" },
+                      { id: "step2", label: "Profile Info" },
+                      { id: "step3", label: "Preferences" },
+                      { id: "step4", label: "Review" },
+                    ]}
+                    defaultStep={1}
+                  >
+                    <WizardHeader title="Create Your Account">
+                      <Button variant="outline" size="sm">Button</Button>
+                      <Button variant="outline" size="sm">Button</Button>
+                    </WizardHeader>
+                    <WizardContent className="min-h-[200px] flex items-center justify-center bg-purple-100/50 dark:bg-purple-900/20 border border-purple-200/50 dark:border-purple-800/30">
+                      <p className="text-purple-600 dark:text-purple-400 text-lg">Layout Multi-Step Body</p>
+                    </WizardContent>
+                    <WizardFooter 
+                      tertiaryLabel="Button"
+                      secondaryLabel="Button"
+                      nextLabel="Button"
+                    />
+                  </Wizard>
                 </div>
               </div>
 
