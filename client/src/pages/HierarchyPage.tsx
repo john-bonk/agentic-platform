@@ -182,12 +182,26 @@ const formatDate = (dateString: string) => {
   });
 };
 
+const getAllExpandableIds = (items: HierarchyItem[]): string[] => {
+  const ids: string[] = [];
+  const collectIds = (items: HierarchyItem[]) => {
+    items.forEach(item => {
+      if (item.children && item.children.length > 0) {
+        ids.push(item.id);
+        collectIds(item.children);
+      }
+    });
+  };
+  collectIds(items);
+  return ids;
+};
+
 export function HierarchyPage() {
   const [location, setLocation] = useLocation();
   const { openTab } = useTabStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(["1", "2", "3", "1-1", "1-1-1"]));
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(() => new Set(getAllExpandableIds(exampleData)));
   
   const isTemplate2 = location.startsWith("/template2");
   const basePath = isTemplate2 ? "/template2" : "";
