@@ -74,23 +74,6 @@ const getStatusBadge = (status: ItemStatus) => {
   );
 };
 
-const getCategoryBadge = (category: ItemCategory) => {
-  const styles: Record<ItemCategory, string> = {
-    Primary: "bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800",
-    Secondary: "bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
-    Tertiary: "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
-  };
-  
-  return (
-    <Badge 
-      variant="outline"
-      className={`text-xs px-2 py-0.5 ${styles[category]}`}
-      data-testid={`badge-category-${category.toLowerCase()}`}
-    >
-      {category}
-    </Badge>
-  );
-};
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -283,7 +266,9 @@ export function ListPage() {
                     {getStatusBadge(item.status)}
                   </div>
                   <div className="w-[120px] flex-shrink-0 px-3">
-                    {getCategoryBadge(item.category)}
+                    <span className="text-sm text-gray-700 dark:text-gray-300" data-testid={`text-category-${item.id}`}>
+                      {item.category}
+                    </span>
                   </div>
                   <div className="w-[140px] flex-shrink-0 px-3">
                     <span className="text-sm text-gray-700 dark:text-gray-300">
