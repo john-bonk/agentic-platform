@@ -116,22 +116,34 @@ function WizardHeader({ title, children, className }: WizardHeaderProps) {
 function WizardStepIndicator({ className }: { className?: string }) {
   const { steps, currentStep } = useWizard()
 
-  // Calculate line width: goes through completed steps only, stopping at active step
-  // Each step takes equal width, line should extend to the start of active step (not past it)
-  const getLineWidth = () => {
-    if (currentStep === 0) return "0%"
-    // Line goes from first step to the current step position
-    // But we want it to stop AT the active step indicator, not go past
-    return `calc(${(currentStep / (steps.length - 1)) * 100}% - 12px)`
-  }
+  // Each step item is w-40 (160px) with gap-8 (32px) between them
+  // Step indicator is w-6 (24px), centered would be at 12px from step start
+  // Distance between step centers = 160px + 32px = 192px
+  const stepWidth = 160 // w-40
+  const gapWidth = 32   // gap-8
+  const indicatorRadius = 12 // half of w-6 (24px)
+  
+  // Line starts at center of first indicator and extends to center of active step
+  const lineWidth = currentStep > 0 ? currentStep * (stepWidth + gapWidth) : 0
 
   return (
     <div className={cn("relative flex gap-8 overflow-hidden", className)}>
-      <div className="absolute left-0 right-0 top-3 h-px bg-slate-200 dark:bg-slate-700 z-0" />
+      {/* Gray background line - spans from first to last indicator center */}
+      <div 
+        className="absolute top-3 h-px bg-slate-200 dark:bg-slate-700 z-0" 
+        style={{ 
+          left: `${indicatorRadius}px`,
+          width: `${(steps.length - 1) * (stepWidth + gapWidth)}px`
+        }}
+      />
+      {/* Teal progress line - spans from first indicator to active step indicator */}
       {currentStep > 0 && (
         <div 
-          className="absolute left-3 top-3 h-px bg-[#266C92] z-0 transition-all duration-300" 
-          style={{ width: getLineWidth() }}
+          className="absolute top-3 h-px bg-[#266C92] z-0 transition-all duration-300" 
+          style={{ 
+            left: `${indicatorRadius}px`,
+            width: `${lineWidth}px`
+          }}
         />
       )}
       
