@@ -9,7 +9,7 @@
 
 export type IconNavItem = 
   | { type: "image"; src: string; alt: string; active: boolean; path?: string; modulePrefix?: string }
-  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch"; alt: string; active: boolean; path?: string; modulePrefix?: string };
+  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish"; alt: string; active: boolean; path?: string; modulePrefix?: string };
 
 export interface SideNavSection {
   title: string;
@@ -31,7 +31,7 @@ export const modules: ModuleConfig[] = [
   {
     id: "template1",
     name: "Template 1",
-    icon: { type: "lucide", icon: "home", alt: "Template 1", active: false, path: "/", modulePrefix: "" },
+    icon: { type: "lucide", icon: "rabbit", alt: "Template 1", active: false, path: "/", modulePrefix: "" },
     sideNavSections: [
       {
         title: "MAIN",
@@ -59,7 +59,7 @@ export const modules: ModuleConfig[] = [
   {
     id: "template2",
     name: "Template 2",
-    icon: { type: "lucide", icon: "folder", alt: "Template 2", active: false, path: "/template2", modulePrefix: "/template2" },
+    icon: { type: "lucide", icon: "fish", alt: "Template 2", active: false, path: "/template2", modulePrefix: "/template2" },
     sideNavSections: [
       {
         title: "MAIN",

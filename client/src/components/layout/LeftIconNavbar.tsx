@@ -15,7 +15,7 @@
  */
 
 import { Link, useLocation } from "wouter";
-import { Home, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch } from "lucide-react";
+import { Home, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish } from "lucide-react";
 import { type IconNavItem } from "@/config/navigation";
 
 interface LeftIconNavbarProps {
@@ -41,6 +41,10 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
         return <List className={`w-4 h-4 ${colorClass}`} />;
       case "git-branch":
         return <GitBranch className={`w-4 h-4 ${colorClass}`} />;
+      case "rabbit":
+        return <Rabbit className={`w-4 h-4 ${colorClass}`} />;
+      case "fish":
+        return <Fish className={`w-4 h-4 ${colorClass}`} />;
       case "refresh-ccw":
         return (
           <div className="relative w-4 h-4 flex items-center justify-center">
