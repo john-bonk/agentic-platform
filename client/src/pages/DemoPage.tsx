@@ -173,19 +173,68 @@ export function DemoPage() {
               <div className="space-y-3">
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900">Avatar</h3>
-                  <p className="text-sm text-slate-500">An image element with fallback</p>
+                  <p className="text-sm text-slate-500">An image element with fallback, sizes, and status</p>
                 </div>
-                <div className="flex gap-4 items-center">
-                  <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                  <Avatar>
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
-                  <Avatar>
-                    <AvatarFallback>AB</AvatarFallback>
-                  </Avatar>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-slate-400 mb-2">Sizes with Initials</p>
+                    <div className="flex gap-4 items-center">
+                      <Avatar size="sm">
+                        <AvatarFallback size="sm">AZ</AvatarFallback>
+                      </Avatar>
+                      <Avatar size="md">
+                        <AvatarFallback size="md">AZ</AvatarFallback>
+                      </Avatar>
+                      <Avatar size="lg">
+                        <AvatarFallback size="lg">AZ</AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400 mb-2">Default Icon</p>
+                    <div className="flex gap-4 items-center">
+                      <Avatar size="sm">
+                        <AvatarFallback size="sm" showIcon />
+                      </Avatar>
+                      <Avatar size="md">
+                        <AvatarFallback size="md" showIcon />
+                      </Avatar>
+                      <Avatar size="lg">
+                        <AvatarFallback size="lg" showIcon />
+                      </Avatar>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400 mb-2">With Image</p>
+                    <div className="flex gap-4 items-center">
+                      <Avatar size="sm">
+                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                        <AvatarFallback size="sm">CN</AvatarFallback>
+                      </Avatar>
+                      <Avatar size="md">
+                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                        <AvatarFallback size="md">CN</AvatarFallback>
+                      </Avatar>
+                      <Avatar size="lg">
+                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                        <AvatarFallback size="lg">CN</AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400 mb-2">Status Indicators</p>
+                    <div className="flex gap-4 items-center">
+                      <Avatar size="md" status="success">
+                        <AvatarFallback size="md">OK</AvatarFallback>
+                      </Avatar>
+                      <Avatar size="md" status="error">
+                        <AvatarFallback size="md">ER</AvatarFallback>
+                      </Avatar>
+                      <Avatar size="md" status="none">
+                        <AvatarFallback size="md">NA</AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </div>
                 </div>
               </div>
 
