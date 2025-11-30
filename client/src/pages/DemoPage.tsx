@@ -192,25 +192,47 @@ export function DemoPage() {
               <div className="space-y-3">
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900">Badge</h3>
-                  <p className="text-sm text-slate-500">Displays a badge or label</p>
+                  <p className="text-sm text-slate-500">Displays a badge or label with colors and weights</p>
                 </div>
                 <div className="space-y-4">
-                  <div className="flex flex-wrap gap-2">
-                    <Badge>Default</Badge>
-                    <Badge variant="secondary">Secondary</Badge>
-                    <Badge variant="outline">Outline</Badge>
-                    <Badge variant="destructive">Destructive</Badge>
+                  <div>
+                    <p className="text-xs text-slate-400 mb-2">Colors (Strong weight)</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge badgeColor="gray" weight="strong">Gray</Badge>
+                      <Badge badgeColor="blue" weight="strong">Blue</Badge>
+                      <Badge badgeColor="red" weight="strong">Red</Badge>
+                      <Badge badgeColor="orange" weight="strong">Orange</Badge>
+                      <Badge badgeColor="yellow" weight="strong">Yellow</Badge>
+                      <Badge badgeColor="green" weight="strong">Green</Badge>
+                      <Badge badgeColor="purple" weight="strong">Purple</Badge>
+                      <Badge badgeColor="teal" weight="strong">Teal</Badge>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge className="bg-green-100 text-green-700 border-green-200" variant="outline">
-                      <Check className="w-3 h-3 mr-1" /> Success
-                    </Badge>
-                    <Badge className="bg-amber-100 text-amber-700 border-amber-200" variant="outline">
-                      <AlertCircle className="w-3 h-3 mr-1" /> Warning
-                    </Badge>
-                    <Badge className="bg-blue-100 text-blue-700 border-blue-200" variant="outline">
-                      <Info className="w-3 h-3 mr-1" /> Info
-                    </Badge>
+                  <div>
+                    <p className="text-xs text-slate-400 mb-2">Weights (Blue)</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge badgeColor="blue" weight="weak">Weak</Badge>
+                      <Badge badgeColor="blue" weight="normal">Normal</Badge>
+                      <Badge badgeColor="blue" weight="strong">Strong</Badge>
+                      <Badge badgeColor="blue" weight="extraStrong">Extra Strong</Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400 mb-2">Sizes</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge badgeColor="teal" weight="strong" size="sm">Small</Badge>
+                      <Badge badgeColor="teal" weight="strong" size="md">Medium</Badge>
+                      <Badge badgeColor="teal" weight="strong" size="lg">Large</Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400 mb-2">Legacy variants (backward compatible)</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="default">Default</Badge>
+                      <Badge variant="secondary">Secondary</Badge>
+                      <Badge variant="outline">Outline</Badge>
+                      <Badge variant="destructive">Destructive</Badge>
+                    </div>
                   </div>
                 </div>
               </div>
