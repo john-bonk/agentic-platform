@@ -27,10 +27,12 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
   const [location] = useLocation();
 
   const isActive = (path: string) => {
-    if (path === "/") {
-      return location === "/";
+    // Exact match for root paths (/ or /template2)
+    if (path === "/" || path === "/template2") {
+      return location === path;
     }
-    return location.startsWith(path);
+    // For other paths, check if location matches exactly or starts with path + "/"
+    return location === path || location.startsWith(path + "/");
   };
 
   return (
