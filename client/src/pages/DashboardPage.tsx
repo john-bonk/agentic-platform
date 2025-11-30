@@ -130,8 +130,11 @@ export function DashboardPage() {
   const [category, setCategory] = useState("all");
   const [priority, setPriority] = useState("all");
   const [status, setStatus] = useState("all");
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { openTab } = useTabStore();
+  
+  const isTemplate2 = location.startsWith("/template2");
+  const basePath = isTemplate2 ? "/template2" : "";
 
   const clearFilters = () => {
     setCategory("all");
@@ -155,13 +158,14 @@ export function DashboardPage() {
   const highPriorityCount = filteredItems.filter(p => p.priority === "High").length;
 
   const handleItemClick = (item: typeof dashboardItems[0]) => {
+    const modulePrefix = isTemplate2 ? "t2-" : "";
     const tab = {
-      id: `item-${item.id}`,
+      id: `${modulePrefix}${item.id}`,
       name: item.name,
-      path: `/items/${item.id}`,
+      path: `${basePath}/items/${item.id}`,
     };
     openTab(tab);
-    setLocation(`/items/${item.id}`);
+    setLocation(`${basePath}/items/${item.id}`);
   };
 
   return (

@@ -85,10 +85,13 @@ const formatDate = (dateString: string) => {
 };
 
 export function ListPage() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { openTab } = useTabStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  
+  const isTemplate2 = location.startsWith("/template2");
+  const basePath = isTemplate2 ? "/template2" : "";
 
   const filteredData = useMemo(() => {
     if (!searchQuery.trim()) return exampleData;
@@ -123,12 +126,13 @@ export function ListPage() {
   };
 
   const handleItemClick = (item: ListItem) => {
+    const modulePrefix = isTemplate2 ? "t2-" : "";
     openTab({
-      id: item.id,
+      id: `${modulePrefix}${item.id}`,
       name: item.name,
-      path: `/items/${item.id}`
+      path: `${basePath}/items/${item.id}`
     });
-    setLocation(`/items/${item.id}`);
+    setLocation(`${basePath}/items/${item.id}`);
   };
 
   return (

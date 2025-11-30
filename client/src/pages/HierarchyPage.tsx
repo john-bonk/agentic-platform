@@ -183,11 +183,14 @@ const formatDate = (dateString: string) => {
 };
 
 export function HierarchyPage() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { openTab } = useTabStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(["1", "2", "3", "1-1", "1-1-1"]));
+  
+  const isTemplate2 = location.startsWith("/template2");
+  const basePath = isTemplate2 ? "/template2" : "";
 
   const filterItems = (items: HierarchyItem[], query: string): HierarchyItem[] => {
     return items.reduce<HierarchyItem[]>((acc, item) => {
@@ -237,12 +240,13 @@ export function HierarchyPage() {
   };
 
   const handleItemClick = (item: HierarchyItem) => {
+    const modulePrefix = isTemplate2 ? "t2-" : "";
     openTab({
-      id: item.id,
+      id: `${modulePrefix}${item.id}`,
       name: item.name,
-      path: `/items/${item.id}`
+      path: `${basePath}/items/${item.id}`
     });
-    setLocation(`/items/${item.id}`);
+    setLocation(`${basePath}/items/${item.id}`);
   };
 
   const getIndentLevel = (type: HierarchyType): number => {

@@ -15,7 +15,7 @@
  */
 
 import { useState } from "react";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -140,11 +140,17 @@ const getPriorityBadge = (priority: string) => {
 };
 
 export function ItemDetailPage() {
-  const [, params] = useRoute("/items/:id");
-  const itemId = params?.id || "1-1";
+  const [location] = useLocation();
   const { openTabs } = useTabStore();
   
-  const tabInfo = openTabs.find(t => t.id === itemId);
+  const isTemplate2 = location.startsWith("/template2");
+  const basePath = isTemplate2 ? "/template2" : "";
+  const modulePrefix = isTemplate2 ? "t2-" : "";
+  
+  const itemIdMatch = location.match(/\/items\/(.+)$/);
+  const itemId = itemIdMatch?.[1] || "1-1";
+  
+  const tabInfo = openTabs.find(t => t.id === `${modulePrefix}${itemId}` || t.id === itemId);
   const staticItem = detailItems[itemId] || detailItems["1-1"];
   
   const item = {
@@ -158,9 +164,9 @@ export function ItemDetailPage() {
   return (
     <AppLayout 
       activeTab={{ 
-        id: item.id, 
+        id: `${modulePrefix}${item.id}`, 
         name: item.name, 
-        path: `/items/${item.id}` 
+        path: `${basePath}/items/${item.id}` 
       }}
     >
       <div className="flex flex-col h-full overflow-auto bg-[#ffffff]">
