@@ -1,16 +1,21 @@
 /**
- * Page Header Component
+ * PageHeader Component
+ * 
+ * CANONICAL IMPLEMENTATION - Use this for all page headers.
+ * DO NOT create custom page headers - use PageHeader instead.
  * 
  * A reusable header for page content with title and optional actions.
  * 
  * Usage:
+ * ```tsx
+ * import { PageHeader } from "@/components/layout";
+ * 
  * <PageHeader 
  *   title="My Page"
  *   description="Optional description"
  *   actions={<Button>Create</Button>}
  * />
- * 
- * TODO: Customize styling and actions as needed
+ * ```
  */
 
 interface PageHeaderProps {

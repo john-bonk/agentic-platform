@@ -1,3 +1,26 @@
+/**
+ * EmptyState Component
+ * 
+ * CANONICAL IMPLEMENTATION - Use this component for all empty state displays.
+ * DO NOT create custom empty states - extend this component instead.
+ * 
+ * Features:
+ * - 4 variants: "search", "no-items", "no-data", "empty-folder"
+ * - Illustration mode (default) or icon mode (useIllustration={false})
+ * - Customizable heading, description, and actions
+ * - Primary, secondary, and tertiary action buttons
+ * 
+ * Usage:
+ * ```tsx
+ * import { EmptyState } from "@/components/ui/empty-state";
+ * 
+ * // With illustration (default)
+ * <EmptyState variant="no-items" primaryAction={{ label: "Create", onClick: () => {} }} />
+ * 
+ * // With icon
+ * <EmptyState variant="search" useIllustration={false} />
+ * ```
+ */
 import { LucideIcon, Search, FileX, Inbox, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

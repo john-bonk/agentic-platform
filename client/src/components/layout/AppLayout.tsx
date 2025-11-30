@@ -1,23 +1,20 @@
 /**
- * App Layout Component
+ * AppLayout Component
+ * 
+ * CANONICAL IMPLEMENTATION - Always wrap pages with this component.
+ * DO NOT create custom page wrappers - use AppLayout instead.
  * 
  * The main layout wrapper that provides consistent structure across all pages.
  * Includes the icon navbar, side navigation, header, and content area.
  * 
  * Usage:
+ * ```tsx
+ * import { AppLayout } from "@/components/layout";
+ * 
  * <AppLayout>
  *   <YourPageContent />
  * </AppLayout>
- * 
- * Or with props:
- * <AppLayout 
- *   showSideNav={false}
- *   pageTitle="My Page"
- * >
- *   <YourPageContent />
- * </AppLayout>
- * 
- * TODO: Customize layout sections as needed
+ * ```
  */
 
 import { useLocation } from "wouter";

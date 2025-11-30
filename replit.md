@@ -5,9 +5,62 @@ A generic, well-structured React + Express full-stack starter template. This tem
 - List Page with flat table format (no nesting)
 - Hierarchy Page with multi-level expandable rows (Region > Country > State > City)
 - Detail Page with tabbed sections
+- Multi-step Wizard with file upload
 - Config-driven navigation system
 
 All content uses generic naming making it easy to customize for any use case. Design uses #266C92 teal as the primary accent color.
+
+# Component Usage Policy
+
+**IMPORTANT: Always use existing components before creating new ones.**
+
+This template includes pre-built, tested components that should be reused. Do NOT create new components for functionality that already exists.
+
+## Required Components (Always Use These)
+
+### Layout Components
+```typescript
+import { AppLayout, PageHeader } from "@/components/layout";
+```
+- `AppLayout` - Main page wrapper with navigation, always wrap pages with this
+- `PageHeader` - Consistent page headers with title, description, and action buttons
+
+### Feedback Components
+```typescript
+import { EmptyState } from "@/components/ui/empty-state";
+```
+- `EmptyState` - Empty state displays with 4 variants: "search", "no-items", "no-data", "empty-folder"
+- Supports illustrations (default) or icons (`useIllustration={false}`)
+- Use for empty lists, search results, folders, or any "no content" state
+
+### Wizard Components
+```typescript
+import { Wizard, WizardHeader, WizardContent, WizardFooter, useWizard } from "@/components/ui/wizard";
+```
+- Multi-step forms with progress indicators
+- Built-in navigation (Next/Previous/Finish buttons)
+- Use for any multi-step creation or configuration flow
+
+### Standard Shadcn Components
+Use existing Shadcn components from `@/components/ui/`:
+- `Button`, `Badge`, `Card` - Core interactive elements
+- `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` - Tabbed interfaces
+- `Input`, `Select`, `Checkbox`, `Label` - Form inputs
+- `Dialog`, `Sheet`, `Popover` - Overlays and modals
+- `Table` - Data tables
+
+## Anti-Patterns (Do NOT Do These)
+
+- Creating custom empty states instead of using `EmptyState`
+- Building new wizard/stepper components instead of using `Wizard`
+- Creating custom page wrappers instead of using `AppLayout`
+- Duplicating layout patterns instead of using `PageHeader`
+
+## Navigation Configuration
+
+All navigation is config-driven. To add new pages:
+1. Add route in `client/src/App.tsx`
+2. Add navigation item in `client/src/config/navigation.ts`
 
 # User Preferences
 
@@ -57,6 +110,7 @@ Preferred communication style: Simple, everyday language.
 - `client/src/pages/ListPage.tsx` - Flat table with search, filters, and item selection
 - `client/src/pages/HierarchyPage.tsx` - Multi-level hierarchical data with expandable rows (NAME, PARENT, TYPE, DATE CREATED, ALLOWED ON columns)
 - `client/src/pages/ItemDetailPage.tsx` - Detail page with tabbed sections (Tab 1-5)
+- `client/src/pages/WizardPage.tsx` - Multi-step wizard with file upload
 - `client/src/pages/DemoPage.tsx` - Component showcase
 - `client/src/pages/SettingsPage.tsx` - Settings page example
 

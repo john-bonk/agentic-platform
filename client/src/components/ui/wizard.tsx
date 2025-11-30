@@ -1,3 +1,29 @@
+/**
+ * Wizard Components
+ * 
+ * CANONICAL IMPLEMENTATION - Use these components for all multi-step forms.
+ * DO NOT create custom steppers or wizards - use these instead.
+ * 
+ * Components:
+ * - Wizard: Main wrapper, provides step context
+ * - WizardHeader: Title and step indicator
+ * - WizardContent: Scrollable content area
+ * - WizardFooter: Navigation buttons (Previous/Next/Finish)
+ * - useWizard: Hook to access wizard state
+ * 
+ * Usage:
+ * ```tsx
+ * import { Wizard, WizardHeader, WizardContent, WizardFooter, useWizard } from "@/components/ui/wizard";
+ * 
+ * <Wizard steps={[{ id: "step1", label: "Step 1" }, { id: "step2", label: "Step 2" }]}>
+ *   <WizardHeader title="Create Item" />
+ *   <WizardContent>
+ *     <YourStepContent />
+ *   </WizardContent>
+ *   <WizardFooter onFinish={() => {}} />
+ * </Wizard>
+ * ```
+ */
 import * as React from "react"
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -203,7 +229,7 @@ interface WizardContentProps {
 
 function WizardContent({ children, className }: WizardContentProps) {
   return (
-    <div className={cn("flex-1 p-6", className)}>
+    <div className={cn("flex-1 min-h-0 overflow-auto p-6", className)}>
       {children}
     </div>
   )
@@ -244,7 +270,7 @@ function WizardFooter({
 
   if (children) {
     return (
-      <div className={cn("flex items-center justify-between gap-4 px-8 py-6", className)}>
+      <div className={cn("flex items-center justify-between gap-4 px-8 py-6 flex-shrink-0 border-t border-gray-200 dark:border-gray-700", className)}>
         {children}
       </div>
     )
@@ -253,7 +279,7 @@ function WizardFooter({
   if (!showDefaultButtons) return null
 
   return (
-    <div className={cn("flex items-center justify-between gap-4 px-8 py-6", className)}>
+    <div className={cn("flex items-center justify-between gap-4 px-8 py-6 flex-shrink-0 border-t border-gray-200 dark:border-gray-700", className)}>
       <div className="flex items-center gap-2">
         {showSecondaryButton && (
           <Button 
