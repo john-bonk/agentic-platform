@@ -240,9 +240,8 @@ export function HierarchyPage() {
   };
 
   const handleItemClick = (item: HierarchyItem) => {
-    const modulePrefix = isTemplate2 ? "t2-" : "";
     openTab({
-      id: `${modulePrefix}${item.id}`,
+      id: item.id,
       name: item.name,
       path: `${basePath}/items/${item.id}`
     });

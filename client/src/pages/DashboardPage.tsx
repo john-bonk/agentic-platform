@@ -158,9 +158,8 @@ export function DashboardPage() {
   const highPriorityCount = filteredItems.filter(p => p.priority === "High").length;
 
   const handleItemClick = (item: typeof dashboardItems[0]) => {
-    const modulePrefix = isTemplate2 ? "t2-" : "";
     const tab = {
-      id: `${modulePrefix}${item.id}`,
+      id: item.id,
       name: item.name,
       path: `${basePath}/items/${item.id}`,
     };

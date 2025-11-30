@@ -126,9 +126,8 @@ export function ListPage() {
   };
 
   const handleItemClick = (item: ListItem) => {
-    const modulePrefix = isTemplate2 ? "t2-" : "";
     openTab({
-      id: `${modulePrefix}${item.id}`,
+      id: item.id,
       name: item.name,
       path: `${basePath}/items/${item.id}`
     });

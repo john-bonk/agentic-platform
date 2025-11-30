@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X, Upload } from "lucide-react";
+import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -340,53 +341,55 @@ export default function WizardPage() {
     setIsOpen(false);
   };
 
-  if (!isOpen) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full gap-4">
-        <p className="text-slate-500 dark:text-slate-400">
-          Wizard closed. Click below to reopen.
-        </p>
-        <Button onClick={handleReopen} data-testid="button-reopen-wizard">
-          Open Wizard
-        </Button>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-6 h-full">
-      <div className="max-w-3xl mx-auto">
-        <Wizard
-          steps={[
-            { id: "details", label: "Plan Details" },
-            { id: "data", label: "Plan Data" },
-            { id: "reviewers", label: "Select Reviewers" },
-          ]}
-          defaultStep={0}
-        >
-          <WizardHeader title="Create new Business Continuity Plan">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleClose}
-              data-testid="button-close-wizard"
-            >
-              <X className="w-4 h-4" />
+    <AppLayout>
+      <div className="flex flex-col h-full overflow-auto bg-white dark:bg-gray-900">
+        {!isOpen ? (
+          <div className="flex flex-col items-center justify-center h-full gap-4">
+            <p className="text-slate-500 dark:text-slate-400">
+              Wizard closed. Click below to reopen.
+            </p>
+            <Button onClick={handleReopen} data-testid="button-reopen-wizard">
+              Open Wizard
             </Button>
-          </WizardHeader>
-          <WizardContent className="min-h-[400px] py-6">
-            <WizardStepContent formData={formData} setFormData={setFormData} />
-          </WizardContent>
-          <WizardFooter
-            showTertiaryButton={false}
-            secondaryLabel="Cancel"
-            nextLabel="Next"
-            finishLabel="Create Plan"
-            onSecondary={handleClose}
-            onFinish={handleFinish}
-          />
-        </Wizard>
+          </div>
+        ) : (
+          <div className="p-6 h-full">
+            <div className="max-w-3xl mx-auto">
+              <Wizard
+                steps={[
+                  { id: "details", label: "Plan Details" },
+                  { id: "data", label: "Plan Data" },
+                  { id: "reviewers", label: "Select Reviewers" },
+                ]}
+                defaultStep={0}
+              >
+                <WizardHeader title="Create new Business Continuity Plan">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleClose}
+                    data-testid="button-close-wizard"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </WizardHeader>
+                <WizardContent className="min-h-[400px] py-6">
+                  <WizardStepContent formData={formData} setFormData={setFormData} />
+                </WizardContent>
+                <WizardFooter
+                  showTertiaryButton={false}
+                  secondaryLabel="Cancel"
+                  nextLabel="Next"
+                  finishLabel="Create Plan"
+                  onSecondary={handleClose}
+                  onFinish={handleFinish}
+                />
+              </Wizard>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </AppLayout>
   );
 }

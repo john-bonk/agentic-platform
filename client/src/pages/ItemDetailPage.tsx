@@ -145,12 +145,11 @@ export function ItemDetailPage() {
   
   const isTemplate2 = location.startsWith("/template2");
   const basePath = isTemplate2 ? "/template2" : "";
-  const modulePrefix = isTemplate2 ? "t2-" : "";
   
   const itemIdMatch = location.match(/\/items\/(.+)$/);
   const itemId = itemIdMatch?.[1] || "1-1";
   
-  const tabInfo = openTabs.find(t => t.id === `${modulePrefix}${itemId}` || t.id === itemId);
+  const tabInfo = openTabs.find(t => t.id === itemId);
   const staticItem = detailItems[itemId] || detailItems["1-1"];
   
   const item = {
@@ -164,7 +163,7 @@ export function ItemDetailPage() {
   return (
     <AppLayout 
       activeTab={{ 
-        id: `${modulePrefix}${item.id}`, 
+        id: item.id, 
         name: item.name, 
         path: `${basePath}/items/${item.id}` 
       }}
