@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { X, Upload, FilePlus, FileUp } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
+import { X, Upload, PlusCircle, ArrowDownToLine } from "lucide-react";
 import { useLocation } from "wouter";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ interface WizardFormData {
   itemName: string;
   itemOwner: string;
   creationMode: "new" | "import" | null;
+  uploadedFile: File | null;
   description: string;
   category: string;
   priority: string;
@@ -36,6 +37,7 @@ const defaultFormData: WizardFormData = {
   itemName: "",
   itemOwner: "",
   creationMode: null,
+  uploadedFile: null,
   description: "",
   category: "",
   priority: "",
@@ -53,26 +55,66 @@ interface StepProps {
 }
 
 function Step1Content({ formData, setFormData }: StepProps) {
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      setFormData({ ...formData, uploadedFile: files[0] });
+    }
+  }, [formData, setFormData]);
+
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setFormData({ ...formData, uploadedFile: files[0] });
+    }
+  }, [formData, setFormData]);
+
+  const handleBrowseClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleRemoveFile = () => {
+    setFormData({ ...formData, uploadedFile: null });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div className="space-y-2">
-        <Label htmlFor="item-name">Item Name</Label>
+    <div className="space-y-4 max-w-[700px]">
+      <div className="space-y-1">
+        <Label htmlFor="item-name" className="text-sm font-medium text-slate-900">Item Name</Label>
         <Input
           id="item-name"
-          placeholder="Enter item name"
+          className="h-8 text-[13px]"
           value={formData.itemName}
           onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
           data-testid="input-item-name"
         />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="item-owner">Owner</Label>
+      <div className="space-y-1">
+        <Label htmlFor="item-owner" className="text-sm font-medium text-slate-900">Owner</Label>
         <Select
           value={formData.itemOwner}
           onValueChange={(value) => setFormData({ ...formData, itemOwner: value })}
         >
-          <SelectTrigger id="item-owner" data-testid="select-item-owner">
-            <SelectValue placeholder="Select an owner" />
+          <SelectTrigger id="item-owner" className="h-8 text-[13px]" data-testid="select-item-owner">
+            <SelectValue placeholder="" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="user1">John Smith</SelectItem>
@@ -81,81 +123,92 @@ function Step1Content({ formData, setFormData }: StepProps) {
           </SelectContent>
         </Select>
       </div>
-      <div className="grid grid-cols-2 gap-4 pt-4">
-        <div
-          className={`border rounded-md p-4 cursor-pointer hover-elevate transition-colors ${
+      <div className="grid grid-cols-2 gap-4 pt-2">
+        <button
+          type="button"
+          className={`bg-white border rounded p-4 cursor-pointer hover-elevate transition-colors h-[113px] ${
             formData.creationMode === "new"
-              ? "border-[#266C92] bg-[#266C92]/5"
-              : ""
+              ? "border-[#266C92]"
+              : "border-slate-200"
           }`}
-          onClick={() => setFormData({ ...formData, creationMode: "new" })}
+          onClick={() => setFormData({ ...formData, creationMode: "new", uploadedFile: null })}
           data-testid="option-create-new"
         >
-          <div className="flex flex-col items-center text-center gap-2">
-            <div
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${
-                formData.creationMode === "new"
-                  ? "bg-[#266C92]/10"
-                  : "bg-slate-100 dark:bg-slate-800"
-              }`}
-            >
-              <FilePlus
-                className={`w-5 h-5 ${
-                  formData.creationMode === "new" ? "text-[#266C92]" : "text-slate-500"
-                }`}
-              />
-            </div>
-            <div>
-              <p className="font-medium text-sm">Create New</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Manually provide information and content for your new item.
-              </p>
-            </div>
+          <div className="flex flex-col items-center text-center gap-1.5 h-full justify-center">
+            <PlusCircle className="w-3 h-3 text-slate-500" />
+            <p className="text-sm text-slate-900">Create New Item</p>
+            <p className="text-xs text-slate-500/70 leading-relaxed">
+              Manually provide information and content for your new item.
+            </p>
           </div>
-        </div>
-        <div
-          className={`border rounded-md p-4 cursor-pointer hover-elevate transition-colors ${
+        </button>
+        <button
+          type="button"
+          className={`bg-white border rounded p-4 cursor-pointer hover-elevate transition-colors h-[113px] ${
             formData.creationMode === "import"
-              ? "border-[#266C92] bg-[#266C92]/5"
-              : ""
+              ? "border-[#266C92]"
+              : "border-slate-200"
           }`}
           onClick={() => setFormData({ ...formData, creationMode: "import" })}
           data-testid="option-import"
         >
-          <div className="flex flex-col items-center text-center gap-2">
-            <div
-              className={`w-10 h-10 rounded-md flex items-center justify-center ${
-                formData.creationMode === "import"
-                  ? "bg-[#266C92]/10"
-                  : "bg-slate-100 dark:bg-slate-800"
-              }`}
-            >
-              <FileUp
-                className={`w-5 h-5 ${
-                  formData.creationMode === "import" ? "text-[#266C92]" : "text-slate-500"
-                }`}
-              />
-            </div>
-            <div>
-              <p className="font-medium text-sm">Import Existing</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Upload an existing document to import into the system.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      {formData.creationMode === "import" && (
-        <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-md p-6 text-center">
-          <div className="flex flex-col items-center gap-2">
-            <Upload className="w-6 h-6 text-slate-400" />
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Drag and drop file or{" "}
-              <Button variant="link" className="p-0 h-auto" data-testid="button-browse">
-                Browse Files
-              </Button>
+          <div className="flex flex-col items-center text-center gap-1.5 h-full justify-center">
+            <ArrowDownToLine className="w-3 h-3 text-slate-500" />
+            <p className="text-sm text-slate-900">Import Existing Item</p>
+            <p className="text-xs text-slate-500/70 leading-relaxed">
+              Upload an existing document to import into the system.
             </p>
           </div>
+        </button>
+      </div>
+      {formData.creationMode === "import" && (
+        <div
+          className={`bg-slate-50 border border-dashed rounded p-4 transition-colors ${
+            isDragging ? "border-[#266C92] bg-[#266C92]/5" : "border-slate-300"
+          }`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          data-testid="drop-zone"
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            onChange={handleFileSelect}
+            data-testid="input-file"
+          />
+          {formData.uploadedFile ? (
+            <div className="flex items-center justify-center gap-3">
+              <div className="flex items-center gap-2">
+                <Upload className="w-3.5 h-3.5 text-slate-600" />
+                <span className="text-xs text-slate-900">{formData.uploadedFile.name}</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-[30px] text-xs px-2.5"
+                onClick={handleRemoveFile}
+                data-testid="button-remove-file"
+              >
+                Remove
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2">
+              <Upload className="w-3.5 h-3.5 text-slate-600" />
+              <span className="text-xs text-slate-900">Drag and drop file or</span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-[30px] text-xs px-2.5"
+                onClick={handleBrowseClick}
+                data-testid="button-browse"
+              >
+                Browse Files
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
