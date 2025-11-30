@@ -22,7 +22,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, actions, className = "" }: PageHeaderProps) {
   return (
-    <header className={`flex flex-col gap-2 py-6 px-8 w-full bg-white ${className}`}>
+    <header className="flex flex-col gap-2 py-6 px-8 w-full bg-white pl-[24px] pr-[24px] pt-[16px] pb-[16px]">
       <div className="flex gap-4 items-start w-full flex-wrap">
         <div className="flex flex-1 flex-col justify-center min-w-0">
           <h1 
