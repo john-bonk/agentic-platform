@@ -143,15 +143,25 @@ export function DemoPage() {
                   <p className="text-sm text-slate-500">Displays a callout for user attention</p>
                 </div>
                 <div className="space-y-4">
-                  <Alert>
-                    <Terminal className="h-4 w-4" />
-                    <AlertTitle>Heads up!</AlertTitle>
+                  <Alert variant="info">
+                    <AlertTitle>Notice Title in Title Case</AlertTitle>
                     <AlertDescription>
-                      You can add components to your app using the cli.
+                      Additional information in support of the title written in sentence case.
+                    </AlertDescription>
+                  </Alert>
+                  <Alert variant="success">
+                    <AlertTitle>Success</AlertTitle>
+                    <AlertDescription>
+                      Your changes have been saved successfully.
+                    </AlertDescription>
+                  </Alert>
+                  <Alert variant="warning">
+                    <AlertTitle>Warning</AlertTitle>
+                    <AlertDescription>
+                      Please review the changes before proceeding.
                     </AlertDescription>
                   </Alert>
                   <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Error</AlertTitle>
                     <AlertDescription>
                       Your session has expired. Please log in again.
