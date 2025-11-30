@@ -59,6 +59,7 @@ function Router() {
       <Route path="/template2" component={DashboardPage} />
       <Route path="/template2/list" component={ListPage} />
       <Route path="/template2/hierarchy" component={HierarchyPage} />
+      <Route path="/template2/wizard" component={WizardPage} />
       <Route path="/template2/items/:id" component={ItemDetailPage} />
       <Route path="/template2/demo" component={DemoPage} />
       <Route path="/template2/settings" component={SettingsPage} />
