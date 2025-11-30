@@ -966,53 +966,53 @@ export function DemoPage() {
                 <div className="flex gap-2">
                   <Sheet>
                     <SheetTrigger asChild>
-                      <Button variant="outline">Open Quick View</Button>
+                      <Button variant="outline" data-testid="button-open-quick-view">Open Quick View</Button>
                     </SheetTrigger>
-                    <SheetContent className="sm:max-w-[500px] p-0 flex flex-col">
+                    <SheetContent className="sm:max-w-[500px] p-0 flex flex-col" data-testid="sheet-quick-view">
                       <div className="flex flex-col h-full">
                         <div className="px-8 pt-8 pb-0">
                           <div className="flex flex-col gap-4">
                             <div className="flex flex-col gap-1">
-                              <span className="text-sm text-slate-500 font-semibold">Inventory Item</span>
-                              <h2 className="text-2xl font-semibold text-slate-900">AWS</h2>
+                              <span className="text-sm text-slate-500 font-semibold">Item Type</span>
+                              <h2 className="text-2xl font-semibold text-slate-900" data-testid="text-panel-title">Sample Item</h2>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <Button variant="outline" size="sm">Create Entity Risk</Button>
-                              <Button variant="outline" size="sm">
-                                Create Assessment
+                            <div className="flex items-center gap-3 flex-wrap">
+                              <Button variant="outline" size="sm" data-testid="button-action-1">Action 1</Button>
+                              <Button variant="outline" size="sm" data-testid="button-action-2">
+                                Action 2
                                 <ChevronDown className="ml-1 h-4 w-4" />
                               </Button>
-                              <Button variant="outline" size="icon" className="h-9 w-9">
+                              <Button variant="outline" size="icon" data-testid="button-more-options">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
                           <div className="flex gap-3 mt-5 border-b border-slate-200">
-                            <button className="pb-3 text-sm font-semibold text-slate-500">Overview</button>
-                            <button className="pb-3 text-sm font-semibold text-slate-500">Questionnaires</button>
-                            <button className="pb-3 text-sm font-semibold text-slate-500">Issues</button>
-                            <button className="pb-3 text-sm font-semibold text-teal-600 border-b-[3px] border-teal-600">Relationships</button>
-                            <button className="pb-3 text-sm font-semibold text-slate-500">Contracts</button>
+                            <button className="pb-3 text-sm font-semibold text-slate-500" data-testid="tab-overview">Overview</button>
+                            <button className="pb-3 text-sm font-semibold text-slate-500" data-testid="tab-details">Details</button>
+                            <button className="pb-3 text-sm font-semibold text-slate-500" data-testid="tab-notes">Notes</button>
+                            <button className="pb-3 text-sm font-semibold text-teal-600 border-b-[3px] border-teal-600" data-testid="tab-related">Related</button>
+                            <button className="pb-3 text-sm font-semibold text-slate-500" data-testid="tab-history">History</button>
                           </div>
                         </div>
                         <div className="flex-1 px-8 py-6 overflow-y-auto">
-                          <h3 className="text-lg font-semibold text-slate-900 mb-4">Relationships</h3>
+                          <h3 className="text-lg font-semibold text-slate-900 mb-4">Related Items</h3>
                           <div className="space-y-3">
                             <div className="flex items-center gap-2">
-                              <span className="w-[140px] text-right text-xs text-slate-900">Vendor</span>
-                              <span className="text-sm text-blue-600">Amazon</span>
+                              <span className="w-[140px] text-right text-xs text-slate-900">Parent</span>
+                              <span className="text-sm text-blue-600" data-testid="link-parent">Parent Item</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="w-[140px] text-right text-xs text-slate-900">Used by</span>
-                              <span className="text-sm text-blue-600">AuditBoard</span>
+                              <span className="w-[140px] text-right text-xs text-slate-900">Owner</span>
+                              <span className="text-sm text-blue-600" data-testid="link-owner">John Smith</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="w-[140px] text-right text-xs text-slate-900">Category</span>
-                              <span className="text-sm text-slate-700">Cloud Infrastructure</span>
+                              <span className="text-sm text-slate-700" data-testid="text-category">Category A</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="w-[140px] text-right text-xs text-slate-900">Status</span>
-                              <Badge className="bg-green-100 text-green-700 border-green-200" variant="outline">Active</Badge>
+                              <Badge className="bg-green-100 text-green-700 border-green-200" variant="outline" data-testid="badge-status">Active</Badge>
                             </div>
                           </div>
                         </div>
