@@ -26,7 +26,7 @@ export function PageHeader({ title, description, actions, className = "" }: Page
       <div className="flex gap-4 items-start w-full flex-wrap">
         <div className="flex flex-1 flex-col justify-center min-w-0">
           <h1 
-            className="text-[28px] font-semibold text-gray-900 leading-[1.33]" 
+            className="font-semibold text-gray-900 text-[20px]" 
             data-testid="page-title"
           >
             {title}
