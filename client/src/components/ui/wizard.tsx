@@ -97,7 +97,7 @@ interface WizardHeaderProps {
 
 function WizardHeader({ title, children, className }: WizardHeaderProps) {
   return (
-    <div className={cn("flex flex-col gap-8 px-8 pt-8 pb-3", className)}>
+    <div className="flex flex-col gap-8 px-8 pl-[24px] pr-[24px] pt-[16px] pb-[16px]">
       <div className="flex items-start justify-between gap-4">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
           {title}
@@ -110,7 +110,7 @@ function WizardHeader({ title, children, className }: WizardHeaderProps) {
       </div>
       <WizardStepIndicator />
     </div>
-  )
+  );
 }
 
 function WizardStepIndicator({ className }: { className?: string }) {
