@@ -814,7 +814,7 @@ export function DemoPage() {
               <div className="space-y-3">
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900">Empty State</h3>
-                  <p className="text-sm text-slate-500">Displays a placeholder when there's no content</p>
+                  <p className="text-sm text-slate-500">Displays a placeholder when there's no content (with illustrations)</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="border rounded-md p-4 flex items-center justify-center">
@@ -841,6 +841,29 @@ export function DemoPage() {
                   <div className="border rounded-md p-4 flex items-center justify-center">
                     <EmptyState 
                       variant="no-data"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">Empty State (Icon Mode)</h3>
+                  <p className="text-sm text-slate-500">Use useIllustration=false for a simpler icon-based look</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="border rounded-md p-4 flex items-center justify-center">
+                    <EmptyState 
+                      variant="search"
+                      useIllustration={false}
+                      primaryAction={{ label: "Clear Filters", onClick: () => toast({ title: "Filters cleared" }) }}
+                    />
+                  </div>
+                  <div className="border rounded-md p-4 flex items-center justify-center">
+                    <EmptyState 
+                      variant="no-items"
+                      useIllustration={false}
+                      primaryAction={{ label: "Create Item", onClick: () => toast({ title: "Creating item..." }) }}
                     />
                   </div>
                 </div>
