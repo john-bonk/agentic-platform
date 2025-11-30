@@ -54,13 +54,16 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
   };
 
   const isActive = (item: IconNavItem) => {
-    if (item.path) {
-      if (item.path === "/") {
-        return location === "/";
-      }
-      return location.startsWith(item.path);
+    // Module-based active detection
+    const modulePrefix = item.modulePrefix ?? "";
+    
+    if (modulePrefix === "") {
+      // Template 1: active when NOT in /template2
+      return !location.startsWith("/template2");
     }
-    return item.active;
+    
+    // Other modules: active when path starts with module prefix
+    return location.startsWith(modulePrefix);
   };
 
   return (
