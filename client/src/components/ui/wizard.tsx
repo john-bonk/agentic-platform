@@ -128,13 +128,10 @@ function WizardStepIndicator({ className }: { className?: string }) {
 
   return (
     <div className={cn("relative flex gap-8 overflow-hidden", className)}>
-      {/* Gray background line - spans from first to last indicator center */}
+      {/* Gray background line - extends from first indicator to edge of container */}
       <div 
-        className="absolute top-3 h-px bg-slate-200 dark:bg-slate-700 z-0" 
-        style={{ 
-          left: `${indicatorRadius}px`,
-          width: `${(steps.length - 1) * (stepWidth + gapWidth)}px`
-        }}
+        className="absolute top-3 right-0 h-px bg-slate-200 dark:bg-slate-700 z-0" 
+        style={{ left: `${indicatorRadius}px` }}
       />
       {/* Teal progress line - spans from first indicator to active step indicator */}
       {currentStep > 0 && (
