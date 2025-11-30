@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { X, Upload, PlusCircle, ArrowDownToLine } from "lucide-react";
+import { X, Upload, PlusCircle, ArrowDownToLine, FileText, Trash2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,28 @@ const defaultFormData: WizardFormData = {
 interface StepProps {
   formData: WizardFormData;
   setFormData: (data: WizardFormData) => void;
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function getFileType(fileName: string): string {
+  const ext = fileName.split('.').pop()?.toLowerCase() || '';
+  const typeMap: Record<string, string> = {
+    pdf: 'PDF',
+    doc: 'Word',
+    docx: 'Word',
+    xls: 'Excel',
+    xlsx: 'Excel',
+    txt: 'Text',
+    csv: 'CSV',
+  };
+  return typeMap[ext] || ext.toUpperCase();
 }
 
 function Step1Content({ formData, setFormData }: StepProps) {
@@ -162,54 +184,67 @@ function Step1Content({ formData, setFormData }: StepProps) {
         </button>
       </div>
       {formData.creationMode === "import" && (
-        <div
-          className={`bg-slate-50 border border-dashed rounded p-4 transition-colors ${
-            isDragging ? "border-[#266C92] bg-[#266C92]/5" : "border-slate-300"
-          }`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          data-testid="drop-zone"
-        >
+        <>
           <input
             ref={fileInputRef}
             type="file"
             className="hidden"
+            accept=".pdf,.doc,.docx,.xls,.xlsx"
             onChange={handleFileSelect}
             data-testid="input-file"
           />
           {formData.uploadedFile ? (
-            <div className="flex items-center justify-center gap-3">
-              <div className="flex items-center gap-2">
-                <Upload className="w-3.5 h-3.5 text-slate-600" />
-                <span className="text-xs text-slate-900">{formData.uploadedFile.name}</span>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-slate-900">Upload Document</Label>
+              <div className="bg-[#266C92]/5 border border-[#266C92]/20 rounded p-3 flex items-center gap-3">
+                <div className="w-10 h-10 bg-white border border-slate-200 rounded flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-5 h-5 text-slate-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-900 truncate">{formData.uploadedFile.name}</p>
+                  <p className="text-xs text-slate-500">
+                    {getFileType(formData.uploadedFile.name)} - {formatFileSize(formData.uploadedFile.size)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveFile}
+                  className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"
+                  data-testid="button-remove-file"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-[30px] text-xs px-2.5"
-                onClick={handleRemoveFile}
-                data-testid="button-remove-file"
-              >
-                Remove
-              </Button>
+              <p className="text-xs text-slate-500">
+                Supported formats: PDF, Word (.doc, .docx), Excel (.xls, .xlsx)
+              </p>
             </div>
           ) : (
-            <div className="flex items-center justify-center gap-2">
-              <Upload className="w-3.5 h-3.5 text-slate-600" />
-              <span className="text-xs text-slate-900">Drag and drop file or</span>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-[30px] text-xs px-2.5"
-                onClick={handleBrowseClick}
-                data-testid="button-browse"
-              >
-                Browse Files
-              </Button>
+            <div
+              className={`bg-slate-50 border border-dashed rounded p-4 transition-colors ${
+                isDragging ? "border-[#266C92] bg-[#266C92]/5" : "border-slate-300"
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              data-testid="drop-zone"
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Upload className="w-3.5 h-3.5 text-slate-600" />
+                <span className="text-xs text-slate-900">Drag and drop file or</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-[30px] text-xs px-2.5"
+                  onClick={handleBrowseClick}
+                  data-testid="button-browse"
+                >
+                  Browse Files
+                </Button>
+              </div>
             </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );
