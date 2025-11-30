@@ -28,6 +28,7 @@ import {
   ItemDetailPage,
   DemoPage,
   SettingsPage,
+  WizardPage,
   NotFound 
 } from "@/pages";
 
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/" component={DashboardPage} />
       <Route path="/list" component={ListPage} />
       <Route path="/hierarchy" component={HierarchyPage} />
+      <Route path="/wizard" component={WizardPage} />
       <Route path="/items/:id" component={ItemDetailPage} />
       <Route path="/demo" component={DemoPage} />
       <Route path="/settings" component={SettingsPage} />

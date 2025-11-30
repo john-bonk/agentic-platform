@@ -39,6 +39,7 @@ export const modules: ModuleConfig[] = [
           { id: "dashboard", label: "Dashboard", path: "/" },
           { id: "list", label: "List Page", path: "/list" },
           { id: "hierarchy", label: "Hierarchy", path: "/hierarchy" },
+          { id: "wizard", label: "Wizard", path: "/wizard" },
         ],
       },
       {
