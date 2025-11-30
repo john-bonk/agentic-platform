@@ -20,6 +20,7 @@ import {
   useWizard,
 } from "@/components/ui/wizard";
 import { useTabStore } from "@/lib/tabStore";
+import { useToast } from "@/hooks/use-toast";
 
 interface WizardFormData {
   itemName: string;
@@ -418,6 +419,7 @@ function WizardStepContent({ formData, setFormData }: StepProps) {
 export default function WizardPage() {
   const [location, setLocation] = useLocation();
   const { closeTab } = useTabStore();
+  const { toast } = useToast();
   const [formData, setFormData] = useState<WizardFormData>(defaultFormData);
 
   const isTemplate2 = location.startsWith("/template2");
@@ -429,7 +431,11 @@ export default function WizardPage() {
   };
 
   const handleFinish = () => {
-    alert(`Item "${formData.itemName || 'New Item'}" created successfully with ${formData.reviewers.length} reviewers!`);
+    const itemName = formData.itemName || 'New Item';
+    toast({
+      title: "Item Created Successfully",
+      description: `"${itemName}" has been created with ${formData.reviewers.length} reviewer${formData.reviewers.length !== 1 ? 's' : ''}.`,
+    });
     closeTab("wizard");
     setLocation(basePath || "/");
   };
