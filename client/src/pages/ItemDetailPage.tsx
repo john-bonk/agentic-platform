@@ -27,6 +27,7 @@ import {
   Info
 } from "lucide-react";
 import { useTabStore } from "@/lib/tabStore";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface DetailItem {
   id: string;
@@ -351,30 +352,42 @@ export function ItemDetailPage() {
               </TabsContent>
 
               <TabsContent value="tab2" className="p-8 m-0">
-                <div className="text-center py-16 text-gray-500">
-                  <p className="text-sm font-medium">Tab 2 Content</p>
-                  <p className="text-xs mt-1">Content for Tab 2 will be displayed here</p>
+                <div className="flex items-center justify-center py-8">
+                  <EmptyState 
+                    variant="no-items"
+                    heading="No items yet"
+                    description="Content for Tab 2 will be displayed here. Add items to get started."
+                  />
                 </div>
               </TabsContent>
 
               <TabsContent value="tab3" className="p-8 m-0">
-                <div className="text-center py-16 text-gray-500">
-                  <p className="text-sm font-medium">Tab 3 Content</p>
-                  <p className="text-xs mt-1">Content for Tab 3 will be displayed here</p>
+                <div className="flex items-center justify-center py-8">
+                  <EmptyState 
+                    variant="no-items"
+                    heading="No items yet"
+                    description="Content for Tab 3 will be displayed here. Add items to get started."
+                  />
                 </div>
               </TabsContent>
 
               <TabsContent value="tab4" className="p-8 m-0">
-                <div className="text-center py-16 text-gray-500">
-                  <p className="text-sm font-medium">Tab 4 Content</p>
-                  <p className="text-xs mt-1">Content for Tab 4 will be displayed here</p>
+                <div className="flex items-center justify-center py-8">
+                  <EmptyState 
+                    variant="no-items"
+                    heading="No items yet"
+                    description="Content for Tab 4 will be displayed here. Add items to get started."
+                  />
                 </div>
               </TabsContent>
 
               <TabsContent value="tab5" className="p-8 m-0">
-                <div className="text-center py-16 text-gray-500">
-                  <p className="text-sm font-medium">Tab 5 Content</p>
-                  <p className="text-xs mt-1">Content for Tab 5 will be displayed here</p>
+                <div className="flex items-center justify-center py-8">
+                  <EmptyState 
+                    variant="no-items"
+                    heading="No items yet"
+                    description="Content for Tab 5 will be displayed here. Add items to get started."
+                  />
                 </div>
               </TabsContent>
             </Tabs>
