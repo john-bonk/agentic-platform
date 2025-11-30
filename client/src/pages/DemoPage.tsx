@@ -44,6 +44,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Wizard, WizardHeader, WizardContent, WizardFooter } from "@/components/ui/wizard";
+import { EmptyState } from "@/components/ui/empty-state";
 import { 
   Bell, 
   Check, 
@@ -808,6 +809,41 @@ export function DemoPage() {
                     </div>
                   </HoverCardContent>
                 </HoverCard>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">Empty State</h3>
+                  <p className="text-sm text-slate-500">Displays a placeholder when there's no content</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="border rounded-md p-4 flex items-center justify-center">
+                    <EmptyState 
+                      variant="search"
+                      primaryAction={{ label: "Clear Filters", onClick: () => toast({ title: "Filters cleared" }) }}
+                      secondaryAction={{ label: "Try Again", onClick: () => toast({ title: "Retrying..." }) }}
+                    />
+                  </div>
+                  <div className="border rounded-md p-4 flex items-center justify-center">
+                    <EmptyState 
+                      variant="no-items"
+                      heading="No items yet"
+                      description="Get started by creating your first item."
+                      primaryAction={{ label: "Create Item", onClick: () => toast({ title: "Creating item..." }) }}
+                    />
+                  </div>
+                  <div className="border rounded-md p-4 flex items-center justify-center">
+                    <EmptyState 
+                      variant="empty-folder"
+                      tertiaryAction={{ label: "Learn more about folders", onClick: () => toast({ title: "Opening help..." }) }}
+                    />
+                  </div>
+                  <div className="border rounded-md p-4 flex items-center justify-center">
+                    <EmptyState 
+                      variant="no-data"
+                    />
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
