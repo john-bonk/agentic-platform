@@ -22,8 +22,8 @@ import {
 import { useTabStore } from "@/lib/tabStore";
 
 interface WizardFormData {
-  planName: string;
-  planOwner: string;
+  itemName: string;
+  itemOwner: string;
   creationMode: "new" | "import" | null;
   description: string;
   category: string;
@@ -33,17 +33,17 @@ interface WizardFormData {
 }
 
 const defaultFormData: WizardFormData = {
-  planName: "",
-  planOwner: "",
+  itemName: "",
+  itemOwner: "",
   creationMode: null,
   description: "",
   category: "",
   priority: "",
   effectiveDate: "",
   reviewers: [
-    { id: "1", name: "Aaron Clark", role: "Risk Manager" },
-    { id: "2", name: "Sarah Johnson", role: "Compliance Officer" },
-    { id: "3", name: "Mike Williams", role: "Operations Director" },
+    { id: "1", name: "Aaron Clark", role: "Manager" },
+    { id: "2", name: "Sarah Johnson", role: "Analyst" },
+    { id: "3", name: "Mike Williams", role: "Director" },
   ],
 };
 
@@ -56,22 +56,22 @@ function Step1Content({ formData, setFormData }: StepProps) {
   return (
     <div className="space-y-6 max-w-2xl">
       <div className="space-y-2">
-        <Label htmlFor="plan-name">Plan Name</Label>
+        <Label htmlFor="item-name">Item Name</Label>
         <Input
-          id="plan-name"
-          placeholder="Enter plan name"
-          value={formData.planName}
-          onChange={(e) => setFormData({ ...formData, planName: e.target.value })}
-          data-testid="input-plan-name"
+          id="item-name"
+          placeholder="Enter item name"
+          value={formData.itemName}
+          onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
+          data-testid="input-item-name"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="plan-owner">Plan Owner</Label>
+        <Label htmlFor="item-owner">Owner</Label>
         <Select
-          value={formData.planOwner}
-          onValueChange={(value) => setFormData({ ...formData, planOwner: value })}
+          value={formData.itemOwner}
+          onValueChange={(value) => setFormData({ ...formData, itemOwner: value })}
         >
-          <SelectTrigger id="plan-owner" data-testid="select-plan-owner">
+          <SelectTrigger id="item-owner" data-testid="select-item-owner">
             <SelectValue placeholder="Select an owner" />
           </SelectTrigger>
           <SelectContent>
@@ -106,9 +106,9 @@ function Step1Content({ formData, setFormData }: StepProps) {
               />
             </div>
             <div>
-              <p className="font-medium text-sm">Create New Plan</p>
+              <p className="font-medium text-sm">Create New</p>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Manually provide information and content within your new plan.
+                Manually provide information and content for your new item.
               </p>
             </div>
           </div>
@@ -137,7 +137,7 @@ function Step1Content({ formData, setFormData }: StepProps) {
               />
             </div>
             <div>
-              <p className="font-medium text-sm">Import Existing Plan</p>
+              <p className="font-medium text-sm">Import Existing</p>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Upload an existing document to import into the system.
               </p>
@@ -168,7 +168,7 @@ function Step2Content({ formData, setFormData }: StepProps) {
         <textarea
           id="description"
           className="w-full min-h-[100px] px-3 py-2 border rounded-md bg-background text-foreground"
-          placeholder="Enter a description for this plan"
+          placeholder="Enter a description"
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           data-testid="input-description"
@@ -185,10 +185,10 @@ function Step2Content({ formData, setFormData }: StepProps) {
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="operations">Operations</SelectItem>
-              <SelectItem value="it">IT</SelectItem>
-              <SelectItem value="finance">Finance</SelectItem>
-              <SelectItem value="hr">Human Resources</SelectItem>
+              <SelectItem value="category1">Category 1</SelectItem>
+              <SelectItem value="category2">Category 2</SelectItem>
+              <SelectItem value="category3">Category 3</SelectItem>
+              <SelectItem value="category4">Category 4</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -225,9 +225,9 @@ function Step2Content({ formData, setFormData }: StepProps) {
 
 function Step3Content({ formData, setFormData }: StepProps) {
   const availableReviewers = [
-    { id: "4", name: "Emily Davis", role: "Legal Counsel" },
-    { id: "5", name: "Robert Brown", role: "IT Director" },
-    { id: "6", name: "Lisa Anderson", role: "CFO" },
+    { id: "4", name: "Emily Davis", role: "Reviewer" },
+    { id: "5", name: "Robert Brown", role: "Approver" },
+    { id: "6", name: "Lisa Anderson", role: "Admin" },
   ];
 
   const handleAddReviewer = (reviewerId: string) => {
@@ -339,7 +339,7 @@ export default function WizardPage() {
   };
 
   const handleFinish = () => {
-    alert(`Plan "${formData.planName || 'New Plan'}" created successfully with ${formData.reviewers.length} reviewers!`);
+    alert(`Item "${formData.itemName || 'New Item'}" created successfully with ${formData.reviewers.length} reviewers!`);
     closeTab("wizard");
     setLocation(basePath || "/");
   };
@@ -348,20 +348,20 @@ export default function WizardPage() {
     <AppLayout
       activeTab={{
         id: "wizard",
-        name: "Create New Plan",
+        name: "Create New Item",
         path: `${basePath}/wizard`
       }}
     >
       <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-gray-900">
         <Wizard
           steps={[
-            { id: "details", label: "Plan Details" },
-            { id: "data", label: "Plan Data" },
+            { id: "details", label: "Item Details" },
+            { id: "data", label: "Item Data" },
             { id: "reviewers", label: "Select Reviewers" },
           ]}
           defaultStep={0}
         >
-          <WizardHeader title="Create new Business Continuity Plan">
+          <WizardHeader title="Create New Item">
             <Button
               variant="ghost"
               size="icon"
@@ -378,7 +378,7 @@ export default function WizardPage() {
             showTertiaryButton={false}
             secondaryLabel="Cancel"
             nextLabel="Next"
-            finishLabel="Create Plan"
+            finishLabel="Create Item"
             onSecondary={handleClose}
             onFinish={handleFinish}
           />

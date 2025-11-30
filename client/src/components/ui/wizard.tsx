@@ -255,15 +255,16 @@ function WizardFooter({
   return (
     <div className={cn("flex items-center justify-between gap-4 px-8 py-6", className)}>
       <div className="flex items-center gap-2">
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={goToPreviousStep}
-          disabled={isFirstStep}
-          data-testid="wizard-button-previous"
-        >
-          {previousLabel}
-        </Button>
+        {showSecondaryButton && (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={onSecondary}
+            data-testid="wizard-button-secondary"
+          >
+            {secondaryLabel}
+          </Button>
+        )}
         {showTertiaryButton && (
           <Button 
             variant="outline" 
@@ -276,16 +277,15 @@ function WizardFooter({
         )}
       </div>
       <div className="flex items-center gap-2">
-        {showSecondaryButton && (
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={onSecondary}
-            data-testid="wizard-button-secondary"
-          >
-            {secondaryLabel}
-          </Button>
-        )}
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={goToPreviousStep}
+          disabled={isFirstStep}
+          data-testid="wizard-button-previous"
+        >
+          {previousLabel}
+        </Button>
         {isLastStep ? (
           <Button 
             size="sm"
