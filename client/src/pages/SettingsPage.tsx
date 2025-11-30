@@ -136,7 +136,7 @@ export function SettingsPage() {
           </h1>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto bg-[#f9fafc]">
           <SettingsSection
             title="Profile Settings"
             description="Manage your personal account information and display preferences."
