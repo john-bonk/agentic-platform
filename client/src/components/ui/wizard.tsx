@@ -116,13 +116,24 @@ function WizardHeader({ title, children, className }: WizardHeaderProps) {
 function WizardStepIndicator({ className }: { className?: string }) {
   const { steps, currentStep } = useWizard()
 
+  // Calculate line width: goes through completed steps only, stopping at active step
+  // Each step takes equal width, line should extend to the start of active step (not past it)
+  const getLineWidth = () => {
+    if (currentStep === 0) return "0%"
+    // Line goes from first step to the current step position
+    // But we want it to stop AT the active step indicator, not go past
+    return `calc(${(currentStep / (steps.length - 1)) * 100}% - 12px)`
+  }
+
   return (
     <div className={cn("relative flex gap-8 overflow-hidden", className)}>
       <div className="absolute left-0 right-0 top-3 h-px bg-slate-200 dark:bg-slate-700 z-0" />
-      <div 
-        className="absolute left-0 top-3 h-px bg-[#266C92] z-0 transition-all duration-300" 
-        style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
-      />
+      {currentStep > 0 && (
+        <div 
+          className="absolute left-3 top-3 h-px bg-[#266C92] z-0 transition-all duration-300" 
+          style={{ width: getLineWidth() }}
+        />
+      )}
       
       {steps.map((step, index) => (
         <WizardStepItem 
