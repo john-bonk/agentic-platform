@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Upload } from "lucide-react";
+import { X, Upload, FilePlus, FileUp } from "lucide-react";
 import { useLocation } from "wouter";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
@@ -93,15 +93,15 @@ function Step1Content({ formData, setFormData }: StepProps) {
         >
           <div className="flex flex-col items-center text-center gap-2">
             <div
-              className={`w-8 h-8 rounded-full border flex items-center justify-center ${
+              className={`w-10 h-10 rounded-md flex items-center justify-center ${
                 formData.creationMode === "new"
-                  ? "border-[#266C92] bg-[#266C92]"
-                  : "border-slate-300 dark:border-slate-600"
+                  ? "bg-[#266C92]/10"
+                  : "bg-slate-100 dark:bg-slate-800"
               }`}
             >
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  formData.creationMode === "new" ? "bg-white" : "bg-slate-400"
+              <FilePlus
+                className={`w-5 h-5 ${
+                  formData.creationMode === "new" ? "text-[#266C92]" : "text-slate-500"
                 }`}
               />
             </div>
@@ -124,15 +124,15 @@ function Step1Content({ formData, setFormData }: StepProps) {
         >
           <div className="flex flex-col items-center text-center gap-2">
             <div
-              className={`w-8 h-8 rounded-full border flex items-center justify-center ${
+              className={`w-10 h-10 rounded-md flex items-center justify-center ${
                 formData.creationMode === "import"
-                  ? "border-[#266C92] bg-[#266C92]"
-                  : "border-slate-300 dark:border-slate-600"
+                  ? "bg-[#266C92]/10"
+                  : "bg-slate-100 dark:bg-slate-800"
               }`}
             >
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  formData.creationMode === "import" ? "bg-white" : "bg-slate-400"
+              <FileUp
+                className={`w-5 h-5 ${
+                  formData.creationMode === "import" ? "text-[#266C92]" : "text-slate-500"
                 }`}
               />
             </div>
@@ -145,17 +145,19 @@ function Step1Content({ formData, setFormData }: StepProps) {
           </div>
         </div>
       </div>
-      <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-md p-6 text-center">
-        <div className="flex flex-col items-center gap-2">
-          <Upload className="w-6 h-6 text-slate-400" />
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Drag and drop file or{" "}
-            <Button variant="link" className="p-0 h-auto" data-testid="button-browse">
-              Browse Files
-            </Button>
-          </p>
+      {formData.creationMode === "import" && (
+        <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-md p-6 text-center">
+          <div className="flex flex-col items-center gap-2">
+            <Upload className="w-6 h-6 text-slate-400" />
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Drag and drop file or{" "}
+              <Button variant="link" className="p-0 h-auto" data-testid="button-browse">
+                Browse Files
+              </Button>
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
