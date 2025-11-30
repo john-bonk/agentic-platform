@@ -20,10 +20,11 @@
  * TODO: Customize layout sections as needed
  */
 
+import { useLocation } from "wouter";
 import { LeftIconNavbar } from "./LeftIconNavbar";
 import { SideNavigation } from "./SideNavigation";
 import { AppHeader } from "./AppHeader";
-import { iconNavItems, sideNavSections, appConfig } from "@/config/navigation";
+import { iconNavItems, appConfig, getModuleFromPath } from "@/config/navigation";
 import { type Tab } from "@/lib/tabStore";
 
 interface AppLayoutProps {
@@ -43,6 +44,9 @@ export function AppLayout({
   activeTab,
   className = "",
 }: AppLayoutProps) {
+  const [location] = useLocation();
+  const currentModule = getModuleFromPath(location);
+  
   return (
     <div className={`flex items-start relative h-screen overflow-hidden ${className}`}>
       {showIconNav && (
@@ -58,8 +62,8 @@ export function AppLayout({
         <div className="flex flex-1 overflow-hidden">
           {showSideNav && (
             <SideNavigation 
-              sections={sideNavSections} 
-              title={appConfig.shortName}
+              sections={currentModule.sideNavSections} 
+              title={currentModule.name}
             />
           )}
           

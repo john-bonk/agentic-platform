@@ -44,20 +44,22 @@ function Router() {
         - Catch-all: <Route path="/docs/:rest*" component={DocsPage} />
       */}
       
-      {/* Dashboard - Main landing page */}
+      {/* Template 1 - Dashboard and Features */}
       <Route path="/" component={DashboardPage} />
-      
-      {/* Features */}
       <Route path="/list" component={ListPage} />
       <Route path="/hierarchy" component={HierarchyPage} />
       <Route path="/items/:id" component={ItemDetailPage} />
-      
-      {/* Examples - Demonstrating different UI patterns */}
       <Route path="/demo" component={DemoPage} />
-      
-      {/* Settings */}
       <Route path="/settings" component={SettingsPage} />
       <Route path="/profile" component={SettingsPage} />
+      
+      {/* Template 2 - Same pages, different module context */}
+      <Route path="/template2" component={DashboardPage} />
+      <Route path="/template2/list" component={ListPage} />
+      <Route path="/template2/hierarchy" component={HierarchyPage} />
+      <Route path="/template2/items/:id" component={ItemDetailPage} />
+      <Route path="/template2/demo" component={DemoPage} />
+      <Route path="/template2/settings" component={SettingsPage} />
       
       {/* 
         TODO: Add your custom routes here
