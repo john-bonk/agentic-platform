@@ -6,6 +6,7 @@
  */
 
 import { AppLayout, PageHeader } from "@/components/layout";
+import avatarSampleImage from "@assets/avatar-sample.png";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -208,16 +209,16 @@ export function DemoPage() {
                     <p className="text-xs text-slate-400 mb-2">With Image</p>
                     <div className="flex gap-4 items-center">
                       <Avatar size="sm">
-                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                        <AvatarFallback size="sm">CN</AvatarFallback>
+                        <AvatarImage src={avatarSampleImage} alt="Sample user" />
+                        <AvatarFallback size="sm">JD</AvatarFallback>
                       </Avatar>
                       <Avatar size="md">
-                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                        <AvatarFallback size="md">CN</AvatarFallback>
+                        <AvatarImage src={avatarSampleImage} alt="Sample user" />
+                        <AvatarFallback size="md">JD</AvatarFallback>
                       </Avatar>
                       <Avatar size="lg">
-                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                        <AvatarFallback size="lg">CN</AvatarFallback>
+                        <AvatarImage src={avatarSampleImage} alt="Sample user" />
+                        <AvatarFallback size="lg">JD</AvatarFallback>
                       </Avatar>
                     </div>
                   </div>
