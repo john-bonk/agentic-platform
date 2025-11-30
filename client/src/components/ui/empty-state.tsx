@@ -1,10 +1,10 @@
 import { LucideIcon, Search, FileX, Inbox, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import illustrationSearch from "@assets/illustrations/magnify-search.png";
-import illustrationDocument from "@assets/illustrations/document.png";
-import illustrationBoxes from "@assets/illustrations/boxes.png";
-import illustrationQuestion from "@assets/illustrations/question-document.png";
+import illustrationSearch from "@assets/illustrations/magnify-search.svg";
+import illustrationDocument from "@assets/illustrations/document.svg";
+import illustrationBoxes from "@assets/illustrations/boxes.svg";
+import illustrationQuestion from "@assets/illustrations/question-document.svg";
 
 type EmptyStateVariant = "search" | "no-data" | "no-items" | "empty-folder";
 
