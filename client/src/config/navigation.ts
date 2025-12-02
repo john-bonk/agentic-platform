@@ -30,56 +30,56 @@ export interface ModuleConfig {
 export const modules: ModuleConfig[] = [
   {
     id: "template1",
-    name: "القالب الأول",
-    icon: { type: "lucide", icon: "rabbit", alt: "القالب الأول", active: false, path: "/", modulePrefix: "" },
+    name: "Template 1",
+    icon: { type: "lucide", icon: "rabbit", alt: "Template 1", active: false, path: "/", modulePrefix: "" },
     sideNavSections: [
       {
-        title: "الرئيسية",
+        title: "Main",
         items: [
-          { id: "dashboard", label: "لوحة التحكم", path: "/" },
-          { id: "list", label: "صفحة القائمة", path: "/list" },
-          { id: "hierarchy", label: "التسلسل الهرمي", path: "/hierarchy" },
-          { id: "wizard", label: "المعالج", path: "/wizard" },
+          { id: "dashboard", label: "Dashboard", path: "/" },
+          { id: "list", label: "List Page", path: "/list" },
+          { id: "hierarchy", label: "Hierarchy", path: "/hierarchy" },
+          { id: "wizard", label: "Wizard", path: "/wizard" },
         ],
       },
       {
-        title: "الأمثلة",
+        title: "Examples",
         items: [
-          { id: "demo", label: "عرض المكونات", path: "/demo" },
+          { id: "demo", label: "Component Demo", path: "/demo" },
         ],
       },
       {
-        title: "الإعدادات",
+        title: "Settings",
         items: [
-          { id: "settings", label: "الإعدادات", path: "/settings" },
+          { id: "settings", label: "Settings", path: "/settings" },
         ],
       },
     ],
   },
   {
     id: "template2",
-    name: "القالب الثاني",
-    icon: { type: "lucide", icon: "fish", alt: "القالب الثاني", active: false, path: "/template2", modulePrefix: "/template2" },
+    name: "Template 2",
+    icon: { type: "lucide", icon: "fish", alt: "Template 2", active: false, path: "/template2", modulePrefix: "/template2" },
     sideNavSections: [
       {
-        title: "الرئيسية",
+        title: "Main",
         items: [
-          { id: "dashboard2", label: "لوحة التحكم", path: "/template2" },
-          { id: "list2", label: "صفحة القائمة", path: "/template2/list" },
-          { id: "hierarchy2", label: "التسلسل الهرمي", path: "/template2/hierarchy" },
-          { id: "wizard2", label: "المعالج", path: "/template2/wizard" },
+          { id: "dashboard2", label: "Dashboard", path: "/template2" },
+          { id: "list2", label: "List Page", path: "/template2/list" },
+          { id: "hierarchy2", label: "Hierarchy", path: "/template2/hierarchy" },
+          { id: "wizard2", label: "Wizard", path: "/template2/wizard" },
         ],
       },
       {
-        title: "الأمثلة",
+        title: "Examples",
         items: [
-          { id: "demo2", label: "عرض المكونات", path: "/template2/demo" },
+          { id: "demo2", label: "Component Demo", path: "/template2/demo" },
         ],
       },
       {
-        title: "الإعدادات",
+        title: "Settings",
         items: [
-          { id: "settings2", label: "الإعدادات", path: "/template2/settings" },
+          { id: "settings2", label: "Settings", path: "/template2/settings" },
         ],
       },
     ],
@@ -112,17 +112,17 @@ export function getModuleFromPath(path: string): ModuleConfig {
  * These appear in the top right corner of the header.
  */
 export const headerUtilityIcons = [
-  { icon: "bot", alt: "المساعد الذكي" },
-  { icon: "clock", alt: "النشاط الأخير" },
-  { icon: "mail", alt: "الرسائل" },
-  { icon: "bell", alt: "الإشعارات" },
+  { icon: "bot", alt: "AI Assistant" },
+  { icon: "clock", alt: "Recent Activity" },
+  { icon: "mail", alt: "Messages" },
+  { icon: "bell", alt: "Notifications" },
 ];
 
 /**
  * App Configuration
  */
 export const appConfig = {
-  name: "قالب البداية",
-  shortName: "القالب",
+  name: "Starter Template",
+  shortName: "Template",
   logoPath: "/figmaAssets/auditboard-logo.png",
 };
