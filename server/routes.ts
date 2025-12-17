@@ -15,7 +15,7 @@ import {
   nodeTypeRegistry,
   type ChatMessage,
 } from "@shared/schema";
-import { generateAssistantResponse, generateWorkflowFromDescription, analyzeWorkflow } from "./openai";
+import { generateAssistantResponse, generateWorkflowFromDescription, analyzeWorkflow } from "./llm";
 import { randomUUID } from "crypto";
 
 export async function registerRoutes(app: Express): Promise<Server> {
