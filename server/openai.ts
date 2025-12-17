@@ -16,7 +16,9 @@ import {
   getNodeType,
 } from "@shared/schema";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY || "missing-key"
+});
 
 const SYSTEM_PROMPT = `You are the AuditBoard Assistant, a specialized AI that helps GRC (Governance, Risk, Compliance) administrators build sophisticated workflows using a visual workflow builder.
 

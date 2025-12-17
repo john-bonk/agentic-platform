@@ -29,7 +29,9 @@ import {
   DemoPage,
   SettingsPage,
   WizardPage,
-  NotFound 
+  NotFound,
+  WorkflowBuilderPage,
+  WorkflowListPage,
 } from "@/pages";
 
 function Router() {
@@ -45,7 +47,7 @@ function Router() {
         - Catch-all: <Route path="/docs/:rest*" component={DocsPage} />
       */}
       
-      {/* Template 1 - Dashboard and Features */}
+      {/* Main Application Routes */}
       <Route path="/" component={DashboardPage} />
       <Route path="/list" component={ListPage} />
       <Route path="/hierarchy" component={HierarchyPage} />
@@ -55,14 +57,9 @@ function Router() {
       <Route path="/settings" component={SettingsPage} />
       <Route path="/profile" component={SettingsPage} />
       
-      {/* Template 2 - Same pages, different module context */}
-      <Route path="/template2" component={DashboardPage} />
-      <Route path="/template2/list" component={ListPage} />
-      <Route path="/template2/hierarchy" component={HierarchyPage} />
-      <Route path="/template2/wizard" component={WizardPage} />
-      <Route path="/template2/items/:id" component={ItemDetailPage} />
-      <Route path="/template2/demo" component={DemoPage} />
-      <Route path="/template2/settings" component={SettingsPage} />
+      {/* Workflow Builder Routes */}
+      <Route path="/workflows" component={WorkflowListPage} />
+      <Route path="/workflow/:id" component={WorkflowBuilderPage} />
       
       {/* 
         TODO: Add your custom routes here

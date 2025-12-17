@@ -15,3 +15,5 @@ export { DemoPage } from "./DemoPage";
 export { SettingsPage } from "./SettingsPage";
 export { default as WizardPage } from "./WizardPage";
 export { default as NotFound } from "./not-found";
+export { WorkflowBuilderPage } from "./WorkflowBuilderPage";
+export { WorkflowListPage } from "./WorkflowListPage";

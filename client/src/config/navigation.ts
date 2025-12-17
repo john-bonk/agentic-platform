@@ -9,7 +9,7 @@
 
 export type IconNavItem = 
   | { type: "image"; src: string; alt: string; active: boolean; path?: string; modulePrefix?: string }
-  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish"; alt: string; active: boolean; path?: string; modulePrefix?: string };
+  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow"; alt: string; active: boolean; path?: string; modulePrefix?: string };
 
 export interface SideNavSection {
   title: string;
@@ -30,22 +30,21 @@ export interface ModuleConfig {
 export const modules: ModuleConfig[] = [
   {
     id: "template1",
-    name: "Template 1",
-    icon: { type: "lucide", icon: "rabbit", alt: "Template 1", active: false, path: "/", modulePrefix: "" },
+    name: "AuditBoard",
+    icon: { type: "lucide", icon: "rabbit", alt: "AuditBoard", active: false, path: "/", modulePrefix: "" },
     sideNavSections: [
       {
         title: "Main",
         items: [
           { id: "dashboard", label: "Dashboard", path: "/" },
-          { id: "list", label: "List Page", path: "/list" },
-          { id: "hierarchy", label: "Hierarchy", path: "/hierarchy" },
-          { id: "wizard", label: "Wizard", path: "/wizard" },
+          { id: "workflows", label: "Workflow Builder", path: "/workflows" },
         ],
       },
       {
-        title: "Examples",
+        title: "Data",
         items: [
-          { id: "demo", label: "Component Demo", path: "/demo" },
+          { id: "list", label: "List Page", path: "/list" },
+          { id: "hierarchy", label: "Hierarchy", path: "/hierarchy" },
         ],
       },
       {
@@ -57,29 +56,15 @@ export const modules: ModuleConfig[] = [
     ],
   },
   {
-    id: "template2",
-    name: "Template 2",
-    icon: { type: "lucide", icon: "fish", alt: "Template 2", active: false, path: "/template2", modulePrefix: "/template2" },
+    id: "workflows",
+    name: "Workflow Builder",
+    icon: { type: "lucide", icon: "workflow", alt: "Workflow Builder", active: false, path: "/workflows", modulePrefix: "/workflows" },
     sideNavSections: [
       {
-        title: "Main",
+        title: "Workflows",
         items: [
-          { id: "dashboard2", label: "Dashboard", path: "/template2" },
-          { id: "list2", label: "List Page", path: "/template2/list" },
-          { id: "hierarchy2", label: "Hierarchy", path: "/template2/hierarchy" },
-          { id: "wizard2", label: "Wizard", path: "/template2/wizard" },
-        ],
-      },
-      {
-        title: "Examples",
-        items: [
-          { id: "demo2", label: "Component Demo", path: "/template2/demo" },
-        ],
-      },
-      {
-        title: "Settings",
-        items: [
-          { id: "settings2", label: "Settings", path: "/template2/settings" },
+          { id: "workflow-list", label: "All Workflows", path: "/workflows" },
+          { id: "workflow-new", label: "Create New", path: "/workflow/new" },
         ],
       },
     ],
@@ -101,7 +86,7 @@ export const sideNavSections: SideNavSection[] = modules[0].sideNavSections;
  * Get side navigation sections for a specific module based on current path
  */
 export function getModuleFromPath(path: string): ModuleConfig {
-  if (path.startsWith("/template2")) {
+  if (path.startsWith("/workflow")) {
     return modules[1];
   }
   return modules[0];
