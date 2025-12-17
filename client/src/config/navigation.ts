@@ -3,13 +3,11 @@
  * 
  * This file defines all navigation items for the application.
  * Modify these arrays to customize your app's navigation structure.
- * 
- * TODO: Replace with your own navigation items
  */
 
 export type IconNavItem = 
   | { type: "image"; src: string; alt: string; active: boolean; path?: string; modulePrefix?: string }
-  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow"; alt: string; active: boolean; path?: string; modulePrefix?: string };
+  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity"; alt: string; active: boolean; path?: string; modulePrefix?: string };
 
 export interface SideNavSection {
   title: string;
@@ -29,39 +27,38 @@ export interface ModuleConfig {
  */
 export const modules: ModuleConfig[] = [
   {
-    id: "template1",
-    name: "AuditBoard",
-    icon: { type: "lucide", icon: "rabbit", alt: "AuditBoard", active: false, path: "/", modulePrefix: "" },
+    id: "intelligence",
+    name: "Intelligence Hub",
+    icon: { type: "lucide", icon: "activity", alt: "Intelligence Hub", active: false, path: "/", modulePrefix: "/" },
     sideNavSections: [
       {
-        title: "Main",
+        title: "Command Center",
         items: [
-          { id: "dashboard", label: "Dashboard", path: "/" },
-          { id: "workflows", label: "Workflow Builder", path: "/workflows" },
+          { id: "intelligence-hub", label: "Intelligence Hub", path: "/" },
         ],
       },
       {
-        title: "Data",
+        title: "Analytics",
         items: [
-          { id: "list", label: "List Page", path: "/list" },
-          { id: "hierarchy", label: "Hierarchy", path: "/hierarchy" },
+          { id: "list", label: "Data Explorer", path: "/list" },
+          { id: "hierarchy", label: "Entity Matrix", path: "/hierarchy" },
         ],
       },
       {
-        title: "Settings",
+        title: "System",
         items: [
-          { id: "settings", label: "Settings", path: "/settings" },
+          { id: "settings", label: "Configuration", path: "/settings" },
         ],
       },
     ],
   },
   {
     id: "workflows",
-    name: "Workflow Builder",
-    icon: { type: "lucide", icon: "workflow", alt: "Workflow Builder", active: false, path: "/workflows", modulePrefix: "/workflows" },
+    name: "Workflows",
+    icon: { type: "lucide", icon: "workflow", alt: "Workflows", active: false, path: "/workflows", modulePrefix: "/workflow" },
     sideNavSections: [
       {
-        title: "Workflows",
+        title: "Workflow Operations",
         items: [
           { id: "workflow-list", label: "All Workflows", path: "/workflows" },
           { id: "workflow-new", label: "Create New", path: "/workflow/new" },
@@ -77,19 +74,54 @@ export const modules: ModuleConfig[] = [
 export const iconNavItems: IconNavItem[] = modules.map(m => m.icon);
 
 /**
- * Side Navigation Sections (default - Template 1)
+ * Side Navigation Sections (default - Intelligence Hub)
  * Use getModuleSideNav() for dynamic module-based navigation
  */
 export const sideNavSections: SideNavSection[] = modules[0].sideNavSections;
 
 /**
- * Get side navigation sections for a specific module based on current path
+ * Get module configuration based on current path
+ * Ensures exclusive active state - only one module active at a time
  */
 export function getModuleFromPath(path: string): ModuleConfig {
+  // Workflow module: any path starting with /workflow (includes /workflows and /workflow/:id)
   if (path.startsWith("/workflow")) {
     return modules[1];
   }
+  // Default to Intelligence Hub
   return modules[0];
+}
+
+/**
+ * Intelligence Hub paths - all paths that belong to the Intelligence Hub module
+ */
+const intelligenceHubPaths = ["/", "/list", "/hierarchy", "/settings", "/profile", "/wizard", "/demo", "/items"];
+
+/**
+ * Determine which module is active based on path
+ * Returns the index of the active module
+ * Explicitly maps all paths to ensure only one module is active at a time
+ */
+export function getActiveModuleIndex(path: string): number {
+  // Workflow module: any path starting with /workflow
+  if (path.startsWith("/workflow")) {
+    return 1; // Workflows module
+  }
+  
+  // Check if path matches Intelligence Hub module paths
+  for (const hubPath of intelligenceHubPaths) {
+    if (path === hubPath || (hubPath !== "/" && path.startsWith(hubPath + "/"))) {
+      return 0; // Intelligence Hub module
+    }
+  }
+  
+  // Root path always goes to Intelligence Hub
+  if (path === "/") {
+    return 0;
+  }
+  
+  // Default to Intelligence Hub for any unmatched paths
+  return 0;
 }
 
 /**
@@ -107,7 +139,7 @@ export const headerUtilityIcons = [
  * App Configuration
  */
 export const appConfig = {
-  name: "Starter Template",
-  shortName: "Template",
+  name: "AuditBoard Intelligence",
+  shortName: "AuditBoard",
   logoPath: "/figmaAssets/auditboard-logo.png",
 };

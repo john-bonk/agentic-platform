@@ -11,8 +11,6 @@
  * 2. Import it here
  * 3. Add a Route below
  * 4. Update navigation config in src/config/navigation.ts
- * 
- * TODO: Add your own routes and pages
  */
 
 import { Switch, Route } from "wouter";
@@ -22,7 +20,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { 
-  DashboardPage, 
+  DashboardPage,
+  IntelligenceHubPage,
   ListPage,
   HierarchyPage,
   ItemDetailPage,
@@ -37,18 +36,10 @@ import {
 function Router() {
   return (
     <Switch>
-      {/* 
-        Main Routes
-        Add your application routes here.
-        
-        Example route patterns:
-        - Static: <Route path="/about" component={AboutPage} />
-        - With params: <Route path="/items/:id">{(params) => <ItemDetail id={params.id} />}</Route>
-        - Catch-all: <Route path="/docs/:rest*" component={DocsPage} />
-      */}
+      {/* Intelligence Hub - Default Landing Page */}
+      <Route path="/" component={IntelligenceHubPage} />
       
-      {/* Main Application Routes */}
-      <Route path="/" component={DashboardPage} />
+      {/* Analytics Routes */}
       <Route path="/list" component={ListPage} />
       <Route path="/hierarchy" component={HierarchyPage} />
       <Route path="/wizard" component={WizardPage} />
@@ -56,16 +47,11 @@ function Router() {
       <Route path="/demo" component={DemoPage} />
       <Route path="/settings" component={SettingsPage} />
       <Route path="/profile" component={SettingsPage} />
+      <Route path="/dashboard-old" component={DashboardPage} />
       
-      {/* Workflow Builder Routes */}
+      {/* Workflow Routes */}
       <Route path="/workflows" component={WorkflowListPage} />
       <Route path="/workflow/:id" component={WorkflowBuilderPage} />
-      
-      {/* 
-        TODO: Add your custom routes here
-        Example:
-        <Route path="/my-feature" component={MyFeaturePage} />
-      */}
       
       {/* 404 - Must be last */}
       <Route component={NotFound} />

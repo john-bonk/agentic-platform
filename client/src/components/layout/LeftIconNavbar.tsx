@@ -3,20 +3,11 @@
  * 
  * A vertical navigation bar with icons that appears on the left side of the app.
  * This component renders icons for quick navigation between major sections.
- * 
- * Usage:
- * <LeftIconNavbar 
- *   items={iconNavItems} 
- *   logoPath="/path/to/logo.png"
- *   onIconClick={(path) => navigate(path)}
- * />
- * 
- * TODO: Customize the icon rendering and styling as needed
  */
 
 import { Link, useLocation } from "wouter";
-import { Home, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish } from "lucide-react";
-import { type IconNavItem } from "@/config/navigation";
+import { Home, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish, Workflow, Activity } from "lucide-react";
+import { type IconNavItem, getActiveModuleIndex } from "@/config/navigation";
 
 interface LeftIconNavbarProps {
   items: IconNavItem[];
@@ -45,6 +36,10 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
         return <Rabbit className={`w-4 h-4 ${colorClass}`} />;
       case "fish":
         return <Fish className={`w-4 h-4 ${colorClass}`} />;
+      case "workflow":
+        return <Workflow className={`w-4 h-4 ${colorClass}`} />;
+      case "activity":
+        return <Activity className={`w-4 h-4 ${colorClass}`} />;
       case "refresh-ccw":
         return (
           <div className="relative w-4 h-4 flex items-center justify-center">
@@ -57,18 +52,8 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
     }
   };
 
-  const isActive = (item: IconNavItem) => {
-    // Module-based active detection
-    const modulePrefix = item.modulePrefix ?? "";
-    
-    if (modulePrefix === "") {
-      // Template 1: active when NOT in /template2
-      return !location.startsWith("/template2");
-    }
-    
-    // Other modules: active when path starts with module prefix
-    return location.startsWith(modulePrefix);
-  };
+  // Get the index of the currently active module based on path
+  const activeModuleIndex = getActiveModuleIndex(location);
 
   return (
     <aside
@@ -90,7 +75,8 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
         </Link>
 
         {items.map((item, index) => {
-          const active = isActive(item);
+          // Only the module at activeModuleIndex is active
+          const active = index === activeModuleIndex;
           const content = (
             <div
               className={`w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-colors ${
