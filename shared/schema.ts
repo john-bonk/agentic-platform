@@ -222,12 +222,35 @@ export interface AssistantIntent {
   parameters: Record<string, unknown>;
 }
 
+export interface WorkflowNodeSpec {
+  tempId: string;
+  typeId: string;
+  label: string;
+  positionX: number;
+  positionY: number;
+  config?: Record<string, unknown>;
+}
+
+export interface WorkflowEdgeSpec {
+  sourceTempId: string;
+  targetTempId: string;
+  sourceHandle?: string;
+  targetHandle?: string;
+}
+
+export interface BatchWorkflowPayload {
+  nodes: WorkflowNodeSpec[];
+  edges: WorkflowEdgeSpec[];
+  description?: string;
+}
+
 export interface AssistantAction {
   id: string;
-  type: "add_node" | "delete_node" | "update_node" | "connect_nodes" | "generate_workflow";
+  type: "add_node" | "delete_node" | "update_node" | "connect_nodes" | "generate_workflow" | "batch_workflow";
   label: string;
   description: string;
   payload: Record<string, unknown>;
+  batchPayload?: BatchWorkflowPayload;
   status: "pending" | "applied" | "rejected";
 }
 

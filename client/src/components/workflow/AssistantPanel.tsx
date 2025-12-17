@@ -42,6 +42,7 @@ function ActionCard({ action, onApply, onReject, isPending }: ActionCardProps) {
       case "connect_nodes":
         return <Zap className="w-4 h-4 text-purple-500" />;
       case "generate_workflow":
+      case "batch_workflow":
         return <Sparkles className="w-4 h-4 text-amber-500" />;
       default:
         return <ChevronRight className="w-4 h-4" />;

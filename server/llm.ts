@@ -135,10 +135,109 @@ const WORKFLOW_TEMPLATES: Record<string, { name: string; keywords: string[]; nod
       { typeId: "end", label: "Complete", offsetY: 480 },
     ],
   },
+  aggregate: {
+    name: "Aggregate Approval Workflow",
+    keywords: ["aggregate approval", "multi-level approval", "consensus approval", "aggregate review", "parallel approval"],
+    nodes: [
+      { typeId: "start", label: "Start", offsetY: 0 },
+      { typeId: "human-task", label: "Prepare Request", offsetY: 120 },
+      { typeId: "parallel-gateway", label: "Split for Parallel Review", offsetY: 240 },
+      { typeId: "approval", label: "Finance Approval", offsetY: 360 },
+      { typeId: "approval", label: "Legal Approval", offsetY: 360 },
+      { typeId: "approval", label: "Manager Approval", offsetY: 360 },
+      { typeId: "parallel-gateway", label: "Merge Reviews", offsetY: 480 },
+      { typeId: "decision", label: "All Approved?", offsetY: 600 },
+      { typeId: "email-notification", label: "Send Approval Status", offsetY: 720 },
+      { typeId: "end", label: "Complete", offsetY: 840 },
+    ],
+  },
+  issue: {
+    name: "Issue Management Workflow",
+    keywords: ["issue workflow", "issue management", "issue tracking", "deficiency workflow"],
+    nodes: [
+      { typeId: "start", label: "Issue Identified", offsetY: 0 },
+      { typeId: "ab-issues", label: "Create Issue", offsetY: 120 },
+      { typeId: "human-task", label: "Assign Owner", offsetY: 240 },
+      { typeId: "human-task", label: "Remediate Issue", offsetY: 360 },
+      { typeId: "approval", label: "Approve Remediation", offsetY: 480 },
+      { typeId: "decision", label: "Issue Resolved?", offsetY: 600 },
+      { typeId: "end", label: "Close Issue", offsetY: 720 },
+    ],
+  },
 };
+
+function findNodeByLabel(nodes: WorkflowNode[], searchTerm: string): WorkflowNode | undefined {
+  const lowerSearch = searchTerm.toLowerCase();
+  return nodes.find(n => 
+    n.label.toLowerCase().includes(lowerSearch) || 
+    n.typeId.toLowerCase().includes(lowerSearch)
+  );
+}
+
+function findInsertPosition(message: string, context: AssistantContext): { afterNode?: WorkflowNode; beforeNode?: WorkflowNode; position: { x: number; y: number } } {
+  const nodes = context.nodes || [];
+  const edges = context.edges || [];
+  
+  const lowerMessage = message.toLowerCase();
+  
+  const afterMatch = lowerMessage.match(/after\s+(?:the\s+)?["']?([^"']+?)["']?\s*(?:step|node|task)?/i);
+  const beforeMatch = lowerMessage.match(/before\s+(?:the\s+)?["']?([^"']+?)["']?\s*(?:step|node|task)?/i);
+  
+  if (afterMatch) {
+    const afterNode = findNodeByLabel(nodes, afterMatch[1].trim());
+    if (afterNode) {
+      const connectedEdge = edges.find(e => e.sourceNodeId === afterNode.id);
+      const targetNode = connectedEdge ? nodes.find(n => n.id === connectedEdge.targetNodeId) : undefined;
+      return {
+        afterNode,
+        beforeNode: targetNode,
+        position: {
+          x: afterNode.positionX,
+          y: afterNode.positionY + 120,
+        },
+      };
+    }
+  }
+  
+  if (beforeMatch) {
+    const beforeNode = findNodeByLabel(nodes, beforeMatch[1].trim());
+    if (beforeNode) {
+      const connectedEdge = edges.find(e => e.targetNodeId === beforeNode.id);
+      const sourceNode = connectedEdge ? nodes.find(n => n.id === connectedEdge.sourceNodeId) : undefined;
+      return {
+        afterNode: sourceNode,
+        beforeNode,
+        position: {
+          x: beforeNode.positionX,
+          y: beforeNode.positionY - 120,
+        },
+      };
+    }
+  }
+  
+  const maxY = nodes.length > 0 ? Math.max(...nodes.map(n => n.positionY)) : 0;
+  const avgX = nodes.length > 0 ? nodes.reduce((sum, n) => sum + n.positionX, 0) / nodes.length : 400;
+  
+  return {
+    position: { x: avgX, y: maxY + 120 },
+  };
+}
+
+function buildWorkflowSummary(context: AssistantContext): string {
+  const nodes = context.nodes || [];
+  const edges = context.edges || [];
+  
+  if (nodes.length === 0) return "Your workflow is currently empty.";
+  
+  const nodeList = nodes.map(n => `• ${n.label} (${n.typeId})`).join("\n");
+  const connectionCount = edges.length;
+  
+  return `Current workflow has ${nodes.length} nodes and ${connectionCount} connections:\n${nodeList}`;
+}
 
 function detectIntent(message: string, context: AssistantContext): IntentMatch {
   const lowerMessage = message.toLowerCase().trim();
+  const hasExistingNodes = (context.nodes?.length || 0) > 0;
   
   // Check for workflow template requests
   for (const [key, template] of Object.entries(WORKFLOW_TEMPLATES)) {
@@ -163,6 +262,10 @@ function detectIntent(message: string, context: AssistantContext): IntentMatch {
     }
     return { type: "GENERATE_WORKFLOW", confidence: 0.7, workflow: "review" };
   }
+  
+  // Check for contextual node creation (after/before specific nodes)
+  const positionPatterns = ["after", "before", "between"];
+  const hasPositionContext = positionPatterns.some(p => lowerMessage.includes(p)) && hasExistingNodes;
   
   // Check for node creation requests
   const createPatterns = ["add", "create", "insert", "new", "put", "include", "need"];
@@ -231,16 +334,25 @@ function calculatePosition(context: AssistantContext, offsetY: number = 0): { x:
 function generateNodeActions(
   nodeType: NodeTypeDefinition, 
   label: string, 
-  context: AssistantContext
+  context: AssistantContext,
+  message?: string
 ): AssistantAction[] {
-  const pos = calculatePosition(context);
+  const insertInfo = message ? findInsertPosition(message, context) : null;
+  const pos = insertInfo?.position || calculatePosition(context);
   const actionId = `action-${Date.now()}`;
+  
+  let description = nodeType.description;
+  if (insertInfo?.afterNode) {
+    description = `Insert after "${insertInfo.afterNode.label}"`;
+  } else if (insertInfo?.beforeNode) {
+    description = `Insert before "${insertInfo.beforeNode.label}"`;
+  }
   
   return [{
     id: actionId,
     type: "add_node",
     label: `Add ${nodeType.name}`,
-    description: nodeType.description,
+    description,
     payload: {
       typeId: nodeType.id,
       label: label,
@@ -252,7 +364,13 @@ function generateNodeActions(
   }];
 }
 
-function generateWorkflowActions(templateKey: string, context: AssistantContext): AssistantAction[] {
+import { 
+  type BatchWorkflowPayload,
+  type WorkflowNodeSpec,
+  type WorkflowEdgeSpec,
+} from "@shared/schema";
+
+function generateBatchWorkflowAction(templateKey: string, context: AssistantContext): AssistantAction[] {
   const template = WORKFLOW_TEMPLATES[templateKey];
   if (!template) return [];
   
@@ -262,32 +380,47 @@ function generateWorkflowActions(templateKey: string, context: AssistantContext)
   const baseY = 100;
   const actionId = Date.now();
   
-  const nodeActions = template.nodes.map((node, index) => ({
-    id: `action-${actionId}-${index}`,
-    type: "add_node" as const,
-    label: `Add ${node.label}`,
-    description: `Step ${index + 1}: ${getNodeType(node.typeId)?.description || "Workflow step"}`,
-    payload: {
-      typeId: node.typeId,
-      label: node.label,
-      positionX: baseX,
-      positionY: baseY + node.offsetY,
-      config: {},
-    },
-    status: "pending" as const,
+  const nodes: WorkflowNodeSpec[] = template.nodes.map((node, index) => ({
+    tempId: `temp-${actionId}-${index}`,
+    typeId: node.typeId,
+    label: node.label,
+    positionX: baseX,
+    positionY: baseY + node.offsetY,
+    config: {},
   }));
   
-  return nodeActions;
+  const edges: WorkflowEdgeSpec[] = [];
+  for (let i = 0; i < nodes.length - 1; i++) {
+    edges.push({
+      sourceTempId: nodes[i].tempId,
+      targetTempId: nodes[i + 1].tempId,
+    });
+  }
+  
+  const batchPayload: BatchWorkflowPayload = {
+    nodes,
+    edges,
+    description: template.name,
+  };
+  
+  return [{
+    id: `action-${actionId}`,
+    type: "batch_workflow",
+    label: `Apply ${template.name}`,
+    description: `Creates ${nodes.length} nodes with ${edges.length} connections`,
+    payload: {},
+    batchPayload,
+    status: "pending",
+  }];
 }
 
-function getConnectionInstructions(template: { nodes: { label: string }[] }): string {
-  if (template.nodes.length < 2) return "";
+function getWorkflowSummary(template: { name: string; nodes: { label: string }[] }): string {
+  const nodeList = template.nodes.map((n, i) => `${i + 1}. ${n.label}`).join("\n");
+  const connectionList = template.nodes.slice(0, -1).map((n, i) => 
+    `   ${n.label} → ${template.nodes[i + 1].label}`
+  ).join("\n");
   
-  const connections = template.nodes.slice(0, -1).map((node, i) => 
-    `• Connect "${node.label}" → "${template.nodes[i + 1].label}"`
-  );
-  
-  return `\n\n**After adding all nodes, connect them:**\n${connections.join("\n")}`;
+  return `**${template.name}** (${template.nodes.length} steps)\n\n**Nodes:**\n${nodeList}\n\n**Connections:**\n${connectionList}`;
 }
 
 function generateHelpResponse(): AssistantResponse {
@@ -329,16 +462,21 @@ How would you like to get started?`,
 
 function generateConversationalResponse(message: string, context: AssistantContext): AssistantResponse {
   const hasNodes = context.nodes && context.nodes.length > 0;
+  const workflowSummary = buildWorkflowSummary(context);
   
   let content = "I'm here to help you build your workflow. ";
   
   if (hasNodes) {
-    content += `Your workflow "${context.workflowName || "Untitled"}" currently has ${context.nodes!.length} node(s). `;
-    content += "What would you like to add or modify?";
+    content += `\n\n**Current State:**\n${workflowSummary}\n\n`;
+    content += "What would you like to add or modify? You can:\n";
+    content += "• Add nodes: \"add an approval after Review Document\"\n";
+    content += "• Analyze: \"check my workflow\" or \"suggest improvements\"\n";
+    content += "• Expand: \"add error handling\" or \"add notifications\"";
   } else {
     content += "Try saying:\n";
     content += "• \"Add a start node\" to begin your workflow\n";
-    content += "• \"Create a review workflow\" to generate a complete template\n";
+    content += "• \"Create a review workflow\" for a complete template\n";
+    content += "• \"Create an aggregate approval workflow\" for multi-level approvals\n";
     content += "• \"Help\" to see all available options";
   }
   
@@ -368,9 +506,23 @@ export async function generateAssistantResponse(
         };
       }
       
-      const actions = generateNodeActions(intent.nodeType, intent.label || intent.nodeType.name, context);
+      const insertInfo = findInsertPosition(lastMessage, context);
+      const actions = generateNodeActions(intent.nodeType, intent.label || intent.nodeType.name, context, lastMessage);
+      
+      let positionNote = "";
+      if (insertInfo.afterNode) {
+        positionNote = ` I'll position it after **${insertInfo.afterNode.label}**.`;
+        if (insertInfo.beforeNode) {
+          positionNote += ` You may want to reconnect the edges: ${insertInfo.afterNode.label} → New Node → ${insertInfo.beforeNode.label}.`;
+        }
+      } else if (insertInfo.beforeNode) {
+        positionNote = ` I'll position it before **${insertInfo.beforeNode.label}**.`;
+      } else if (context.nodes && context.nodes.length > 0) {
+        positionNote = ` I'll add it below your existing nodes.`;
+      }
+      
       return {
-        content: `I'll add a **${intent.nodeType.name}** to your workflow. ${intent.nodeType.description}\n\nClick **Apply** to add it to the canvas.`,
+        content: `I'll add a **${intent.nodeType.name}** to your workflow.${positionNote}\n\n${intent.nodeType.description}\n\nClick **Apply** to add it to the canvas.`,
         intent: { type: "CREATE_NODE", confidence: intent.confidence, parameters: { nodeType: intent.nodeType.id } },
         actions,
       };
@@ -379,11 +531,11 @@ export async function generateAssistantResponse(
     case "GENERATE_WORKFLOW": {
       const templateKey = intent.workflow || "review";
       const template = WORKFLOW_TEMPLATES[templateKey];
-      const actions = generateWorkflowActions(templateKey, context);
-      const connectionInstructions = getConnectionInstructions(template);
+      const actions = generateBatchWorkflowAction(templateKey, context);
+      const summary = getWorkflowSummary(template);
       
       return {
-        content: `I'll create a **${template.name}** for you with ${template.nodes.length} steps:\n\n${template.nodes.map((n, i) => `${i + 1}. ${n.label}`).join("\n")}\n\nClick **Apply** on each action to add the nodes to your canvas.${connectionInstructions}`,
+        content: `I'll create this workflow for you:\n\n${summary}\n\nClick **Apply** to add all nodes and connections to your canvas at once.`,
         intent: { type: "GENERATE_WORKFLOW", confidence: intent.confidence, parameters: { template: templateKey } },
         actions,
       };

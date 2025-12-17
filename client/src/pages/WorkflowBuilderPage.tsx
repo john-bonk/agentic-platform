@@ -159,6 +159,7 @@ export function WorkflowBuilderPage() {
     setNodes,
     setEdges,
     addNode,
+    addEdge,
     removeNode,
     setPanelOpen,
     setInspectorNodeId,
@@ -263,6 +264,78 @@ export function WorkflowBuilderPage() {
           });
           const newNode = await res.json();
           addNode(newNode);
+          break;
+        }
+        case "batch_workflow": {
+          if (!action.batchPayload) {
+            console.error("batch_workflow action missing batchPayload");
+            toast({
+              title: "Error",
+              description: "Invalid workflow payload",
+              variant: "destructive",
+            });
+            break;
+          }
+          const { nodes: nodeSpecs, edges: edgeSpecs } = action.batchPayload;
+          const tempIdToRealId: Record<string, string> = {};
+          const createdNodes: WorkflowNode[] = [];
+          let nodesFailed = false;
+          
+          for (const nodeSpec of nodeSpecs) {
+            try {
+              const res = await apiRequest("POST", `/api/workflows/${workflowId}/nodes`, {
+                typeId: nodeSpec.typeId,
+                label: nodeSpec.label,
+                positionX: nodeSpec.positionX,
+                positionY: nodeSpec.positionY,
+                config: nodeSpec.config || {},
+                metadata: {},
+              });
+              const newNode = await res.json();
+              tempIdToRealId[nodeSpec.tempId] = newNode.id;
+              createdNodes.push(newNode);
+              addNode(newNode);
+            } catch (err) {
+              console.error(`Failed to create node ${nodeSpec.label}:`, err);
+              nodesFailed = true;
+              toast({
+                title: "Partial Failure",
+                description: `Failed to create node "${nodeSpec.label}". ${createdNodes.length} nodes were created.`,
+                variant: "destructive",
+              });
+              break;
+            }
+          }
+          
+          if (nodesFailed) break;
+          
+          let edgesCreated = 0;
+          for (const edgeSpec of edgeSpecs) {
+            const sourceId = tempIdToRealId[edgeSpec.sourceTempId];
+            const targetId = tempIdToRealId[edgeSpec.targetTempId];
+            if (!sourceId || !targetId) {
+              console.warn(`Skipping edge: missing ID mapping for ${edgeSpec.sourceTempId} -> ${edgeSpec.targetTempId}`);
+              continue;
+            }
+            try {
+              const res = await apiRequest("POST", `/api/workflows/${workflowId}/edges`, {
+                sourceNodeId: sourceId,
+                targetNodeId: targetId,
+                sourceHandle: edgeSpec.sourceHandle,
+                targetHandle: edgeSpec.targetHandle,
+              });
+              const newEdge = await res.json();
+              addEdge(newEdge);
+              edgesCreated++;
+            } catch (err) {
+              console.error(`Failed to create edge:`, err);
+            }
+          }
+          
+          toast({
+            title: "Workflow Created",
+            description: `Added ${createdNodes.length} nodes and ${edgesCreated} connections`,
+          });
           break;
         }
         case "generate_workflow": {
