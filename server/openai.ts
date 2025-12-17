@@ -2,7 +2,6 @@
  * OpenAI Integration for AuditBoard Assistant
  * 
  * Provides LLM-powered workflow building assistance
- * the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
  */
 
 import OpenAI from "openai";
@@ -16,8 +15,13 @@ import {
   getNodeType,
 } from "@shared/schema";
 
+const apiKey = process.env.OPENAI_API_KEY;
+if (!apiKey) {
+  console.warn("Warning: OPENAI_API_KEY not set. Assistant functionality will be limited.");
+}
+
 const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || "missing-key"
+  apiKey: apiKey || "sk-placeholder"
 });
 
 const SYSTEM_PROMPT = `You are the AuditBoard Assistant, a specialized AI that helps GRC (Governance, Risk, Compliance) administrators build sophisticated workflows using a visual workflow builder.
@@ -151,10 +155,16 @@ export async function generateAssistantResponse(
   ];
 
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      return {
+        content: "The OpenAI API key is not configured. Please add your OPENAI_API_KEY in the Secrets tab to enable the AI assistant.",
+      };
+    }
+
     const response = await openai.chat.completions.create({
-      model: "gpt-5",
+      model: "gpt-4o",
       messages: formattedMessages,
-      max_completion_tokens: 4096,
+      max_tokens: 4096,
     });
 
     const content = response.choices[0].message.content || "";

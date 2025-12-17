@@ -42,7 +42,8 @@ function toReactFlowNode(node: WorkflowNode, onConfigure: (id: string) => void):
       config: node.config || {},
       onConfigure,
     },
-    selected: false,
+    draggable: true,
+    selectable: true,
   };
 }
 
@@ -94,33 +95,34 @@ function WorkflowCanvasInner({ workflowId, onNodeConfigure }: WorkflowCanvasInne
   );
 
   const onNodesChange = useCallback(
-    async (changes: NodeChange[]) => {
-      const updatedNodes = applyNodeChanges(changes, nodes);
-      
+    (changes: NodeChange[]) => {
       for (const change of changes) {
-        if (change.type === "position" && change.position && !change.dragging) {
+        if (change.type === "position" && change.dragging === false && change.position) {
           const node = storeNodes.find((n) => n.id === change.id);
           if (node) {
-            try {
-              await apiRequest("PATCH", `/api/nodes/${change.id}`, {
-                positionX: change.position.x,
-                positionY: change.position.y,
-              });
+            apiRequest("PATCH", `/api/nodes/${change.id}`, {
+              positionX: change.position.x,
+              positionY: change.position.y,
+            }).then(() => {
               updateNode(change.id, {
-                positionX: change.position.x,
-                positionY: change.position.y,
+                positionX: change.position!.x,
+                positionY: change.position!.y,
               });
-            } catch (error) {
+            }).catch((error) => {
               console.error("Failed to update node position:", error);
-            }
+            });
+          }
+        } else if (change.type === "position" && change.dragging) {
+          if (change.position) {
+            updateNode(change.id, {
+              positionX: change.position.x,
+              positionY: change.position.y,
+            });
           }
         } else if (change.type === "remove") {
-          try {
-            await apiRequest("DELETE", `/api/nodes/${change.id}`, undefined);
-            removeNode(change.id);
-          } catch (error) {
-            console.error("Failed to delete node:", error);
-          }
+          apiRequest("DELETE", `/api/nodes/${change.id}`, undefined)
+            .then(() => removeNode(change.id))
+            .catch((error) => console.error("Failed to delete node:", error));
         } else if (change.type === "select") {
           if (change.selected) {
             setSelectedNodeIds([change.id]);
@@ -129,7 +131,7 @@ function WorkflowCanvasInner({ workflowId, onNodeConfigure }: WorkflowCanvasInne
         }
       }
     },
-    [nodes, storeNodes, updateNode, removeNode, setSelectedNodeIds, setInspectorNodeId]
+    [storeNodes, updateNode, removeNode, setSelectedNodeIds, setInspectorNodeId]
   );
 
   const onEdgesChange = useCallback(
