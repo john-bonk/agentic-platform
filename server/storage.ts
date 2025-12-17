@@ -16,6 +16,36 @@ import {
 import { randomUUID } from "crypto";
 
 /**
+ * Batch Operation Types
+ */
+export interface BatchNodeSpec {
+  tempId: string;
+  typeId: string;
+  label: string;
+  config?: Record<string, unknown>;
+  positionX: number;
+  positionY: number;
+  metadata?: Record<string, unknown>;
+}
+
+export interface BatchEdgeSpec {
+  sourceTempId: string;
+  targetTempId: string;
+  sourceHandle?: string | null;
+  targetHandle?: string | null;
+  label?: string | null;
+  condition?: unknown;
+  metadata?: Record<string, unknown>;
+}
+
+export interface BatchWorkflowResult {
+  workflow: Workflow;
+  nodes: WorkflowNode[];
+  edges: WorkflowEdge[];
+  tempIdMapping: Record<string, string>;
+}
+
+/**
  * Storage Interface
  */
 export interface IStorage {
@@ -34,12 +64,24 @@ export interface IStorage {
   createNode(node: InsertNode): Promise<WorkflowNode>;
   updateNode(id: string, node: Partial<InsertNode>): Promise<WorkflowNode | undefined>;
   deleteNode(id: string): Promise<boolean>;
+  deleteNodesByWorkflow(workflowId: string): Promise<number>;
   
   getEdges(workflowId: string): Promise<WorkflowEdge[]>;
   getEdge(id: string): Promise<WorkflowEdge | undefined>;
   createEdge(edge: InsertEdge): Promise<WorkflowEdge>;
   updateEdge(id: string, edge: Partial<InsertEdge>): Promise<WorkflowEdge | undefined>;
   deleteEdge(id: string): Promise<boolean>;
+  deleteEdgesByWorkflow(workflowId: string): Promise<number>;
+  
+  createWorkflowWithContents(
+    workflow: InsertWorkflow,
+    nodes: BatchNodeSpec[],
+    edges: BatchEdgeSpec[]
+  ): Promise<BatchWorkflowResult>;
+  
+  duplicateWorkflow(id: string, newName?: string): Promise<BatchWorkflowResult | undefined>;
+  
+  clearWorkflowContents(workflowId: string): Promise<{ nodesDeleted: number; edgesDeleted: number }>;
   
   getSession(id: string): Promise<AssistantSession | undefined>;
   getSessionByWorkflow(workflowId: string): Promise<AssistantSession | undefined>;
@@ -289,6 +331,117 @@ export class MemStorage implements IStorage {
 
   async deleteEdge(id: string): Promise<boolean> {
     return this.edges.delete(id);
+  }
+
+  async deleteNodesByWorkflow(workflowId: string): Promise<number> {
+    const nodes = await this.getNodes(workflowId);
+    nodes.forEach(n => this.nodes.delete(n.id));
+    return nodes.length;
+  }
+
+  async deleteEdgesByWorkflow(workflowId: string): Promise<number> {
+    const edges = await this.getEdges(workflowId);
+    edges.forEach(e => this.edges.delete(e.id));
+    return edges.length;
+  }
+
+  async createWorkflowWithContents(
+    workflowData: InsertWorkflow,
+    nodeSpecs: BatchNodeSpec[],
+    edgeSpecs: BatchEdgeSpec[]
+  ): Promise<BatchWorkflowResult> {
+    const workflow = await this.createWorkflow(workflowData);
+    const tempIdMapping: Record<string, string> = {};
+    const nodes: WorkflowNode[] = [];
+    const edges: WorkflowEdge[] = [];
+
+    for (const spec of nodeSpecs) {
+      const node = await this.createNode({
+        workflowId: workflow.id,
+        typeId: spec.typeId,
+        label: spec.label,
+        config: spec.config || {},
+        positionX: spec.positionX,
+        positionY: spec.positionY,
+        metadata: spec.metadata || {},
+      });
+      tempIdMapping[spec.tempId] = node.id;
+      nodes.push(node);
+    }
+
+    for (const spec of edgeSpecs) {
+      const sourceNodeId = tempIdMapping[spec.sourceTempId];
+      const targetNodeId = tempIdMapping[spec.targetTempId];
+      if (!sourceNodeId || !targetNodeId) {
+        console.warn(`Skipping edge: missing mapping for ${spec.sourceTempId} -> ${spec.targetTempId}`);
+        continue;
+      }
+      const edge = await this.createEdge({
+        workflowId: workflow.id,
+        sourceNodeId,
+        targetNodeId,
+        sourceHandle: spec.sourceHandle || null,
+        targetHandle: spec.targetHandle || null,
+        label: spec.label || null,
+        condition: spec.condition || null,
+        metadata: spec.metadata || {},
+      });
+      edges.push(edge);
+    }
+
+    return { workflow, nodes, edges, tempIdMapping };
+  }
+
+  async duplicateWorkflow(id: string, newName?: string): Promise<BatchWorkflowResult | undefined> {
+    const original = await this.getWorkflow(id);
+    if (!original) return undefined;
+
+    const originalNodes = await this.getNodes(id);
+    const originalEdges = await this.getEdges(id);
+
+    const nodeSpecs: BatchNodeSpec[] = originalNodes.map((n, i) => ({
+      tempId: `dup-${i}`,
+      typeId: n.typeId,
+      label: n.label,
+      config: n.config as Record<string, unknown>,
+      positionX: n.positionX,
+      positionY: n.positionY,
+      metadata: n.metadata as Record<string, unknown>,
+    }));
+
+    const oldIdToTempId: Record<string, string> = {};
+    originalNodes.forEach((n, i) => {
+      oldIdToTempId[n.id] = `dup-${i}`;
+    });
+
+    const edgeSpecs: BatchEdgeSpec[] = originalEdges.map(e => ({
+      sourceTempId: oldIdToTempId[e.sourceNodeId],
+      targetTempId: oldIdToTempId[e.targetNodeId],
+      sourceHandle: e.sourceHandle,
+      targetHandle: e.targetHandle,
+      label: e.label,
+      condition: e.condition,
+      metadata: e.metadata as Record<string, unknown>,
+    }));
+
+    return this.createWorkflowWithContents(
+      {
+        name: newName || `${original.name} (Copy)`,
+        description: original.description,
+        status: "draft",
+        tags: original.tags,
+        visibility: original.visibility,
+        version: 1,
+      },
+      nodeSpecs,
+      edgeSpecs
+    );
+  }
+
+  async clearWorkflowContents(workflowId: string): Promise<{ nodesDeleted: number; edgesDeleted: number }> {
+    const edgesDeleted = await this.deleteEdgesByWorkflow(workflowId);
+    const nodesDeleted = await this.deleteNodesByWorkflow(workflowId);
+    return { nodesDeleted, edgesDeleted };
   }
 
   async getSession(id: string): Promise<AssistantSession | undefined> {
