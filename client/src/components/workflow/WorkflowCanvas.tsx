@@ -106,8 +106,6 @@ function WorkflowCanvasInner({ workflowId, onNodeConfigure }: WorkflowCanvasInne
     [storeEdges]
   );
   
-  // Debug: Log when nodes change to verify real-time updates
-  console.log("[WorkflowCanvas] nodes updated:", storeNodes.length, "nodes, sample config:", storeNodes[0]?.config);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
