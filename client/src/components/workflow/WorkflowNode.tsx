@@ -1,5 +1,8 @@
 /**
  * Custom Workflow Node Component for React Flow
+ * 
+ * IMPORTANT: This component uses a custom memo comparison to ensure
+ * config changes trigger re-renders for real-time canvas updates.
  */
 
 import { memo, useMemo } from "react";
@@ -25,6 +28,7 @@ interface WorkflowNodeData {
   label: string;
   typeId: string;
   config: Record<string, unknown>;
+  configHash?: string;
   onConfigure?: (nodeId: string) => void;
 }
 
@@ -171,4 +175,20 @@ function WorkflowNodeComponent({ id, data, selected }: NodeProps<WorkflowNodeDat
   );
 }
 
-export const WorkflowNodeMemo = memo(WorkflowNodeComponent);
+/**
+ * Custom comparison function for React.memo
+ * Ensures config changes trigger re-renders by comparing configHash
+ */
+function arePropsEqual(
+  prevProps: NodeProps<WorkflowNodeData>,
+  nextProps: NodeProps<WorkflowNodeData>
+): boolean {
+  if (prevProps.id !== nextProps.id) return false;
+  if (prevProps.selected !== nextProps.selected) return false;
+  if (prevProps.data.label !== nextProps.data.label) return false;
+  if (prevProps.data.typeId !== nextProps.data.typeId) return false;
+  if (prevProps.data.configHash !== nextProps.data.configHash) return false;
+  return true;
+}
+
+export const WorkflowNodeMemo = memo(WorkflowNodeComponent, arePropsEqual);

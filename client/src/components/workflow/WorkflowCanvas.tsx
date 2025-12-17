@@ -31,7 +31,17 @@ const nodeTypes = {
   workflowNode: WorkflowNodeMemo,
 };
 
+/**
+ * Generates a simple hash of the config object for change detection.
+ * This ensures React Flow re-renders nodes when config changes.
+ */
+function computeConfigHash(config: Record<string, unknown> | null): string {
+  if (!config || Object.keys(config).length === 0) return "";
+  return JSON.stringify(config);
+}
+
 function toReactFlowNode(node: WorkflowNode, onConfigure: (id: string) => void): Node {
+  const config = (node.config as Record<string, unknown>) || {};
   return {
     id: node.id,
     type: "workflowNode",
@@ -39,7 +49,8 @@ function toReactFlowNode(node: WorkflowNode, onConfigure: (id: string) => void):
     data: {
       label: node.label,
       typeId: node.typeId,
-      config: node.config || {},
+      config: config,
+      configHash: computeConfigHash(config),
       onConfigure,
     },
     draggable: true,
@@ -84,15 +95,19 @@ function WorkflowCanvasInner({ workflowId, onNodeConfigure }: WorkflowCanvasInne
     setInspectorNodeId,
   } = useWorkflowStore();
 
-  const nodes = useMemo(
-    () => storeNodes.map((n) => toReactFlowNode(n, onNodeConfigure)),
-    [storeNodes, onNodeConfigure]
-  );
+  // Convert store nodes to React Flow nodes
+  // Using useMemo with configHash comparison ensures re-renders on config changes
+  const nodes = useMemo(() => {
+    return storeNodes.map((n) => toReactFlowNode(n, onNodeConfigure));
+  }, [storeNodes, onNodeConfigure]);
   
   const edges = useMemo(
     () => storeEdges.map(toReactFlowEdge),
     [storeEdges]
   );
+  
+  // Debug: Log when nodes change to verify real-time updates
+  console.log("[WorkflowCanvas] nodes updated:", storeNodes.length, "nodes, sample config:", storeNodes[0]?.config);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
