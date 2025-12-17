@@ -76,18 +76,50 @@ function WorkflowNodeComponent({ id, data, selected }: NodeProps<WorkflowNodeDat
         {Object.keys(data.config).length > 0 && (
           <div className="mt-2 pt-2 border-t border-border">
             <div className="flex flex-wrap gap-1">
-              {Object.entries(data.config).slice(0, 2).map(([key, value]) => (
-                <Badge 
-                  key={key} 
-                  variant="secondary" 
-                  className="text-xs truncate max-w-full"
-                >
-                  {typeof value === "string" ? value.slice(0, 15) : String(value).slice(0, 15)}
-                </Badge>
-              ))}
-              {Object.keys(data.config).length > 2 && (
+              {Object.entries(data.config).slice(0, 3).map(([key, value]) => {
+                let displayValue = "";
+                if (typeof value === "string") {
+                  displayValue = value.length > 12 ? value.slice(0, 12) + "..." : value;
+                } else if (typeof value === "number" || typeof value === "boolean") {
+                  displayValue = String(value);
+                } else if (Array.isArray(value)) {
+                  if (value.length > 0 && typeof value[0] === "object" && value[0] !== null) {
+                    const firstItem = value[0] as Record<string, unknown>;
+                    const itemValue = firstItem.value || firstItem.field || firstItem.name || Object.values(firstItem)[0];
+                    displayValue = itemValue ? `${String(itemValue).slice(0, 10)}...` : `[${value.length}]`;
+                  } else if (value.length > 0) {
+                    displayValue = String(value[0]).slice(0, 10) + (value.length > 1 ? `+${value.length - 1}` : "");
+                  } else {
+                    displayValue = "[]";
+                  }
+                } else if (value && typeof value === "object") {
+                  const obj = value as Record<string, unknown>;
+                  const meaningfulValue = obj.value || obj.status || obj.name || obj.field || Object.values(obj)[0];
+                  if (meaningfulValue && typeof meaningfulValue === "string") {
+                    displayValue = meaningfulValue.length > 10 ? meaningfulValue.slice(0, 10) + "..." : meaningfulValue;
+                  } else if (meaningfulValue !== undefined) {
+                    displayValue = String(meaningfulValue).slice(0, 10);
+                  } else {
+                    displayValue = "{}";
+                  }
+                } else {
+                  displayValue = String(value || "");
+                }
+                return (
+                  <Badge 
+                    key={key} 
+                    variant="secondary" 
+                    className="text-xs"
+                    title={`${key}: ${JSON.stringify(value)}`}
+                  >
+                    <span className="text-muted-foreground mr-1">{key}:</span>
+                    {displayValue}
+                  </Badge>
+                );
+              })}
+              {Object.keys(data.config).length > 3 && (
                 <Badge variant="outline" className="text-xs">
-                  +{Object.keys(data.config).length - 2}
+                  +{Object.keys(data.config).length - 3}
                 </Badge>
               )}
             </div>

@@ -159,7 +159,7 @@ export class MemStorage implements IStorage {
       { id: "n2", workflowId: "wf1", typeId: "ab-issues", label: "Query Open Issues", config: { action: "query", filters: { status: "open" } }, positionX: 300, positionY: 200, metadata: {}, createdAt: now },
       { id: "n3", workflowId: "wf1", typeId: "decision", label: "High Priority?", config: { conditions: [{ field: "priority", operator: "equals", value: "high" }] }, positionX: 500, positionY: 200, metadata: {}, createdAt: now },
       { id: "n4", workflowId: "wf1", typeId: "approval", label: "Manager Approval", config: { approvers: ["manager@company.com"], requiredApprovals: 1 }, positionX: 700, positionY: 100, metadata: {}, createdAt: now },
-      { id: "n5", workflowId: "wf1", typeId: "human-task", label: "Standard Review", config: { assignee: "reviewer@company.com", title: "Review Issue" }, positionX: 700, positionY: 300, metadata: {}, createdAt: now },
+      { id: "n5", workflowId: "wf1", typeId: "human-task", label: "Standard Review", config: { assignee: "reviewer@company.com", title: "Review Issue", priority: "medium", description: "Review the flagged issue" }, positionX: 700, positionY: 300, metadata: {}, createdAt: now },
       { id: "n6", workflowId: "wf1", typeId: "email-notification", label: "Send Summary", config: { to: ["team@company.com"], subject: "Issue Review Complete" }, positionX: 900, positionY: 200, metadata: {}, createdAt: now },
       { id: "n7", workflowId: "wf1", typeId: "end", label: "End", config: {}, positionX: 1100, positionY: 200, metadata: {}, createdAt: now },
     ];
