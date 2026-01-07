@@ -8,6 +8,7 @@
  */
 
 export { DashboardPage } from "./DashboardPage";
+export { default as HomePage } from "./HomePage";
 export { default as IntelligenceHubPage } from "./IntelligenceHubPage";
 export { ListPage } from "./ListPage";
 export { HierarchyPage } from "./HierarchyPage";

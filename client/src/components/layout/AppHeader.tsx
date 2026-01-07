@@ -17,14 +17,11 @@ import {
   User,
   Search,
   Command,
-  Plus,
   FileText,
   AlertTriangle,
   ClipboardList,
-  Settings,
-  Building2,
-  Shield,
   Lock,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,17 +39,25 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { type Tab } from "@/lib/tabStore";
+import { useWorkspaceStore, workspaces, type Workspace } from "@/lib/workspaceStore";
 
 interface AppHeaderProps {
   activeTab?: Tab | null;
   className?: string;
 }
 
-const workspaces = [
-  { id: "enterprise-risk", name: "Enterprise Risk", icon: AlertTriangle },
-  { id: "enterprise-audit", name: "Enterprise Audit", icon: ClipboardList },
-  { id: "it-security", name: "IT Security", icon: Lock },
-];
+const getWorkspaceIcon = (workspaceId: string) => {
+  switch (workspaceId) {
+    case "enterprise-risk":
+      return AlertTriangle;
+    case "enterprise-audit":
+      return ClipboardList;
+    case "it-security":
+      return Lock;
+    default:
+      return ClipboardList;
+  }
+};
 
 const quickActions = [
   { id: "risk-event", label: "Create new Risk Event", icon: AlertTriangle, category: "Create" },
@@ -69,7 +74,7 @@ const utilityIcons = [
 ];
 
 export function AppHeader({ className = "" }: AppHeaderProps) {
-  const [currentWorkspace, setCurrentWorkspace] = useState(workspaces[1]); // Default to Enterprise Audit
+  const { currentWorkspace, setWorkspace } = useWorkspaceStore();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -116,7 +121,11 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
     setSearchQuery("");
   };
 
-  const CurrentWorkspaceIcon = currentWorkspace.icon;
+  const handleWorkspaceChange = (workspace: Workspace) => {
+    setWorkspace(workspace);
+  };
+
+  const CurrentWorkspaceIcon = getWorkspaceIcon(currentWorkspace.id);
 
   return (
     <header 
@@ -140,18 +149,19 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
             <DropdownMenuLabel className="text-xs text-gray-500 font-normal">Your workspaces</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {workspaces.map((workspace) => {
-              const WorkspaceIcon = workspace.icon;
+              const WorkspaceIcon = getWorkspaceIcon(workspace.id);
+              const isActive = workspace.id === currentWorkspace.id;
               return (
                 <DropdownMenuItem
                   key={workspace.id}
-                  onClick={() => setCurrentWorkspace(workspace)}
+                  onClick={() => handleWorkspaceChange(workspace)}
                   className="flex items-center gap-2 cursor-pointer"
                   data-testid={`workspace-option-${workspace.id}`}
                 >
                   <WorkspaceIcon className="w-4 h-4 text-gray-500" />
                   <span>{workspace.name}</span>
-                  {workspace.id === currentWorkspace.id && (
-                    <span className="ml-auto text-[#266C92] text-xs">Active</span>
+                  {isActive && (
+                    <Check className="ml-auto w-4 h-4 text-[#266C92]" />
                   )}
                 </DropdownMenuItem>
               );

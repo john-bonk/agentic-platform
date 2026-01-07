@@ -21,6 +21,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { 
   DashboardPage,
+  HomePage,
   IntelligenceHubPage,
   ListPage,
   HierarchyPage,
@@ -36,10 +37,27 @@ import {
 function Router() {
   return (
     <Switch>
-      {/* Intelligence Hub - Default Landing Page */}
-      <Route path="/" component={IntelligenceHubPage} />
+      {/* Home - Default Landing Page */}
+      <Route path="/" component={HomePage} />
       
-      {/* Analytics Routes */}
+      {/* Home Module Routes */}
+      <Route path="/my-dashboard" component={HomePage} />
+      <Route path="/inventory" component={HomePage} />
+      <Route path="/coverage-mapping" component={HomePage} />
+      <Route path="/controls" component={HomePage} />
+      <Route path="/tests" component={HomePage} />
+      <Route path="/issues" component={HomePage} />
+      <Route path="/financial-accounts" component={HomePage} />
+      <Route path="/control-self-assessments" component={HomePage} />
+      <Route path="/processes" component={HomePage} />
+      <Route path="/risk-control-matrix" component={HomePage} />
+      <Route path="/coso-framework" component={HomePage} />
+      <Route path="/open-tasks" component={HomePage} />
+      <Route path="/financial-accounts-view" component={HomePage} />
+      <Route path="/financial-applications-view" component={HomePage} />
+      
+      {/* Intelligence Hub Routes */}
+      <Route path="/intelligence" component={IntelligenceHubPage} />
       <Route path="/list" component={ListPage} />
       <Route path="/hierarchy" component={HierarchyPage} />
       <Route path="/wizard" component={WizardPage} />

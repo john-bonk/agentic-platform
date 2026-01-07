@@ -7,6 +7,7 @@
 
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { type SideNavSection, getActiveModuleIndex } from "@/config/navigation";
 
 interface SideNavigationProps {
@@ -18,31 +19,30 @@ interface SideNavigationProps {
 export function SideNavigation({ sections, title, className = "" }: SideNavigationProps) {
   const [location] = useLocation();
 
-  // Get active module to ensure exclusive active states
   const activeModuleIndex = getActiveModuleIndex(location);
 
   const isActive = (path: string) => {
-    // For the Intelligence Hub (index 0), check standard path matching
     if (activeModuleIndex === 0) {
-      // Root path exact match
       if (path === "/") {
         return location === "/";
       }
-      // For other paths in this module, exact match or child paths
       return location === path || location.startsWith(path + "/");
     }
     
-    // For Workflows module (index 1)
     if (activeModuleIndex === 1) {
-      // /workflows exact match
       if (path === "/workflows") {
         return location === "/workflows";
       }
-      // /workflow/new exact match
       if (path === "/workflow/new") {
         return location === "/workflow/new";
       }
-      // For individual workflow pages
+      return location === path || location.startsWith(path + "/");
+    }
+
+    if (activeModuleIndex === 2) {
+      if (path === "/intelligence") {
+        return location === "/intelligence";
+      }
       return location === path || location.startsWith(path + "/");
     }
     
@@ -96,6 +96,15 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
                         >
                           {item.label}
                         </span>
+                        {item.badge && (
+                          <Badge 
+                            variant="secondary" 
+                            className="bg-[#266C92] text-white text-xs h-5 min-w-5 flex items-center justify-center"
+                            data-testid={`nav-badge-${item.id}`}
+                          >
+                            {item.badge}
+                          </Badge>
+                        )}
                       </Button>
                     </Link>
                   </li>

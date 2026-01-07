@@ -11,7 +11,7 @@ export type IconNavItem =
 
 export interface SideNavSection {
   title: string;
-  items: { id: string; label: string; path: string }[];
+  items: { id: string; label: string; path: string; badge?: string }[];
 }
 
 export interface ModuleConfig {
@@ -27,27 +27,48 @@ export interface ModuleConfig {
  */
 export const modules: ModuleConfig[] = [
   {
-    id: "intelligence",
-    name: "Intelligence Hub",
-    icon: { type: "lucide", icon: "activity", alt: "Intelligence Hub", active: false, path: "/", modulePrefix: "/" },
+    id: "home",
+    name: "Home",
+    icon: { type: "lucide", icon: "home", alt: "Home", active: false, path: "/", modulePrefix: "/" },
     sideNavSections: [
       {
-        title: "Command Center",
+        title: "Dashboards",
         items: [
-          { id: "intelligence-hub", label: "Intelligence Hub", path: "/" },
+          { id: "zero-day-event", label: "Zero-Day Event", path: "/" },
+          { id: "my-dashboard", label: "My Dashboard", path: "/my-dashboard" },
         ],
       },
       {
-        title: "Analytics",
+        title: "Inventory",
         items: [
-          { id: "list", label: "Data Explorer", path: "/list" },
-          { id: "hierarchy", label: "Entity Matrix", path: "/hierarchy" },
+          { id: "all-inventory", label: "All Inventory", path: "/inventory" },
+          { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
         ],
       },
       {
-        title: "System",
+        title: "Environment",
         items: [
-          { id: "settings", label: "Configuration", path: "/settings" },
+          { id: "controls", label: "Controls", path: "/controls" },
+          { id: "tests", label: "Tests", path: "/tests" },
+          { id: "issues", label: "Issues", path: "/issues" },
+          { id: "financial-accounts", label: "Financial Accounts", path: "/financial-accounts" },
+        ],
+      },
+      {
+        title: "Inbox",
+        items: [
+          { id: "control-self-assessments", label: "Control Self Assessments", path: "/control-self-assessments" },
+          { id: "processes", label: "Processes", path: "/processes" },
+        ],
+      },
+      {
+        title: "Views",
+        items: [
+          { id: "risk-control-matrix", label: "Risk Control Matrix", path: "/risk-control-matrix" },
+          { id: "coso-framework", label: "COSO Framework", path: "/coso-framework" },
+          { id: "open-tasks", label: "Open Tasks", path: "/open-tasks", badge: "4" },
+          { id: "financial-accounts-view", label: "Financial Accounts View", path: "/financial-accounts-view" },
+          { id: "financial-applications-view", label: "Financial Applications View", path: "/financial-applications-view" },
         ],
       },
     ],
@@ -66,6 +87,32 @@ export const modules: ModuleConfig[] = [
       },
     ],
   },
+  {
+    id: "intelligence",
+    name: "Intelligence Hub",
+    icon: { type: "lucide", icon: "activity", alt: "Intelligence Hub", active: false, path: "/intelligence", modulePrefix: "/intelligence" },
+    sideNavSections: [
+      {
+        title: "Command Center",
+        items: [
+          { id: "intelligence-hub", label: "Intelligence Hub", path: "/intelligence" },
+        ],
+      },
+      {
+        title: "Analytics",
+        items: [
+          { id: "list", label: "Data Explorer", path: "/list" },
+          { id: "hierarchy", label: "Entity Matrix", path: "/hierarchy" },
+        ],
+      },
+      {
+        title: "System",
+        items: [
+          { id: "settings", label: "Configuration", path: "/settings" },
+        ],
+      },
+    ],
+  },
 ];
 
 /**
@@ -74,7 +121,7 @@ export const modules: ModuleConfig[] = [
 export const iconNavItems: IconNavItem[] = modules.map(m => m.icon);
 
 /**
- * Side Navigation Sections (default - Intelligence Hub)
+ * Side Navigation Sections (default - Home)
  * Use getModuleSideNav() for dynamic module-based navigation
  */
 export const sideNavSections: SideNavSection[] = modules[0].sideNavSections;
@@ -88,14 +135,23 @@ export function getModuleFromPath(path: string): ModuleConfig {
   if (path.startsWith("/workflow")) {
     return modules[1];
   }
-  // Default to Intelligence Hub
+  // Intelligence Hub module
+  if (path.startsWith("/intelligence")) {
+    return modules[2];
+  }
+  // Default to Home
   return modules[0];
 }
 
 /**
- * Intelligence Hub paths - all paths that belong to the Intelligence Hub module
+ * Home paths - all paths that belong to the Home module
  */
-const intelligenceHubPaths = ["/", "/list", "/hierarchy", "/settings", "/profile", "/wizard", "/demo", "/items"];
+const homePaths = [
+  "/", "/my-dashboard", "/inventory", "/coverage-mapping", "/controls", "/tests", 
+  "/issues", "/financial-accounts", "/control-self-assessments", "/processes",
+  "/risk-control-matrix", "/coso-framework", "/open-tasks", "/financial-accounts-view",
+  "/financial-applications-view", "/profile", "/wizard", "/demo", "/items"
+];
 
 /**
  * Determine which module is active based on path
@@ -108,19 +164,24 @@ export function getActiveModuleIndex(path: string): number {
     return 1; // Workflows module
   }
   
-  // Check if path matches Intelligence Hub module paths
-  for (const hubPath of intelligenceHubPaths) {
-    if (path === hubPath || (hubPath !== "/" && path.startsWith(hubPath + "/"))) {
-      return 0; // Intelligence Hub module
+  // Intelligence Hub module
+  if (path.startsWith("/intelligence") || path === "/list" || path === "/hierarchy" || path === "/settings") {
+    return 2; // Intelligence Hub module
+  }
+  
+  // Check if path matches Home module paths
+  for (const homePath of homePaths) {
+    if (path === homePath || (homePath !== "/" && path.startsWith(homePath + "/"))) {
+      return 0; // Home module
     }
   }
   
-  // Root path always goes to Intelligence Hub
+  // Root path always goes to Home
   if (path === "/") {
     return 0;
   }
   
-  // Default to Intelligence Hub for any unmatched paths
+  // Default to Home for any unmatched paths
   return 0;
 }
 
