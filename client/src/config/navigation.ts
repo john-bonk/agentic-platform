@@ -34,8 +34,7 @@ export const modules: ModuleConfig[] = [
       {
         title: "Dashboards",
         items: [
-          { id: "zero-day-event", label: "Zero-Day Event", path: "/" },
-          { id: "my-dashboard", label: "My Dashboard", path: "/my-dashboard" },
+          { id: "my-dashboard", label: "My Dashboard", path: "/" },
         ],
       },
       {
@@ -52,13 +51,6 @@ export const modules: ModuleConfig[] = [
           { id: "tests", label: "Tests", path: "/tests" },
           { id: "issues", label: "Issues", path: "/issues" },
           { id: "financial-accounts", label: "Financial Accounts", path: "/financial-accounts" },
-        ],
-      },
-      {
-        title: "Inbox",
-        items: [
-          { id: "control-self-assessments", label: "Control Self Assessments", path: "/control-self-assessments" },
-          { id: "processes", label: "Processes", path: "/processes" },
         ],
       },
       {
@@ -148,9 +140,9 @@ export function getModuleFromPath(path: string): ModuleConfig {
  */
 const homePaths = [
   "/", "/my-dashboard", "/inventory", "/coverage-mapping", "/controls", "/tests", 
-  "/issues", "/financial-accounts", "/control-self-assessments", "/processes",
-  "/risk-control-matrix", "/coso-framework", "/open-tasks", "/financial-accounts-view",
-  "/financial-applications-view", "/profile", "/wizard", "/demo", "/items"
+  "/issues", "/financial-accounts", "/risk-control-matrix", "/coso-framework", 
+  "/open-tasks", "/financial-accounts-view", "/financial-applications-view", 
+  "/profile", "/wizard", "/demo", "/items"
 ];
 
 /**

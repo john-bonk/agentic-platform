@@ -48,8 +48,6 @@ function Router() {
       <Route path="/tests" component={HomePage} />
       <Route path="/issues" component={HomePage} />
       <Route path="/financial-accounts" component={HomePage} />
-      <Route path="/control-self-assessments" component={HomePage} />
-      <Route path="/processes" component={HomePage} />
       <Route path="/risk-control-matrix" component={HomePage} />
       <Route path="/coso-framework" component={HomePage} />
       <Route path="/open-tasks" component={HomePage} />
