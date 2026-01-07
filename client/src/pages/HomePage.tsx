@@ -1,26 +1,27 @@
 /**
- * Home Page
+ * Home Page - Complete redesign to match mockup
  * 
- * The main landing page for each workspace with welcome message
- * and task list. Content adapts based on current workspace.
+ * Layout structure:
+ * 1. Teal hero header with welcome message
+ * 2. "What would you like to do?" assistant card
+ * 3. Inbox section with horizontal stat tabs
+ * 4. Two-column: Task Overview donut + Task list
+ * 5. Your workspaces section
  */
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { 
+  ChevronDown,
   ChevronRight, 
-  FileText, 
-  Users,
-  Calendar,
-  BarChart3,
-  Shield,
+  Sparkles,
+  Send,
   Target,
-  ClipboardList,
-  MessageSquare,
-  AlertCircle,
+  Shield,
+  Zap,
 } from "lucide-react";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 
@@ -40,23 +41,18 @@ interface ScenarioPlanning {
   total: number;
 }
 
-interface QuickStat {
+interface InboxStat {
   label: string;
   value: number;
-  icon: React.ElementType;
 }
 
 const workspaceContent: Record<string, {
-  criticalAlert?: { title: string; label: string };
   scenarioPlanning: ScenarioPlanning;
   tasks: Task[];
-  quickStats: QuickStat[];
+  inboxStats: InboxStat[];
+  quickActions: { label: string; id: string }[];
 }> = {
   "enterprise-risk": {
-    criticalAlert: {
-      title: "Global tariff changes impacting supply chain",
-      label: "Tariff Mitigation",
-    },
     scenarioPlanning: {
       title: "Tariff Mitigation Strategy",
       progress: "2/4 Completed",
@@ -97,20 +93,21 @@ const workspaceContent: Record<string, {
         status: "incomplete",
       },
     ],
-    quickStats: [
-      { label: "My Tasks", value: 4, icon: ClipboardList },
-      { label: "My Issues", value: 0, icon: AlertCircle },
-      { label: "My Controls", value: 0, icon: Shield },
-      { label: "My Narratives", value: 0, icon: FileText },
-      { label: "My Risks", value: 0, icon: Target },
-      { label: "My Comments", value: 0, icon: MessageSquare },
+    inboxStats: [
+      { label: "My Tasks", value: 4 },
+      { label: "My Issues", value: 0 },
+      { label: "My Controls", value: 0 },
+      { label: "My Narratives", value: 0 },
+      { label: "My Risks", value: 0 },
+      { label: "My Comments", value: 0 },
+    ],
+    quickActions: [
+      { label: "Create new Risk Event", id: "risk-event" },
+      { label: "Start new Risk Assessment", id: "risk-assessment" },
+      { label: "Create new Audit", id: "audit" },
     ],
   },
   "enterprise-audit": {
-    criticalAlert: {
-      title: "Climate instability affecting M&A vertical farming acquisition in Singapore",
-      label: "M&A Climate Instability",
-    },
     scenarioPlanning: {
       title: "Climate Instability (M&A Oversight)",
       progress: "1/2 Completed",
@@ -151,20 +148,21 @@ const workspaceContent: Record<string, {
         status: "incomplete",
       },
     ],
-    quickStats: [
-      { label: "My Tasks", value: 4, icon: ClipboardList },
-      { label: "My Issues", value: 0, icon: AlertCircle },
-      { label: "My Controls", value: 0, icon: Shield },
-      { label: "My Narratives", value: 0, icon: FileText },
-      { label: "My Risks", value: 0, icon: Target },
-      { label: "My Comments", value: 0, icon: MessageSquare },
+    inboxStats: [
+      { label: "My Tasks", value: 4 },
+      { label: "My Issues", value: 0 },
+      { label: "My Controls", value: 0 },
+      { label: "My Narratives", value: 0 },
+      { label: "My Risks", value: 0 },
+      { label: "My Comments", value: 0 },
+    ],
+    quickActions: [
+      { label: "Create new Risk Event", id: "risk-event" },
+      { label: "Start new Risk Assessment", id: "risk-assessment" },
+      { label: "Create new Audit", id: "audit" },
     ],
   },
   "it-security": {
-    criticalAlert: {
-      title: "Major vulnerability impacting Apache Log4j",
-      label: "Apache Log4j",
-    },
     scenarioPlanning: {
       title: "Apache Log4j Response",
       progress: "2/3 Completed",
@@ -205,196 +203,286 @@ const workspaceContent: Record<string, {
         status: "incomplete",
       },
     ],
-    quickStats: [
-      { label: "My Tasks", value: 4, icon: ClipboardList },
-      { label: "My Issues", value: 0, icon: AlertCircle },
-      { label: "My Controls", value: 0, icon: Shield },
-      { label: "My Narratives", value: 0, icon: FileText },
-      { label: "My Risks", value: 0, icon: Target },
-      { label: "My Comments", value: 0, icon: MessageSquare },
+    inboxStats: [
+      { label: "My Tasks", value: 4 },
+      { label: "My Issues", value: 0 },
+      { label: "My Controls", value: 0 },
+      { label: "My Narratives", value: 0 },
+      { label: "My Risks", value: 0 },
+      { label: "My Comments", value: 0 },
+    ],
+    quickActions: [
+      { label: "Create new Risk Event", id: "risk-event" },
+      { label: "Start new Risk Assessment", id: "risk-assessment" },
+      { label: "Create new Audit", id: "audit" },
     ],
   },
 };
 
+const workspaces = [
+  {
+    id: "enterprise-risk",
+    name: "Enterprise Risk",
+    icon: Target,
+    color: "#266C92",
+    description: "Integration description lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc malesuada libero id nisl bibendum ultrices.",
+  },
+  {
+    id: "enterprise-audit",
+    name: "Enterprise Audit",
+    icon: Shield,
+    color: "#266C92",
+    description: "Integration description lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc malesuada libero id nisl bibendum ultrices.",
+  },
+  {
+    id: "it-security",
+    name: "IT Security",
+    icon: Zap,
+    color: "#266C92",
+    description: "Integration description lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc malesuada libero id nisl bibendum ultrices.",
+  },
+];
+
+function DonutChart({ value, total }: { value: number; total: number }) {
+  const percentage = (value / total) * 100;
+  const circumference = 2 * Math.PI * 45;
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <div className="relative w-40 h-40 mx-auto">
+      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke="#e5e7eb"
+          strokeWidth="10"
+        />
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke="#f59e0b"
+          strokeWidth="10"
+          strokeDasharray={strokeDasharray}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-4xl font-bold text-gray-900">{value}</span>
+        <span className="text-sm text-gray-500">Open Tasks</span>
+      </div>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const { currentWorkspace, refreshKey } = useWorkspaceStore();
   const content = workspaceContent[currentWorkspace.id] || workspaceContent["enterprise-risk"];
+  const [activeTab, setActiveTab] = useState("My Tasks");
+  const [scenarioExpanded, setScenarioExpanded] = useState(true);
 
   useEffect(() => {
+    setActiveTab("My Tasks");
   }, [refreshKey]);
 
+  const incompleteTasks = content.tasks.filter(t => t.status === "incomplete").length;
+
   return (
-    <AppLayout 
-      showHeader={true}
-      showSideNav={true}
-    >
-      <div className="flex flex-col h-full overflow-y-auto bg-gray-50" key={refreshKey}>
-        <div className="bg-[#266C92] text-white">
-          <div className="px-6 py-5">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div>
-                <h1 className="text-xl font-semibold mb-0.5" data-testid="welcome-message">
-                  Welcome back, {currentWorkspace.personaTitle}
-                </h1>
-                <p className="text-white/80 text-sm" data-testid="welcome-subtitle">
-                  {content.tasks.filter(t => t.status === "incomplete").length} New critical tasks to review
-                </p>
-              </div>
-              {content.criticalAlert && (
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-md px-4 py-2.5">
-                  <Badge variant="destructive" className="bg-red-500 text-white text-xs font-medium uppercase" data-testid="critical-badge">
-                    Critical
-                  </Badge>
-                  <span className="text-sm" data-testid="critical-alert-title">{content.criticalAlert.title}</span>
-                  <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 h-7 w-7" data-testid="critical-alert-action">
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              )}
-            </div>
+    <AppLayout showHeader={true} showSideNav={true}>
+      <div className="flex flex-col h-full overflow-y-auto" key={refreshKey}>
+        {/* Hero Header */}
+        <div className="bg-[#266C92] text-white px-8 py-6">
+          <div className="max-w-6xl">
+            <h1 className="text-2xl font-semibold" data-testid="welcome-message">
+              Welcome back, {currentWorkspace.personaTitle}
+              <span className="ml-4 text-base font-normal text-white/80">
+                {incompleteTasks} New critical{" "}
+                <span className="underline cursor-pointer hover:text-white">tasks to review</span>
+              </span>
+            </h1>
           </div>
         </div>
 
-        <div className="p-6 space-y-6">
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-            {content.quickStats.map((stat, index) => {
-              const StatIcon = stat.icon;
-              return (
-                <Card key={index} className="hover-elevate cursor-pointer" data-testid={`quick-stat-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                  <CardContent className="p-3">
-                    <div className="flex flex-col items-center text-center gap-1">
-                      <div className="text-xl font-bold text-gray-900" data-testid={`stat-value-${index}`}>{stat.value}</div>
-                      <div className="text-xs text-gray-500">{stat.label}</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <Card data-testid="task-overview-card">
-                <CardHeader className="pb-2 pt-4 px-4">
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <CardTitle className="text-sm font-semibold text-gray-900">Task Overview</CardTitle>
-                    <Badge variant="secondary" className="bg-amber-100 text-amber-700 text-xs" data-testid="incomplete-count">
-                      Incomplete {content.tasks.filter(t => t.status === "incomplete").length}
-                    </Badge>
+        {/* Main Content */}
+        <div className="flex-1 bg-slate-50 px-8 py-6">
+          <div className="max-w-6xl space-y-6">
+            
+            {/* What would you like to do? Card */}
+            <Card className="shadow-sm border border-slate-200" data-testid="assistant-card">
+              <CardContent className="p-6">
+                <h2 className="text-lg font-semibold text-gray-900 text-center mb-4">
+                  What would you like to do?
+                </h2>
+                <div className="flex items-center gap-3 max-w-2xl mx-auto mb-4">
+                  <div className="relative flex-1">
+                    <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                      placeholder="Ask AuditBoard Assistant..."
+                      className="pl-10 h-10 bg-slate-50 border-slate-200"
+                      data-testid="input-assistant"
+                    />
                   </div>
-                </CardHeader>
+                  <Button className="bg-[#266C92] hover:bg-[#1e5a7a] text-white px-6" data-testid="button-get-started">
+                    Get Started
+                  </Button>
+                </div>
+                <div className="flex items-center justify-center gap-6">
+                  {content.quickActions.map((action) => (
+                    <Button
+                      key={action.id}
+                      variant="ghost"
+                      className="text-sm text-gray-600 gap-2"
+                      data-testid={`button-quick-action-${action.id}`}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      {action.label}
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Inbox Section */}
+            <div data-testid="inbox-section">
+              <h2 className="text-lg font-semibold text-gray-900 mb-3">Inbox</h2>
+              <div className="flex items-center gap-1 border-b border-slate-200 overflow-x-auto">
+                {content.inboxStats.map((stat) => (
+                  <button
+                    key={stat.label}
+                    onClick={() => setActiveTab(stat.label)}
+                    className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors relative ${
+                      activeTab === stat.label
+                        ? "text-[#266C92]"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                    data-testid={`tab-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    {stat.label}{" "}
+                    <span className={`ml-1 ${activeTab === stat.label ? "text-[#266C92]" : "text-gray-400"}`}>
+                      {stat.value}
+                    </span>
+                    {activeTab === stat.label && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#266C92]" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Task Overview + Scenario Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
+              {/* Left: Task Overview Donut */}
+              <Card className="shadow-sm border border-slate-200" data-testid="task-overview-card">
+                <CardContent className="p-6">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-1">Task Overview</h3>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+                    <span>Incomplete</span>
+                    <span className="w-2 h-2 rounded-full bg-gray-300" />
+                    <span>{incompleteTasks}</span>
+                  </div>
+                  <DonutChart value={incompleteTasks} total={incompleteTasks || 1} />
+                  <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                    Incomplete
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Right: Scenario Task List */}
+              <Card className="shadow-sm border border-slate-200" data-testid="scenario-card">
                 <CardContent className="p-0">
-                  <div className="divide-y divide-gray-100" data-testid="task-list">
-                    {content.tasks.map((task) => (
-                      <div 
-                        key={task.id} 
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
-                        data-testid={`task-item-${task.id}`}
-                      >
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <Badge variant="outline" className="text-xs text-amber-600 border-amber-200 bg-amber-50 h-5">
-                              Incomplete
-                            </Badge>
+                  {/* Scenario Header */}
+                  <button
+                    onClick={() => setScenarioExpanded(!scenarioExpanded)}
+                    className="w-full flex items-center gap-2 px-4 py-3 bg-slate-50 border-b border-slate-200 text-left hover:bg-slate-100 transition-colors"
+                    data-testid="button-scenario-toggle"
+                  >
+                    {scenarioExpanded ? (
+                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-gray-500" />
+                    )}
+                    <span className="font-medium text-gray-900">{content.scenarioPlanning.title}</span>
+                  </button>
+
+                  {/* Task List */}
+                  {scenarioExpanded && (
+                    <div className="divide-y divide-slate-100" data-testid="task-list">
+                      {content.tasks.map((task) => (
+                        <div
+                          key={task.id}
+                          className="flex items-start gap-4 px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors"
+                          data-testid={`task-item-${task.id}`}
+                        >
+                          <span className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded mt-0.5">
+                            Incomplete
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-[#266C92] hover:underline cursor-pointer" data-testid={`task-title-${task.id}`}>
+                              {task.title}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-0.5">{task.context}</div>
                           </div>
-                          <div className="font-medium text-gray-900 text-sm" data-testid={`task-title-${task.id}`}>{task.title}</div>
-                          <div className="text-xs text-gray-500 mt-0.5">{task.context}</div>
-                        </div>
-                        <div className="flex-shrink-0 text-right hidden sm:block">
-                          <div className="text-xs text-gray-400 mb-0.5">Preparer(s)</div>
-                          <div className="flex items-center gap-1 justify-end">
-                            {task.preparers.slice(0, 2).map((preparer, idx) => (
-                              <div 
-                                key={idx} 
-                                className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600"
-                                title={preparer}
-                              >
-                                {preparer.split(' ').map(n => n[0]).join('')}
-                              </div>
-                            ))}
+                          <div className="text-right flex-shrink-0">
+                            <div className="text-xs text-gray-400">Due Date</div>
+                            <div className="text-sm text-gray-700" data-testid={`task-due-${task.id}`}>{task.dueDate}</div>
                           </div>
                         </div>
-                        <div className="flex-shrink-0 text-right hidden sm:block">
-                          <div className="text-xs text-gray-400 mb-0.5">Due Date</div>
-                          <div className="text-sm text-gray-700" data-testid={`task-due-${task.id}`}>{task.dueDate}</div>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
 
-            <div className="space-y-4">
-              <Card data-testid="scenario-planning-card">
-                <CardHeader className="pb-2 pt-4 px-4">
-                  <CardTitle className="text-sm font-semibold text-gray-900">Scenario Planning</CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 pb-4">
-                  <div className="space-y-2">
-                    <div className="text-sm text-gray-700" data-testid="scenario-title">{content.scenarioPlanning.title}</div>
-                    <div className="w-full bg-gray-200 rounded-full h-1.5">
-                      <div 
-                        className="bg-[#266C92] h-1.5 rounded-full transition-all" 
-                        style={{ width: `${(content.scenarioPlanning.completed / content.scenarioPlanning.total) * 100}%` }}
-                        data-testid="scenario-progress"
-                      />
-                    </div>
-                    <div className="text-xs text-gray-500" data-testid="scenario-progress-text">{content.scenarioPlanning.progress}</div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card data-testid="reports-card">
-                <CardHeader className="pb-2 pt-4 px-4">
-                  <CardTitle className="text-sm font-semibold text-gray-900">Reports</CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 pb-4">
-                  <div className="space-y-1">
-                    <Button variant="ghost" className="w-full justify-start gap-2 h-8 px-2 text-sm" data-testid="report-frameworks">
-                      <BarChart3 className="w-4 h-4 text-gray-400" />
-                      <span>Frameworks</span>
-                      <Badge variant="secondary" className="ml-auto text-xs bg-amber-100 text-amber-700 h-5">Incomplete</Badge>
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start gap-2 h-8 px-2 text-sm" data-testid="report-test-files">
-                      <FileText className="w-4 h-4 text-gray-400" />
-                      <span>Test Files</span>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card data-testid="recent-submissions-card">
-                <CardHeader className="pb-2 pt-4 px-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded bg-[#266C92]/10 flex items-center justify-center">
-                      <FileText className="w-3.5 h-3.5 text-[#266C92]" />
-                    </div>
-                    <CardTitle className="text-sm font-semibold text-gray-900">The New Asgard</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="px-4 pb-4">
-                  <div className="flex items-center gap-3 p-2 bg-gray-50 rounded-md">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs text-gray-400 mb-0.5">Preparer(s)</div>
-                      <div className="text-sm text-gray-700">SIG LITE Questionnaire</div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Users className="w-3 h-3 text-gray-400" />
-                        <span className="text-xs text-gray-500">Steven Yeun</span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs text-gray-400 mb-0.5">Submitted</div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-gray-400" />
-                        <span className="text-xs text-gray-500">10-31-2025</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Your Workspaces Section */}
+            <div data-testid="workspaces-section">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Your workspaces</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {workspaces.map((ws) => {
+                  const Icon = ws.icon;
+                  const isActive = ws.id === currentWorkspace.id;
+                  return (
+                    <Card
+                      key={ws.id}
+                      className={`shadow-sm border h-full ${
+                        isActive ? "border-[#266C92] bg-white" : "border-slate-200 bg-white"
+                      }`}
+                      data-testid={`workspace-card-${ws.id}`}
+                    >
+                      <CardContent className="p-5 flex flex-col h-full">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div
+                            className="w-8 h-8 rounded flex items-center justify-center"
+                            style={{ backgroundColor: `${ws.color}15` }}
+                          >
+                            <Icon className="w-4 h-4" style={{ color: ws.color }} />
+                          </div>
+                          <h3 className="font-semibold text-gray-900">{ws.name}</h3>
+                        </div>
+                        <p className="text-sm text-gray-500 line-clamp-3 flex-1">
+                          {ws.description}
+                        </p>
+                        <Button
+                          variant={isActive ? "default" : "outline"}
+                          size="sm"
+                          className={`mt-4 w-full ${isActive ? "bg-[#266C92] hover:bg-[#1e5a7a]" : ""}`}
+                          data-testid={`button-workspace-${ws.id}`}
+                        >
+                          {isActive ? "Active" : "Switch"}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
             </div>
+
           </div>
         </div>
       </div>
