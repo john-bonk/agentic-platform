@@ -24,6 +24,11 @@ interface AssistantContext {
   edges?: WorkflowEdge[];
   selectedNodes?: WorkflowNode[];
   validationErrors?: string[];
+  homeContext?: {
+    workspaceId: string;
+    scenario: string;
+    focus: string;
+  };
 }
 
 interface AssistantResponse {

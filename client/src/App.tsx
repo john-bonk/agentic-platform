@@ -33,6 +33,7 @@ import {
   WorkflowBuilderPage,
   WorkflowListPage,
 } from "@/pages";
+import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
 function Router() {
   return (
@@ -81,6 +82,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <HomeAssistantPanel />
       </TooltipProvider>
     </QueryClientProvider>
   );

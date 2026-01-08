@@ -569,6 +569,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/assistant/home-chat", async (req: Request, res: Response) => {
+    try {
+      const { messages, workspaceId, context } = req.body as {
+        messages: ChatMessage[];
+        workspaceId?: string;
+        context?: string;
+      };
+
+      const workspaceContexts: Record<string, { scenario: string; focus: string }> = {
+        "enterprise-risk": {
+          scenario: "Tariff Mitigation Strategy",
+          focus: "risk management, supply chain, vendor assessment, board reporting",
+        },
+        "enterprise-audit": {
+          scenario: "Climate Instability (M&A Oversight) - vertical farming acquisition in Singapore",
+          focus: "audit coverage, organizational impact, audit committee presentations",
+        },
+        "it-security": {
+          scenario: "Apache Log4j Vulnerability Response",
+          focus: "vulnerability assessment, patching, incident response, compliance",
+        },
+      };
+
+      const wsContext = workspaceContexts[workspaceId || "enterprise-risk"];
+
+      const response = await generateAssistantResponse(messages, {
+        workflowId: undefined,
+        workflowName: undefined,
+        nodes: undefined,
+        edges: undefined,
+        selectedNodes: undefined,
+        homeContext: {
+          workspaceId: workspaceId || "enterprise-risk",
+          scenario: wsContext.scenario,
+          focus: wsContext.focus,
+        },
+      });
+
+      const suggestedActions = [];
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage && lastMessage.content.toLowerCase().includes("task")) {
+        suggestedActions.push({
+          id: `action-${Date.now()}`,
+          type: "navigate",
+          label: "View Open Tasks",
+          description: "See all your pending tasks",
+          route: "/open-tasks",
+          status: "pending",
+        });
+      }
+      if (lastMessage && lastMessage.content.toLowerCase().includes("dashboard")) {
+        suggestedActions.push({
+          id: `action-${Date.now() + 1}`,
+          type: "navigate",
+          label: "Go to Dashboard",
+          description: "View your main dashboard",
+          route: "/",
+          status: "pending",
+        });
+      }
+
+      res.json({
+        ...response,
+        actions: suggestedActions.length > 0 ? suggestedActions : response.actions,
+      });
+    } catch (error) {
+      console.error("Home assistant chat error:", error);
+      res.status(500).json({ error: "Failed to process assistant request" });
+    }
+  });
+
   app.post("/api/assistant/generate-workflow", async (req: Request, res: Response) => {
     try {
       const { description, workflowId } = req.body as {

@@ -40,6 +40,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { type Tab } from "@/lib/tabStore";
 import { useWorkspaceStore, workspaces, type Workspace } from "@/lib/workspaceStore";
+import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 
 interface AppHeaderProps {
   activeTab?: Tab | null;
@@ -75,6 +76,7 @@ const utilityIcons = [
 
 export function AppHeader({ className = "" }: AppHeaderProps) {
   const { currentWorkspace, setWorkspace } = useWorkspaceStore();
+  const { toggleOpen: toggleAssistant } = useHomeAssistantStore();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -259,6 +261,7 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
             variant="ghost"
             size="icon"
             className="w-9 h-9 rounded hover:bg-gray-800"
+            onClick={item.icon === "bot" ? toggleAssistant : undefined}
             data-testid={`header-utility-${item.icon}`}
           >
             {getUtilityIcon(item.icon)}
