@@ -187,7 +187,7 @@ export default function ReportingPage() {
                   <div 
                     key={report.id}
                     className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover-elevate cursor-pointer"
-                    onClick={() => setLocation(`/reporting/artifacts/${report.id}`)}
+                    onClick={() => setLocation(`/reporting/view/${report.id === "rpt-1" ? "board-report" : report.id === "rpt-2" ? "audit-committee-report" : report.id === "rpt-3" ? "compliance-report" : "board-report"}`)}
                     data-testid={`report-item-${report.id}`}
                   >
                     <div className="flex items-center gap-4">

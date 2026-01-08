@@ -20,12 +20,11 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { SlideDeckViewer } from "@/components/ui/slide-deck-viewer";
 import { useHomeAssistantStore, type ChatMessage, type SuggestedAction } from "@/lib/homeAssistantStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
-import { getSlideDeck, getExperienceConfig, type SlideDeck } from "@/lib/reportingContent";
+import { getExperienceConfig } from "@/lib/reportingContent";
 
 interface QuickAction {
   id: string;
@@ -130,11 +129,10 @@ const workspaceQuickActions: Record<string, QuickAction[]> = {
     },
     {
       id: "patch-status",
-      label: "View Patch Status",
-      description: "Real-time dashboard of Log4j remediation progress",
+      label: "Analyze Patch Compliance",
+      description: "Real-time analysis of Log4j remediation progress and compliance gaps",
       icon: Shield,
-      type: "navigate",
-      route: "/reporting/patch-status",
+      type: "analyze",
       color: "#10b981",
     },
     {
@@ -397,7 +395,6 @@ function InteractiveExperience({ type, workspaceId, onClose, onNavigate }: Inter
 export function HomeAssistantPanel() {
   const [inputValue, setInputValue] = useState("");
   const [activeExperience, setActiveExperience] = useState<string | null>(null);
-  const [activeSlideDeck, setActiveSlideDeck] = useState<SlideDeck | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
   
@@ -501,14 +498,10 @@ export function HomeAssistantPanel() {
         : action.id.includes("audit-committee") ? "audit-committee-report"
         : action.id.includes("compliance") ? "compliance-report"
         : "board-report";
-      const deck = getSlideDeck(currentWorkspace.id, deckKey);
-      if (deck) {
-        setActiveSlideDeck(deck);
-        setActiveExperience(null);
-      }
+      setOpen(false);
+      setLocation(`/reporting/view/${deckKey}`);
     } else if (action.type === "analyze" || action.type === "create") {
       setActiveExperience(action.type);
-      setActiveSlideDeck(null);
     }
   };
 
@@ -560,7 +553,7 @@ export function HomeAssistantPanel() {
         </div>
         
         <ScrollArea className="flex-1 p-4">
-          {messages.length === 0 && !activeExperience && !activeSlideDeck && (
+          {messages.length === 0 && !activeExperience && (
             <div className="space-y-4">
               <div className="text-center py-4">
                 <div className="w-12 h-12 rounded-full bg-[#266C92]/10 flex items-center justify-center mx-auto mb-3">
@@ -582,18 +575,6 @@ export function HomeAssistantPanel() {
                 ))}
               </div>
             </div>
-          )}
-
-          {activeSlideDeck && (
-            <SlideDeckViewer
-              deck={activeSlideDeck}
-              onClose={() => setActiveSlideDeck(null)}
-              onNavigate={(route) => {
-                setActiveSlideDeck(null);
-                setOpen(false);
-                setLocation(route);
-              }}
-            />
           )}
 
           {activeExperience && (

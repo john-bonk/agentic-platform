@@ -33,7 +33,7 @@ import {
   WorkflowBuilderPage,
   WorkflowListPage,
   ReportingPage,
-  PatchStatusPage,
+  SlideViewerPage,
   VendorExposurePage,
   OrgImpactPage,
   CoverageMappingPage,
@@ -77,13 +77,13 @@ function Router() {
       
       {/* Reporting Routes */}
       <Route path="/reporting" component={ReportingPage} />
-      <Route path="/reporting/patch-status" component={PatchStatusPage} />
+      <Route path="/reporting/view/:deckId" component={SlideViewerPage} />
       <Route path="/reporting/board-reports" component={ReportingPage} />
       <Route path="/reporting/audit-committee" component={ReportingPage} />
       <Route path="/reporting/compliance-reports" component={ReportingPage} />
       <Route path="/reporting/slide-builder" component={ReportingPage} />
       <Route path="/reporting/export-center" component={ReportingPage} />
-      <Route path="/reporting/artifacts/:id" component={ReportingPage} />
+      <Route path="/reporting/artifacts/:id" component={SlideViewerPage} />
       
       {/* Intelligence Hub Sub-Routes */}
       <Route path="/intelligence/vendor-exposure" component={VendorExposurePage} />
