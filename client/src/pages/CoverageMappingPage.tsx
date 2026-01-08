@@ -1,152 +1,294 @@
+import { useCallback, useMemo } from "react";
+import {
+  ReactFlow,
+  Background,
+  Controls,
+  useNodesState,
+  useEdgesState,
+  Node,
+  Edge,
+  ConnectionLineType,
+  MarkerType,
+  Handle,
+  Position,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 import { AppLayout, PageHeader } from "@/components/layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Globe, MapPin, Building2, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Info, Filter, MoreHorizontal } from "lucide-react";
 
-interface CoverageEntity {
-  id: string;
-  name: string;
-  region: string;
-  type: string;
-  status: "mapped" | "pending" | "new";
-  controls: number;
+interface GroupNodeData {
+  label: string;
+  items: { id: string; label: string; highlighted?: boolean }[];
+  headerColor: string;
+  itemColor?: string;
 }
 
-const coverageEntities: CoverageEntity[] = [
-  { id: "1", name: "Singapore HQ", region: "Asia-Pacific", type: "Headquarters", status: "new", controls: 12 },
-  { id: "2", name: "Singapore R&D Center", region: "Asia-Pacific", type: "Research Facility", status: "new", controls: 8 },
-  { id: "3", name: "Singapore Distribution Hub", region: "Asia-Pacific", type: "Distribution", status: "pending", controls: 15 },
-  { id: "4", name: "Singapore Manufacturing", region: "Asia-Pacific", type: "Manufacturing", status: "new", controls: 22 },
-  { id: "5", name: "US Corporate HQ", region: "North America", type: "Headquarters", status: "mapped", controls: 45 },
-  { id: "6", name: "EU Regional Office", region: "Europe", type: "Regional Office", status: "mapped", controls: 28 },
+function GroupNode({ data }: { data: GroupNodeData }) {
+  return (
+    <div 
+      className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 min-w-[200px] overflow-visible"
+      style={{ minWidth: 200 }}
+    >
+      <div 
+        className="flex items-center justify-between px-3 py-2 rounded-t-lg"
+        style={{ backgroundColor: data.headerColor }}
+      >
+        <span className="text-white text-xs font-medium">{data.label}</span>
+        <button className="w-4 h-4 rounded bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
+          <Plus className="w-3 h-3 text-white" />
+        </button>
+      </div>
+      <div className="p-1.5 space-y-0.5">
+        {data.items.map((item, idx) => (
+          <div 
+            key={item.id}
+            className={`relative px-2.5 py-1.5 text-xs rounded transition-colors ${
+              item.highlighted 
+                ? "bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4a9bc7] font-medium" 
+                : "bg-slate-50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+            }`}
+            style={data.itemColor && item.highlighted ? { backgroundColor: `${data.itemColor}15`, color: data.itemColor } : undefined}
+          >
+            {item.label}
+            <Handle
+              type="source"
+              position={Position.Right}
+              id={`source-${item.id}`}
+              className="!w-2 !h-2 !bg-[#266C92] !border-0 !right-[-4px]"
+              style={{ top: '50%', transform: 'translateY(-50%)' }}
+            />
+            <Handle
+              type="target"
+              position={Position.Left}
+              id={`target-${item.id}`}
+              className="!w-2 !h-2 !bg-[#266C92] !border-0 !left-[-4px]"
+              style={{ top: '50%', transform: 'translateY(-50%)' }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const nodeTypes = {
+  groupNode: GroupNode,
+};
+
+const TEAL = "#266C92";
+const PURPLE = "#7c3aed";
+const MAGENTA = "#a855f7";
+
+const initialNodes: Node[] = [
+  {
+    id: "regulatory-frameworks",
+    type: "groupNode",
+    position: { x: 50, y: 50 },
+    data: {
+      label: "Regulatory Frameworks",
+      headerColor: TEAL,
+      items: [
+        { id: "ava-food-safety", label: "AVA Food Safety" },
+      ],
+    },
+  },
+  {
+    id: "compliance-frameworks",
+    type: "groupNode",
+    position: { x: 50, y: 150 },
+    data: {
+      label: "Compliance Frameworks",
+      headerColor: TEAL,
+      items: [
+        { id: "iso-22000", label: "ISO 22000 (Food Safety)" },
+        { id: "iso-14001", label: "ISO 14001 (Environmental Management)" },
+        { id: "ohsas-18001", label: "OHSAS 18001 (Health & Safety)" },
+      ],
+    },
+  },
+  {
+    id: "policies",
+    type: "groupNode",
+    position: { x: 50, y: 320 },
+    data: {
+      label: "Policies",
+      headerColor: TEAL,
+      items: [
+        { id: "sustainable-sourcing", label: "Sustainable Sourcing" },
+      ],
+    },
+  },
+  {
+    id: "risks",
+    type: "groupNode",
+    position: { x: 50, y: 420 },
+    data: {
+      label: "Risks",
+      headerColor: TEAL,
+      items: [
+        { id: "climate-supply-disruption", label: "Climate-Related Supply Disruption" },
+        { id: "food-contamination", label: "Food Contamination & Safety Incidents" },
+        { id: "cybersecurity-breach", label: "Cybersecurity Breach" },
+        { id: "market-volatility", label: "Market Volatility" },
+      ],
+    },
+  },
+  {
+    id: "controls",
+    type: "groupNode",
+    position: { x: 50, y: 640 },
+    data: {
+      label: "Controls",
+      headerColor: TEAL,
+      items: [
+        { id: "climate-change-mitigation", label: "Climate Change Mitigation" },
+        { id: "supply-chain-traceability", label: "Supply Chain Traceability" },
+        { id: "regulatory-compliance-audits", label: "Regulatory Compliance Audits" },
+      ],
+    },
+  },
+  {
+    id: "facilities",
+    type: "groupNode",
+    position: { x: 520, y: 50 },
+    data: {
+      label: "Facilities",
+      headerColor: TEAL,
+      items: [
+        { id: "se-east-bio", label: "SE-East Bio" },
+        { id: "se-west-hq", label: "SE-West HQ" },
+      ],
+    },
+  },
+  {
+    id: "product-lines",
+    type: "groupNode",
+    position: { x: 520, y: 170 },
+    data: {
+      label: "Product Lines",
+      headerColor: TEAL,
+      items: [
+        { id: "algae-based-proteins", label: "Algae-Based Proteins", highlighted: true },
+        { id: "hydroponic-microgreens", label: "Hydroponic Microgreens" },
+        { id: "seafood-alternatives", label: "Seafood Alternatives" },
+      ],
+    },
+  },
+  {
+    id: "it-systems",
+    type: "groupNode",
+    position: { x: 520, y: 340 },
+    data: {
+      label: "IT Systems",
+      headerColor: TEAL,
+      items: [
+        { id: "supply-chain-mgmt", label: "Supply Chain Management" },
+        { id: "environmental-monitoring", label: "Environmental Monitoring" },
+        { id: "climate-data-analytics", label: "Climate Data Analytics" },
+        { id: "hr-payroll", label: "HR & Payroll" },
+      ],
+    },
+  },
+  {
+    id: "processes",
+    type: "groupNode",
+    position: { x: 520, y: 560 },
+    data: {
+      label: "Processes",
+      headerColor: TEAL,
+      items: [
+        { id: "raw-material-procurement", label: "Raw Material Procurement" },
+        { id: "waste-treatment", label: "Waste Treatment & Disposal" },
+        { id: "energy-consumption", label: "Energy Consumption & Monitoring" },
+        { id: "water-usage", label: "Water Usage Optimization" },
+      ],
+    },
+  },
+];
+
+const initialEdges: Edge[] = [
+  { id: "e1", source: "regulatory-frameworks", sourceHandle: "source-ava-food-safety", target: "facilities", targetHandle: "target-se-east-bio", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
+  { id: "e2", source: "regulatory-frameworks", sourceHandle: "source-ava-food-safety", target: "facilities", targetHandle: "target-se-west-hq", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
+  { id: "e3", source: "compliance-frameworks", sourceHandle: "source-iso-22000", target: "product-lines", targetHandle: "target-algae-based-proteins", type: "smoothstep", style: { stroke: PURPLE, strokeWidth: 2 }, animated: false },
+  { id: "e4", source: "compliance-frameworks", sourceHandle: "source-iso-14001", target: "product-lines", targetHandle: "target-hydroponic-microgreens", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 2 }, animated: false },
+  { id: "e5", source: "compliance-frameworks", sourceHandle: "source-ohsas-18001", target: "product-lines", targetHandle: "target-seafood-alternatives", type: "smoothstep", style: { stroke: PURPLE, strokeWidth: 2 }, animated: false },
+  { id: "e6", source: "policies", sourceHandle: "source-sustainable-sourcing", target: "it-systems", targetHandle: "target-supply-chain-mgmt", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
+  { id: "e7", source: "risks", sourceHandle: "source-climate-supply-disruption", target: "it-systems", targetHandle: "target-environmental-monitoring", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 2 }, animated: false },
+  { id: "e8", source: "risks", sourceHandle: "source-food-contamination", target: "it-systems", targetHandle: "target-climate-data-analytics", type: "smoothstep", style: { stroke: PURPLE, strokeWidth: 2 }, animated: false },
+  { id: "e9", source: "risks", sourceHandle: "source-cybersecurity-breach", target: "it-systems", targetHandle: "target-hr-payroll", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
+  { id: "e10", source: "risks", sourceHandle: "source-market-volatility", target: "processes", targetHandle: "target-raw-material-procurement", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 2 }, animated: false },
+  { id: "e11", source: "controls", sourceHandle: "source-climate-change-mitigation", target: "processes", targetHandle: "target-waste-treatment", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
+  { id: "e12", source: "controls", sourceHandle: "source-supply-chain-traceability", target: "processes", targetHandle: "target-energy-consumption", type: "smoothstep", style: { stroke: PURPLE, strokeWidth: 2 }, animated: false },
+  { id: "e13", source: "controls", sourceHandle: "source-regulatory-compliance-audits", target: "processes", targetHandle: "target-water-usage", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
 ];
 
 export default function CoverageMappingPage() {
-  const getStatusBadge = (status: CoverageEntity["status"]) => {
-    switch (status) {
-      case "mapped":
-        return <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"><CheckCircle2 className="w-3 h-3 mr-1" />Mapped</Badge>;
-      case "pending":
-        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
-      case "new":
-        return <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"><AlertCircle className="w-3 h-3 mr-1" />New</Badge>;
-    }
-  };
-
-  const newEntities = coverageEntities.filter(e => e.status === "new").length;
-  const pendingEntities = coverageEntities.filter(e => e.status === "pending").length;
-  const mappedEntities = coverageEntities.filter(e => e.status === "mapped").length;
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   return (
     <AppLayout>
-      <PageHeader
-        title="Coverage Mapping"
-        description="Audit coverage mapping for Singapore acquisition integration"
-      />
-
-      <div className="p-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-semibold">{coverageEntities.length}</p>
-                  <p className="text-sm text-muted-foreground">Total Entities</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-semibold">{newEntities}</p>
-                  <p className="text-sm text-muted-foreground">New Entities</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-semibold">{pendingEntities}</p>
-                  <p className="text-sm text-muted-foreground">Pending Review</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                  <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-semibold">{mappedEntities}</p>
-                  <p className="text-sm text-muted-foreground">Fully Mapped</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Coverage Mapping</h1>
+          </div>
+          <Button variant="ghost" size="icon" data-testid="button-coverage-more">
+            <MoreHorizontal className="w-5 h-5" />
+          </Button>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-[#266C92]" />
-              Entity Coverage Matrix
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {coverageEntities.map((entity) => (
-                <div 
-                  key={entity.id}
-                  className="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover-elevate"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                      <Building2 className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{entity.name}</p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>{entity.region}</span>
-                        <span className="text-slate-300 dark:text-slate-600">|</span>
-                        <span>{entity.type}</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="font-medium">{entity.controls}</p>
-                      <p className="text-xs text-muted-foreground">Controls</p>
-                    </div>
-                    {getStatusBadge(entity.status)}
-                    <Button variant="outline" size="sm" data-testid={`button-map-entity-${entity.id}`}>
-                      {entity.status === "mapped" ? "Review" : "Map"}
-                    </Button>
-                  </div>
-                </div>
-              ))}
+        <div className="mx-6 mt-4 mb-2">
+          <div className="flex items-start gap-3 px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+            <Info className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                Suggested Mapping for SEA FoodSource M&A
+              </p>
+              <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">
+                3 new risks added to library. Issues detected in 1 Compliance Framework, and 1 Control.
+              </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+
+        <div className="mx-6 mb-2">
+          <Button variant="outline" size="sm" className="gap-1.5" data-testid="button-add-filter">
+            <Filter className="w-3.5 h-3.5" />
+            Add Filter
+          </Button>
+        </div>
+
+        <div className="flex-1 mx-6 mb-6 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 overflow-hidden">
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            nodeTypes={nodeTypes}
+            connectionLineType={ConnectionLineType.SmoothStep}
+            defaultEdgeOptions={{
+              type: "smoothstep",
+              style: { strokeWidth: 2 },
+            }}
+            fitView
+            fitViewOptions={{ padding: 0.2 }}
+            proOptions={{ hideAttribution: true }}
+            minZoom={0.5}
+            maxZoom={1.5}
+            nodesDraggable={true}
+            nodesConnectable={false}
+            elementsSelectable={true}
+          >
+            <Background color="#e2e8f0" gap={20} size={1} />
+            <Controls 
+              showInteractive={false}
+              className="!bg-white dark:!bg-slate-800 !border-slate-200 dark:!border-slate-700 !shadow-sm"
+            />
+          </ReactFlow>
+        </div>
       </div>
     </AppLayout>
   );

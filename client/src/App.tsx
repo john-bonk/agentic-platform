@@ -37,6 +37,7 @@ import {
   VendorExposurePage,
   OrgImpactPage,
   CoverageMappingPage,
+  AllInventoryPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -48,7 +49,7 @@ function Router() {
       
       {/* Home Module Routes */}
       <Route path="/my-dashboard" component={HomePage} />
-      <Route path="/inventory" component={HomePage} />
+      <Route path="/inventory" component={AllInventoryPage} />
       <Route path="/coverage-mapping" component={CoverageMappingPage} />
       <Route path="/controls" component={HomePage} />
       <Route path="/tests" component={HomePage} />

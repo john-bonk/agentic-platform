@@ -1,0 +1,205 @@
+MegaCorp
+/
+Organization Admin
+Search by topic or ask a question
+ 
+⌘ + K
+JB
+MegaCorp
+/
+Organization Admin
+Search by topic or ask a question
+ 
+⌘ + K
+JB
+All Inventory
+All Inventory
+Coverage Mapping
+Button
+Dashboards
+Button
+Dashboards
+My Dashboard
+All Inventory
+Back to Page
+My Dashboard
+Coverage Mapping
+Button
+Parent Label
+Button
+Button
+Parent Label
+Button
+Overview: M&A
+Overview: M&A
+Button
+User-generated description which needs to support unlimited characters and will show entire overflow.
+Button
+User-generated description which needs to support unlimited characters and will show entire overflow.
+Overview
+Locations
+Legal Entities
+Facilities
+Product Lines
+Teams
+IT Systems
+Suggested Mapping for SEA FoodSource M&A
+Inventory
+Last reviewed 4 days ago
+Inventory
+3 new risks added to library. Issues detected in 1 Compliance Framework, and 1 Control.
+Button
+All Inventory
+Button
+All Inventory
+Coverage Mapping
+Add Filter
+Coverage Mapping
+Regulatory Frameworks
+Create Issue
+Facilities
+Create Issue
+ENVIRONMENT
+ENVIRONMENT
+AVA Food Safety
+SE-East Bio
+Controls
+Controls
+SE-West HQ
+Tests
+Tests
+Compliance Frameworks
+Create Issue
+Issues
+Locations
+Create Issue
+Legal Entities
+Create Issue
+Facilities
+Create Issue
+Product Lines
+Create Issue
+Teams
+Create Issue
+IT Systems
+Create Issue
+Issues
+ISO 22000 (Food Safety)
+Product Lines
+Create Issue
+Financial Accounts
+North America
+Evergrow Logistics
+US-West Agri
+Beverages
+Sourcing & Supply
+SAP
+Financial Accounts
+ISO 14001 (Environmental Management)
+Algae-Based Proteins
+Control Self Assessments
+United States
+ClimateCare Ventures
+US-Mid Pro
+Frozen Foods
+Sustainability
+Oracle Fusion
+Control Self Assessments
+OHSAS 18001 (Health & Safety)
+Hydroponic Microgreens
+Processes
+Mexico
+NuHarvest Innovations
+US-South Pack
+Plant-Based Proteins
+Food Safety
+Salesforce
+Processes
+Seafood Alternatives
+Scenario Planning
+Canada
+SunCoast Foods
+Dairy Products
+Distribution
+Azure SQL Database Servers
+Scenario Planning
+Policies
+Create Issue
+Reports
+US-East Dist
+Reports
+Sustainable Sourcing
+IT Systems
+Create Issue
+Europe
+GreenFoods Holdings
+CA-SE Pro/Pack
+Meat Processing
+Operations
+BPC
+VIEWS
+Germany
+Agri-Hub Distributors
+MX-Central Farm
+Packaged Goods
+Corporate
+Firebase Realtime Database
+VIEWS
+Supply Chain Management
+Risks
+Create Issue
+Environmental Monitoring
+Risk Control Matrix
+France
+SEA FoodSource
+MX-South Hub
+Cereals & Grains
+JD Tableau
+Risk Control Matrix
+Climate-Related Supply Disruption
+COSO Framework
+United Kingdom
+DE-North Euro
+Organic Vegetables
+Zapier Automations 
+COSO Framework
+Climate Data Analytics
+Financial Accounts View
+Asia-Pacific
+Algae-Based Proteins
+Financial Accounts View
+Food Contamination & Safety Incidents
+HR & Payroll
+FR-South Green
+Cybersecurity Breach
+Financial Applications View
+Singapore
+UK-Central Hub
+Hydro Microgreens
+Financial Applications View
+Market Volatility
+Processes
+Create Issue
+Frameworks
+UK-Innovation
+Seafood Alternatives
+Frameworks
+Raw Material Procurement
+Test Files
+SE-East Bio
+Test Files
+Controls
+Create Issue
+Waste Treatment & Disposal
+SE-West HQ
+Climate Change Mitigation
+Energy Consumption & Monitoring
+Button
+Button
+Supply Chain Traceability
+Water Usage Optimization
+Button
+Button
+Regulatory Compliance Audits
+Button
+Button
