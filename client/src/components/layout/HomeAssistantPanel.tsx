@@ -1,8 +1,8 @@
 /**
  * Home Assistant Panel
  * 
- * A generalized AI assistant panel for home pages and general navigation.
- * Adapted from the workflow AssistantPanel but context-aware for workspace actions.
+ * A non-modal overlay AI assistant panel for home pages and general navigation.
+ * Workspace-aware with deep interactive quick actions.
  */
 
 import { useState, useRef, useEffect } from "react";
@@ -10,19 +10,142 @@ import {
   Send, Bot, Sparkles, X, Loader2, 
   FileText, AlertTriangle, ClipboardList, 
   BarChart3, Users, Shield, ChevronRight,
-  ExternalLink
+  ExternalLink, Workflow, Plus, Search,
+  TrendingUp, AlertCircle, CheckCircle2,
+  Building2, Globe, Zap, Target
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useHomeAssistantStore, type ChatMessage, type SuggestedAction } from "@/lib/homeAssistantStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+
+interface QuickAction {
+  id: string;
+  label: string;
+  description: string;
+  icon: typeof Bot;
+  type: "workflow" | "navigate" | "create" | "analyze" | "report";
+  workflowTemplate?: string;
+  route?: string;
+  color: string;
+}
+
+const workspaceQuickActions: Record<string, QuickAction[]> = {
+  "enterprise-risk": [
+    {
+      id: "create-tariff-workflow",
+      label: "Create Tariff Impact Workflow",
+      description: "Build automated workflow to assess and mitigate tariff exposure across supply chain",
+      icon: Workflow,
+      type: "workflow",
+      workflowTemplate: "tariff-mitigation",
+      color: "#266C92",
+    },
+    {
+      id: "risk-assessment",
+      label: "Start Risk Assessment",
+      description: "Launch comprehensive risk assessment for current tariff scenarios",
+      icon: Target,
+      type: "create",
+      route: "/wizard",
+      color: "#f59e0b",
+    },
+    {
+      id: "vendor-analysis",
+      label: "Analyze Vendor Exposure",
+      description: "Deep-dive analysis of vendor tariff exposure and alternative sourcing",
+      icon: Building2,
+      type: "analyze",
+      color: "#10b981",
+    },
+    {
+      id: "board-report",
+      label: "Generate Board Report",
+      description: "Auto-generate executive summary of tariff risks for board presentation",
+      icon: BarChart3,
+      type: "report",
+      color: "#8b5cf6",
+    },
+  ],
+  "enterprise-audit": [
+    {
+      id: "create-ma-workflow",
+      label: "Create M&A Audit Workflow",
+      description: "Build workflow for Singapore vertical farming acquisition oversight",
+      icon: Workflow,
+      type: "workflow",
+      workflowTemplate: "ma-audit",
+      color: "#266C92",
+    },
+    {
+      id: "coverage-mapping",
+      label: "Update Coverage Mapping",
+      description: "Map audit coverage for new Singapore entity integration",
+      icon: Globe,
+      type: "navigate",
+      route: "/coverage-mapping",
+      color: "#10b981",
+    },
+    {
+      id: "org-impact",
+      label: "Assess Organizational Impact",
+      description: "Analyze how acquisition affects current audit structure",
+      icon: Users,
+      type: "analyze",
+      color: "#f59e0b",
+    },
+    {
+      id: "audit-committee-report",
+      label: "Prepare Audit Committee Deck",
+      description: "Generate presentation materials for audit committee review",
+      icon: FileText,
+      type: "report",
+      color: "#8b5cf6",
+    },
+  ],
+  "it-security": [
+    {
+      id: "create-incident-workflow",
+      label: "Create Incident Response Workflow",
+      description: "Build automated Log4j vulnerability response and remediation workflow",
+      icon: Workflow,
+      type: "workflow",
+      workflowTemplate: "incident-response",
+      color: "#266C92",
+    },
+    {
+      id: "vulnerability-scan",
+      label: "Launch Vulnerability Scan",
+      description: "Initiate comprehensive Log4j scan across all systems",
+      icon: Search,
+      type: "create",
+      color: "#ef4444",
+    },
+    {
+      id: "patch-status",
+      label: "View Patch Status",
+      description: "Real-time dashboard of Log4j remediation progress",
+      icon: Shield,
+      type: "navigate",
+      route: "/intelligence",
+      color: "#10b981",
+    },
+    {
+      id: "compliance-report",
+      label: "Generate Compliance Report",
+      description: "Create security compliance report for executive briefing",
+      icon: ClipboardList,
+      type: "report",
+      color: "#8b5cf6",
+    },
+  ],
+};
 
 interface ActionCardProps {
   action: SuggestedAction;
@@ -45,6 +168,8 @@ function ActionCard({ action, onApply, onDismiss }: ActionCardProps) {
         return <Users className="w-4 h-4 text-blue-500" />;
       case "security_review":
         return <Shield className="w-4 h-4 text-red-500" />;
+      case "workflow":
+        return <Workflow className="w-4 h-4 text-[#266C92]" />;
       default:
         return <Sparkles className="w-4 h-4 text-[#266C92]" />;
     }
@@ -132,8 +257,198 @@ function MessageBubble({ message }: MessageBubbleProps) {
   );
 }
 
+interface QuickActionCardProps {
+  action: QuickAction;
+  onExecute: (action: QuickAction) => void;
+}
+
+function QuickActionCard({ action, onExecute }: QuickActionCardProps) {
+  const Icon = action.icon;
+  
+  return (
+    <button
+      onClick={() => onExecute(action)}
+      className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-[#266C92] hover:bg-slate-50 transition-all group"
+      data-testid={`quick-action-${action.id}`}
+    >
+      <div className="flex items-start gap-3">
+        <div 
+          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ backgroundColor: `${action.color}15` }}
+        >
+          <Icon className="w-4 h-4" style={{ color: action.color }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-gray-900 group-hover:text-[#266C92]">
+            {action.label}
+          </p>
+          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+            {action.description}
+          </p>
+        </div>
+        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#266C92] flex-shrink-0 mt-0.5" />
+      </div>
+    </button>
+  );
+}
+
+interface InteractiveExperienceProps {
+  type: string;
+  workspaceId: string;
+  onClose: () => void;
+  onNavigate: (route: string) => void;
+}
+
+function InteractiveExperience({ type, workspaceId, onClose, onNavigate }: InteractiveExperienceProps) {
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [completed, setCompleted] = useState(false);
+
+  const experiences: Record<string, Record<string, { title: string; steps: string[]; result: string }>> = {
+    "enterprise-risk": {
+      "analyze": {
+        title: "Vendor Exposure Analysis",
+        steps: [
+          "Scanning vendor database for tariff-affected regions...",
+          "Calculating exposure levels across 47 vendors...",
+          "Identifying high-risk supply chain dependencies...",
+          "Generating mitigation recommendations..."
+        ],
+        result: "Analysis complete! Found 12 high-risk vendors with >40% tariff exposure. 3 critical suppliers in affected regions require immediate attention. View detailed report?"
+      },
+      "report": {
+        title: "Board Report Generation",
+        steps: [
+          "Aggregating risk metrics from current quarter...",
+          "Compiling tariff impact scenarios...",
+          "Generating executive summary charts...",
+          "Formatting presentation deck..."
+        ],
+        result: "Board report generated! 24-page executive summary with 8 key insights on tariff mitigation strategy. Ready for download or direct presentation."
+      },
+    },
+    "enterprise-audit": {
+      "analyze": {
+        title: "Organizational Impact Assessment",
+        steps: [
+          "Mapping current audit structure...",
+          "Analyzing Singapore entity integration points...",
+          "Calculating audit coverage gaps...",
+          "Generating restructuring recommendations..."
+        ],
+        result: "Assessment complete! Singapore acquisition adds 3 new audit areas. Coverage mapping updated with 15 new controls. 2 existing audit workflows require modification."
+      },
+      "report": {
+        title: "Audit Committee Deck Preparation",
+        steps: [
+          "Pulling M&A audit findings...",
+          "Compiling key risk indicators...",
+          "Generating compliance status summary...",
+          "Creating visual dashboards..."
+        ],
+        result: "Audit committee presentation ready! 18 slides covering M&A integration status, key findings, and recommended actions for next quarter."
+      },
+    },
+    "it-security": {
+      "create": {
+        title: "Vulnerability Scan Initiation",
+        steps: [
+          "Connecting to security scanning infrastructure...",
+          "Identifying Log4j instances across 234 systems...",
+          "Prioritizing critical systems for immediate scan...",
+          "Initiating comprehensive vulnerability assessment..."
+        ],
+        result: "Scan initiated! Estimated completion: 45 minutes. 234 systems queued. Real-time results available in Security Dashboard. 3 critical systems prioritized for immediate analysis."
+      },
+      "report": {
+        title: "Security Compliance Report",
+        steps: [
+          "Gathering Log4j remediation metrics...",
+          "Calculating compliance scores by department...",
+          "Compiling incident timeline...",
+          "Generating executive summary..."
+        ],
+        result: "Compliance report generated! Current remediation status: 78% complete. 12 systems pending patches. Report includes action items and timeline for full remediation."
+      },
+    },
+  };
+
+  const experience = experiences[workspaceId]?.[type];
+
+  useEffect(() => {
+    if (!experience) return;
+    
+    setLoading(true);
+    const interval = setInterval(() => {
+      setStep(prev => {
+        if (prev >= experience.steps.length) {
+          clearInterval(interval);
+          setLoading(false);
+          setCompleted(true);
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, [experience]);
+
+  if (!experience) {
+    return null;
+  }
+
+  return (
+    <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="font-medium text-gray-900">{experience.title}</h4>
+        <Button size="sm" variant="ghost" onClick={onClose}>
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
+      
+      <div className="space-y-2 mb-4">
+        {experience.steps.slice(0, step).map((stepText, idx) => (
+          <div key={idx} className="flex items-center gap-2">
+            {idx < step - 1 || completed ? (
+              <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+            ) : (
+              <Loader2 className="w-4 h-4 text-[#266C92] animate-spin flex-shrink-0" />
+            )}
+            <span className="text-sm text-gray-600">{stepText}</span>
+          </div>
+        ))}
+      </div>
+
+      {completed && (
+        <div className="bg-white p-3 rounded-lg border border-green-200">
+          <div className="flex items-start gap-2">
+            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-gray-700">{experience.result}</p>
+              <div className="flex gap-2 mt-3">
+                <Button 
+                  size="sm" 
+                  className="bg-[#266C92] hover:bg-[#1e5a7a]"
+                  onClick={() => onNavigate("/intelligence")}
+                >
+                  View Details
+                </Button>
+                <Button size="sm" variant="outline" onClick={onClose}>
+                  Done
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function HomeAssistantPanel() {
   const [inputValue, setInputValue] = useState("");
+  const [activeExperience, setActiveExperience] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
   
@@ -155,38 +470,7 @@ export function HomeAssistantPanel() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const getContextualPrompts = () => {
-    switch (currentWorkspace.id) {
-      case "enterprise-risk":
-        return [
-          "What are my open risk tasks?",
-          "Show tariff mitigation status",
-          "Create a risk assessment",
-          "View risk dashboard",
-        ];
-      case "enterprise-audit":
-        return [
-          "Show M&A audit tasks",
-          "What audits need attention?",
-          "Create new audit finding",
-          "View audit coverage",
-        ];
-      case "it-security":
-        return [
-          "Log4j remediation status",
-          "Show security vulnerabilities",
-          "Create security incident",
-          "View compliance status",
-        ];
-      default:
-        return [
-          "What are my open tasks?",
-          "Show dashboard overview",
-          "Create new workflow",
-          "Help me get started",
-        ];
-    }
-  };
+  const quickActions = workspaceQuickActions[currentWorkspace.id] || workspaceQuickActions["enterprise-risk"];
 
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -247,6 +531,23 @@ export function HomeAssistantPanel() {
     updateActionStatus(action.id, "dismissed");
   };
 
+  const handleQuickAction = async (action: QuickAction) => {
+    if (action.type === "workflow") {
+      const res = await apiRequest("POST", "/api/workflows", {
+        name: action.label.replace("Create ", ""),
+        description: action.description,
+      });
+      const workflow = await res.json();
+      setOpen(false);
+      setLocation(`/workflow/${workflow.id}`);
+    } else if (action.type === "navigate" && action.route) {
+      setOpen(false);
+      setLocation(action.route);
+    } else if (action.type === "analyze" || action.type === "report" || action.type === "create") {
+      setActiveExperience(action.type);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -254,56 +555,82 @@ export function HomeAssistantPanel() {
     }
   };
 
-  const quickPrompts = getContextualPrompts();
+  if (!isOpen) return null;
 
   return (
-    <Sheet open={isOpen} onOpenChange={setOpen}>
-      <SheetContent 
-        side="right" 
-        className="w-[400px] sm:w-[450px] p-0 flex flex-col"
+    <>
+      <div 
+        className="fixed inset-0 bg-black/20 z-40"
+        onClick={() => setOpen(false)}
+        data-testid="home-assistant-backdrop"
+      />
+      <div 
+        className="fixed right-4 top-16 bottom-4 w-[420px] bg-white rounded-lg shadow-xl border border-slate-200 flex flex-col z-50 overflow-hidden"
         data-testid="home-assistant-panel"
       >
-        <SheetHeader className="p-4 border-b border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#266C92]/10 flex items-center justify-center">
-              <Bot className="w-5 h-5 text-[#266C92]" />
+        <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-[#266C92] to-[#1e5a7a]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                <Bot className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-white">
+                  AuditBoard Assistant
+                </h3>
+                <p className="text-xs text-white/80">
+                  AI-powered help for {currentWorkspace.name}
+                </p>
+              </div>
             </div>
-            <div>
-              <SheetTitle className="text-base font-semibold text-gray-900">
-                AuditBoard Assistant
-              </SheetTitle>
-              <p className="text-xs text-gray-500">
-                AI-powered help for {currentWorkspace.name}
-              </p>
-            </div>
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              className="text-white hover:bg-white/20"
+              onClick={() => setOpen(false)}
+              data-testid="button-close-assistant"
+            >
+              <X className="w-5 h-5" />
+            </Button>
           </div>
-        </SheetHeader>
+        </div>
         
         <ScrollArea className="flex-1 p-4">
-          {messages.length === 0 && (
-            <div className="text-center py-8">
-              <div className="w-14 h-14 rounded-full bg-[#266C92]/10 flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-7 h-7 text-[#266C92]" />
+          {messages.length === 0 && !activeExperience && (
+            <div className="space-y-4">
+              <div className="text-center py-4">
+                <div className="w-12 h-12 rounded-full bg-[#266C92]/10 flex items-center justify-center mx-auto mb-3">
+                  <Sparkles className="w-6 h-6 text-[#266C92]" />
+                </div>
+                <h4 className="font-semibold text-gray-900 mb-1">How can I help you?</h4>
+                <p className="text-sm text-gray-500 max-w-xs mx-auto">
+                  Quick actions for {currentWorkspace.name}
+                </p>
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">How can I help you?</h4>
-              <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
-                Ask me about your tasks, create new items, or get insights about your {currentWorkspace.name} workspace.
-              </p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {quickPrompts.map((prompt) => (
-                  <Button
-                    key={prompt}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setInputValue(prompt)}
-                    className="text-xs border-slate-200 text-gray-600 hover:border-[#266C92] hover:text-[#266C92]"
-                    data-testid={`quick-prompt-${prompt.toLowerCase().replace(/\s+/g, '-').slice(0, 20)}`}
-                  >
-                    {prompt}
-                  </Button>
+              
+              <div className="space-y-2">
+                {quickActions.map((action) => (
+                  <QuickActionCard
+                    key={action.id}
+                    action={action}
+                    onExecute={handleQuickAction}
+                  />
                 ))}
               </div>
             </div>
+          )}
+
+          {activeExperience && (
+            <InteractiveExperience
+              type={activeExperience}
+              workspaceId={currentWorkspace.id}
+              onClose={() => setActiveExperience(null)}
+              onNavigate={(route) => {
+                setActiveExperience(null);
+                setOpen(false);
+                setLocation(route);
+              }}
+            />
           )}
           
           {messages.map((message) => (
@@ -367,7 +694,7 @@ export function HomeAssistantPanel() {
             </Button>
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </>
   );
 }

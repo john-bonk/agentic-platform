@@ -24,6 +24,8 @@ import {
   Zap,
 } from "lucide-react";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
+import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
+import headerBgImage from "@assets/Welcome_Image_1767849747805.png";
 
 interface Task {
   id: string;
@@ -285,6 +287,7 @@ export default function HomePage() {
   const content = workspaceContent[currentWorkspace.id] || workspaceContent["enterprise-risk"];
   const [activeTab, setActiveTab] = useState("My Tasks");
   const [scenarioExpanded, setScenarioExpanded] = useState(true);
+  const { setOpen: setAssistantOpen } = useHomeAssistantStore();
 
   useEffect(() => {
     setActiveTab("My Tasks");
@@ -295,9 +298,12 @@ export default function HomePage() {
   return (
     <AppLayout showHeader={true} showSideNav={true}>
       <div className="flex flex-col h-full overflow-y-auto" key={refreshKey}>
-        {/* Hero Header */}
-        <div className="bg-[#266C92] text-white px-8 py-6">
-          <div className="max-w-6xl">
+        {/* Hero Header with Background Image */}
+        <div 
+          className="text-white px-8 py-6 bg-cover bg-center bg-no-repeat relative"
+          style={{ backgroundImage: `url(${headerBgImage})` }}
+        >
+          <div className="max-w-6xl relative z-10">
             <h1 className="text-2xl font-semibold" data-testid="welcome-message">
               Welcome back, {currentWorkspace.personaTitle}
               <span className="ml-4 text-base font-normal text-white/80">
@@ -325,19 +331,25 @@ export default function HomePage() {
                       placeholder="Ask AuditBoard Assistant..."
                       className="pl-10 h-10 bg-slate-50 border-slate-200"
                       data-testid="input-assistant"
+                      onFocus={() => setAssistantOpen(true)}
                     />
                   </div>
-                  <Button className="bg-[#266C92] hover:bg-[#1e5a7a] text-white px-6" data-testid="button-get-started">
+                  <Button 
+                    className="bg-[#266C92] hover:bg-[#1e5a7a] text-white px-6" 
+                    data-testid="button-get-started"
+                    onClick={() => setAssistantOpen(true)}
+                  >
                     Get Started
                   </Button>
                 </div>
-                <div className="flex items-center justify-center gap-6">
+                <div className="flex items-center justify-center gap-6 flex-wrap">
                   {content.quickActions.map((action) => (
                     <Button
                       key={action.id}
                       variant="ghost"
                       className="text-sm text-gray-600 gap-2"
                       data-testid={`button-quick-action-${action.id}`}
+                      onClick={() => setAssistantOpen(true)}
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       {action.label}
