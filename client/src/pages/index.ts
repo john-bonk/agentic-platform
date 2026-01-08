@@ -19,3 +19,8 @@ export { default as WizardPage } from "./WizardPage";
 export { default as NotFound } from "./not-found";
 export { WorkflowBuilderPage } from "./WorkflowBuilderPage";
 export { WorkflowListPage } from "./WorkflowListPage";
+export { default as ReportingPage } from "./ReportingPage";
+export { default as PatchStatusPage } from "./PatchStatusPage";
+export { default as VendorExposurePage } from "./VendorExposurePage";
+export { default as OrgImpactPage } from "./OrgImpactPage";
+export { default as CoverageMappingPage } from "./CoverageMappingPage";

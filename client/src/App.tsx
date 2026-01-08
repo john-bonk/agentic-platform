@@ -32,6 +32,11 @@ import {
   NotFound,
   WorkflowBuilderPage,
   WorkflowListPage,
+  ReportingPage,
+  PatchStatusPage,
+  VendorExposurePage,
+  OrgImpactPage,
+  CoverageMappingPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -44,7 +49,7 @@ function Router() {
       {/* Home Module Routes */}
       <Route path="/my-dashboard" component={HomePage} />
       <Route path="/inventory" component={HomePage} />
-      <Route path="/coverage-mapping" component={HomePage} />
+      <Route path="/coverage-mapping" component={CoverageMappingPage} />
       <Route path="/controls" component={HomePage} />
       <Route path="/tests" component={HomePage} />
       <Route path="/issues" component={HomePage} />
@@ -69,6 +74,20 @@ function Router() {
       {/* Workflow Routes */}
       <Route path="/workflows" component={WorkflowListPage} />
       <Route path="/workflow/:id" component={WorkflowBuilderPage} />
+      
+      {/* Reporting Routes */}
+      <Route path="/reporting" component={ReportingPage} />
+      <Route path="/reporting/patch-status" component={PatchStatusPage} />
+      <Route path="/reporting/board-reports" component={ReportingPage} />
+      <Route path="/reporting/audit-committee" component={ReportingPage} />
+      <Route path="/reporting/compliance-reports" component={ReportingPage} />
+      <Route path="/reporting/slide-builder" component={ReportingPage} />
+      <Route path="/reporting/export-center" component={ReportingPage} />
+      <Route path="/reporting/artifacts/:id" component={ReportingPage} />
+      
+      {/* Intelligence Hub Sub-Routes */}
+      <Route path="/intelligence/vendor-exposure" component={VendorExposurePage} />
+      <Route path="/intelligence/org-impact" component={OrgImpactPage} />
       
       {/* 404 - Must be last */}
       <Route component={NotFound} />

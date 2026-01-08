@@ -7,7 +7,7 @@
 
 export type IconNavItem = 
   | { type: "image"; src: string; alt: string; active: boolean; path?: string; modulePrefix?: string }
-  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity"; alt: string; active: boolean; path?: string; modulePrefix?: string };
+  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity" | "bar-chart-3"; alt: string; active: boolean; path?: string; modulePrefix?: string };
 
 export interface SideNavSection {
   title: string;
@@ -95,12 +95,43 @@ export const modules: ModuleConfig[] = [
         items: [
           { id: "list", label: "Data Explorer", path: "/list" },
           { id: "hierarchy", label: "Entity Matrix", path: "/hierarchy" },
+          { id: "vendor-exposure", label: "Vendor Exposure", path: "/intelligence/vendor-exposure" },
+          { id: "org-impact", label: "Org Impact Analysis", path: "/intelligence/org-impact" },
         ],
       },
       {
         title: "System",
         items: [
           { id: "settings", label: "Configuration", path: "/settings" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "reporting",
+    name: "Reporting",
+    icon: { type: "lucide", icon: "bar-chart-3", alt: "Reporting", active: false, path: "/reporting", modulePrefix: "/reporting" },
+    sideNavSections: [
+      {
+        title: "Reports",
+        items: [
+          { id: "reporting-overview", label: "Report Library", path: "/reporting" },
+          { id: "patch-status", label: "Patch Status", path: "/reporting/patch-status" },
+        ],
+      },
+      {
+        title: "Artifacts",
+        items: [
+          { id: "board-reports", label: "Board Reports", path: "/reporting/board-reports" },
+          { id: "audit-committee", label: "Audit Committee", path: "/reporting/audit-committee" },
+          { id: "compliance-reports", label: "Compliance Reports", path: "/reporting/compliance-reports" },
+        ],
+      },
+      {
+        title: "Tools",
+        items: [
+          { id: "slide-builder", label: "Slide Builder", path: "/reporting/slide-builder" },
+          { id: "export-center", label: "Export Center", path: "/reporting/export-center" },
         ],
       },
     ],
@@ -131,6 +162,10 @@ export function getModuleFromPath(path: string): ModuleConfig {
   if (path.startsWith("/intelligence")) {
     return modules[2];
   }
+  // Reporting module
+  if (path.startsWith("/reporting")) {
+    return modules[3];
+  }
   // Default to Home
   return modules[0];
 }
@@ -159,6 +194,11 @@ export function getActiveModuleIndex(path: string): number {
   // Intelligence Hub module
   if (path.startsWith("/intelligence") || path === "/list" || path === "/hierarchy" || path === "/settings") {
     return 2; // Intelligence Hub module
+  }
+  
+  // Reporting module
+  if (path.startsWith("/reporting")) {
+    return 3; // Reporting module
   }
   
   // Check if path matches Home module paths

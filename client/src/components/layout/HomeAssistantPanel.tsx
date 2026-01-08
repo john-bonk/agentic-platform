@@ -20,10 +20,12 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { SlideDeckViewer } from "@/components/ui/slide-deck-viewer";
 import { useHomeAssistantStore, type ChatMessage, type SuggestedAction } from "@/lib/homeAssistantStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { getSlideDeck, getExperienceConfig, type SlideDeck } from "@/lib/reportingContent";
 
 interface QuickAction {
   id: string;
@@ -88,8 +90,7 @@ const workspaceQuickActions: Record<string, QuickAction[]> = {
       label: "Update Coverage Mapping",
       description: "Map audit coverage for new Singapore entity integration",
       icon: Globe,
-      type: "navigate",
-      route: "/coverage-mapping",
+      type: "create",
       color: "#10b981",
     },
     {
@@ -133,7 +134,7 @@ const workspaceQuickActions: Record<string, QuickAction[]> = {
       description: "Real-time dashboard of Log4j remediation progress",
       icon: Shield,
       type: "navigate",
-      route: "/intelligence",
+      route: "/reporting/patch-status",
       color: "#10b981",
     },
     {
@@ -300,122 +301,68 @@ interface InteractiveExperienceProps {
 }
 
 function InteractiveExperience({ type, workspaceId, onClose, onNavigate }: InteractiveExperienceProps) {
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState(0);
   const [completed, setCompleted] = useState(false);
 
-  const experiences: Record<string, Record<string, { title: string; steps: string[]; result: string }>> = {
-    "enterprise-risk": {
-      "analyze": {
-        title: "Vendor Exposure Analysis",
-        steps: [
-          "Scanning vendor database for tariff-affected regions...",
-          "Calculating exposure levels across 47 vendors...",
-          "Identifying high-risk supply chain dependencies...",
-          "Generating mitigation recommendations..."
-        ],
-        result: "Analysis complete! Found 12 high-risk vendors with >40% tariff exposure. 3 critical suppliers in affected regions require immediate attention. View detailed report?"
-      },
-      "report": {
-        title: "Board Report Generation",
-        steps: [
-          "Aggregating risk metrics from current quarter...",
-          "Compiling tariff impact scenarios...",
-          "Generating executive summary charts...",
-          "Formatting presentation deck..."
-        ],
-        result: "Board report generated! 24-page executive summary with 8 key insights on tariff mitigation strategy. Ready for download or direct presentation."
-      },
-    },
-    "enterprise-audit": {
-      "analyze": {
-        title: "Organizational Impact Assessment",
-        steps: [
-          "Mapping current audit structure...",
-          "Analyzing Singapore entity integration points...",
-          "Calculating audit coverage gaps...",
-          "Generating restructuring recommendations..."
-        ],
-        result: "Assessment complete! Singapore acquisition adds 3 new audit areas. Coverage mapping updated with 15 new controls. 2 existing audit workflows require modification."
-      },
-      "report": {
-        title: "Audit Committee Deck Preparation",
-        steps: [
-          "Pulling M&A audit findings...",
-          "Compiling key risk indicators...",
-          "Generating compliance status summary...",
-          "Creating visual dashboards..."
-        ],
-        result: "Audit committee presentation ready! 18 slides covering M&A integration status, key findings, and recommended actions for next quarter."
-      },
-    },
-    "it-security": {
-      "create": {
-        title: "Vulnerability Scan Initiation",
-        steps: [
-          "Connecting to security scanning infrastructure...",
-          "Identifying Log4j instances across 234 systems...",
-          "Prioritizing critical systems for immediate scan...",
-          "Initiating comprehensive vulnerability assessment..."
-        ],
-        result: "Scan initiated! Estimated completion: 45 minutes. 234 systems queued. Real-time results available in Security Dashboard. 3 critical systems prioritized for immediate analysis."
-      },
-      "report": {
-        title: "Security Compliance Report",
-        steps: [
-          "Gathering Log4j remediation metrics...",
-          "Calculating compliance scores by department...",
-          "Compiling incident timeline...",
-          "Generating executive summary..."
-        ],
-        result: "Compliance report generated! Current remediation status: 78% complete. 12 systems pending patches. Report includes action items and timeline for full remediation."
-      },
-    },
-  };
-
-  const experience = experiences[workspaceId]?.[type];
+  const experience = getExperienceConfig(workspaceId, type);
 
   useEffect(() => {
     if (!experience) return;
     
-    setLoading(true);
-    const interval = setInterval(() => {
-      setStep(prev => {
-        if (prev >= experience.steps.length) {
-          clearInterval(interval);
-          setLoading(false);
-          setCompleted(true);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 1200);
-
-    return () => clearInterval(interval);
+    let currentStep = 0;
+    const runSteps = async () => {
+      for (const stepConfig of experience.steps) {
+        await new Promise(resolve => setTimeout(resolve, stepConfig.duration));
+        currentStep++;
+        setStep(currentStep);
+      }
+      setCompleted(true);
+    };
+    
+    runSteps();
   }, [experience]);
 
   if (!experience) {
-    return null;
+    return (
+      <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+        <div className="flex items-center gap-2 mb-2">
+          <AlertCircle className="w-4 h-4 text-amber-500" />
+          <span className="text-sm font-medium text-amber-800">Experience Not Available</span>
+        </div>
+        <p className="text-sm text-amber-700 mb-3">
+          This action type ({type}) is not yet configured for {workspaceId}.
+        </p>
+        <Button size="sm" variant="outline" onClick={onClose}>
+          Close
+        </Button>
+      </div>
+    );
   }
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+    <div className="p-4 bg-slate-50 rounded-lg border border-slate-200" data-testid="interactive-experience">
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-medium text-gray-900">{experience.title}</h4>
-        <Button size="sm" variant="ghost" onClick={onClose}>
+        <Button size="icon" variant="ghost" onClick={onClose}>
           <X className="w-4 h-4" />
         </Button>
       </div>
       
+      <p className="text-sm text-gray-500 mb-4">{experience.description}</p>
+      
       <div className="space-y-2 mb-4">
-        {experience.steps.slice(0, step).map((stepText, idx) => (
+        {experience.steps.map((stepConfig, idx) => (
           <div key={idx} className="flex items-center gap-2">
-            {idx < step - 1 || completed ? (
+            {idx < step ? (
               <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-            ) : (
+            ) : idx === step && !completed ? (
               <Loader2 className="w-4 h-4 text-[#266C92] animate-spin flex-shrink-0" />
+            ) : (
+              <div className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0" />
             )}
-            <span className="text-sm text-gray-600">{stepText}</span>
+            <span className={`text-sm ${idx <= step ? "text-gray-700" : "text-gray-400"}`}>
+              {stepConfig.label}
+            </span>
           </div>
         ))}
       </div>
@@ -430,11 +377,12 @@ function InteractiveExperience({ type, workspaceId, onClose, onNavigate }: Inter
                 <Button 
                   size="sm" 
                   className="bg-[#266C92] hover:bg-[#1e5a7a]"
-                  onClick={() => onNavigate("/intelligence")}
+                  onClick={() => onNavigate(experience.destination)}
+                  data-testid="button-view-results"
                 >
-                  View Details
+                  {experience.destinationLabel}
                 </Button>
-                <Button size="sm" variant="outline" onClick={onClose}>
+                <Button size="sm" variant="outline" onClick={onClose} data-testid="button-close-experience">
                   Done
                 </Button>
               </div>
@@ -449,6 +397,7 @@ function InteractiveExperience({ type, workspaceId, onClose, onNavigate }: Inter
 export function HomeAssistantPanel() {
   const [inputValue, setInputValue] = useState("");
   const [activeExperience, setActiveExperience] = useState<string | null>(null);
+  const [activeSlideDeck, setActiveSlideDeck] = useState<SlideDeck | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
   
@@ -533,18 +482,33 @@ export function HomeAssistantPanel() {
 
   const handleQuickAction = async (action: QuickAction) => {
     if (action.type === "workflow") {
-      const res = await apiRequest("POST", "/api/workflows", {
-        name: action.label.replace("Create ", ""),
-        description: action.description,
-      });
-      const workflow = await res.json();
-      setOpen(false);
-      setLocation(`/workflow/${workflow.id}`);
+      try {
+        const res = await apiRequest("POST", "/api/workflows", {
+          name: action.label.replace("Create ", ""),
+          description: action.description,
+        });
+        const workflow = await res.json();
+        setOpen(false);
+        setLocation(`/workflow/${workflow.id}`);
+      } catch (error) {
+        console.error("Failed to create workflow:", error);
+      }
     } else if (action.type === "navigate" && action.route) {
       setOpen(false);
       setLocation(action.route);
-    } else if (action.type === "analyze" || action.type === "report" || action.type === "create") {
+    } else if (action.type === "report") {
+      const deckKey = action.id.includes("board") ? "board-report" 
+        : action.id.includes("audit-committee") ? "audit-committee-report"
+        : action.id.includes("compliance") ? "compliance-report"
+        : "board-report";
+      const deck = getSlideDeck(currentWorkspace.id, deckKey);
+      if (deck) {
+        setActiveSlideDeck(deck);
+        setActiveExperience(null);
+      }
+    } else if (action.type === "analyze" || action.type === "create") {
       setActiveExperience(action.type);
+      setActiveSlideDeck(null);
     }
   };
 
@@ -596,7 +560,7 @@ export function HomeAssistantPanel() {
         </div>
         
         <ScrollArea className="flex-1 p-4">
-          {messages.length === 0 && !activeExperience && (
+          {messages.length === 0 && !activeExperience && !activeSlideDeck && (
             <div className="space-y-4">
               <div className="text-center py-4">
                 <div className="w-12 h-12 rounded-full bg-[#266C92]/10 flex items-center justify-center mx-auto mb-3">
@@ -618,6 +582,18 @@ export function HomeAssistantPanel() {
                 ))}
               </div>
             </div>
+          )}
+
+          {activeSlideDeck && (
+            <SlideDeckViewer
+              deck={activeSlideDeck}
+              onClose={() => setActiveSlideDeck(null)}
+              onNavigate={(route) => {
+                setActiveSlideDeck(null);
+                setOpen(false);
+                setLocation(route);
+              }}
+            />
           )}
 
           {activeExperience && (
