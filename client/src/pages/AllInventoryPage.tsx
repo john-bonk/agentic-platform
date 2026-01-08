@@ -270,11 +270,10 @@ export default function AllInventoryPage() {
     return edges;
   };
 
-  const generateBidirectionalEdges = (): Edge[] => {
+  const generateReverseEdges = (): Edge[] => {
     const edges: Edge[] = [];
-    const facilities = ["us-west-agri", "us-mid-pro", "us-south-pack", "us-east-dist", "ca-se-propack", "mx-central-farm", "mx-south-hub", "de-north-euro", "fr-south-green", "uk-central-hub", "uk-innovation", "se-east-bio", "se-west-hq"];
-    const legalEntities = ["evergrow-logistics", "climatecare-ventures", "nuharvest-innovations", "suncoast-foods", "greenfoods-holdings", "agri-hub", "sea-foodsource"];
     
+    // Teams → Product Lines (reverse: 6 teams × 11 product lines = 66 edges)
     teams.forEach((team, tIdx) => {
       productLines.forEach((pl, pIdx) => {
         const colorIdx = (tIdx + pIdx) % edgeColors.length;
@@ -285,12 +284,13 @@ export default function AllInventoryPage() {
           target: "product-lines",
           targetHandle: `target-${pl}`,
           type: "smoothstep",
-          style: { stroke: edgeColors[colorIdx], strokeWidth: 1, opacity: 0.3 },
+          style: { stroke: edgeColors[colorIdx], strokeWidth: 1, opacity: 0.35 },
           animated: false,
         });
       });
     });
 
+    // IT Systems → Teams (reverse: 8 IT systems × 6 teams = 48 edges)
     itSystems.forEach((sys, sIdx) => {
       teams.forEach((team, tIdx) => {
         const colorIdx = (sIdx + tIdx) % edgeColors.length;
@@ -301,43 +301,9 @@ export default function AllInventoryPage() {
           target: "teams",
           targetHandle: `target-${team}`,
           type: "smoothstep",
-          style: { stroke: edgeColors[colorIdx], strokeWidth: 1, opacity: 0.3 },
+          style: { stroke: edgeColors[colorIdx], strokeWidth: 1, opacity: 0.35 },
           animated: false,
         });
-      });
-    });
-
-    facilities.forEach((fac, fIdx) => {
-      legalEntities.forEach((le, lIdx) => {
-        if ((fIdx + lIdx) % 3 === 0) {
-          edges.push({
-            id: `e-fac-${fac}-le-${le}`,
-            source: "facilities",
-            sourceHandle: `source-${fac}`,
-            target: "legal-entities",
-            targetHandle: `target-${le}`,
-            type: "smoothstep",
-            style: { stroke: "#94a3b8", strokeWidth: 1, opacity: 0.25 },
-            animated: false,
-          });
-        }
-      });
-    });
-
-    productLines.forEach((pl, pIdx) => {
-      facilities.forEach((fac, fIdx) => {
-        if ((pIdx + fIdx) % 4 === 0) {
-          edges.push({
-            id: `e-pl-${pl}-fac-${fac}`,
-            source: "product-lines",
-            sourceHandle: `source-${pl}`,
-            target: "facilities",
-            targetHandle: `target-${fac}`,
-            type: "smoothstep",
-            style: { stroke: "#94a3b8", strokeWidth: 1, opacity: 0.25 },
-            animated: false,
-          });
-        }
       });
     });
 
@@ -354,7 +320,7 @@ export default function AllInventoryPage() {
     { id: "e-se2-seafood", source: "facilities", sourceHandle: "source-se-west-hq", target: "product-lines", targetHandle: "target-seafood-alternatives", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
     ...generateProductToTeamEdges(),
     ...generateTeamToITEdges(),
-    ...generateBidirectionalEdges(),
+    ...generateReverseEdges(),
   ];
 
   const [nodes, setNodes, onNodesChange] = useNodesState(inventoryNodes);
