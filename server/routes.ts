@@ -52,7 +52,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/workflows", async (req: Request, res: Response) => {
     try {
-      const validated = insertWorkflowSchema.parse(req.body);
+      const { templateId, ...workflowData } = req.body;
+      
+      if (templateId) {
+        const template = getWorkflowTemplate(templateId);
+        if (template) {
+          const workflowInput = {
+            ...template.workflow,
+            name: workflowData.name || template.workflow.name,
+            description: workflowData.description || template.workflow.description,
+          };
+          const validated = insertWorkflowSchema.parse(workflowInput);
+          const workflow = await storage.createWorkflowWithContents(
+            validated,
+            template.nodes,
+            template.edges
+          );
+          return res.status(201).json(workflow);
+        }
+      }
+      
+      const validated = insertWorkflowSchema.parse(workflowData);
       const workflow = await storage.createWorkflow(validated);
       res.status(201).json(workflow);
     } catch (error) {

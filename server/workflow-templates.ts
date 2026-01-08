@@ -473,6 +473,106 @@ const complianceTrainingWorkflow: WorkflowTemplate = {
 };
 
 /**
+ * Template 11: Tariff Impact Mitigation Workflow
+ * Supply chain tariff exposure assessment and mitigation
+ */
+const tariffMitigationWorkflow: WorkflowTemplate = {
+  workflow: {
+    name: "Tariff Impact Mitigation",
+    description: "Automated workflow to assess and mitigate tariff exposure across supply chain",
+    status: "active",
+    tags: ["tariff", "supply-chain", "risk", "mitigation"],
+    visibility: "team",
+    version: 1,
+  },
+  nodes: [
+    { tempId: "t1", typeId: "start", label: "Tariff Alert Received", config: {}, positionX: 100, positionY: 200, metadata: {} },
+    { tempId: "t2", typeId: "ab-risks", label: "Query Impacted Vendors", config: { action: "query", filters: { category: "supply-chain", region: "affected" } }, positionX: 300, positionY: 200, metadata: {} },
+    { tempId: "t3", typeId: "llm-task", label: "AI Impact Analysis", config: { prompt: "Analyze tariff impact on vendor relationships and calculate exposure" }, positionX: 500, positionY: 200, metadata: {} },
+    { tempId: "t4", typeId: "decision", label: "Exposure Level?", config: { conditions: [{ field: "exposure", operator: "gte", value: 5000000 }] }, positionX: 700, positionY: 200, metadata: {} },
+    { tempId: "t5", typeId: "parallel-gateway", label: "Critical Actions", config: { mode: "all" }, positionX: 900, positionY: 100, metadata: {} },
+    { tempId: "t6", typeId: "human-task", label: "Identify Alt Suppliers", config: { assignee: "procurement@company.com", title: "Source Alternative Suppliers" }, positionX: 1100, positionY: 50, metadata: {} },
+    { tempId: "t7", typeId: "human-task", label: "Renegotiate Contracts", config: { assignee: "legal@company.com", title: "Contract Renegotiation" }, positionX: 1100, positionY: 150, metadata: {} },
+    { tempId: "t8", typeId: "email-notification", label: "Board Alert", config: { to: ["cro@company.com", "cfo@company.com"], subject: "Critical Tariff Exposure Alert", priority: "high" }, positionX: 1100, positionY: 250, metadata: {} },
+    { tempId: "t9", typeId: "parallel-gateway", label: "Consolidate", config: { mode: "all" }, positionX: 1300, positionY: 100, metadata: {} },
+    { tempId: "t10", typeId: "human-task", label: "Standard Review", config: { assignee: "risk-analyst@company.com" }, positionX: 900, positionY: 300, metadata: {} },
+    { tempId: "t11", typeId: "approval", label: "Risk Owner Approval", config: { approvers: ["cro@company.com"], requiredApprovals: 1 }, positionX: 1300, positionY: 200, metadata: {} },
+    { tempId: "t12", typeId: "ab-risks", label: "Update Risk Register", config: { action: "update", fields: ["mitigation_status", "exposure_amount"] }, positionX: 1500, positionY: 200, metadata: {} },
+    { tempId: "t13", typeId: "email-notification", label: "Notify Stakeholders", config: { to: ["stakeholders@company.com"], subject: "Tariff Mitigation Update" }, positionX: 1700, positionY: 200, metadata: {} },
+    { tempId: "t14", typeId: "end", label: "End", config: {}, positionX: 1900, positionY: 200, metadata: {} },
+  ],
+  edges: [
+    { sourceTempId: "t1", targetTempId: "t2", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t2", targetTempId: "t3", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t3", targetTempId: "t4", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t4", targetTempId: "t5", sourceHandle: "critical", targetHandle: null, label: "Critical ($5M+)", condition: null, metadata: {} },
+    { sourceTempId: "t4", targetTempId: "t10", sourceHandle: "moderate", targetHandle: null, label: "Moderate", condition: null, metadata: {} },
+    { sourceTempId: "t5", targetTempId: "t6", sourceHandle: "branch-1", targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t5", targetTempId: "t7", sourceHandle: "branch-2", targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t5", targetTempId: "t8", sourceHandle: "branch-3", targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t6", targetTempId: "t9", sourceHandle: null, targetHandle: "join-1", label: null, condition: null, metadata: {} },
+    { sourceTempId: "t7", targetTempId: "t9", sourceHandle: null, targetHandle: "join-2", label: null, condition: null, metadata: {} },
+    { sourceTempId: "t8", targetTempId: "t9", sourceHandle: null, targetHandle: "join-3", label: null, condition: null, metadata: {} },
+    { sourceTempId: "t9", targetTempId: "t11", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t10", targetTempId: "t11", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t11", targetTempId: "t12", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t12", targetTempId: "t13", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t13", targetTempId: "t14", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+  ],
+};
+
+/**
+ * Template 12: M&A Audit Workflow
+ * Acquisition integration audit and oversight
+ */
+const maAuditWorkflow: WorkflowTemplate = {
+  workflow: {
+    name: "M&A Integration Audit",
+    description: "Build workflow for acquisition oversight and integration audit",
+    status: "active",
+    tags: ["ma", "acquisition", "audit", "integration"],
+    visibility: "team",
+    version: 1,
+  },
+  nodes: [
+    { tempId: "t1", typeId: "start", label: "M&A Announced", config: {}, positionX: 100, positionY: 200, metadata: {} },
+    { tempId: "t2", typeId: "human-task", label: "Collect Entity Data", config: { assignee: "ma-lead@company.com", title: "Gather Target Company Information" }, positionX: 300, positionY: 200, metadata: {} },
+    { tempId: "t3", typeId: "parallel-gateway", label: "Due Diligence Tracks", config: { mode: "all" }, positionX: 500, positionY: 200, metadata: {} },
+    { tempId: "t4", typeId: "human-task", label: "Financial Audit", config: { assignee: "finance-audit@company.com", title: "Review Financial Statements" }, positionX: 700, positionY: 80, metadata: {} },
+    { tempId: "t5", typeId: "human-task", label: "IT Systems Audit", config: { assignee: "it-audit@company.com", title: "Assess IT Infrastructure" }, positionX: 700, positionY: 180, metadata: {} },
+    { tempId: "t6", typeId: "human-task", label: "Compliance Review", config: { assignee: "compliance@company.com", title: "Regulatory Compliance Check" }, positionX: 700, positionY: 280, metadata: {} },
+    { tempId: "t7", typeId: "human-task", label: "HR & Culture", config: { assignee: "hr@company.com", title: "Organizational Assessment" }, positionX: 700, positionY: 380, metadata: {} },
+    { tempId: "t8", typeId: "parallel-gateway", label: "Consolidate Findings", config: { mode: "all" }, positionX: 900, positionY: 200, metadata: {} },
+    { tempId: "t9", typeId: "llm-task", label: "AI Risk Synthesis", config: { prompt: "Synthesize due diligence findings and identify integration risks" }, positionX: 1100, positionY: 200, metadata: {} },
+    { tempId: "t10", typeId: "data-transform", label: "Generate Risk Matrix", config: { transformation: "risk-matrix" }, positionX: 1300, positionY: 200, metadata: {} },
+    { tempId: "t11", typeId: "approval", label: "CAE Sign-off", config: { approvers: ["cae@company.com"], requiredApprovals: 1 }, positionX: 1500, positionY: 200, metadata: {} },
+    { tempId: "t12", typeId: "email-notification", label: "Board Report", config: { to: ["board@company.com", "audit-committee@company.com"], subject: "M&A Integration Audit Complete" }, positionX: 1700, positionY: 200, metadata: {} },
+    { tempId: "t13", typeId: "schedule-trigger", label: "30-Day Follow-up", config: { delay: "30d" }, positionX: 1900, positionY: 200, metadata: {} },
+    { tempId: "t14", typeId: "human-task", label: "Integration Progress Check", config: { assignee: "ma-lead@company.com" }, positionX: 2100, positionY: 200, metadata: {} },
+    { tempId: "t15", typeId: "end", label: "End", config: {}, positionX: 2300, positionY: 200, metadata: {} },
+  ],
+  edges: [
+    { sourceTempId: "t1", targetTempId: "t2", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t2", targetTempId: "t3", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t3", targetTempId: "t4", sourceHandle: "branch-1", targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t3", targetTempId: "t5", sourceHandle: "branch-2", targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t3", targetTempId: "t6", sourceHandle: "branch-3", targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t3", targetTempId: "t7", sourceHandle: "branch-4", targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t4", targetTempId: "t8", sourceHandle: null, targetHandle: "join-1", label: null, condition: null, metadata: {} },
+    { sourceTempId: "t5", targetTempId: "t8", sourceHandle: null, targetHandle: "join-2", label: null, condition: null, metadata: {} },
+    { sourceTempId: "t6", targetTempId: "t8", sourceHandle: null, targetHandle: "join-3", label: null, condition: null, metadata: {} },
+    { sourceTempId: "t7", targetTempId: "t8", sourceHandle: null, targetHandle: "join-4", label: null, condition: null, metadata: {} },
+    { sourceTempId: "t8", targetTempId: "t9", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t9", targetTempId: "t10", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t10", targetTempId: "t11", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t11", targetTempId: "t12", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t12", targetTempId: "t13", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t13", targetTempId: "t14", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+    { sourceTempId: "t14", targetTempId: "t15", sourceHandle: null, targetHandle: null, label: null, condition: null, metadata: {} },
+  ],
+};
+
+/**
  * All workflow templates indexed by key
  */
 export const workflowTemplates: Record<string, WorkflowTemplate> = {
@@ -486,6 +586,8 @@ export const workflowTemplates: Record<string, WorkflowTemplate> = {
   "audit-preparation": auditPreparationWorkflow,
   "change-management": changeManagementWorkflow,
   "compliance-training": complianceTrainingWorkflow,
+  "tariff-mitigation": tariffMitigationWorkflow,
+  "ma-audit": maAuditWorkflow,
 };
 
 /**

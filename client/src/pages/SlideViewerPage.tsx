@@ -245,45 +245,71 @@ export default function SlideViewerPage() {
         </div>
       </header>
 
-      <div className="flex-1 flex items-center justify-center p-8 relative">
-        <Button
-          size="icon"
-          variant="ghost"
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl disabled:opacity-30"
-          onClick={handlePrevSlide}
-          disabled={currentSlide === 0}
-          data-testid="button-prev-slide"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </Button>
+      <div className="flex-1 flex overflow-hidden">
+        <aside className="w-48 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 overflow-y-auto p-3 space-y-2">
+          {deck.slides.map((s, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              className={`w-full aspect-[16/9] rounded-lg border-2 transition-all overflow-hidden ${
+                idx === currentSlide 
+                  ? "border-[#266C92] ring-2 ring-[#266C92]/30" 
+                  : "border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500"
+              }`}
+              data-testid={`thumbnail-${idx}`}
+            >
+              <div className="w-full h-full bg-slate-50 dark:bg-slate-700 p-2 flex flex-col items-center justify-center text-center">
+                <span className="text-[8px] font-medium text-slate-500 dark:text-slate-400 mb-1">
+                  Slide {idx + 1}
+                </span>
+                <span className="text-[7px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-tight">
+                  {s.title}
+                </span>
+              </div>
+            </button>
+          ))}
+        </aside>
 
-        <div 
-          className="w-full max-w-6xl aspect-[16/9] bg-white dark:bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700"
-          data-testid={`slide-${currentSlide}`}
-        >
-          <SlideContent slide={slide} />
+        <div className="flex-1 flex items-center justify-center p-8 relative">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl disabled:opacity-30"
+            onClick={handlePrevSlide}
+            disabled={currentSlide === 0}
+            data-testid="button-prev-slide"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+
+          <div 
+            className="w-full max-w-5xl aspect-[16/9] bg-white dark:bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700"
+            data-testid={`slide-${currentSlide}`}
+          >
+            <SlideContent slide={slide} />
+          </div>
+
+          <Button
+            size="icon"
+            variant="ghost"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl disabled:opacity-30"
+            onClick={handleNextSlide}
+            disabled={currentSlide === deck.slides.length - 1}
+            data-testid="button-next-slide"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </Button>
         </div>
-
-        <Button
-          size="icon"
-          variant="ghost"
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl disabled:opacity-30"
-          onClick={handleNextSlide}
-          disabled={currentSlide === deck.slides.length - 1}
-          data-testid="button-next-slide"
-        >
-          <ChevronRight className="w-6 h-6" />
-        </Button>
       </div>
 
-      <footer className="flex items-center justify-center gap-2 py-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+      <footer className="flex items-center justify-center gap-2 py-3 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
         {deck.slides.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setCurrentSlide(idx)}
-            className={`w-3 h-3 rounded-full transition-all ${
+            className={`w-2.5 h-2.5 rounded-full transition-all ${
               idx === currentSlide 
-                ? "bg-[#266C92] w-8" 
+                ? "bg-[#266C92] w-6" 
                 : "bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500"
             }`}
             data-testid={`slide-indicator-${idx}`}

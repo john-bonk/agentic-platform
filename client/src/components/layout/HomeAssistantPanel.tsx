@@ -128,9 +128,9 @@ const workspaceQuickActions: Record<string, QuickAction[]> = {
       color: "#ef4444",
     },
     {
-      id: "patch-status",
-      label: "Analyze Patch Compliance",
-      description: "Real-time analysis of Log4j remediation progress and compliance gaps",
+      id: "threat-detection",
+      label: "Run Threat Detection Scan",
+      description: "AI-powered analysis of potential attack vectors and intrusion indicators",
       icon: Shield,
       type: "analyze",
       color: "#10b981",
@@ -392,9 +392,24 @@ function InteractiveExperience({ type, workspaceId, onClose, onNavigate }: Inter
   );
 }
 
+interface BuildingReportState {
+  active: boolean;
+  deckKey: string;
+  step: number;
+}
+
+const reportBuildSteps = [
+  { label: "Querying data sources...", duration: 800 },
+  { label: "Analyzing metrics and KPIs...", duration: 1000 },
+  { label: "Generating visualizations...", duration: 900 },
+  { label: "Compiling executive summary...", duration: 1100 },
+  { label: "Finalizing presentation...", duration: 700 },
+];
+
 export function HomeAssistantPanel() {
   const [inputValue, setInputValue] = useState("");
   const [activeExperience, setActiveExperience] = useState<string | null>(null);
+  const [buildingReport, setBuildingReport] = useState<BuildingReportState | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
   
@@ -415,6 +430,15 @@ export function HomeAssistantPanel() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (buildingReport?.active && buildingReport.step < reportBuildSteps.length) {
+      const timer = setTimeout(() => {
+        setBuildingReport(prev => prev ? { ...prev, step: prev.step + 1 } : null);
+      }, reportBuildSteps[buildingReport.step].duration);
+      return () => clearTimeout(timer);
+    }
+  }, [buildingReport]);
 
   const quickActions = workspaceQuickActions[currentWorkspace.id] || workspaceQuickActions["enterprise-risk"];
 
@@ -483,6 +507,7 @@ export function HomeAssistantPanel() {
         const res = await apiRequest("POST", "/api/workflows", {
           name: action.label.replace("Create ", ""),
           description: action.description,
+          templateId: action.workflowTemplate,
         });
         const workflow = await res.json();
         setOpen(false);
@@ -498,8 +523,7 @@ export function HomeAssistantPanel() {
         : action.id.includes("audit-committee") ? "audit-committee-report"
         : action.id.includes("compliance") ? "compliance-report"
         : "board-report";
-      setOpen(false);
-      setLocation(`/reporting/view/${deckKey}`);
+      setBuildingReport({ active: true, deckKey, step: 0 });
     } else if (action.type === "analyze" || action.type === "create") {
       setActiveExperience(action.type);
     }
@@ -553,7 +577,7 @@ export function HomeAssistantPanel() {
         </div>
         
         <ScrollArea className="flex-1 p-4">
-          {messages.length === 0 && !activeExperience && (
+          {messages.length === 0 && !activeExperience && !buildingReport && (
             <div className="space-y-4">
               <div className="text-center py-4">
                 <div className="w-12 h-12 rounded-full bg-[#266C92]/10 flex items-center justify-center mx-auto mb-3">
@@ -588,6 +612,77 @@ export function HomeAssistantPanel() {
                 setLocation(route);
               }}
             />
+          )}
+
+          {buildingReport && (
+            <div className="bg-slate-50 rounded-lg p-4 space-y-4" data-testid="building-report-block">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#266C92]/10 flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-[#266C92]" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900">Building Report</h4>
+                  <p className="text-xs text-gray-500">Generating presentation slides...</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {reportBuildSteps.map((step, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`flex items-center gap-2 text-sm transition-all duration-300 ${
+                      idx < buildingReport.step 
+                        ? "text-green-600" 
+                        : idx === buildingReport.step 
+                          ? "text-[#266C92]" 
+                          : "text-gray-400"
+                    }`}
+                  >
+                    {idx < buildingReport.step ? (
+                      <CheckCircle2 className="w-4 h-4" />
+                    ) : idx === buildingReport.step ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <div className="w-4 h-4 rounded-full border-2 border-gray-300" />
+                    )}
+                    <span>{step.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              {buildingReport.step >= reportBuildSteps.length && (
+                <div className="bg-white p-3 rounded-lg border border-green-200">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-gray-700">Report generated successfully. Your presentation is ready to view.</p>
+                      <div className="flex gap-2 mt-3">
+                        <Button 
+                          size="sm" 
+                          className="bg-[#266C92] hover:bg-[#1e5a7a]"
+                          onClick={() => {
+                            setOpen(false);
+                            setLocation(`/reporting/view/${buildingReport.deckKey}`);
+                            setBuildingReport(null);
+                          }}
+                          data-testid="button-open-report"
+                        >
+                          Open Report
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => setBuildingReport(null)}
+                          data-testid="button-close-building"
+                        >
+                          Close
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
           
           {messages.map((message) => (

@@ -116,7 +116,6 @@ export const modules: ModuleConfig[] = [
         title: "Reports",
         items: [
           { id: "reporting-overview", label: "Report Library", path: "/reporting" },
-          { id: "patch-status", label: "Patch Status", path: "/reporting/patch-status" },
         ],
       },
       {
