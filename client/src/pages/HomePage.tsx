@@ -298,9 +298,9 @@ export default function HomePage() {
   return (
     <AppLayout showHeader={true} showSideNav={true}>
       <div className="flex flex-col h-full overflow-y-auto" key={refreshKey}>
-        {/* Hero Header with Background Image */}
+        {/* Hero Header with Background Image - extends behind the assistant card */}
         <div 
-          className="text-white px-8 py-6 bg-cover bg-center bg-no-repeat relative"
+          className="text-white px-8 pt-6 pb-32 bg-cover bg-center bg-no-repeat relative"
           style={{ backgroundImage: `url(${headerBgImage})` }}
         >
           <div className="max-w-6xl relative z-10">
@@ -314,12 +314,12 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 bg-slate-50 px-8 py-6">
+        {/* Main Content - negative margin to overlap the header */}
+        <div className="flex-1 bg-slate-50 px-8 py-6 -mt-24">
           <div className="max-w-6xl space-y-6">
             
             {/* What would you like to do? Card */}
-            <Card className="shadow-sm border border-slate-200" data-testid="assistant-card">
+            <Card className="shadow-sm border border-slate-200 bg-white" data-testid="assistant-card">
               <CardContent className="p-6">
                 <h2 className="text-lg font-semibold text-gray-900 text-center mb-4">
                   What would you like to do?
