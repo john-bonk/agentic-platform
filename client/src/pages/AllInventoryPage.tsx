@@ -241,44 +241,21 @@ export default function AllInventoryPage() {
     { id: "e-dairy-safety", source: "product-lines", sourceHandle: "source-dairy-products", target: "teams", targetHandle: "target-food-safety", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
     { id: "e-meat-ops", source: "product-lines", sourceHandle: "source-meat-processing", target: "teams", targetHandle: "target-operations", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
     { id: "e-pack-corp", source: "product-lines", sourceHandle: "source-packaged-goods", target: "teams", targetHandle: "target-corporate", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-cereal-sourcing", source: "product-lines", sourceHandle: "source-cereals-grains", target: "teams", targetHandle: "target-sourcing-supply", type: "smoothstep", style: { stroke: PURPLE, strokeWidth: 1.5 }, animated: false },
-    { id: "e-organic-sustain", source: "product-lines", sourceHandle: "source-organic-vegetables", target: "teams", targetHandle: "target-sustainability", type: "smoothstep", style: { stroke: PURPLE, strokeWidth: 1.5 }, animated: false },
+    { id: "e-cereal-sourcing", source: "product-lines", sourceHandle: "source-cereals-grains", target: "teams", targetHandle: "target-sourcing-supply", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
+    { id: "e-organic-sustain", source: "product-lines", sourceHandle: "source-organic-vegetables", target: "teams", targetHandle: "target-sustainability", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
     { id: "e-algae-sustain", source: "product-lines", sourceHandle: "source-algae-proteins", target: "teams", targetHandle: "target-sustainability", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
     { id: "e-hydro-safety", source: "product-lines", sourceHandle: "source-hydro-microgreens", target: "teams", targetHandle: "target-food-safety", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
     { id: "e-seafood-ops", source: "product-lines", sourceHandle: "source-seafood-alternatives", target: "teams", targetHandle: "target-operations", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
     
-    // Teams → Product Lines (reverse: each team maps back to its product lines)
-    { id: "e-rev-sourcing-bev", source: "teams", sourceHandle: "source-sourcing-supply", target: "product-lines", targetHandle: "target-beverages", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-sourcing-cereal", source: "teams", sourceHandle: "source-sourcing-supply", target: "product-lines", targetHandle: "target-cereals-grains", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-sustain-plant", source: "teams", sourceHandle: "source-sustainability", target: "product-lines", targetHandle: "target-plant-based-proteins", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-sustain-organic", source: "teams", sourceHandle: "source-sustainability", target: "product-lines", targetHandle: "target-organic-vegetables", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-sustain-algae", source: "teams", sourceHandle: "source-sustainability", target: "product-lines", targetHandle: "target-algae-proteins", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-rev-safety-dairy", source: "teams", sourceHandle: "source-food-safety", target: "product-lines", targetHandle: "target-dairy-products", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-safety-hydro", source: "teams", sourceHandle: "source-food-safety", target: "product-lines", targetHandle: "target-hydro-microgreens", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-rev-dist-frozen", source: "teams", sourceHandle: "source-distribution", target: "product-lines", targetHandle: "target-frozen-foods", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-ops-meat", source: "teams", sourceHandle: "source-operations", target: "product-lines", targetHandle: "target-meat-processing", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-ops-seafood", source: "teams", sourceHandle: "source-operations", target: "product-lines", targetHandle: "target-seafood-alternatives", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-rev-corp-pack", source: "teams", sourceHandle: "source-corporate", target: "product-lines", targetHandle: "target-packaged-goods", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    
-    // Teams → IT Systems (forward: each team maps to specific IT systems)
+    // Teams → IT Systems (forward only - no reverse edges)
     { id: "e-sourcing-sap", source: "teams", sourceHandle: "source-sourcing-supply", target: "it-systems", targetHandle: "target-sap", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
     { id: "e-sustain-oracle", source: "teams", sourceHandle: "source-sustainability", target: "it-systems", targetHandle: "target-oracle-fusion", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
     { id: "e-safety-firebase", source: "teams", sourceHandle: "source-food-safety", target: "it-systems", targetHandle: "target-firebase", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
     { id: "e-dist-salesforce", source: "teams", sourceHandle: "source-distribution", target: "it-systems", targetHandle: "target-salesforce", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
     { id: "e-ops-azure", source: "teams", sourceHandle: "source-operations", target: "it-systems", targetHandle: "target-azure-sql", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
     { id: "e-corp-bpc", source: "teams", sourceHandle: "source-corporate", target: "it-systems", targetHandle: "target-bpc", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-sustain-tableau", source: "teams", sourceHandle: "source-sustainability", target: "it-systems", targetHandle: "target-jd-tableau", type: "smoothstep", style: { stroke: PURPLE, strokeWidth: 1.5 }, animated: false },
-    { id: "e-ops-zapier", source: "teams", sourceHandle: "source-operations", target: "it-systems", targetHandle: "target-zapier", type: "smoothstep", style: { stroke: PURPLE, strokeWidth: 1.5 }, animated: false },
-    
-    // IT Systems → Teams (reverse: each IT system maps back to its teams)
-    { id: "e-rev-sap-sourcing", source: "it-systems", sourceHandle: "source-sap", target: "teams", targetHandle: "target-sourcing-supply", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-oracle-sustain", source: "it-systems", sourceHandle: "source-oracle-fusion", target: "teams", targetHandle: "target-sustainability", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-rev-salesforce-dist", source: "it-systems", sourceHandle: "source-salesforce", target: "teams", targetHandle: "target-distribution", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-azure-ops", source: "it-systems", sourceHandle: "source-azure-sql", target: "teams", targetHandle: "target-operations", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-bpc-corp", source: "it-systems", sourceHandle: "source-bpc", target: "teams", targetHandle: "target-corporate", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-firebase-safety", source: "it-systems", sourceHandle: "source-firebase", target: "teams", targetHandle: "target-food-safety", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-rev-tableau-sustain", source: "it-systems", sourceHandle: "source-jd-tableau", target: "teams", targetHandle: "target-sustainability", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
-    { id: "e-rev-zapier-ops", source: "it-systems", sourceHandle: "source-zapier", target: "teams", targetHandle: "target-operations", type: "smoothstep", style: { stroke: MAGENTA, strokeWidth: 1.5 }, animated: false },
+    { id: "e-sustain-tableau", source: "teams", sourceHandle: "source-sustainability", target: "it-systems", targetHandle: "target-jd-tableau", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
+    { id: "e-ops-zapier", source: "teams", sourceHandle: "source-operations", target: "it-systems", targetHandle: "target-zapier", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
   ];
 
   const [nodes, setNodes, onNodesChange] = useNodesState(inventoryNodes);
