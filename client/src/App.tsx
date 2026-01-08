@@ -38,6 +38,7 @@ import {
   OrgImpactPage,
   CoverageMappingPage,
   AllInventoryPage,
+  GlobalResidualRiskPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -89,6 +90,9 @@ function Router() {
       {/* Intelligence Hub Sub-Routes */}
       <Route path="/intelligence/vendor-exposure" component={VendorExposurePage} />
       <Route path="/intelligence/org-impact" component={OrgImpactPage} />
+      
+      {/* CRO Workspace Routes */}
+      <Route path="/cro/global-residual-risk" component={GlobalResidualRiskPage} />
       
       {/* 404 - Must be last */}
       <Route component={NotFound} />

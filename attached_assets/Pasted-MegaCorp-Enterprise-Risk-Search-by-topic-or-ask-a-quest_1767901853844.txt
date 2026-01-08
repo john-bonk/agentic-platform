@@ -1,0 +1,646 @@
+MegaCorp
+/
+Enterprise Risk
+Search by topic or ask a question
+ 
+⌘ + K
+JB
+MegaCorp
+/
+Corporate Risk
+Search by topic or ask a question
+ 
+⌘ + K
+JB
+MegaCorp
+/
+Corporate Risk
+Search by topic or ask a question
+ 
+⌘ + K
+JB
+My Dashboard
+Tariff Event
+Total Exposure
+Regional Impact
+Products at Risk
+Scenario Plan
+Residual Risk
+My Dashboard
+Tariff Event
+Total Exposure
+Regional Impact
+Products at Risk
+Scenario Plan
+Residual Risk
+My Dashboard
+Tariff Event
+Total Exposure
+Regional Impact
+Products at Risk
+Scenario Plan
+Residual Risk
+Button
+Dashboards
+Button
+Dashboards
+Button
+Dashboards
+Button
+My Dashboard
+Global Residual Risk
+Create Issue
+Create Issue
+Create Issue
+Button
+My Dashboard
+Global Residual Risk
+Create Issue
+Create Issue
+Create Issue
+Button
+My Dashboard
+Global Residual Risk
+Create Issue
+Create Issue
+Create Issue
+Overview: Tariff Event
+Overview: Tariff Event
+Overview: Tariff Event
+ABC Tech LLC
+Button
+Total Exposure
+Button
+Total Exposure
+Button
+Total Exposure
+Dallas TX
+Button
+Regional Impact
+Top Risks & Mitigation Plans
+North America
+Manage Inventory
+Button
+Regional Impact
+Top Risks & Mitigation Plans
+North America
+Manage Inventory
+Button
+Regional Impact
+Top Risks & Mitigation Plans
+North America
+TARIFF RISK
+85
+Manage Inventory
+$1.8M
+Critical
+Products at Risk
+Products at Risk
+Products at Risk
+Global Residual Risk
+CRITICAL
+US Tariffs Enacted
+$10M
+85
+ABC Tech LLC
+XYZ Corp
+Supply Co
+Global Residual Risk
+CRITICAL
+US Tariffs Enacted
+$10M
+85
+ABC Tech LLC
+XYZ Corp
+Supply Co
+Global Residual Risk
+CRITICAL
+US Tariffs Enacted
+$10M
+85
+ABC Tech LLC
+TARIFF RATE
+XYZ Corp
+ANNUAL VOLUME
+Supply Co
+Supply chain diversification to ASEAN region underway
+Risk Score
+Chicago IL
+Supply chain diversification to ASEAN region underway
+Risk Score
+Chicago IL
+Supply chain diversification to ASEAN region underway
+Risk Score
+25%
+Chicago IL
+24,000 units
+Dallas TX
+$2.1M
+Dallas TX
+$2.1M
+Dallas TX
+$2.1M
+Risk management
+$1.8M
+$1.1M
+$0.8M
+$0.9M
+Risk management
+$1.8M
+$1.1M
+$0.8M
+$0.9M
+Risk management
+$1.8M
+IMPORT COUNTRIES
+$1.1M
+$0.8M
+$0.9M
+Organization Overview
+TIMELINE
+EU Regulatory Changes
+OWNER
+MITIGATION STATUS
+$6.2M
+68
+Organization Overview
+TIMELINE
+OWNER
+MITIGATION STATUS
+Organization Overview
+TIMELINE
+OWNER
+MITIGATION STATUS
+China
+Vietnam
+Taiwan
+Q2 2025
+HIGH
+Assign Owner
+NOT STARTED
+Q2 2025
+Assign Owner
+NOT STARTED
+Q2 2025
+Assign Owner
+NOT STARTED
+Scenario Planning
+Legal entity restructuring and compliance review in progress
+Risk Score
+Phoenix AZ
+Atlanta GA
+American Logistics
+Scenario Planning
+Phoenix AZ
+Atlanta GA
+American Logistics
+Scenario Planning
+Phoenix AZ
+AFFECTED PRODUCT LINES
+Atlanta GA
+American Logistics
+RECOMMENDED MITIGATIONS
+$1.4M
+$1.7M
+RECOMMENDED MITIGATIONS
+$1.4M
+$1.7M
+RECOMMENDED MITIGATIONS
+$1.4M
+$1.7M
+Risk Calculation
+Risk Calculation
+Risk Calculation
+Semiconductor Components
+Control Activity
+Establish supplier diversification to ASEAN region (Vietnam, Thailand, Malaysia)
+Restructure Dallas, Chicago, and Los Angeles facility operations
+Negotiate tariff exemptions for critical component imports
+Memphis TN
+Control Activity
+Establish supplier diversification to ASEAN region (Vietnam, Thailand, Malaysia)
+Restructure Dallas, Chicago, and Los Angeles facility operations
+Negotiate tariff exemptions for critical component imports
+Memphis TN
+Control Activity
+Establish supplier diversification to ASEAN region (Vietnam, Thailand, Malaysia)
+Restructure Dallas, Chicago, and Los Angeles facility operations
+Negotiate tariff exemptions for critical component imports
+Electronic Assemblies
+Memphis TN
+MEDIUM
+Currency Fluctuation Risk
+$3.8M
+47
+$1.3M
+$1.1M
+$0.9M
+$1.3M
+$1.1M
+$0.9M
+Industrial IoT Devices
+$1.3M
+$1.1M
+$0.9M
+Control Certification
+Seattle WA
+Houston TX
+Detroit MI
+Control Certification
+Seattle WA
+Houston TX
+Detroit MI
+Control Certification
+Seattle WA
+Houston TX
+Detroit MI
+Hedging strategy implementation across major currencies
+Risk Score
+$1.0M
+$0.9M
+$1.4M
+$1.1M
+$1.0M
+$0.9M
+$1.4M
+$1.1M
+$1.0M
+$0.9M
+RECOMMENDED MITIGATIONS
+$1.4M
+$1.1M
+KRI Dashboard
+KRI Dashboard
+KRI Dashboard
+Source semiconductors from Malaysia and Thailand suppliers
+Inventory Dashboard
+Midwest Trading
+Inventory Dashboard
+Midwest Trading
+Inventory Dashboard
+Midwest Trading
+$1M
+Global Trade Inc
+$1M
+Global Trade Inc
+$1M
+Global Trade Inc
+Negotiate duty drawback on re-exported finished goods
+COST OF MITIGATION
+HIGH
+Supplier Concentration
+$5.1M
+72
+from Compliance with FSMA
+Minneapolis MN
+COST OF MITIGATION
+from Compliance with FSMA
+Minneapolis MN
+COST OF MITIGATION
+from Compliance with FSMA
+Apply for Section 301 tariff exclusions for critical components
+Minneapolis MN
+Risk Environment 
+Dual-sourcing initiative for critical components initiated
+Risk Score
+Los Angeles CA
+Miami FL
+San Diego CA
+$0.8M
+$1.1M
+$0.9M
+$0.8M
+Risk Environment 
+Los Angeles CA
+Miami FL
+San Diego CA
+$0.8M
+$1.1M
+$0.9M
+$0.8M
+Risk Environment 
+Los Angeles CA
+Miami FL
+San Diego CA
+$0.8M
+$1.1M
+$0.9M
+$0.8M
+Projected Impact with $1M Investment
+-$8.5M
+$1.2M
+$0.9M
+$1.1M
+Projected Impact with $1M Investment
+-$8.5M
+$1.2M
+$0.9M
+$1.1M
+Projected Impact with $1M Investment
+-$8.5M
+$1.2M
+$0.9M
+$1.1M
+Risk Control Matrix
+Reduces net tariff exposure from $10M to $1.5M by Q3 2025
+Risk Control Matrix
+Reduces net tariff exposure from $10M to $1.5M by Q3 2025
+Risk Control Matrix
+Reduces net tariff exposure from $10M to $1.5M by Q3 2025
+Controls
+Controls
+Controls
+Risks
+Strategic Objectives
+EMEA
+Risks
+EMEA
+Risks
+EMEA
+Risks Assessments
+Risks Assessments
+EU Regulatory Changes
+$6.2M
+68
+Risks Assessments
+EU Regulatory Changes
+$6.2M
+68
+Issues
+Issues
+HIGH
+Issues
+HIGH
+1
+Expand into advanced farming
+EU Holdings GmbH
+Continental Trading
+Nordic Imports
+Legal entity restructuring and compliance review in progress
+Risk Score
+EU Holdings GmbH
+Continental Trading
+Nordic Imports
+Legal entity restructuring and compliance review in progress
+Risk Score
+EU Holdings GmbH
+Continental Trading
+Nordic Imports
+Key Risk Indicators
+Target: Q3 2025 | Owner: Innovation & Growth
+Key Risk Indicators
+Key Risk Indicators
+Risk Event Mitigation
+INITIATIVE
+COST
+Berlin
+Stockholm
+Oslo
+Risk Event Mitigation
+Berlin
+Stockholm
+Oslo
+Risk Event Mitigation
+Berlin
+Stockholm
+Oslo
+$1.4M
+Paris
+$1.0M
+$0.8M
+MEDIUM
+Currency Fluctuation Risk
+$3.8M
+47
+$1.4M
+Paris
+$1.0M
+$0.8M
+MEDIUM
+Currency Fluctuation Risk
+$3.8M
+47
+$1.4M
+Paris
+$1.0M
+$0.8M
+$1.6M
+$1.6M
+$1.6M
+Button
+Vertical farming pilot program
+$1.4M
+Button
+Hedging strategy implementation across major currencies
+Risk Score
+Button
+Hedging strategy implementation across major currencies
+Risk Score
+Button
+Precision agriculture technology
+$890K
+Munich
+Western Supply
+Button
+Munich
+Western Supply
+Button
+Munich
+Western Supply
+$1.1M
+72
+$1.1M
+72
+$1.1M
+Sustainable farming partnerships
+$520K
+Lyon
+Amsterdam
+HIGH
+Supplier Concentration
+$5.1M
+Lyon
+Amsterdam
+HIGH
+Supplier Concentration
+$5.1M
+Lyon
+Amsterdam
+Button
+Hamburg
+$1.2M
+$0.9M
+$0.5M
+Button
+Dual-sourcing initiative for critical components initiated
+Risk Score
+Hamburg
+$1.2M
+$0.9M
+$0.5M
+Button
+Dual-sourcing initiative for critical components initiated
+Risk Score
+Hamburg
+$1.2M
+$0.9M
+$0.5M
+$0.7M
+$0.7M
+$0.7M
+2
+Compliance with FSMA
+Target: Q2 2025 | Owner: Quality & Regulatory
+Strategic Objectives
+Strategic Objectives
+INITIATIVE
+COST
+Asia-Pacific
+Asia-Pacific
+Asia-Pacific
+Food safety modernization audit
+$340K
+1
+Expand into advanced farming
+1
+Expand into advanced farming
+Target: Q3 2025 | Owner: Innovation & Growth
+Target: Q3 2025 | Owner: Innovation & Growth
+Preventive controls implementation
+$580K
+APAC Holdings Ltd
+Pacific Trade Corp
+Southeast Imports
+APAC Holdings Ltd
+Pacific Trade Corp
+Southeast Imports
+APAC Holdings Ltd
+Pacific Trade Corp
+Southeast Imports
+INITIATIVE
+COST
+INITIATIVE
+COST
+Supplier verification program
+$420K
+Tokyo
+Singapore
+Vertical farming pilot program
+$1.4M
+Tokyo
+Singapore
+Vertical farming pilot program
+$1.4M
+Tokyo
+Singapore
+Shanghai
+Beijing
+$1.5M
+$1.3M
+$0.9M
+Shanghai
+Beijing
+$1.5M
+$1.3M
+$0.9M
+Shanghai
+Beijing
+$1.5M
+$1.3M
+$0.9M
+Increase Nutrition of Top Product Lines
+$2.2M
+$1.8M
+Precision agriculture technology
+$890K
+$2.2M
+$1.8M
+Precision agriculture technology
+$890K
+$2.2M
+$1.8M
+3
+Target: Q4 2025 | Owner: Product Development
+Sustainable farming partnerships
+$520K
+Sustainable farming partnerships
+$520K
+Oceania Supply
+Oceania Supply
+Oceania Supply
+INITIATIVE
+COST
+Osaka
+Osaka
+Osaka
+Guangzhou
+$1.1M
+Sydney
+$0.6M
+2
+Compliance with FSMA
+Guangzhou
+$1.1M
+Sydney
+$0.6M
+2
+Compliance with FSMA
+Guangzhou
+$1.1M
+Sydney
+$0.6M
+Reformulation R&D for flagship products
+$730K
+$1.4M
+$0.8M
+Target: Q2 2025 | Owner: Quality & Regulatory
+$1.4M
+$0.8M
+Target: Q2 2025 | Owner: Quality & Regulatory
+$1.4M
+$0.8M
+Fortification ingredient sourcing
+$290K
+INITIATIVE
+COST
+INITIATIVE
+COST
+Consumer testing & validation
+$180K
+Food safety modernization audit
+$340K
+Food safety modernization audit
+$340K
+Risk Level
+Risk Level
+Risk Level
+Preventive controls implementation
+$580K
+Preventive controls implementation
+$580K
+Supplier verification program
+$420K
+Supplier verification program
+$420K
+3
+Increase Nutrition of Top Product Lines
+3
+Increase Nutrition of Top Product Lines
+Target: Q4 2025 | Owner: Product Development
+Target: Q4 2025 | Owner: Product Development
+INITIATIVE
+COST
+INITIATIVE
+COST
+Reformulation R&D for flagship products
+$730K
+Reformulation R&D for flagship products
+$730K
+Fortification ingredient sourcing
+$290K
+Fortification ingredient sourcing
+$290K
+Consumer testing & validation
+$180K
+Consumer testing & validation
+$180K

@@ -7,7 +7,7 @@
 
 export type IconNavItem = 
   | { type: "image"; src: string; alt: string; active: boolean; path?: string; modulePrefix?: string }
-  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity" | "bar-chart-3"; alt: string; active: boolean; path?: string; modulePrefix?: string };
+  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity" | "bar-chart-3" | "shield"; alt: string; active: boolean; path?: string; modulePrefix?: string };
 
 export interface SideNavSection {
   title: string;
@@ -135,6 +135,33 @@ export const modules: ModuleConfig[] = [
       },
     ],
   },
+  {
+    id: "cro",
+    name: "CRO Workspace",
+    icon: { type: "lucide", icon: "shield", alt: "CRO Workspace", active: false, path: "/cro/global-residual-risk", modulePrefix: "/cro" },
+    sideNavSections: [
+      {
+        title: "Risk Management",
+        items: [
+          { id: "global-residual-risk", label: "Global Residual Risk", path: "/cro/global-residual-risk" },
+        ],
+      },
+      {
+        title: "Analytics",
+        items: [
+          { id: "risk-heatmap", label: "Risk Heatmap", path: "/cro/risk-heatmap" },
+          { id: "mitigation-tracker", label: "Mitigation Tracker", path: "/cro/mitigation-tracker" },
+        ],
+      },
+      {
+        title: "Reports",
+        items: [
+          { id: "board-deck", label: "Board Deck", path: "/cro/board-deck" },
+          { id: "quarterly-review", label: "Quarterly Review", path: "/cro/quarterly-review" },
+        ],
+      },
+    ],
+  },
 ];
 
 /**
@@ -164,6 +191,10 @@ export function getModuleFromPath(path: string): ModuleConfig {
   // Reporting module
   if (path.startsWith("/reporting")) {
     return modules[3];
+  }
+  // CRO Workspace module
+  if (path.startsWith("/cro")) {
+    return modules[4];
   }
   // Default to Home
   return modules[0];
@@ -198,6 +229,11 @@ export function getActiveModuleIndex(path: string): number {
   // Reporting module
   if (path.startsWith("/reporting")) {
     return 3; // Reporting module
+  }
+  
+  // CRO Workspace module
+  if (path.startsWith("/cro")) {
+    return 4; // CRO Workspace module
   }
   
   // Check if path matches Home module paths

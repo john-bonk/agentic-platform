@@ -25,3 +25,4 @@ export { default as VendorExposurePage } from "./VendorExposurePage";
 export { default as OrgImpactPage } from "./OrgImpactPage";
 export { default as CoverageMappingPage } from "./CoverageMappingPage";
 export { default as AllInventoryPage } from "./AllInventoryPage";
+export { default as GlobalResidualRiskPage } from "./GlobalResidualRiskPage";
