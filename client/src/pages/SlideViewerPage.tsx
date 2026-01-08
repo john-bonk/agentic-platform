@@ -132,6 +132,71 @@ function SlideContent({ slide }: { slide: Slide }) {
   );
 }
 
+function MiniSlideContent({ slide }: { slide: Slide }) {
+  if (slide.type === "title") {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center px-2">
+        <h1 className="text-[6px] font-bold text-gray-900 dark:text-white leading-tight">{slide.title}</h1>
+        {slide.subtitle && (
+          <p className="text-[4px] text-gray-600 dark:text-gray-300 mt-0.5 line-clamp-2">{slide.subtitle}</p>
+        )}
+      </div>
+    );
+  }
+
+  if (slide.type === "metrics" && slide.metrics) {
+    return (
+      <div className="flex flex-col h-full p-1">
+        <h2 className="text-[5px] font-bold text-gray-900 dark:text-white mb-1 truncate">{slide.title}</h2>
+        <div className="grid grid-cols-2 gap-0.5 flex-1">
+          {slide.metrics.slice(0, 4).map((metric, idx) => (
+            <div 
+              key={idx}
+              className="flex flex-col items-center justify-center rounded bg-white dark:bg-slate-700 p-0.5"
+            >
+              <p className="text-[5px] font-bold text-[#266C92]">{metric.value}</p>
+              <p className="text-[3px] text-gray-500 dark:text-gray-400 truncate w-full text-center">{metric.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (slide.type === "bullets" && slide.bulletPoints) {
+    return (
+      <div className="flex flex-col h-full p-1">
+        <h2 className="text-[5px] font-bold text-gray-900 dark:text-white mb-1 truncate">{slide.title}</h2>
+        <ul className="space-y-0.5 flex-1">
+          {slide.bulletPoints.slice(0, 3).map((bullet: string, idx: number) => (
+            <li key={idx} className="flex items-start gap-0.5">
+              <div className="w-1 h-1 rounded-full bg-[#266C92] flex-shrink-0 mt-0.5" />
+              <span className="text-[3px] text-gray-700 dark:text-gray-300 line-clamp-1">{bullet}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  if (slide.type === "chart") {
+    return (
+      <div className="flex flex-col h-full p-1">
+        <h2 className="text-[5px] font-bold text-gray-900 dark:text-white mb-1 truncate">{slide.title}</h2>
+        <div className="flex-1 flex items-center justify-center">
+          <BarChart3 className="w-4 h-4 text-[#266C92]" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full p-1">
+      <h2 className="text-[5px] font-bold text-gray-900 dark:text-white text-center">{slide.title}</h2>
+    </div>
+  );
+}
+
 export default function SlideViewerPage() {
   const [, params] = useRoute("/reporting/view/:deckId");
   const [, artifactParams] = useRoute("/reporting/artifacts/:id");
@@ -258,13 +323,8 @@ export default function SlideViewerPage() {
               }`}
               data-testid={`thumbnail-${idx}`}
             >
-              <div className="w-full h-full bg-slate-50 dark:bg-slate-700 p-2 flex flex-col items-center justify-center text-center">
-                <span className="text-[8px] font-medium text-slate-500 dark:text-slate-400 mb-1">
-                  Slide {idx + 1}
-                </span>
-                <span className="text-[7px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-tight">
-                  {s.title}
-                </span>
+              <div className="w-full h-full bg-slate-50 dark:bg-slate-700">
+                <MiniSlideContent slide={s} />
               </div>
             </button>
           ))}

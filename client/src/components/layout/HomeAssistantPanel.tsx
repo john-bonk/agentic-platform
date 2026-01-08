@@ -40,12 +40,12 @@ interface QuickAction {
 const workspaceQuickActions: Record<string, QuickAction[]> = {
   "enterprise-risk": [
     {
-      id: "create-tariff-workflow",
-      label: "Create Tariff Impact Workflow",
-      description: "Build automated workflow to assess and mitigate tariff exposure across supply chain",
+      id: "open-tariff-workflow",
+      label: "Open Tariff Impact Workflow",
+      description: "View the tariff exposure assessment and mitigation workflow for supply chain risk",
       icon: Workflow,
-      type: "workflow",
-      workflowTemplate: "tariff-mitigation",
+      type: "navigate",
+      route: "/workflow/wf-tariff",
       color: "#266C92",
     },
     {
@@ -76,12 +76,12 @@ const workspaceQuickActions: Record<string, QuickAction[]> = {
   ],
   "enterprise-audit": [
     {
-      id: "create-ma-workflow",
-      label: "Create M&A Audit Workflow",
-      description: "Build workflow for Singapore vertical farming acquisition oversight",
+      id: "open-ma-workflow",
+      label: "Open M&A Audit Workflow",
+      description: "View the Singapore vertical farming acquisition oversight workflow",
       icon: Workflow,
-      type: "workflow",
-      workflowTemplate: "ma-audit",
+      type: "navigate",
+      route: "/workflow/wf-ma-audit",
       color: "#266C92",
     },
     {
@@ -111,12 +111,12 @@ const workspaceQuickActions: Record<string, QuickAction[]> = {
   ],
   "it-security": [
     {
-      id: "create-incident-workflow",
-      label: "Create Incident Response Workflow",
-      description: "Build automated Log4j vulnerability response and remediation workflow",
+      id: "open-incident-workflow",
+      label: "Open Incident Response Workflow",
+      description: "View the Log4j vulnerability response and remediation workflow",
       icon: Workflow,
-      type: "workflow",
-      workflowTemplate: "incident-response",
+      type: "navigate",
+      route: "/workflow/wf-incident",
       color: "#266C92",
     },
     {

@@ -8,6 +8,7 @@
  */
 
 import { useState, useRef, useEffect } from "react";
+import { useLocation } from "wouter";
 import {
   BellIcon,
   BotIcon,
@@ -77,6 +78,7 @@ const utilityIcons = [
 export function AppHeader({ className = "" }: AppHeaderProps) {
   const { currentWorkspace, setWorkspace } = useWorkspaceStore();
   const { toggleOpen: toggleAssistant } = useHomeAssistantStore();
+  const [, setLocation] = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -125,6 +127,8 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
 
   const handleWorkspaceChange = (workspace: Workspace) => {
     setWorkspace(workspace);
+    // Always navigate to Home when switching workspaces
+    setLocation("/");
   };
 
   const CurrentWorkspaceIcon = getWorkspaceIcon(currentWorkspace.id);
