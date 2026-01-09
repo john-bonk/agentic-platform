@@ -40,6 +40,7 @@ import {
   AllInventoryPage,
   GlobalResidualRiskPage,
   CAEResidualRiskPage,
+  CISOResidualRiskPage,
   GlobalResidualRiskRouter,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
@@ -100,8 +101,8 @@ function Router() {
       {/* CAE Workspace Routes */}
       <Route path="/cae/global-residual-risk" component={CAEResidualRiskPage} />
       
-      {/* CISO Workspace Routes - uses CRO page as placeholder until dedicated page exists */}
-      <Route path="/ciso/global-residual-risk" component={GlobalResidualRiskPage} />
+      {/* CISO Workspace Routes */}
+      <Route path="/ciso/global-residual-risk" component={CISOResidualRiskPage} />
       
       {/* 404 - Must be last */}
       <Route component={NotFound} />
