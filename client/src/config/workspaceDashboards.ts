@@ -12,8 +12,9 @@
  * 
  * 1. IN-FRAME (Primary): From the workspace Home side navigation
  *    - Route: /global-residual-risk (renders based on current workspace)
- *    - Keeps "Home" active in global nav
+ *    - Keeps "Home" active in global nav (NOT the Residual Risk module)
  *    - Uses workspaceStore.currentWorkspace to determine which view to render
+ *    - GlobalResidualRiskRouter delegates to the appropriate component
  * 
  * 2. DIRECT (Secondary): From the Residual Risk module in global nav
  *    - Routes: /cro/global-residual-risk, /cae/global-residual-risk, etc.
@@ -21,32 +22,60 @@
  *    - Provides explicit workspace-specific access
  * 
  * =============================================================================
- * HOW TO ADD A NEW WORKSPACE (e.g., CISO)
+ * CRITICAL NAVIGATION BEHAVIOR
  * =============================================================================
  * 
- * 1. Add entry to WORKSPACE_DASHBOARDS array below with:
- *    - id, persona, label, description
- *    - inFramePath: "/global-residual-risk" (always the same)
- *    - directPath: "/ciso/global-residual-risk" (workspace-specific)
+ * - /global-residual-risk → Home module stays active (in-frame rendering)
+ * - /cro/*, /cae/*, /ciso/* → Residual Risk module becomes active
  * 
- * 2. Create page component: client/src/pages/CISOResidualRiskPage.tsx
- *    - Copy from CAEResidualRiskPage.tsx as template
- *    - Update content/data for CISO use case
+ * This is enforced by:
+ * - homePaths array in navigation.ts includes "/global-residual-risk"
+ * - getModuleFromPath() and getActiveModuleIndex() check for /cro, /cae, /ciso
  * 
- * 3. Update client/src/pages/GlobalResidualRiskRouter.tsx:
- *    - Import the new page component
- *    - Add case for "CISO" in the switch statement
+ * =============================================================================
+ * HOW TO ADD A NEW WORKSPACE (CHECKLIST)
+ * =============================================================================
  * 
- * 4. Add direct route in client/src/App.tsx:
- *    - <Route path="/ciso/global-residual-risk" component={CISOResidualRiskPage} />
+ * Step 1: Add entry to WORKSPACE_DASHBOARDS array below (this file)
+ *   □ id: unique identifier (e.g., "ciso-dashboard")
+ *   □ persona: matches workspaceStore persona (e.g., "CISO")
+ *   □ label: display name (e.g., "CISO")
+ *   □ description: helpful description
+ *   □ componentName: page component name (e.g., "CISOResidualRiskPage")
+ *   □ inFramePath: "/global-residual-risk" (ALWAYS the same)
+ *   □ directPath: "/ciso/global-residual-risk" (workspace-specific)
  * 
- * 5. Update navigation.ts workspaceHomeNav:
- *    - Add "CISO" entry (copy from CAE, update path if needed)
+ * Step 2: Create page component
+ *   □ File: client/src/pages/{Persona}ResidualRiskPage.tsx
+ *   □ Copy from CAEResidualRiskPage.tsx as template
+ *   □ Export from client/src/pages/index.ts
  * 
- * 6. Update navigation.ts Residual Risk module sideNavSections:
- *    - Add { id: "ciso-dashboard", label: "CISO", path: "/ciso/global-residual-risk" }
+ * Step 3: Update GlobalResidualRiskRouter.tsx
+ *   □ Import the new page component
+ *   □ Add case for the persona in switch statement
  * 
- * That's it! The workspace store already has CISO defined.
+ * Step 4: Add direct route in App.tsx
+ *   □ <Route path="/{persona}/global-residual-risk" component={Page} />
+ * 
+ * Step 5: Update navigation.ts
+ *   □ getModuleFromPath(): Add path.startsWith("/{persona}") check
+ *   □ getActiveModuleIndex(): Add path.startsWith("/{persona}") check
+ *   □ Residual Risk sideNavSections: Add dashboard item
+ * 
+ * Step 6: Verify workspaceHomeNav has the persona's Home navigation
+ *   □ Should already point to "/global-residual-risk" (in-frame path)
+ * 
+ * =============================================================================
+ * TESTING CHECKLIST (after adding workspace)
+ * =============================================================================
+ * 
+ * □ Switch to new workspace via workspace selector
+ * □ Click "Global Residual Risk" in Home side nav → view loads, Home stays active
+ * □ Click Residual Risk module in global nav → dashboard list shows new workspace
+ * □ Click new workspace in Residual Risk module → view loads, Residual Risk active
+ * □ URL /global-residual-risk with new workspace selected → correct view renders
+ * □ URL /{persona}/global-residual-risk → Residual Risk module active
+ * 
  * =============================================================================
  */
 
@@ -55,14 +84,17 @@ export interface WorkspaceDashboard {
   persona: string;
   label: string;
   description: string;
+  componentName: string;
   inFramePath: string;
   directPath: string;
 }
 
 /**
- * All workspace dashboards
+ * All workspace dashboards - SINGLE SOURCE OF TRUTH
+ * 
  * The inFramePath is the same for all - renders based on workspace context
  * The directPath is workspace-specific for direct navigation
+ * The componentName documents which component renders this dashboard
  */
 export const WORKSPACE_DASHBOARDS: WorkspaceDashboard[] = [
   {
@@ -70,6 +102,7 @@ export const WORKSPACE_DASHBOARDS: WorkspaceDashboard[] = [
     persona: "CRO",
     label: "CRO",
     description: "Chief Risk Officer view - Tariff and supply chain risk focus",
+    componentName: "GlobalResidualRiskPage",
     inFramePath: "/global-residual-risk",
     directPath: "/cro/global-residual-risk",
   },
@@ -78,6 +111,7 @@ export const WORKSPACE_DASHBOARDS: WorkspaceDashboard[] = [
     persona: "CAE",
     label: "CAE",
     description: "Chief Audit Executive view - M&A audit and compliance focus",
+    componentName: "CAEResidualRiskPage",
     inFramePath: "/global-residual-risk",
     directPath: "/cae/global-residual-risk",
   },
@@ -86,6 +120,7 @@ export const WORKSPACE_DASHBOARDS: WorkspaceDashboard[] = [
     persona: "CISO",
     label: "CISO",
     description: "Chief Information Security Officer view - Cybersecurity risk focus",
+    componentName: "GlobalResidualRiskPage",
     inFramePath: "/global-residual-risk",
     directPath: "/ciso/global-residual-risk",
   },
@@ -111,7 +146,22 @@ export function getDashboardNavItems() {
 
 /**
  * Check if a path is a direct workspace path (for Residual Risk module)
+ * Used to determine if Residual Risk module should be active
  */
 export function isDirectWorkspacePath(path: string): boolean {
   return WORKSPACE_DASHBOARDS.some(d => path.startsWith(d.directPath));
 }
+
+/**
+ * Get all direct workspace path prefixes
+ * These are the prefixes that trigger the Residual Risk module
+ */
+export function getDirectPathPrefixes(): string[] {
+  return WORKSPACE_DASHBOARDS.map(d => `/${d.persona.toLowerCase()}`);
+}
+
+/**
+ * Get the in-frame path (same for all workspaces)
+ * This path keeps the Home module active
+ */
+export const IN_FRAME_PATH = "/global-residual-risk";
