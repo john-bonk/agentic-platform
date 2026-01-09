@@ -60,6 +60,26 @@ const companyColors = [
   { bg: "bg-[#c2e8f5]", text: "text-gray-800", locationBg: "bg-[#a0d4e8]" },
 ];
 
+// Red color scheme for high tariff risk (affected) tiles
+const affectedColors = [
+  { bg: "bg-red-600", text: "text-white", locationBg: "bg-red-700" },
+  { bg: "bg-red-500", text: "text-white", locationBg: "bg-red-600" },
+  { bg: "bg-red-400", text: "text-white", locationBg: "bg-red-500" },
+  { bg: "bg-red-300", text: "text-gray-800", locationBg: "bg-red-400" },
+  { bg: "bg-red-200", text: "text-gray-800", locationBg: "bg-red-300" },
+  { bg: "bg-red-100", text: "text-gray-800", locationBg: "bg-red-200" },
+];
+
+// Gray color scheme for non-affected tiles
+const inactiveColors = [
+  { bg: "bg-gray-400", text: "text-white", locationBg: "bg-gray-500" },
+  { bg: "bg-gray-300", text: "text-gray-700", locationBg: "bg-gray-400" },
+  { bg: "bg-gray-200", text: "text-gray-700", locationBg: "bg-gray-300" },
+  { bg: "bg-gray-200", text: "text-gray-600", locationBg: "bg-gray-300" },
+  { bg: "bg-gray-100", text: "text-gray-600", locationBg: "bg-gray-200" },
+  { bg: "bg-gray-100", text: "text-gray-500", locationBg: "bg-gray-200" },
+];
+
 function getSeverityColor(severity: string): string {
   switch (severity) {
     case "Critical": return "bg-red-500";
@@ -217,7 +237,18 @@ function TreemapCell({
   
   // Determine if this company/location should be highlighted based on tariff risk
   const isHighTariffRisk = company.tooltip && company.tooltip.tariffRisk >= 60;
-  const showTariffHighlight = highlightTariffs && isHighTariffRisk;
+  
+  // Select color scheme based on highlighting state
+  let activeColors;
+  if (highlightTariffs) {
+    // When tariff highlighting is active, use red for affected, gray for non-affected
+    activeColors = isHighTariffRisk 
+      ? affectedColors[colorIndex % affectedColors.length]
+      : inactiveColors[colorIndex % inactiveColors.length];
+  } else {
+    // Normal mode - use teal color scheme
+    activeColors = colors;
+  }
 
   // Calculate tooltip position based on available space
   const calculateTooltipPosition = () => {
@@ -288,9 +319,7 @@ function TreemapCell({
   return (
     <div 
       ref={cellRef}
-      className={`${colors.bg} ${colors.text} rounded-sm overflow-visible flex flex-col relative cursor-pointer ${
-        showTariffHighlight ? "ring-2 ring-red-500 ring-offset-1" : ""
-      }`}
+      className={`${activeColors.bg} ${activeColors.text} rounded-sm overflow-visible flex flex-col relative cursor-pointer transition-colors duration-200`}
       style={{ 
         flex: `${widthPercentage} 0 0`,
         minWidth: "80px"
@@ -312,7 +341,7 @@ function TreemapCell({
           {company.locations.map((location) => (
             <div 
               key={location.id}
-              className={`${colors.locationBg} rounded-sm p-1.5 flex-1 min-h-[36px] cursor-pointer transition-all hover:opacity-90 ${
+              className={`${activeColors.locationBg} rounded-sm p-1.5 flex-1 min-h-[36px] cursor-pointer transition-all hover:opacity-90 ${
                 selectedLocation?.id === location.id ? "ring-2 ring-white ring-opacity-50" : ""
               }`}
               data-testid={`treemap-location-${location.id}`}
