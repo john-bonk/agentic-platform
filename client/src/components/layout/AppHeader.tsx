@@ -143,7 +143,7 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="flex items-center gap-2 h-8 px-3 text-white hover:bg-gray-800 rounded-md"
+              className="flex items-center gap-2 h-8 px-3 text-white hover:text-gray-200 hover:bg-gray-800 rounded-md"
               data-testid="workspace-switcher"
             >
               <CurrentWorkspaceIcon className="w-4 h-4 text-gray-300" />
