@@ -26,6 +26,7 @@
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import GlobalResidualRiskPage from "./GlobalResidualRiskPage";
 import CAEResidualRiskPage from "./CAEResidualRiskPage";
+import CISOResidualRiskPage from "./CISOResidualRiskPage";
 
 export default function GlobalResidualRiskRouter() {
   const { currentWorkspace } = useWorkspaceStore();
@@ -36,7 +37,7 @@ export default function GlobalResidualRiskRouter() {
     case "CAE":
       return <CAEResidualRiskPage />;
     case "CISO":
-      return <GlobalResidualRiskPage />;
+      return <CISOResidualRiskPage />;
     default:
       return <GlobalResidualRiskPage />;
   }
