@@ -454,36 +454,36 @@ export default function HomePage() {
 
             {/* Your Workspaces Section */}
             <div data-testid="workspaces-section">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Your workspaces</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">Your workspaces</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {workspaces.map((ws) => {
                   const Icon = ws.icon;
                   const isActive = ws.id === currentWorkspace.id;
                   return (
                     <Card
                       key={ws.id}
-                      className={`shadow-sm border h-full ${
+                      className={`shadow-sm border ${
                         isActive ? "border-[#266C92] bg-white" : "border-slate-200 bg-white"
                       }`}
                       data-testid={`workspace-card-${ws.id}`}
                     >
-                      <CardContent className="p-5 flex flex-col h-full">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div
-                            className="w-8 h-8 rounded flex items-center justify-center"
-                            style={{ backgroundColor: `${ws.color}15` }}
-                          >
-                            <Icon className="w-4 h-4" style={{ color: ws.color }} />
-                          </div>
-                          <h3 className="font-semibold text-gray-900">{ws.name}</h3>
+                      <CardContent className="p-3 flex items-center gap-3">
+                        <div
+                          className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: `${ws.color}15` }}
+                        >
+                          <Icon className="w-4 h-4" style={{ color: ws.color }} />
                         </div>
-                        <p className="text-sm text-gray-500 line-clamp-3 flex-1">
-                          {ws.description}
-                        </p>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 text-sm">{ws.name}</h3>
+                          <p className="text-xs text-gray-500 truncate">
+                            {ws.description}
+                          </p>
+                        </div>
                         <Button
                           variant={isActive ? "default" : "outline"}
                           size="sm"
-                          className={`mt-4 w-full ${isActive ? "bg-[#266C92] hover:bg-[#1e5a7a]" : ""}`}
+                          className={`flex-shrink-0 ${isActive ? "bg-[#266C92] hover:bg-[#1e5a7a]" : ""}`}
                           data-testid={`button-workspace-${ws.id}`}
                           onClick={() => {
                             if (!isActive) {
