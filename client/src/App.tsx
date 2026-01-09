@@ -39,6 +39,7 @@ import {
   CoverageMappingPage,
   AllInventoryPage,
   GlobalResidualRiskPage,
+  CAEAuditOverviewPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -94,6 +95,9 @@ function Router() {
       
       {/* CRO Workspace Routes */}
       <Route path="/cro/global-residual-risk" component={GlobalResidualRiskPage} />
+      
+      {/* CAE Workspace Routes */}
+      <Route path="/cae/audit-overview" component={CAEAuditOverviewPage} />
       
       {/* 404 - Must be last */}
       <Route component={NotFound} />
