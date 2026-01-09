@@ -174,10 +174,24 @@ const mockRegions: RegionData[] = [
         percentage: 34,
         color: "#266C92",
         locations: [
-          { id: "chicago", name: "Chicago", value: "$1.8M", percentage: 43 },
-          { id: "dallas", name: "Dallas", value: "$1.4M", percentage: 33 },
-          { id: "miami", name: "Miami", value: "$1.0M", percentage: 24 },
+          { id: "dallas", name: "Dallas TX", value: "$1.8M", percentage: 43 },
+          { id: "phoenix", name: "Phoenix AZ", value: "$1.4M", percentage: 33 },
+          { id: "seattle", name: "Seattle WA", value: "$1.0M", percentage: 24 },
         ],
+        tooltip: {
+          tariffRisk: 85,
+          severity: "Critical",
+          dollarValue: "$1.8M",
+          tariffRate: "25%",
+          annualVolume: "24,000 units",
+          importCountries: ["China", "Vietnam", "Taiwan"],
+          affectedProductLines: ["Semiconductor Components", "Electronic Assemblies", "Industrial IoT Devices"],
+          recommendedMitigations: [
+            "Source semiconductors from Malaysia and Thailand suppliers",
+            "Negotiate duty drawback on re-exported finished goods",
+            "Apply for Section 301 tariff exclusions for critical components"
+          ],
+        },
       },
       {
         id: "xyz-corp",
@@ -189,6 +203,19 @@ const mockRegions: RegionData[] = [
           { id: "new-york", name: "New York", value: "$1.6M", percentage: 52 },
           { id: "boston", name: "Boston", value: "$1.5M", percentage: 48 },
         ],
+        tooltip: {
+          tariffRisk: 72,
+          severity: "High",
+          dollarValue: "$3.1M",
+          tariffRate: "18%",
+          annualVolume: "18,500 units",
+          importCountries: ["Mexico", "Canada"],
+          affectedProductLines: ["Industrial Equipment", "Machinery Parts"],
+          recommendedMitigations: [
+            "Leverage USMCA provisions for qualifying goods",
+            "Establish bonded warehouse operations"
+          ],
+        },
       },
       {
         id: "global-trade",
@@ -200,6 +227,19 @@ const mockRegions: RegionData[] = [
           { id: "la", name: "Los Angeles", value: "$1.4M", percentage: 58 },
           { id: "seattle", name: "Seattle", value: "$1.0M", percentage: 42 },
         ],
+        tooltip: {
+          tariffRisk: 58,
+          severity: "Medium",
+          dollarValue: "$2.4M",
+          tariffRate: "12%",
+          annualVolume: "32,000 units",
+          importCountries: ["Japan", "South Korea"],
+          affectedProductLines: ["Consumer Electronics", "Display Panels"],
+          recommendedMitigations: [
+            "Utilize foreign trade zone benefits",
+            "Implement first sale valuation"
+          ],
+        },
       },
       {
         id: "supply-co",
@@ -211,6 +251,18 @@ const mockRegions: RegionData[] = [
           { id: "denver", name: "Denver", value: "$0.9M", percentage: 60 },
           { id: "phoenix", name: "Phoenix", value: "$0.6M", percentage: 40 },
         ],
+        tooltip: {
+          tariffRisk: 45,
+          severity: "Medium",
+          dollarValue: "$1.5M",
+          tariffRate: "8%",
+          annualVolume: "15,000 units",
+          importCountries: ["Germany", "UK"],
+          affectedProductLines: ["Precision Instruments"],
+          recommendedMitigations: [
+            "Apply for temporary importation bonds"
+          ],
+        },
       },
       {
         id: "american-logistics",
@@ -221,6 +273,18 @@ const mockRegions: RegionData[] = [
         locations: [
           { id: "atlanta", name: "Atlanta", value: "$1.2M", percentage: 100 },
         ],
+        tooltip: {
+          tariffRisk: 32,
+          severity: "Low",
+          dollarValue: "$1.2M",
+          tariffRate: "5%",
+          annualVolume: "8,000 units",
+          importCountries: ["India"],
+          affectedProductLines: ["Packaging Materials"],
+          recommendedMitigations: [
+            "Review HTS classifications for optimization"
+          ],
+        },
       },
     ],
   },
@@ -231,30 +295,56 @@ const mockRegions: RegionData[] = [
     companies: [
       {
         id: "euro-partners",
-        name: "Euro Partners GmbH",
+        name: "EU Holdings GmbH",
         totalValue: "$3.2M",
         percentage: 37,
         color: "#266C92",
         locations: [
           { id: "berlin", name: "Berlin", value: "$1.4M", percentage: 44 },
-          { id: "munich", name: "Munich", value: "$1.0M", percentage: 31 },
-          { id: "hamburg", name: "Hamburg", value: "$0.8M", percentage: 25 },
+          { id: "munich", name: "Munich", value: "$1.1M", percentage: 34 },
+          { id: "hamburg", name: "Hamburg", value: "$0.7M", percentage: 22 },
         ],
+        tooltip: {
+          tariffRisk: 68,
+          severity: "High",
+          dollarValue: "$3.2M",
+          tariffRate: "15%",
+          annualVolume: "28,000 units",
+          importCountries: ["China", "South Korea", "Japan"],
+          affectedProductLines: ["Automotive Components", "Industrial Machinery"],
+          recommendedMitigations: [
+            "Qualify EU-based alternative suppliers",
+            "Apply for duty suspension on critical inputs"
+          ],
+        },
       },
       {
         id: "uk-solutions",
-        name: "UK Solutions Ltd",
+        name: "Continental Trading",
         totalValue: "$2.5M",
         percentage: 29,
         color: "#3a8ab5",
         locations: [
-          { id: "london", name: "London", value: "$1.5M", percentage: 60 },
-          { id: "manchester", name: "Manchester", value: "$1.0M", percentage: 40 },
+          { id: "paris", name: "Paris", value: "$1.6M", percentage: 64 },
+          { id: "lyon", name: "Lyon", value: "$0.9M", percentage: 36 },
         ],
+        tooltip: {
+          tariffRisk: 52,
+          severity: "Medium",
+          dollarValue: "$2.5M",
+          tariffRate: "10%",
+          annualVolume: "19,000 units",
+          importCountries: ["UK", "Switzerland"],
+          affectedProductLines: ["Precision Equipment", "Medical Devices"],
+          recommendedMitigations: [
+            "Leverage EU trade agreements",
+            "Establish regional distribution hub"
+          ],
+        },
       },
       {
         id: "nordic-trading",
-        name: "Nordic Trading",
+        name: "Nordic Imports",
         totalValue: "$1.8M",
         percentage: 21,
         color: "#5ca3c7",
@@ -262,17 +352,41 @@ const mockRegions: RegionData[] = [
           { id: "stockholm", name: "Stockholm", value: "$1.0M", percentage: 56 },
           { id: "oslo", name: "Oslo", value: "$0.8M", percentage: 44 },
         ],
+        tooltip: {
+          tariffRisk: 38,
+          severity: "Low",
+          dollarValue: "$1.8M",
+          tariffRate: "6%",
+          annualVolume: "12,000 units",
+          importCountries: ["Norway", "Iceland"],
+          affectedProductLines: ["Marine Equipment", "Energy Systems"],
+          recommendedMitigations: [
+            "Utilize EEA preferential rates"
+          ],
+        },
       },
       {
         id: "med-supply",
-        name: "Med Supply SA",
+        name: "Western Supply",
         totalValue: "$1.2M",
         percentage: 13,
         color: "#7ebdd8",
         locations: [
-          { id: "paris", name: "Paris", value: "$0.7M", percentage: 58 },
-          { id: "madrid", name: "Madrid", value: "$0.5M", percentage: 42 },
+          { id: "amsterdam", name: "Amsterdam", value: "$0.9M", percentage: 75 },
+          { id: "brussels", name: "Brussels", value: "$0.3M", percentage: 25 },
         ],
+        tooltip: {
+          tariffRisk: 28,
+          severity: "Low",
+          dollarValue: "$1.2M",
+          tariffRate: "4%",
+          annualVolume: "8,500 units",
+          importCountries: ["Belgium", "Netherlands"],
+          affectedProductLines: ["Logistics Equipment"],
+          recommendedMitigations: [
+            "Consolidate shipments for volume discounts"
+          ],
+        },
       },
     ],
   },
@@ -292,6 +406,19 @@ const mockRegions: RegionData[] = [
           { id: "hong-kong", name: "Hong Kong", value: "$0.8M", percentage: 33 },
           { id: "tokyo", name: "Tokyo", value: "$0.4M", percentage: 17 },
         ],
+        tooltip: {
+          tariffRisk: 75,
+          severity: "High",
+          dollarValue: "$2.4M",
+          tariffRate: "20%",
+          annualVolume: "35,000 units",
+          importCountries: ["China", "Taiwan", "Vietnam"],
+          affectedProductLines: ["Electronics", "Semiconductors", "Components"],
+          recommendedMitigations: [
+            "Diversify manufacturing to ASEAN countries",
+            "Apply for tariff exemptions on tech components"
+          ],
+        },
       },
       {
         id: "pacific-partners",
@@ -303,6 +430,18 @@ const mockRegions: RegionData[] = [
           { id: "sydney", name: "Sydney", value: "$1.1M", percentage: 58 },
           { id: "melbourne", name: "Melbourne", value: "$0.8M", percentage: 42 },
         ],
+        tooltip: {
+          tariffRisk: 42,
+          severity: "Medium",
+          dollarValue: "$1.9M",
+          tariffRate: "8%",
+          annualVolume: "15,000 units",
+          importCountries: ["Australia", "New Zealand"],
+          affectedProductLines: ["Agricultural Equipment", "Mining Tools"],
+          recommendedMitigations: [
+            "Leverage AUKUS trade benefits"
+          ],
+        },
       },
       {
         id: "china-trade",
@@ -314,6 +453,19 @@ const mockRegions: RegionData[] = [
           { id: "shanghai", name: "Shanghai", value: "$0.8M", percentage: 67 },
           { id: "beijing", name: "Beijing", value: "$0.4M", percentage: 33 },
         ],
+        tooltip: {
+          tariffRisk: 88,
+          severity: "Critical",
+          dollarValue: "$1.2M",
+          tariffRate: "25%",
+          annualVolume: "22,000 units",
+          importCountries: ["China"],
+          affectedProductLines: ["Consumer Goods", "Textiles"],
+          recommendedMitigations: [
+            "Shift production to Vietnam or Thailand",
+            "Apply for Section 301 exclusions"
+          ],
+        },
       },
       {
         id: "india-solutions",
@@ -325,6 +477,18 @@ const mockRegions: RegionData[] = [
           { id: "mumbai", name: "Mumbai", value: "$0.5M", percentage: 63 },
           { id: "bangalore", name: "Bangalore", value: "$0.3M", percentage: 37 },
         ],
+        tooltip: {
+          tariffRisk: 35,
+          severity: "Low",
+          dollarValue: "$0.8M",
+          tariffRate: "5%",
+          annualVolume: "10,000 units",
+          importCountries: ["India"],
+          affectedProductLines: ["IT Services Equipment", "Software"],
+          recommendedMitigations: [
+            "Utilize India FTA provisions"
+          ],
+        },
       },
     ],
   },

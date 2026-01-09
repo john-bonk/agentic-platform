@@ -11,4 +11,4 @@ export { StrategicObjectives } from "./StrategicObjectives";
 export type { StrategicObjective, Initiative } from "./StrategicObjectives";
 
 export { RegionalTreemap, RegionalTreemaps } from "./RegionalTreemap";
-export type { RegionData, CompanyData, LocationData } from "./RegionalTreemap";
+export type { RegionData, CompanyData, LocationData, CompanyTooltipData } from "./RegionalTreemap";

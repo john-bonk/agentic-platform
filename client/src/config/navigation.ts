@@ -35,6 +35,7 @@ export const modules: ModuleConfig[] = [
         title: "Dashboards",
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
+          { id: "global-residual-risk-home", label: "Global Residual Risk", path: "/cro/global-residual-risk" },
         ],
       },
       {
