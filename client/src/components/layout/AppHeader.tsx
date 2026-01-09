@@ -135,10 +135,10 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
 
   return (
     <header 
-      className={`flex h-12 items-center justify-between px-3 w-full bg-gray-900 flex-shrink-0 sticky top-0 z-40 gap-4 ${className}`}
+      className={`relative flex h-12 items-center justify-between px-3 w-full bg-gray-900 flex-shrink-0 sticky top-0 z-40 ${className}`}
       data-testid="app-header"
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 z-10">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -176,12 +176,12 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
         </DropdownMenu>
       </div>
 
-      <div className="flex-1 flex justify-center max-w-xl">
+      <div className="absolute left-1/2 -translate-x-1/2 w-full max-w-md px-4">
         <Popover open={searchOpen} onOpenChange={setSearchOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="ghost"
-              className="flex items-center gap-2 h-8 px-3 bg-gray-800 hover:bg-gray-700 rounded-md w-full max-w-md justify-between"
+              className="flex items-center gap-2 h-8 px-3 bg-gray-800 hover:bg-gray-700 rounded-md w-full justify-between"
               data-testid="global-search-trigger"
             >
               <div className="flex items-center gap-2">
@@ -256,7 +256,7 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
         </Popover>
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 z-10">
         {utilityIcons.map((item, index) => (
           <Button
             key={index}
