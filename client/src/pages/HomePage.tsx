@@ -23,7 +23,7 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
-import { useWorkspaceStore } from "@/lib/workspaceStore";
+import { useWorkspaceStore, workspaces as storeWorkspaces } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 import headerBgImage from "@assets/Welcome_Image_1767849747805.png";
 
@@ -283,7 +283,7 @@ function DonutChart({ value, total }: { value: number; total: number }) {
 }
 
 export default function HomePage() {
-  const { currentWorkspace, refreshKey } = useWorkspaceStore();
+  const { currentWorkspace, refreshKey, setWorkspace } = useWorkspaceStore();
   const content = workspaceContent[currentWorkspace.id] || workspaceContent["enterprise-risk"];
   const [activeTab, setActiveTab] = useState("My Tasks");
   const [scenarioExpanded, setScenarioExpanded] = useState(true);
@@ -485,6 +485,12 @@ export default function HomePage() {
                           size="sm"
                           className={`mt-4 w-full ${isActive ? "bg-[#266C92] hover:bg-[#1e5a7a]" : ""}`}
                           data-testid={`button-workspace-${ws.id}`}
+                          onClick={() => {
+                            if (!isActive) {
+                              const storeWs = storeWorkspaces.find(w => w.id === ws.id);
+                              if (storeWs) setWorkspace(storeWs);
+                            }
+                          }}
                         >
                           {isActive ? "Active" : "Switch"}
                         </Button>
