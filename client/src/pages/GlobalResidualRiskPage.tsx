@@ -1,10 +1,16 @@
 /**
- * GlobalResidualRiskPage
+ * GlobalResidualRiskPage (CRO Workspace)
  * 
- * A sophisticated dashboard for the CRO workspace displaying:
+ * Global Residual Risk dashboard for the CRO (Chief Risk Officer) workspace.
+ * Focus: Tariff and Supply Chain Risk
+ * 
+ * Features:
  * - Top Risks & Mitigation Plans with expandable risk cards
  * - Strategic Objectives with initiative/cost tables
  * - Regional treemap visualizations for North America, EMEA, Asia Pacific
+ * 
+ * PATTERN: This follows the workspace dashboard pattern defined in workspaceDashboards.ts.
+ * Path: /cro/global-residual-risk
  * 
  * Design follows AuditBoard's professional design system with teal #266C92 accents.
  */

@@ -1,11 +1,16 @@
 /**
- * CAEAuditOverviewPage
+ * CAEResidualRiskPage
  * 
- * A sophisticated dashboard for the CAE (Chief Audit Executive) workspace displaying:
- * - Overview: M&A Audit and Compliance
+ * Global Residual Risk dashboard for the CAE (Chief Audit Executive) workspace.
+ * Focus: M&A Audit and Compliance
+ * 
+ * Features:
  * - Top Risks and Mitigation Plans with expandable audit risk cards
  * - Strategic Audit Objectives with progress tracking
  * - Critical Audit Areas treemap with audit-focused tooltips
+ * 
+ * PATTERN: This follows the workspace dashboard pattern defined in workspaceDashboards.ts.
+ * Path: /cae/global-residual-risk
  * 
  * Design follows AuditBoard's professional design system with teal #266C92 accents.
  */
@@ -369,7 +374,7 @@ const mockAuditRegions: AuditRegionData[] = [
   },
 ];
 
-export default function CAEAuditOverviewPage() {
+export default function CAEResidualRiskPage() {
   const [expandedRiskId, setExpandedRiskId] = useState<string | null>(null);
 
   return (

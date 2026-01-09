@@ -145,7 +145,7 @@ export const modules: ModuleConfig[] = [
         title: "Dashboards",
         items: [
           { id: "cro-dashboard", label: "CRO", path: "/cro/global-residual-risk" },
-          { id: "cae-dashboard", label: "CAE", path: "/cae/audit-overview" },
+          { id: "cae-dashboard", label: "CAE", path: "/cae/global-residual-risk" },
         ],
       },
       {
