@@ -73,19 +73,21 @@ interface TreemapTooltipProps {
   company: CompanyData;
   location?: LocationData;
   onClose: () => void;
+  position: "right" | "left";
 }
 
-function TreemapTooltip({ company, location, onClose }: TreemapTooltipProps) {
+function TreemapTooltip({ company, location, onClose, position }: TreemapTooltipProps) {
   const tooltip = company.tooltip;
   if (!tooltip) return null;
+  
+  const positionStyles = position === "right" 
+    ? { top: "-10px", left: "calc(100% + 4px)" }
+    : { top: "-10px", right: "calc(100% + 4px)" };
   
   return (
     <div 
       className="absolute z-50 bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-72"
-      style={{ 
-        top: "-10px",
-        left: "calc(100% + 4px)"
-      }}
+      style={positionStyles}
       data-testid={`tooltip-${company.id}`}
       onClick={(e) => e.stopPropagation()}
     >
@@ -203,11 +205,29 @@ function TreemapCell({
 }) {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState<"right" | "left">("right");
   const cellRef = useRef<HTMLDivElement>(null);
   const colors = companyColors[colorIndex % companyColors.length];
   const hasLocations = company.locations.length > 0;
   
   const widthPercentage = Math.max(company.percentage, 15);
+
+  // Calculate tooltip position based on available space
+  const calculateTooltipPosition = () => {
+    if (cellRef.current) {
+      const rect = cellRef.current.getBoundingClientRect();
+      const tooltipWidth = 288; // w-72 = 18rem = 288px
+      const viewportWidth = window.innerWidth;
+      const spaceOnRight = viewportWidth - rect.right;
+      
+      // If not enough space on right, show on left
+      if (spaceOnRight < tooltipWidth + 20) {
+        setTooltipPosition("left");
+      } else {
+        setTooltipPosition("right");
+      }
+    }
+  };
 
   // Close tooltip when clicking outside
   useEffect(() => {
@@ -233,6 +253,7 @@ function TreemapCell({
       setIsOpen(false);
     } else {
       // Open tooltip at company level
+      calculateTooltipPosition();
       setSelectedLocation(null);
       setIsOpen(true);
     }
@@ -246,6 +267,7 @@ function TreemapCell({
       setSelectedLocation(null);
     } else {
       // Open/switch to new location
+      calculateTooltipPosition();
       setSelectedLocation(location);
       setIsOpen(true);
     }
@@ -300,6 +322,7 @@ function TreemapCell({
           company={company} 
           location={selectedLocation || undefined} 
           onClose={handleClose}
+          position={tooltipPosition}
         />
       )}
     </div>

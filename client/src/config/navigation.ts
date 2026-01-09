@@ -35,7 +35,7 @@ export const modules: ModuleConfig[] = [
         title: "Dashboards",
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
-          { id: "global-residual-risk-home", label: "Global Residual Risk", path: "/cro/global-residual-risk" },
+          { id: "global-residual-risk-home", label: "Global Residual Risk", path: "/global-residual-risk" },
         ],
       },
       {
@@ -208,7 +208,7 @@ const homePaths = [
   "/", "/my-dashboard", "/inventory", "/coverage-mapping", "/controls", "/tests", 
   "/issues", "/financial-accounts", "/risk-control-matrix", "/coso-framework", 
   "/open-tasks", "/financial-accounts-view", "/financial-applications-view", 
-  "/profile", "/wizard", "/demo", "/items"
+  "/profile", "/wizard", "/demo", "/items", "/global-residual-risk"
 ];
 
 /**

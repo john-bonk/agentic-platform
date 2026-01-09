@@ -50,6 +50,7 @@ function Router() {
       
       {/* Home Module Routes */}
       <Route path="/my-dashboard" component={HomePage} />
+      <Route path="/global-residual-risk" component={GlobalResidualRiskPage} />
       <Route path="/inventory" component={AllInventoryPage} />
       <Route path="/coverage-mapping" component={CoverageMappingPage} />
       <Route path="/controls" component={HomePage} />

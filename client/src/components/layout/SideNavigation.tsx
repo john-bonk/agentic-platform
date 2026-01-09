@@ -22,13 +22,18 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
   const activeModuleIndex = getActiveModuleIndex(location);
 
   const isActive = (path: string) => {
+    // Home module
     if (activeModuleIndex === 0) {
       if (path === "/") {
-        return location === "/";
+        return location === "/" || location === "/my-dashboard";
+      }
+      if (path === "/global-residual-risk") {
+        return location === "/global-residual-risk";
       }
       return location === path || location.startsWith(path + "/");
     }
     
+    // Workflows module
     if (activeModuleIndex === 1) {
       if (path === "/workflows") {
         return location === "/workflows";
@@ -39,10 +44,21 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
       return location === path || location.startsWith(path + "/");
     }
 
+    // Intelligence Hub module
     if (activeModuleIndex === 2) {
       if (path === "/intelligence") {
         return location === "/intelligence";
       }
+      return location === path || location.startsWith(path + "/");
+    }
+
+    // Reporting module
+    if (activeModuleIndex === 3) {
+      return location === path || location.startsWith(path + "/");
+    }
+
+    // CRO Workspace module
+    if (activeModuleIndex === 4) {
       return location === path || location.startsWith(path + "/");
     }
     
