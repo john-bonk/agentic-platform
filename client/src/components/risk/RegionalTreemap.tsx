@@ -5,10 +5,10 @@
  * with nested company/location breakdowns. Used in the Global Residual Risk view.
  */
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Globe, Pin, Bookmark, MoreHorizontal } from "lucide-react";
+import { ChevronRight, Globe, Pin, Bookmark, MoreHorizontal, X } from "lucide-react";
 
 export interface LocationData {
   id: string;
@@ -72,9 +72,10 @@ function getSeverityColor(severity: string): string {
 interface TreemapTooltipProps {
   company: CompanyData;
   location?: LocationData;
+  onClose: () => void;
 }
 
-function TreemapTooltip({ company, location }: TreemapTooltipProps) {
+function TreemapTooltip({ company, location, onClose }: TreemapTooltipProps) {
   const tooltip = company.tooltip;
   if (!tooltip) return null;
   
@@ -83,9 +84,10 @@ function TreemapTooltip({ company, location }: TreemapTooltipProps) {
       className="absolute z-50 bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-72"
       style={{ 
         top: "-10px",
-        left: "calc(100% - 4px)"
+        left: "calc(100% + 4px)"
       }}
       data-testid={`tooltip-${company.id}`}
+      onClick={(e) => e.stopPropagation()}
     >
       {/* Header with actions */}
       <div className="flex items-start justify-between mb-3">
@@ -108,9 +110,10 @@ function TreemapTooltip({ company, location }: TreemapTooltipProps) {
           </button>
           <button 
             className="p-1 hover:bg-gray-100 rounded"
-            data-testid={`button-more-${company.id}`}
+            data-testid={`button-close-${company.id}`}
+            onClick={onClose}
           >
-            <MoreHorizontal className="w-3 h-3 text-gray-400" />
+            <X className="w-3 h-3 text-gray-400" />
           </button>
         </div>
       </div>
@@ -198,39 +201,71 @@ function TreemapCell({
   company: CompanyData; 
   colorIndex: number;
 }) {
-  const [hoveredLocation, setHoveredLocation] = useState<LocationData | null>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const cellRef = useRef<HTMLDivElement>(null);
   const colors = companyColors[colorIndex % companyColors.length];
   const hasLocations = company.locations.length > 0;
   
   const widthPercentage = Math.max(company.percentage, 15);
 
-  const handleMouseEnter = () => {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-      hideTimeoutRef.current = null;
+  // Close tooltip when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (cellRef.current && !cellRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        setSelectedLocation(null);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
     }
-    setIsHovered(true);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleCompanyClick = () => {
+    if (isOpen && selectedLocation === null) {
+      // If tooltip is open at company level, close it
+      setIsOpen(false);
+    } else {
+      // Open tooltip at company level
+      setSelectedLocation(null);
+      setIsOpen(true);
+    }
   };
 
-  const handleMouseLeave = () => {
-    hideTimeoutRef.current = setTimeout(() => {
-      setIsHovered(false);
-      setHoveredLocation(null);
-    }, 200);
+  const handleLocationClick = (location: LocationData, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isOpen && selectedLocation?.id === location.id) {
+      // Clicking same location closes tooltip
+      setIsOpen(false);
+      setSelectedLocation(null);
+    } else {
+      // Open/switch to new location
+      setSelectedLocation(location);
+      setIsOpen(true);
+    }
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setSelectedLocation(null);
   };
   
   return (
     <div 
-      className={`${colors.bg} ${colors.text} rounded-sm overflow-visible flex flex-col relative`}
+      ref={cellRef}
+      className={`${colors.bg} ${colors.text} rounded-sm overflow-visible flex flex-col relative cursor-pointer`}
       style={{ 
         flex: `${widthPercentage} 0 0`,
         minWidth: "80px"
       }}
       data-testid={`treemap-company-${company.id}`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onClick={handleCompanyClick}
     >
       <div className="p-2 border-b border-white/20">
         <div className="text-xs font-semibold truncate" data-testid={`text-company-name-${company.id}`}>
@@ -246,9 +281,11 @@ function TreemapCell({
           {company.locations.map((location) => (
             <div 
               key={location.id}
-              className={`${colors.locationBg} rounded-sm p-1.5 flex-1 min-h-[36px] cursor-pointer transition-opacity hover:opacity-90`}
+              className={`${colors.locationBg} rounded-sm p-1.5 flex-1 min-h-[36px] cursor-pointer transition-all hover:opacity-90 ${
+                selectedLocation?.id === location.id ? "ring-2 ring-white ring-opacity-50" : ""
+              }`}
               data-testid={`treemap-location-${location.id}`}
-              onMouseEnter={() => setHoveredLocation(location)}
+              onClick={(e) => handleLocationClick(location, e)}
             >
               <div className="text-[10px] font-medium truncate">{location.name}</div>
               <div className="text-[10px] opacity-80">{location.value}</div>
@@ -258,13 +295,12 @@ function TreemapCell({
       )}
       
       {/* Tooltip */}
-      {isHovered && company.tooltip && (
-        <div 
-          onMouseEnter={handleMouseEnter} 
-          onMouseLeave={handleMouseLeave}
-        >
-          <TreemapTooltip company={company} location={hoveredLocation || undefined} />
-        </div>
+      {isOpen && company.tooltip && (
+        <TreemapTooltip 
+          company={company} 
+          location={selectedLocation || undefined} 
+          onClose={handleClose}
+        />
       )}
     </div>
   );
