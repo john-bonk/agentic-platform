@@ -21,8 +21,9 @@ import { useLocation } from "wouter";
 import { LeftIconNavbar } from "./LeftIconNavbar";
 import { SideNavigation } from "./SideNavigation";
 import { AppHeader } from "./AppHeader";
-import { iconNavItems, appConfig, getModuleFromPath } from "@/config/navigation";
+import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav } from "@/config/navigation";
 import { type Tab } from "@/lib/tabStore";
+import { useWorkspaceStore } from "@/lib/workspaceStore";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -43,6 +44,13 @@ export function AppLayout({
 }: AppLayoutProps) {
   const [location] = useLocation();
   const currentModule = getModuleFromPath(location);
+  const { currentWorkspace } = useWorkspaceStore();
+  
+  const isHomeModule = currentModule.id === "home";
+  const workspaceNav = isHomeModule ? getWorkspaceHomeNav(currentWorkspace.persona) : null;
+  
+  const sideNavSections = workspaceNav ? workspaceNav.sections : currentModule.sideNavSections;
+  const sideNavTitle = workspaceNav ? workspaceNav.title : currentModule.name;
   
   return (
     <div className={`flex items-start relative h-screen overflow-hidden ${className}`}>
@@ -59,8 +67,8 @@ export function AppLayout({
         <div className="flex flex-1 overflow-hidden">
           {showSideNav && (
             <SideNavigation 
-              sections={currentModule.sideNavSections} 
-              title={currentModule.name}
+              sections={sideNavSections} 
+              title={sideNavTitle}
             />
           )}
           

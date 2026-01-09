@@ -3,6 +3,11 @@
  * 
  * This file defines all navigation items for the application.
  * Modify these arrays to customize your app's navigation structure.
+ * 
+ * WORKSPACE PATTERN:
+ * The Home module has workspace-specific navigation defined in workspaceHomeNav.
+ * Each workspace (CRO, CAE, CISO) has its own side nav with links to its specific
+ * Global Residual Risk dashboard.
  */
 
 export type IconNavItem = 
@@ -19,6 +24,135 @@ export interface ModuleConfig {
   name: string;
   icon: IconNavItem;
   sideNavSections: SideNavSection[];
+}
+
+/**
+ * Workspace-specific Home Navigation
+ * Maps workspace persona (CRO, CAE, CISO) to their specific side nav sections.
+ * The Global Residual Risk link routes to the workspace-specific dashboard.
+ */
+export const workspaceHomeNav: Record<string, { title: string; sections: SideNavSection[] }> = {
+  "CRO": {
+    title: "Enterprise Risk",
+    sections: [
+      {
+        title: "Dashboards",
+        items: [
+          { id: "my-dashboard", label: "My Dashboard", path: "/" },
+          { id: "global-residual-risk-cro", label: "Global Residual Risk", path: "/cro/global-residual-risk" },
+        ],
+      },
+      {
+        title: "Inventory",
+        items: [
+          { id: "all-inventory", label: "All Inventory", path: "/inventory" },
+          { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
+        ],
+      },
+      {
+        title: "Environment",
+        items: [
+          { id: "controls", label: "Controls", path: "/controls" },
+          { id: "tests", label: "Tests", path: "/tests" },
+          { id: "issues", label: "Issues", path: "/issues" },
+          { id: "financial-accounts", label: "Financial Accounts", path: "/financial-accounts" },
+        ],
+      },
+      {
+        title: "Views",
+        items: [
+          { id: "risk-control-matrix", label: "Risk Control Matrix", path: "/risk-control-matrix" },
+          { id: "coso-framework", label: "COSO Framework", path: "/coso-framework" },
+          { id: "open-tasks", label: "Open Tasks", path: "/open-tasks", badge: "4" },
+          { id: "financial-accounts-view", label: "Financial Accounts View", path: "/financial-accounts-view" },
+          { id: "financial-applications-view", label: "Financial Applications View", path: "/financial-applications-view" },
+        ],
+      },
+    ],
+  },
+  "CAE": {
+    title: "Enterprise Audit",
+    sections: [
+      {
+        title: "Dashboards",
+        items: [
+          { id: "my-dashboard", label: "My Dashboard", path: "/" },
+          { id: "global-residual-risk-cae", label: "Global Residual Risk", path: "/cae/global-residual-risk" },
+        ],
+      },
+      {
+        title: "Inventory",
+        items: [
+          { id: "all-inventory", label: "All Inventory", path: "/inventory" },
+          { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
+        ],
+      },
+      {
+        title: "Environment",
+        items: [
+          { id: "controls", label: "Controls", path: "/controls" },
+          { id: "tests", label: "Tests", path: "/tests" },
+          { id: "issues", label: "Issues", path: "/issues" },
+          { id: "financial-accounts", label: "Financial Accounts", path: "/financial-accounts" },
+        ],
+      },
+      {
+        title: "Views",
+        items: [
+          { id: "risk-control-matrix", label: "Risk Control Matrix", path: "/risk-control-matrix" },
+          { id: "coso-framework", label: "COSO Framework", path: "/coso-framework" },
+          { id: "open-tasks", label: "Open Tasks", path: "/open-tasks", badge: "4" },
+          { id: "financial-accounts-view", label: "Financial Accounts View", path: "/financial-accounts-view" },
+          { id: "financial-applications-view", label: "Financial Applications View", path: "/financial-applications-view" },
+        ],
+      },
+    ],
+  },
+  "CISO": {
+    title: "IT Security",
+    sections: [
+      {
+        title: "Dashboards",
+        items: [
+          { id: "my-dashboard", label: "My Dashboard", path: "/" },
+          { id: "global-residual-risk-ciso", label: "Global Residual Risk", path: "/ciso/global-residual-risk" },
+        ],
+      },
+      {
+        title: "Inventory",
+        items: [
+          { id: "all-inventory", label: "All Inventory", path: "/inventory" },
+          { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
+        ],
+      },
+      {
+        title: "Environment",
+        items: [
+          { id: "controls", label: "Controls", path: "/controls" },
+          { id: "tests", label: "Tests", path: "/tests" },
+          { id: "issues", label: "Issues", path: "/issues" },
+          { id: "financial-accounts", label: "Financial Accounts", path: "/financial-accounts" },
+        ],
+      },
+      {
+        title: "Views",
+        items: [
+          { id: "risk-control-matrix", label: "Risk Control Matrix", path: "/risk-control-matrix" },
+          { id: "coso-framework", label: "COSO Framework", path: "/coso-framework" },
+          { id: "open-tasks", label: "Open Tasks", path: "/open-tasks", badge: "4" },
+          { id: "financial-accounts-view", label: "Financial Accounts View", path: "/financial-accounts-view" },
+          { id: "financial-applications-view", label: "Financial Applications View", path: "/financial-applications-view" },
+        ],
+      },
+    ],
+  },
+};
+
+/**
+ * Get workspace-specific home navigation
+ */
+export function getWorkspaceHomeNav(persona: string): { title: string; sections: SideNavSection[] } {
+  return workspaceHomeNav[persona] || workspaceHomeNav["CRO"];
 }
 
 /**
