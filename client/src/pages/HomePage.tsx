@@ -316,7 +316,7 @@ export default function HomePage() {
 
         {/* Main Content - negative margin to overlap the header, higher z-index */}
         <div className="flex-1 bg-slate-50 px-8 py-6 -mt-24 relative z-10">
-          <div className="max-w-6xl space-y-6">
+          <div className="max-w-6xl mx-auto space-y-6">
             
             {/* What would you like to do? Card */}
             <Card className="shadow-sm border border-slate-200 bg-white" data-testid="assistant-card">
