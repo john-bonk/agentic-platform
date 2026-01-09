@@ -27,3 +27,4 @@ export { default as CoverageMappingPage } from "./CoverageMappingPage";
 export { default as AllInventoryPage } from "./AllInventoryPage";
 export { default as GlobalResidualRiskPage } from "./GlobalResidualRiskPage";
 export { default as CAEResidualRiskPage } from "./CAEResidualRiskPage";
+export { default as GlobalResidualRiskRouter } from "./GlobalResidualRiskRouter";

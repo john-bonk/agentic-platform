@@ -39,7 +39,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         title: "Dashboards",
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
-          { id: "global-residual-risk-cro", label: "Global Residual Risk", path: "/cro/global-residual-risk" },
+          { id: "global-residual-risk-cro", label: "Global Residual Risk", path: "/global-residual-risk" },
         ],
       },
       {
@@ -77,7 +77,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         title: "Dashboards",
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
-          { id: "global-residual-risk-cae", label: "Global Residual Risk", path: "/cae/global-residual-risk" },
+          { id: "global-residual-risk-cae", label: "Global Residual Risk", path: "/global-residual-risk" },
         ],
       },
       {
@@ -115,7 +115,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         title: "Dashboards",
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
-          { id: "global-residual-risk-ciso", label: "Global Residual Risk", path: "/ciso/global-residual-risk" },
+          { id: "global-residual-risk-ciso", label: "Global Residual Risk", path: "/global-residual-risk" },
         ],
       },
       {
@@ -280,6 +280,7 @@ export const modules: ModuleConfig[] = [
         items: [
           { id: "cro-dashboard", label: "CRO", path: "/cro/global-residual-risk" },
           { id: "cae-dashboard", label: "CAE", path: "/cae/global-residual-risk" },
+          { id: "ciso-dashboard", label: "CISO", path: "/ciso/global-residual-risk" },
         ],
       },
       {
@@ -328,8 +329,8 @@ export function getModuleFromPath(path: string): ModuleConfig {
   if (path.startsWith("/reporting")) {
     return modules[3];
   }
-  // Residual Risk module (both CRO and CAE paths)
-  if (path.startsWith("/cro") || path.startsWith("/cae")) {
+  // Residual Risk module (CRO, CAE, CISO direct paths)
+  if (path.startsWith("/cro") || path.startsWith("/cae") || path.startsWith("/ciso")) {
     return modules[4];
   }
   // Default to Home
@@ -367,8 +368,8 @@ export function getActiveModuleIndex(path: string): number {
     return 3; // Reporting module
   }
   
-  // Residual Risk module (both CRO and CAE paths)
-  if (path.startsWith("/cro") || path.startsWith("/cae")) {
+  // Residual Risk module (CRO, CAE, CISO direct paths)
+  if (path.startsWith("/cro") || path.startsWith("/cae") || path.startsWith("/ciso")) {
     return 4; // Residual Risk module
   }
   

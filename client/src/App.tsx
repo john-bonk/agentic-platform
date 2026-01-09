@@ -40,6 +40,7 @@ import {
   AllInventoryPage,
   GlobalResidualRiskPage,
   CAEResidualRiskPage,
+  GlobalResidualRiskRouter,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -51,7 +52,7 @@ function Router() {
       
       {/* Home Module Routes */}
       <Route path="/my-dashboard" component={HomePage} />
-      <Route path="/global-residual-risk" component={GlobalResidualRiskPage} />
+      <Route path="/global-residual-risk" component={GlobalResidualRiskRouter} />
       <Route path="/inventory" component={AllInventoryPage} />
       <Route path="/coverage-mapping" component={CoverageMappingPage} />
       <Route path="/controls" component={HomePage} />
@@ -98,6 +99,9 @@ function Router() {
       
       {/* CAE Workspace Routes */}
       <Route path="/cae/global-residual-risk" component={CAEResidualRiskPage} />
+      
+      {/* CISO Workspace Routes - uses CRO page as placeholder until dedicated page exists */}
+      <Route path="/ciso/global-residual-risk" component={GlobalResidualRiskPage} />
       
       {/* 404 - Must be last */}
       <Route component={NotFound} />
