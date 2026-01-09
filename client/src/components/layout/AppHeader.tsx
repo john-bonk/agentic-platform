@@ -174,8 +174,6 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
             })}
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <div className="text-gray-600 select-none">/</div>
       </div>
 
       <div className="flex-1 flex justify-center max-w-xl">

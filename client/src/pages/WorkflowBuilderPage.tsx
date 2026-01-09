@@ -8,9 +8,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useRoute, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { 
-  Plus, Save, Play, MoreHorizontal, ChevronLeft, 
+  Save, Play, MoreHorizontal, ChevronLeft, 
   PanelRightClose, PanelRight, Loader2, Workflow
 } from "lucide-react";
+import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -396,65 +397,68 @@ export function WorkflowBuilderPage() {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
+      <AppLayout showHeader={true} showSideNav={false}>
+        <div className="h-full flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col bg-muted/30">
-      <WorkflowBuilderHeader
-        workflow={workflow}
-        onBack={() => navigate("/workflows")}
-        isPanelOpen={isPanelOpen}
-        onTogglePanel={() => setPanelOpen(!isPanelOpen)}
-        onSave={handleSaveWorkflow}
-      />
-      
-      <div className="flex-1 flex overflow-hidden">
-        <div className="w-56 shrink-0">
-          <NodePalette onDragStart={handleDragStart} />
-        </div>
+    <AppLayout showHeader={true} showSideNav={false}>
+      <div className="h-full flex flex-col bg-muted/30">
+        <WorkflowBuilderHeader
+          workflow={workflow}
+          onBack={() => navigate("/workflows")}
+          isPanelOpen={isPanelOpen}
+          onTogglePanel={() => setPanelOpen(!isPanelOpen)}
+          onSave={handleSaveWorkflow}
+        />
         
-        <div className="flex-1 relative">
-          {workflowId && !isNewWorkflow && (
-            <WorkflowCanvas 
-              workflowId={workflowId} 
-              onNodeConfigure={handleNodeConfigure}
+        <div className="flex-1 flex overflow-hidden">
+          <div className="w-56 shrink-0">
+            <NodePalette onDragStart={handleDragStart} />
+          </div>
+          
+          <div className="flex-1 relative">
+            {workflowId && !isNewWorkflow && (
+              <WorkflowCanvas 
+                workflowId={workflowId} 
+                onNodeConfigure={handleNodeConfigure}
+              />
+            )}
+            {isNewWorkflow && (
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center">
+                  <Workflow className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">
+                    Create a new workflow to get started
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {inspectorNode && (
+            <NodeInspector
+              node={inspectorNode}
+              onClose={() => setInspectorNodeId(null)}
+              onDelete={handleDeleteNode}
             />
           )}
-          {isNewWorkflow && (
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center">
-                <Workflow className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">
-                  Create a new workflow to get started
-                </p>
-              </div>
+          
+          {isPanelOpen && !inspectorNode && (
+            <div className="w-96 shrink-0">
+              <AssistantPanel
+                workflowId={workflowId && !isNewWorkflow ? workflowId : null}
+                onApplyAction={handleApplyAction}
+              />
             </div>
           )}
         </div>
         
-        {inspectorNode && (
-          <NodeInspector
-            node={inspectorNode}
-            onClose={() => setInspectorNodeId(null)}
-            onDelete={handleDeleteNode}
-          />
-        )}
-        
-        {isPanelOpen && !inspectorNode && (
-          <div className="w-96 shrink-0">
-            <AssistantPanel
-              workflowId={workflowId && !isNewWorkflow ? workflowId : null}
-              onApplyAction={handleApplyAction}
-            />
-          </div>
-        )}
-      </div>
-      
-      <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
+        <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Workflow</DialogTitle>
@@ -503,6 +507,7 @@ export function WorkflowBuilderPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </AppLayout>
   );
 }
