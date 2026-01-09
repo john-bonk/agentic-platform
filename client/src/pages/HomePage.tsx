@@ -305,7 +305,7 @@ export default function HomePage() {
         >
           <div className="max-w-6xl relative z-10">
             <h1 className="text-2xl font-semibold" data-testid="welcome-message">
-              Welcome back, {currentWorkspace.personaTitle}
+              Welcome back, {currentWorkspace.persona}
               <span className="ml-4 text-base font-normal text-white/80">
                 {incompleteTasks} New critical{" "}
                 <span className="underline cursor-pointer hover:text-white">tasks to review</span>
