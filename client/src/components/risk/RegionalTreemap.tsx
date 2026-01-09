@@ -48,6 +48,7 @@ export interface RegionData {
 interface RegionalTreemapProps {
   region: RegionData;
   onViewBreakdown?: () => void;
+  highlightTariffs?: boolean;
 }
 
 const companyColors = [
@@ -198,10 +199,12 @@ function TreemapTooltip({ company, location, onClose, position }: TreemapTooltip
 
 function TreemapCell({ 
   company, 
-  colorIndex 
+  colorIndex,
+  highlightTariffs = false
 }: { 
   company: CompanyData; 
   colorIndex: number;
+  highlightTariffs?: boolean;
 }) {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -211,6 +214,10 @@ function TreemapCell({
   const hasLocations = company.locations.length > 0;
   
   const widthPercentage = Math.max(company.percentage, 15);
+  
+  // Determine if this company/location should be highlighted based on tariff risk
+  const isHighTariffRisk = company.tooltip && company.tooltip.tariffRisk >= 60;
+  const showTariffHighlight = highlightTariffs && isHighTariffRisk;
 
   // Calculate tooltip position based on available space
   const calculateTooltipPosition = () => {
@@ -281,7 +288,9 @@ function TreemapCell({
   return (
     <div 
       ref={cellRef}
-      className={`${colors.bg} ${colors.text} rounded-sm overflow-visible flex flex-col relative cursor-pointer`}
+      className={`${colors.bg} ${colors.text} rounded-sm overflow-visible flex flex-col relative cursor-pointer ${
+        showTariffHighlight ? "ring-2 ring-red-500 ring-offset-1" : ""
+      }`}
       style={{ 
         flex: `${widthPercentage} 0 0`,
         minWidth: "80px"
@@ -329,7 +338,7 @@ function TreemapCell({
   );
 }
 
-export function RegionalTreemap({ region, onViewBreakdown }: RegionalTreemapProps) {
+export function RegionalTreemap({ region, onViewBreakdown, highlightTariffs = false }: RegionalTreemapProps) {
   return (
     <div 
       className="border border-gray-200 rounded-md bg-white"
@@ -366,6 +375,7 @@ export function RegionalTreemap({ region, onViewBreakdown }: RegionalTreemapProp
               key={company.id} 
               company={company} 
               colorIndex={index}
+              highlightTariffs={highlightTariffs}
             />
           ))}
         </div>
@@ -376,9 +386,10 @@ export function RegionalTreemap({ region, onViewBreakdown }: RegionalTreemapProp
 
 interface RegionalTreemapsProps {
   regions: RegionData[];
+  highlightTariffs?: boolean;
 }
 
-export function RegionalTreemaps({ regions }: RegionalTreemapsProps) {
+export function RegionalTreemaps({ regions, highlightTariffs = false }: RegionalTreemapsProps) {
   return (
     <div className="space-y-4" data-testid="panel-regional-treemaps">
       {regions.map((region) => (
@@ -386,6 +397,7 @@ export function RegionalTreemaps({ regions }: RegionalTreemapsProps) {
           key={region.id} 
           region={region}
           onViewBreakdown={() => console.log(`View breakdown for ${region.name}`)}
+          highlightTariffs={highlightTariffs}
         />
       ))}
     </div>

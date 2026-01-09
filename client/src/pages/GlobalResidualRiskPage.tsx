@@ -495,7 +495,7 @@ const mockRegions: RegionData[] = [
 ];
 
 export default function GlobalResidualRiskPage() {
-  const [expandedRiskId, setExpandedRiskId] = useState<string | null>("risk-1");
+  const [expandedRiskId, setExpandedRiskId] = useState<string | null>(null);
 
   const totalExposure = "$27.4M";
   const mitigatedValue = "$19.7M";
@@ -597,7 +597,10 @@ export default function GlobalResidualRiskPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <RegionalTreemaps regions={mockRegions} />
+                    <RegionalTreemaps 
+                      regions={mockRegions} 
+                      highlightTariffs={expandedRiskId === "risk-1"}
+                    />
                   </CardContent>
                 </Card>
               </div>
