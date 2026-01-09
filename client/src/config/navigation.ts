@@ -137,14 +137,15 @@ export const modules: ModuleConfig[] = [
     ],
   },
   {
-    id: "cro",
-    name: "CRO Workspace",
-    icon: { type: "lucide", icon: "shield", alt: "CRO Workspace", active: false, path: "/cro/global-residual-risk", modulePrefix: "/cro" },
+    id: "residual-risk",
+    name: "Residual Risk",
+    icon: { type: "lucide", icon: "shield", alt: "Residual Risk", active: false, path: "/cro/global-residual-risk", modulePrefix: "/residual-risk" },
     sideNavSections: [
       {
-        title: "Risk Management",
+        title: "Dashboards",
         items: [
-          { id: "global-residual-risk", label: "Global Residual Risk", path: "/cro/global-residual-risk" },
+          { id: "cro-dashboard", label: "CRO", path: "/cro/global-residual-risk" },
+          { id: "cae-dashboard", label: "CAE", path: "/cae/audit-overview" },
         ],
       },
       {
@@ -159,51 +160,6 @@ export const modules: ModuleConfig[] = [
         items: [
           { id: "board-deck", label: "Board Deck", path: "/cro/board-deck" },
           { id: "quarterly-review", label: "Quarterly Review", path: "/cro/quarterly-review" },
-        ],
-      },
-    ],
-  },
-  {
-    id: "cae",
-    name: "CAE Workspace",
-    icon: { type: "lucide", icon: "folder", alt: "CAE Workspace", active: false, path: "/cae/audit-overview", modulePrefix: "/cae" },
-    sideNavSections: [
-      {
-        title: "Dashboards",
-        items: [
-          { id: "my-dashboard-cae", label: "My Dashboard", path: "/cae/my-dashboard" },
-          { id: "audit-overview", label: "Overview: M&A", path: "/cae/audit-overview" },
-        ],
-      },
-      {
-        title: "Inventory",
-        items: [
-          { id: "all-inventory-cae", label: "All Inventory", path: "/cae/all-inventory" },
-          { id: "coverage-mapping-cae", label: "Coverage Mapping", path: "/cae/coverage-mapping" },
-        ],
-      },
-      {
-        title: "Environment",
-        items: [
-          { id: "controls-cae", label: "Controls", path: "/cae/controls" },
-          { id: "tests-cae", label: "Tests", path: "/cae/tests" },
-          { id: "issues-cae", label: "Issues", path: "/cae/issues" },
-          { id: "financial-accounts-cae", label: "Financial Accounts", path: "/cae/financial-accounts" },
-          { id: "control-self-assessments", label: "Control Self Assessments", path: "/cae/control-self-assessments" },
-          { id: "processes", label: "Processes", path: "/cae/processes" },
-          { id: "scenario-planning", label: "Scenario Planning", path: "/cae/scenario-planning" },
-          { id: "reports-cae", label: "Reports", path: "/cae/reports" },
-        ],
-      },
-      {
-        title: "Views",
-        items: [
-          { id: "risk-control-matrix-cae", label: "Risk Control Matrix", path: "/cae/risk-control-matrix" },
-          { id: "coso-framework-cae", label: "COSO Framework", path: "/cae/coso-framework" },
-          { id: "financial-accounts-view-cae", label: "Financial Accounts View", path: "/cae/financial-accounts-view" },
-          { id: "financial-applications-view-cae", label: "Financial Applications View", path: "/cae/financial-applications-view" },
-          { id: "frameworks", label: "Frameworks", path: "/cae/frameworks" },
-          { id: "test-files", label: "Test Files", path: "/cae/test-files" },
         ],
       },
     ],
@@ -238,13 +194,9 @@ export function getModuleFromPath(path: string): ModuleConfig {
   if (path.startsWith("/reporting")) {
     return modules[3];
   }
-  // CRO Workspace module
-  if (path.startsWith("/cro")) {
+  // Residual Risk module (both CRO and CAE paths)
+  if (path.startsWith("/cro") || path.startsWith("/cae")) {
     return modules[4];
-  }
-  // CAE Workspace module
-  if (path.startsWith("/cae")) {
-    return modules[5];
   }
   // Default to Home
   return modules[0];
@@ -281,14 +233,9 @@ export function getActiveModuleIndex(path: string): number {
     return 3; // Reporting module
   }
   
-  // CRO Workspace module
-  if (path.startsWith("/cro")) {
-    return 4; // CRO Workspace module
-  }
-  
-  // CAE Workspace module
-  if (path.startsWith("/cae")) {
-    return 5; // CAE Workspace module
+  // Residual Risk module (both CRO and CAE paths)
+  if (path.startsWith("/cro") || path.startsWith("/cae")) {
+    return 4; // Residual Risk module
   }
   
   // Check if path matches Home module paths
