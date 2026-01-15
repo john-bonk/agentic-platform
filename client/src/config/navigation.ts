@@ -14,9 +14,20 @@ export type IconNavItem =
   | { type: "image"; src: string; alt: string; active: boolean; path?: string; modulePrefix?: string }
   | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity" | "bar-chart-3" | "shield"; alt: string; active: boolean; path?: string; modulePrefix?: string };
 
+export interface SideNavItem {
+  id: string;
+  label: string;
+  path: string;
+  badge?: string;
+  icon?: string;
+}
+
 export interface SideNavSection {
+  id: string;
   title: string;
-  items: { id: string; label: string; path: string; badge?: string }[];
+  items: SideNavItem[];
+  defaultExpanded?: boolean;
+  collapsible?: boolean;
 }
 
 export interface ModuleConfig {
@@ -36,21 +47,30 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
     title: "Enterprise Risk",
     sections: [
       {
+        id: "cro-dashboards",
         title: "Dashboards",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
           { id: "global-residual-risk-cro", label: "Global Residual Risk", path: "/global-residual-risk" },
         ],
       },
       {
+        id: "cro-inventory",
         title: "Inventory",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "all-inventory", label: "All Inventory", path: "/inventory" },
           { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
         ],
       },
       {
+        id: "cro-environment",
         title: "Environment",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "controls", label: "Controls", path: "/controls" },
           { id: "tests", label: "Tests", path: "/tests" },
@@ -59,7 +79,10 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         ],
       },
       {
+        id: "cro-views",
         title: "Views",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "risk-control-matrix", label: "Risk Control Matrix", path: "/risk-control-matrix" },
           { id: "coso-framework", label: "COSO Framework", path: "/coso-framework" },
@@ -74,21 +97,30 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
     title: "Enterprise Audit",
     sections: [
       {
+        id: "cae-dashboards",
         title: "Dashboards",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
           { id: "global-residual-risk-cae", label: "Global Residual Risk", path: "/global-residual-risk" },
         ],
       },
       {
+        id: "cae-inventory",
         title: "Inventory",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "all-inventory", label: "All Inventory", path: "/inventory" },
           { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
         ],
       },
       {
+        id: "cae-environment",
         title: "Environment",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "controls", label: "Controls", path: "/controls" },
           { id: "tests", label: "Tests", path: "/tests" },
@@ -97,7 +129,10 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         ],
       },
       {
+        id: "cae-views",
         title: "Views",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "risk-control-matrix", label: "Risk Control Matrix", path: "/risk-control-matrix" },
           { id: "coso-framework", label: "COSO Framework", path: "/coso-framework" },
@@ -112,21 +147,30 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
     title: "IT Security",
     sections: [
       {
+        id: "ciso-dashboards",
         title: "Dashboards",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
           { id: "global-residual-risk-ciso", label: "Global Residual Risk", path: "/global-residual-risk" },
         ],
       },
       {
+        id: "ciso-inventory",
         title: "Inventory",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "all-inventory", label: "All Inventory", path: "/inventory" },
           { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
         ],
       },
       {
+        id: "ciso-environment",
         title: "Environment",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "controls", label: "Controls", path: "/controls" },
           { id: "tests", label: "Tests", path: "/tests" },
@@ -135,7 +179,10 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         ],
       },
       {
+        id: "ciso-views",
         title: "Views",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "risk-control-matrix", label: "Risk Control Matrix", path: "/risk-control-matrix" },
           { id: "coso-framework", label: "COSO Framework", path: "/coso-framework" },
@@ -166,21 +213,30 @@ export const modules: ModuleConfig[] = [
     icon: { type: "lucide", icon: "home", alt: "Home", active: false, path: "/", modulePrefix: "/" },
     sideNavSections: [
       {
+        id: "home-dashboards",
         title: "Dashboards",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
           { id: "global-residual-risk-home", label: "Global Residual Risk", path: "/global-residual-risk" },
         ],
       },
       {
+        id: "home-inventory",
         title: "Inventory",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "all-inventory", label: "All Inventory", path: "/inventory" },
           { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
         ],
       },
       {
+        id: "home-environment",
         title: "Environment",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "controls", label: "Controls", path: "/controls" },
           { id: "tests", label: "Tests", path: "/tests" },
@@ -189,7 +245,10 @@ export const modules: ModuleConfig[] = [
         ],
       },
       {
+        id: "home-views",
         title: "Views",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "risk-control-matrix", label: "Risk Control Matrix", path: "/risk-control-matrix" },
           { id: "coso-framework", label: "COSO Framework", path: "/coso-framework" },
@@ -206,7 +265,10 @@ export const modules: ModuleConfig[] = [
     icon: { type: "lucide", icon: "workflow", alt: "Workflows", active: false, path: "/workflows", modulePrefix: "/workflow" },
     sideNavSections: [
       {
+        id: "workflow-operations",
         title: "Workflow Operations",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "workflow-list", label: "All Workflows", path: "/workflows" },
           { id: "workflow-new", label: "Create New", path: "/workflow/new" },
@@ -220,13 +282,19 @@ export const modules: ModuleConfig[] = [
     icon: { type: "lucide", icon: "activity", alt: "Intelligence Hub", active: false, path: "/intelligence", modulePrefix: "/intelligence" },
     sideNavSections: [
       {
+        id: "intel-command",
         title: "Command Center",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "intelligence-hub", label: "Intelligence Hub", path: "/intelligence" },
         ],
       },
       {
+        id: "intel-analytics",
         title: "Analytics",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "list", label: "Data Explorer", path: "/list" },
           { id: "hierarchy", label: "Entity Matrix", path: "/hierarchy" },
@@ -235,7 +303,10 @@ export const modules: ModuleConfig[] = [
         ],
       },
       {
+        id: "intel-system",
         title: "System",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "settings", label: "Configuration", path: "/settings" },
         ],
@@ -248,13 +319,19 @@ export const modules: ModuleConfig[] = [
     icon: { type: "lucide", icon: "bar-chart-3", alt: "Reporting", active: false, path: "/reporting", modulePrefix: "/reporting" },
     sideNavSections: [
       {
+        id: "reporting-reports",
         title: "Reports",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "reporting-overview", label: "Report Library", path: "/reporting" },
         ],
       },
       {
+        id: "reporting-artifacts",
         title: "Artifacts",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "board-reports", label: "Board Reports", path: "/reporting/board-reports" },
           { id: "audit-committee", label: "Audit Committee", path: "/reporting/audit-committee" },
@@ -262,7 +339,10 @@ export const modules: ModuleConfig[] = [
         ],
       },
       {
+        id: "reporting-tools",
         title: "Tools",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "slide-builder", label: "Slide Builder", path: "/reporting/slide-builder" },
           { id: "export-center", label: "Export Center", path: "/reporting/export-center" },
@@ -276,7 +356,10 @@ export const modules: ModuleConfig[] = [
     icon: { type: "lucide", icon: "shield", alt: "Residual Risk", active: false, path: "/cro/global-residual-risk", modulePrefix: "/residual-risk" },
     sideNavSections: [
       {
+        id: "risk-dashboards",
         title: "Dashboards",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "cro-dashboard", label: "CRO", path: "/cro/global-residual-risk" },
           { id: "cae-dashboard", label: "CAE", path: "/cae/global-residual-risk" },
@@ -284,14 +367,20 @@ export const modules: ModuleConfig[] = [
         ],
       },
       {
+        id: "risk-analytics",
         title: "Analytics",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "risk-heatmap", label: "Risk Heatmap", path: "/cro/risk-heatmap" },
           { id: "mitigation-tracker", label: "Mitigation Tracker", path: "/cro/mitigation-tracker" },
         ],
       },
       {
+        id: "risk-reports",
         title: "Reports",
+        defaultExpanded: true,
+        collapsible: true,
         items: [
           { id: "board-deck", label: "Board Deck", path: "/cro/board-deck" },
           { id: "quarterly-review", label: "Quarterly Review", path: "/cro/quarterly-review" },
