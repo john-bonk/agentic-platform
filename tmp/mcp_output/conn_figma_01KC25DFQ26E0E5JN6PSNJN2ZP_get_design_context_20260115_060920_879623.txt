@@ -1,0 +1,1026 @@
+<mcp_external_output>
+
+### Content Block 1 (Text)
+<frame id="2316:23572" name="Create Workspace 06" x="1853" y="427" width="1512" height="982">
+  <frame id="2316:23573" name="Navigation" x="49" y="50" width="236" height="932">
+    <frame id="2316:23574" name="Workplace" x="0" y="0" width="236" height="932">
+      <frame id="2316:23575" name="Nav" x="0" y="0" width="236" height="932">
+        <frame id="2316:23576" name="Nav Section 2" x="13.888888359069824" y="20" width="208.3333282470703" height="212.5208282470703">
+          <instance id="2316:23577" name=".Category" x="0" y="0" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23578" name="Nav Section 1" x="0" y="30.645832061767578" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23579" name=".Nav Section Options 1" x="0" y="61.291664123535156" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23580" name=".Nav Section Options 2" x="0" y="91.9375" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23581" name=".Nav Section Options 3" x="0" y="122.58332824707031" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23582" name=".Nav Section Options 4" x="0" y="153.22915649414062" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23583" name=".Nav Section Options 5" x="0" y="183.87498474121094" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23584" name=".Nav Section Options 6" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+          <instance id="2316:23585" name=".Nav Section Options 7" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+          <instance id="2316:23586" name=".Nav Section Options 8" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+          <instance id="2316:23587" name=".Nav Section Options 9" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+          <instance id="2316:23588" name=".Nav Section Options 10" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+        </frame>
+        <frame id="2316:23589" name="Nav Section 6" x="13.888888359069824" y="256.8263854980469" width="208.3333282470703" height="243.16665649414062">
+          <instance id="2316:23590" name=".Category" x="0" y="0" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23591" name=".Nav Section Options 1" x="0" y="30.645832061767578" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23592" name=".Nav Section Options 11" x="0" y="61.291664123535156" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23593" name=".Nav Section Options 12" x="0" y="91.9375" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23594" name=".Nav Section Options 2" x="0" y="122.58332824707031" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23595" name=".Nav Section Options 3" x="0" y="153.22915649414062" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23596" name=".Nav Section Options 4" x="0" y="183.87498474121094" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23597" name=".Nav Section Options 5" x="0" y="214.52081298828125" width="208.3333282470703" height="28.645832061767578" />
+          <instance id="2316:23598" name=".Nav Section Options 6" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+          <instance id="2316:23599" name=".Nav Section Options 7" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+          <instance id="2316:23600" name=".Nav Section Options 8" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+          <instance id="2316:23601" name=".Nav Section Options 9" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+          <instance id="2316:23602" name=".Nav Section Options 10" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+        </frame>
+        <instance id="2316:23603" name="Nav Section 3" x="13.888888359069824" y="524.298583984375" width="208.3333282470703" height="241.31942749023438" />
+        <instance id="2316:23604" name="Nav Section 4" x="13.888888359069824" y="719.6180419921875" width="208.3333282470703" height="150.17359924316406" hidden="true" />
+        <instance id="2316:23605" name="Nav Section 5" x="13.888885498046875" y="711.8056640625" width="208.3333282470703" height="150.17359924316406" hidden="true" />
+      </frame>
+    </frame>
+  </frame>
+  <instance id="2316:23606" name="Nav 1" x="1" y="51" width="48" height="932" />
+  <frame id="2316:23607" name="Top Navbar" x="285" y="50" width="1229" height="24">
+    <frame id="2316:23608" name="Tablist" x="0" y="-0.40151214599609375" width="959.792724609375" height="24.401512145996094">
+      <frame id="2316:23609" name="Icon Tab 01" x="0" y="0" width="27.112791061401367" height="24.401512145996094">
+        <instance id="2316:23610" name="x-lg" x="9.489476203918457" y="8.133838653564453" width="8.133835792541504" height="8.133835792541504" />
+      </frame>
+      <frame id="2316:23611" name="Icon Tab 02" x="27.112791061401367" y="0" width="27.112791061401367" height="24.401512145996094">
+        <instance id="2316:23612" name="pin" x="9.489476203918457" y="8.133838653564453" width="8.133835792541504" height="8.133835792541504" />
+      </frame>
+      <frame id="2316:23613" name="Icon Tab 03" x="54.225582122802734" y="0" width="27.112791061401367" height="24.401512145996094">
+        <instance id="2316:23614" name="gear" x="9.489476203918457" y="8.133838653564453" width="8.133835792541504" height="8.133835792541504" />
+      </frame>
+      <instance id="2316:23615" name="Tab 9" x="81.33837127685547" y="0" width="97.60604095458984" height="24.40151023864746" />
+      <instance id="2316:23616" name="Tab 18" x="178.9444122314453" y="0" width="97.60604095458984" height="24.40151023864746" />
+      <instance id="2316:23617" name="Tab 01" x="87.43873596191406" y="-0.0000016954209058894776" width="97.60604095458984" height="24.40151023864746" hidden="true" />
+      <instance id="2316:23618" name="Tab 02" x="187.07826232910156" y="-0.0000016954209058894776" width="97.60604095458984" height="24.40151023864746" hidden="true" />
+      <instance id="2316:23619" name="Tab 03" x="286.7177429199219" y="-0.0000016954209058894776" width="97.60604095458984" height="24.40151023864746" hidden="true" />
+      <instance id="2316:23620" name="Tab 10" x="276.5504455566406" y="0" width="97.60604095458984" height="24.40151023864746" />
+      <instance id="2316:23621" name="Tab 11" x="374.156494140625" y="0" width="97.60604095458984" height="24.40151023864746" />
+      <instance id="2316:23622" name="Tab 12" x="471.7625427246094" y="0" width="97.60604095458984" height="24.40151023864746" />
+      <instance id="2316:23623" name="Tab 13" x="569.3685913085938" y="0" width="97.60604095458984" height="24.40151023864746" />
+      <instance id="2316:23624" name="Tab 04" x="666.974609375" y="0" width="97.60604095458984" height="24.40151023864746" />
+      <instance id="2316:23625" name="Tab 17" x="764.5806274414062" y="0" width="97.60604095458984" height="24.40151023864746" />
+      <instance id="2316:23626" name="Tab 16" x="862.1866455078125" y="0" width="97.60604095458984" height="24.40151023864746" />
+      <instance id="2316:23627" name="Tab 05" x="187.07826232910156" y="-0.0000016954209058894776" width="97.60604095458984" height="24.40151023864746" hidden="true" />
+      <instance id="2316:23628" name="Tab 06" x="286.7177429199219" y="-0.0000016954209058894776" width="97.60604095458984" height="24.40151023864746" hidden="true" />
+      <instance id="2316:23629" name="Tab 07" x="187.07826232910156" y="-0.0000016954209058894776" width="97.60604095458984" height="24.40151023864746" hidden="true" />
+    </frame>
+  </frame>
+  <instance id="2316:23630" name="View Header" x="286" y="74" width="1226" height="98" />
+  <frame id="2316:23631" name="Top Navbar" x="0" y="0" width="1514" height="50">
+    <frame id="2316:23632" name="End Actions" x="1279" y="0" width="227" height="50">
+      <frame id="2316:23633" name="Actions" x="0" y="5" width="172" height="40">
+        <instance id="2316:23634" name=".Nav Item" x="0" y="0" width="40" height="40" />
+        <instance id="2316:23635" name=".Nav Item" x="44" y="0" width="40" height="40" />
+        <instance id="2316:23636" name=".Nav Item" x="88" y="0" width="40" height="40" />
+        <instance id="2316:23637" name=".Nav Item" x="132" y="0" width="40" height="40" />
+      </frame>
+      <frame id="2316:23638" name="Avatar Menu" x="184" y="5" width="43" height="40">
+        <instance id="2316:23639" name="Avatar" x="0" y="8" width="24" height="24" />
+        <instance id="2316:23640" name="carat-down" x="27" y="12" width="16" height="16" />
+      </frame>
+    </frame>
+    <frame id="2316:23641" name="Group 1" x="612" y="10.8212890625" width="460" height="28">
+      <rounded-rectangle id="2316:23642" name="Rectangle 1" x="612" y="10.8212890625" width="460" height="28" />
+      <frame id="2316:23643" name="Frame 965509" x="1035.158203125" y="15.39605712890625" width="28.8504638671875" height="18.8504638671875">
+        <text id="2316:23644" name="⌘ + K" x="4.425232410430908" y="4.425232410430908" width="20" height="10" />
+      </frame>
+      <text id="2316:23645" name="Search by topic or ask a question" x="645" y="15.4462890625" width="192" height="19" />
+      <instance id="2316:23646" name="search" x="622.158203125" y="18.99993896484375" width="12" height="12" />
+      <text id="2316:23647" name="Text" x="654.158203125" y="15.1962890625" width="0" height="19.25" />
+    </frame>
+    <frame id="2316:23648" name="Nav Bar Option" x="7" y="8" width="34.72222137451172" height="34.72222137451172">
+      <frame id="2316:23649" name="AuditBoard" x="5.208319664001465" y="5.208251953125" width="24.30555534362793" height="24.30555534362793" />
+    </frame>
+  </frame>
+  <frame id="2316:23651" name="CROScenario" x="285" y="172" width="1216" height="743">
+    <frame id="2316:23652" name="Container" x="34.25352096557617" y="16" width="1147.492919921875" height="1573.5211181640625">
+      <frame id="2316:23653" name="Container" x="0" y="0" width="608" height="1573.5211181640625">
+        <frame id="2316:23654" name="Container" x="0" y="0" width="608" height="470">
+          <frame id="2316:23655" name="Heading 3" x="0" y="0" width="608" height="25.690141677856445">
+            <text id="2316:23656" name="Top Risks &amp; Mitigation Plans" x="-0.0003851232468150556" y="2.4647955894470215" width="209" height="21" />
+          </frame>
+          <frame id="2316:23657" name="Container" x="0" y="42.81690216064453" width="608" height="754.1126708984375">
+            <frame id="2316:23658" name="Container" x="0" y="0" width="608" height="87.7699966430664">
+              <frame id="2316:23659" name="Container" x="19.26760482788086" y="19.26760482788086" width="569.4647827148438" height="51.38028335571289">
+                <frame id="2316:23660" name="Container" x="-0.0000152587890625" y="2.943662643432617" width="390.3279113769531" height="45.492958068847656">
+                  <frame id="2316:23661" name="Container" x="0" y="0" width="390.3279113769531" height="23.54929542541504">
+                    <frame id="2316:23662" name="Badge" x="0" y="3.7746477127075195" width="57" height="16">
+                      <text id="2316:23663" name="CRITICAL" x="7.5" y="0" width="42" height="16" />
+                    </frame>
+                    <frame id="2316:23664" name="Paragraph" x="65.5633773803711" y="0.5352115631103516" width="133.4515838623047" height="22.478872299194336">
+                      <text id="2316:23665" name="US Tariffs Enacted" x="-0.0008527729078195989" y="0.00003266670319135301" width="122" height="23" />
+                    </frame>
+                    <frame id="2316:23666" name="Text" x="207.57833862304688" y="0.5352115631103516" width="40.04885482788086" height="22.478872299194336">
+                      <text id="2316:23667" name="$10M" x="0.00044014083687216043" y="0.00003266670319135301" width="39" height="23" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23668" name="Paragraph" x="0" y="27.83098602294922" width="390.3279113769531" height="17.661972045898438">
+                    <text id="2316:23669" name="Supply chain diversification to ASEAN region under" x="-0.00035761442268267274" y="-0.5351803302764893" width="270" height="18" />
+                  </frame>
+                </frame>
+                <frame id="2316:23670" name="Container" x="390.327880859375" y="0" width="179.1368865966797" height="51.38028335571289">
+                  <frame id="2316:23671" name="Container" x="-0.000577684841118753" y="2.408491849899292" width="59.24956130981445" height="46.56338119506836">
+                    <frame id="2316:23672" name="Paragraph" x="0" y="0" width="59.24956130981445" height="28.901409149169922">
+                      <text id="2316:23673" name="85" x="35.18120193481445" y="-0.5351665616035461" width="25" height="29" />
+                      <instance id="2316:23674" name=".Nav Item" x="19.150390625" y="6.5070037841796875" width="16" height="16" />
+                    </frame>
+                    <frame id="2316:23675" name="Paragraph" x="0" y="28.901409149169922" width="59.24956130981445" height="17.661972045898438">
+                      <text id="2316:23676" name="Risk Score" x="7.492380142211914" y="-0.5352473855018616" width="52" height="18" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23677" name="Container" x="76.37574005126953" y="0.00004126320345676504" width="102.76056671142578" height="51.38028335571289">
+                    <frame id="2316:23678" name="Icon" x="0" y="0" width="102.76056671142578" height="51.38028335571289" />
+                  </frame>
+                </frame>
+              </frame>
+              <frame id="2316:23682" name="Container" x="19.26760482788086" y="87.77464294433594" width="569.4647827148438" height="1">
+                <frame id="2316:23683" name="Container" x="0" y="18.19718360900879" width="569.4647827148438" height="48.16901397705078">
+                  <frame id="2316:23684" name="Container" x="-0.08935546875" y="0.09326171875" width="70" height="48">
+                    <frame id="2316:23685" name="Paragraph" x="0" y="0" width="70" height="17.661972045898438">
+                      <text id="2316:23686" name="TIMELINE" x="-0.00035761442268267274" y="-0.5352903604507446" width="50" height="18" />
+                    </frame>
+                    <frame id="2316:23687" name="Paragraph" x="0" y="21.943662643432617" width="70" height="22.478872299194336">
+                      <text id="2316:23688" name="Q2 2025" x="-0.00035761442268267274" y="-0.000020631603547371924" width="60" height="23" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23689" name="Container" x="99.91064453125" y="0" width="178.40097045898438" height="48.16901397705078">
+                    <frame id="2316:23690" name="Paragraph" x="0" y="0" width="178.40097045898438" height="17.661972045898438">
+                      <text id="2316:23691" name="OWNER" x="0.000027508802304510027" y="-0.5352903604507446" width="42" height="18" />
+                    </frame>
+                    <frame id="2316:23692" name="Button" x="0" y="20.61962890625" width="100.05105590820312" height="22.478872299194336">
+                      <text id="2316:23693" name="Assign Owner" x="0" y="0" width="93" height="23" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23694" name="Container" x="225.91064453125" y="0" width="178.40933227539062" height="48.16901397705078">
+                    <frame id="2316:23695" name="Paragraph" x="0.000412632041843608" y="-0.00007908781117293984" width="178.40933227539062" height="17.661972045898438">
+                      <text id="2316:23696" name="MITIGATION STATUS" x="0.000412632041843608" y="-0.5352903604507446" width="107" height="18" />
+                    </frame>
+                    <frame id="2316:23697" name="Badge" x="-0.14453125" y="27.09326171875" width="76" height="16">
+                      <text id="2316:23698" name="NOT STARTED" x="6.5" y="0" width="63" height="16" />
+                    </frame>
+                  </frame>
+                </frame>
+                <frame id="2316:23699" name="Container" x="0" y="83.49295806884766" width="569.4647827148438" height="99">
+                  <frame id="2316:23700" name="Paragraph" x="0" y="0" width="569.4647827148438" height="17.661972045898438">
+                    <text id="2316:23701" name="RECOMMENDED MITIGATIONS" x="20.478515625" y="-0.5351715087890625" width="160" height="18" />
+                    <instance id="2316:23702" name=".Nav Item" x="0.478515625" y="-0.084503173828125" width="16" height="16" />
+                  </frame>
+                  <frame id="2316:23703" name="Container" x="0" y="26.225353240966797" width="569.4647827148438" height="22.478872299194336">
+                    <frame id="2316:23704" name="Paragraph" x="14.985557556152344" y="0.000051579005230451" width="548.0145263671875" height="22.478872299194336">
+                      <text id="2316:23705" name="Establish supplier diversification to ASEAN region" x="-13.074951171875" y="0" width="448" height="68" />
+                    </frame>
+                  </frame>
+                </frame>
+                <instance id="2316:23706" name="Divider" x="0" y="199.61972045898438" width="569.4647827148438" height="1" />
+                <frame id="2316:23707" name="Frame 2085662665" x="0" y="217.74647521972656" width="569.4647827148438" height="121.67605590820312">
+                  <frame id="2316:23708" name="Container" x="0" y="0" width="569.4647827148438" height="40.140846252441406">
+                    <frame id="2316:23709" name="Paragraph" x="0" y="11.2392578125" width="124.23591613769531" height="17.661972045898438">
+                      <text id="2316:23710" name="COST OF MITIGATION" x="4.478515625" y="-0.53515625" width="114" height="18" />
+                    </frame>
+                    <frame id="2316:23711" name="Container" x="410.94189453125" y="0" width="158.52288818359375" height="40.140846252441406">
+                      <frame id="2316:23712" name="Paragraph" x="0" y="0" width="158.52288818359375" height="22.478872299194336">
+                        <text id="2316:23713" name="$1M" x="129.37074279785156" y="0.000006877200121380156" width="30" height="23" />
+                      </frame>
+                      <frame id="2316:23714" name="Paragraph" x="0.00013754400424659252" y="22.478879928588867" width="158.52288818359375" height="17.661972045898438">
+                        <text id="2316:23715" name="from Compliance with FSMA" x="19.267744064331055" y="-0.5350909233093262" width="141" height="18" />
+                      </frame>
+                    </frame>
+                  </frame>
+                  <frame id="2316:23716" name="Container" x="0" y="45.140846252441406" width="569.4647827148438" height="76.53520965576172">
+                    <frame id="2316:23717" name="Frame 2085662664" x="12.845069885253906" y="12.845069885253906" width="471.2785949707031" height="50.90140914916992">
+                      <frame id="2316:23718" name="Container" x="0" y="0" width="471.2785949707031" height="28.901409149169922">
+                        <frame id="2316:23719" name="Paragraph" x="0" y="3.211268424987793" width="276.9132995605469" height="22.478872299194336">
+                          <text id="2316:23720" name="Projected Impact with $1M Investment" x="19.6328125" y="-0.000030517578125" width="254" height="23" />
+                          <instance id="2316:23721" name=".Nav Item" x="-0.3671875" y="3.676055908203125" width="16" height="16" />
+                        </frame>
+                      </frame>
+                      <frame id="2316:23722" name="Paragraph" x="0" y="32.90140914916992" width="461" height="18">
+                        <text id="2316:23723" name="Reduces net tariff exposure from $10M to $1.5M by " x="0.0009628080879338086" y="-0.535328209400177" width="300" height="18" />
+                      </frame>
+                    </frame>
+                    <frame id="2316:23724" name="Paragraph" x="488.40533447265625" y="12.845069885253906" width="68.21434783935547" height="63.69013977050781">
+                      <text id="2316:23725" name="-$8.5M" x="-0.49462890625" y="-0.23095703125" width="68" height="58" />
+                    </frame>
+                  </frame>
+                </frame>
+              </frame>
+            </frame>
+            <frame id="2316:23726" name="Container" x="0" y="100.61506652832031" width="608" height="87.77465057373047">
+              <frame id="2316:23727" name="Container" x="18.19718360900879" y="18.19718360900879" width="571.6056518554688" height="51.38028335571289">
+                <frame id="2316:23728" name="Container" x="0" y="2.943662643432617" width="392.46875" height="45.492958068847656">
+                  <frame id="2316:23729" name="Container" x="0" y="0" width="392.46875" height="23.54929542541504">
+                    <frame id="2316:23730" name="Badge" x="0" y="3.7746477127075195" width="57" height="16">
+                      <text id="2316:23731" name="HIGH" x="17" y="0" width="23" height="16" />
+                    </frame>
+                    <frame id="2316:23732" name="Paragraph" x="65.5633773803711" y="0.5352115631103516" width="170.13864135742188" height="22.478872299194336">
+                      <text id="2316:23733" name="EU Regulatory Changes" x="0.0009352993220090866" y="0.0000034385993785690516" width="157" height="23" />
+                    </frame>
+                    <frame id="2316:23734" name="Text" x="244.26541137695312" y="0.5352115631103516" width="46.12015914916992" height="22.478872299194336">
+                      <text id="2316:23735" name="$6.2M" x="0" y="0" width="45" height="23" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23736" name="Paragraph" x="0" y="27.83098602294922" width="392.46875" height="17.661972045898438">
+                    <text id="2316:23737" name="Legal entity restructuring and compliance review i" x="-0.0004676496610045433" y="-0.5353316068649292" width="293" height="18" />
+                  </frame>
+                </frame>
+                <frame id="2316:23738" name="Container" x="392.46875" y="0" width="179.1368865966797" height="51.38028335571289">
+                  <frame id="2316:23739" name="Container" x="-0.0004676496610045433" y="2.4083406925201416" width="59.24956130981445" height="46.56338119506836">
+                    <frame id="2316:23740" name="Paragraph" x="0" y="0" width="59.24956130981445" height="28.901409149169922">
+                      <text id="2316:23741" name="68" x="33.70948028564453" y="-0.5353178381919861" width="25" height="29" />
+                    </frame>
+                    <frame id="2316:23742" name="Paragraph" x="0" y="28.901409149169922" width="59.24956130981445" height="17.661972045898438">
+                      <text id="2316:23743" name="Risk Score" x="7.492490291595459" y="-0.5352765917778015" width="52" height="18" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23744" name="Container" x="76.3758544921875" y="-0.00011003520921804011" width="102.76056671142578" height="51.38028335571289">
+                    <frame id="2316:23745" name="Icon" x="0" y="0" width="102.76056671142578" height="51.38028335571289" />
+                    <frame id="2316:23746" name="Group 80" x="8.13623046875" y="31.76904296875" width="87" height="18" />
+                  </frame>
+                </frame>
+              </frame>
+            </frame>
+            <frame id="2316:23749" name="Container" x="0" y="201.2347869873047" width="608" height="87.77465057373047">
+              <frame id="2316:23750" name="Container" x="18.19718360900879" y="18.19718360900879" width="571.6056518554688" height="51.38028335571289">
+                <frame id="2316:23751" name="Container" x="0" y="2.943662643432617" width="392.46875" height="45.492958068847656">
+                  <frame id="2316:23752" name="Container" x="0" y="0" width="392.46875" height="23.54929542541504">
+                    <frame id="2316:23753" name="Badge" x="0" y="3.7746477127075195" width="57" height="16">
+                      <text id="2316:23754" name="MEDIUM" x="9.5" y="0" width="38" height="16" />
+                    </frame>
+                    <frame id="2316:23755" name="Paragraph" x="65.5633773803711" y="0.5352115631103516" width="186.2953338623047" height="22.478872299194336">
+                      <text id="2316:23756" name="Currency Fluctuation Risk" x="0.0007152288453653455" y="0.00009284220868721604" width="170" height="23" />
+                    </frame>
+                    <frame id="2316:23757" name="Text" x="260.4220886230469" y="0.5352115631103516" width="46.2121467590332" height="22.478872299194336">
+                      <text id="2316:23758" name="$3.8M" x="0" y="0" width="45" height="23" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23759" name="Paragraph" x="0" y="27.83098602294922" width="392.46875" height="17.661972045898438">
+                    <text id="2316:23760" name="Hedging strategy implementation across major curre" x="-0.0004676496610045433" y="-0.5352421998977661" width="282" height="18" />
+                  </frame>
+                </frame>
+                <frame id="2316:23761" name="Container" x="392.46875" y="0" width="179.1368865966797" height="51.38028335571289">
+                  <frame id="2316:23762" name="Container" x="-0.0004676496610045433" y="2.4084300994873047" width="59.24956130981445" height="46.56338119506836">
+                    <frame id="2316:23763" name="Paragraph" x="0" y="0" width="59.24956130981445" height="28.901409149169922">
+                      <text id="2316:23764" name="47" x="36.44407272338867" y="-0.535228431224823" width="24" height="29" />
+                    </frame>
+                    <frame id="2316:23765" name="Paragraph" x="0" y="28.901409149169922" width="59.24956130981445" height="17.661972045898438">
+                      <text id="2316:23766" name="Risk Score" x="7.492490291595459" y="-0.5351871848106384" width="52" height="18" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23767" name="Container" x="76.3758544921875" y="-0.000020631603547371924" width="102.76056671142578" height="51.38028335571289">
+                    <frame id="2316:23768" name="Icon" x="0" y="0" width="102.76056671142578" height="51.38028335571289" />
+                    <frame id="2316:23769" name="Group 80" x="8.13623046875" y="32.1494140625" width="87" height="18" />
+                  </frame>
+                </frame>
+              </frame>
+            </frame>
+            <frame id="2316:23772" name="Container" x="0" y="301.8544921875" width="608" height="87.77465057373047">
+              <frame id="2316:23773" name="Container" x="18.19718360900879" y="18.19718360900879" width="571.6056518554688" height="51.38028335571289">
+                <frame id="2316:23774" name="Container" x="0" y="2.943662643432617" width="392.46875" height="45.492958068847656">
+                  <frame id="2316:23775" name="Container" x="0" y="0" width="392.46875" height="23.54929542541504">
+                    <frame id="2316:23776" name="Badge" x="0" y="3.7746477127075195" width="57" height="16">
+                      <text id="2316:23777" name="HIGH" x="17" y="0" width="23" height="16" />
+                    </frame>
+                    <frame id="2316:23778" name="Paragraph" x="65.5633773803711" y="0.5352115631103516" width="167.10299682617188" height="22.478872299194336">
+                      <text id="2316:23779" name="Supplier Concentration" x="0.0009352993220090866" y="-0.00006189481064211577" width="153" height="23" />
+                    </frame>
+                    <frame id="2316:23780" name="Text" x="241.22976684570312" y="0.5352115631103516" width="43.377201080322266" height="22.478872299194336">
+                      <text id="2316:23781" name="$5.1M" x="-0.0006602112553082407" y="-0.00006189481064211577" width="42" height="23" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23782" name="Paragraph" x="0" y="27.83098602294922" width="392.46875" height="17.661972045898438">
+                    <text id="2316:23783" name="Dual-sourcing initiative for critical components i" x="-0.0004676496610045433" y="-0.535152792930603" width="269" height="18" />
+                  </frame>
+                </frame>
+                <frame id="2316:23784" name="Container" x="392.46875" y="0" width="179.1368865966797" height="51.38028335571289">
+                  <frame id="2316:23785" name="Container" x="-0.0004676496610045433" y="2.4085195064544678" width="59.24956130981445" height="46.56338119506836">
+                    <frame id="2316:23786" name="Paragraph" x="0" y="0" width="59.24956130981445" height="28.901409149169922">
+                      <text id="2316:23787" name="72" x="36.21828079223633" y="-0.5351390838623047" width="23" height="29" />
+                    </frame>
+                    <frame id="2316:23788" name="Paragraph" x="0" y="28.901409149169922" width="59.24956130981445" height="17.661972045898438">
+                      <text id="2316:23789" name="Risk Score" x="7.492490291595459" y="-0.5350977778434753" width="52" height="18" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23790" name="Container" x="76.3758544921875" y="0.00006877200939925388" width="102.76056671142578" height="51.38028335571289" />
+                </frame>
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+        <frame id="2316:23794" name="Container" x="0" y="495.69012451171875" width="608" height="750.9014282226562">
+          <frame id="2316:23795" name="Heading 3" x="0" y="0" width="608" height="25.690141677856445">
+            <text id="2316:23796" name="Strategic Objectives" x="-0.0003851232468150556" y="2.4648849964141846" width="152" height="21" />
+          </frame>
+          <frame id="2316:23797" name="Container" x="0" y="42.81690216064453" width="608" height="708.0845336914062">
+            <frame id="2316:23798" name="Container" x="0" y="0" width="608" height="227.46478271484375">
+              <frame id="2316:23799" name="Container" x="18.19679832458496" y="18.19728660583496" width="571.6056518554688" height="40.140846252441406">
+                <frame id="2316:23800" name="Container" x="-0.0004676496610045433" y="2.1408658027648926" width="25.690141677856445" height="25.690141677856445">
+                  <frame id="2316:23801" name="Text" x="9.792694091796875" y="4.014084815979004" width="6.096390724182129" height="17.661972045898438">
+                    <text id="2316:23802" name="1" x="-0.0007427376694977283" y="-0.5352903604507446" width="6" height="18" />
+                  </frame>
+                </frame>
+                <frame id="2316:23803" name="Container" x="38.53474426269531" y="0.00002063160172838252" width="533.0704345703125" height="40.140846252441406">
+                  <frame id="2316:23804" name="Paragraph" x="0" y="0" width="533.0704345703125" height="22.478872299194336">
+                    <text id="2316:23805" name="Expand into advanced farming" x="-0.000412632041843608" y="0.00002063160172838252" width="200" height="23" />
+                  </frame>
+                  <frame id="2316:23806" name="Paragraph" x="0" y="22.478872299194336" width="533.0704345703125" height="17.661972045898438">
+                    <text id="2316:23807" name="Target: Q3 2025 | Owner: Innovation &amp; Growth" x="-0.000412632041843608" y="-0.5353212952613831" width="229" height="18" />
+                  </frame>
+                </frame>
+              </frame>
+              <frame id="2316:23808" name="Container" x="1.0700373649597168" y="71.1832046508789" width="605.859130859375" height="155.21127319335938">
+                <frame id="2316:23809" name="Container" x="0" y="1.0704225301742554" width="605.859130859375" height="34.78873062133789">
+                  <frame id="2316:23810" name="Text" x="17.126760482788086" y="8.563379287719727" width="60.529048919677734" height="17.661972045898438">
+                    <text id="2316:23811" name="INITIATIVE" x="-0.0004676496610045433" y="-0.5351012349128723" width="55" height="18" />
+                  </frame>
+                  <frame id="2316:23812" name="Text" x="555.5659790039062" y="8.563379287719727" width="33.16637420654297" height="17.661972045898438">
+                    <text id="2316:23813" name="COST" x="-0.0006602112553082407" y="-0.5351012349128723" width="31" height="18" />
+                  </frame>
+                </frame>
+                <frame id="2316:23814" name="Container" x="0" y="35.859153747558594" width="605.859130859375" height="119.35211181640625">
+                  <frame id="2316:23815" name="Container" x="0" y="0" width="605.859130859375" height="40.140846252441406">
+                    <frame id="2316:23816" name="Container" x="17.126760482788086" y="10.704225540161133" width="180.3411102294922" height="17.661972045898438">
+                      <frame id="2316:23817" name="Container" x="0" y="0.2676057815551758" width="4.2816901206970215" height="17.126760482788086" />
+                      <frame id="2316:23818" name="Text" x="12.845069885253906" y="0" width="167.49603271484375" height="17.661972045898438">
+                        <text id="2316:23819" name="Vertical farming pilot program" x="0.0008527729078195989" y="-0.5352112650871277" width="144" height="18" />
+                      </frame>
+                    </frame>
+                    <frame id="2316:23820" name="Text" x="552.9902954101562" y="10.704225540161133" width="35.7420768737793" height="17.661972045898438">
+                      <text id="2316:23821" name="$1.4M" x="-0.0001925616234075278" y="-0.5352112650871277" width="34" height="18" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23822" name="Container" x="0" y="40.140846252441406" width="605.859130859375" height="40.140846252441406">
+                    <frame id="2316:23823" name="Container" x="17.126760482788086" y="10.704225540161133" width="194.0475311279297" height="17.661972045898438">
+                      <frame id="2316:23824" name="Container" x="0" y="0.2676057815551758" width="4.2816901206970215" height="17.126760482788086" />
+                      <frame id="2316:23825" name="Text" x="12.845062255859375" y="0" width="181.2024688720703" height="17.661972045898438">
+                        <text id="2316:23826" name="Precision agriculture technology" x="0.0008527729078195989" y="-0.5352353453636169" width="157" height="18" />
+                      </frame>
+                    </frame>
+                    <frame id="2316:23827" name="Text" x="548.8424072265625" y="10.704225540161133" width="39.88996505737305" height="17.661972045898438">
+                      <text id="2316:23828" name="$890K" x="0.00035761442268267274" y="-0.5352353453636169" width="38" height="18" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23829" name="Container" x="0" y="80.28169250488281" width="605.859130859375" height="39.0704231262207">
+                    <frame id="2316:23830" name="Container" x="17.126760482788086" y="10.704225540161133" width="198.41285705566406" height="17.661972045898438">
+                      <frame id="2316:23831" name="Container" x="0" y="0.2676057815551758" width="4.2816901206970215" height="17.126760482788086" />
+                      <frame id="2316:23832" name="Text" x="12.845069885253906" y="0" width="185.56777954101562" height="17.661972045898438">
+                        <text id="2316:23833" name="Sustainable farming partnerships" x="0.0008527729078195989" y="-0.5352594256401062" width="162" height="18" />
+                      </frame>
+                    </frame>
+                    <frame id="2316:23834" name="Text" x="549.586669921875" y="10.704225540161133" width="39.145687103271484" height="17.661972045898438">
+                      <text id="2316:23835" name="$520K" x="0.0004951584269292653" y="-0.5352594256401062" width="37" height="18" />
+                    </frame>
+                  </frame>
+                </frame>
+              </frame>
+            </frame>
+            <frame id="2316:23836" name="Container" x="0" y="240.30984497070312" width="608" height="227.46478271484375">
+              <frame id="2316:23837" name="Container" x="18.19679832458496" y="18.197086334228516" width="571.6056518554688" height="40.140846252441406">
+                <frame id="2316:23838" name="Container" x="-0.0004676496610045433" y="2.1409103870391846" width="25.690141677856445" height="25.690141677856445">
+                  <frame id="2316:23839" name="Text" x="9.023327827453613" y="4.014084815979004" width="7.643486022949219" height="17.661972045898438">
+                    <text id="2316:23840" name="2" x="-0.000577684841118753" y="-0.5352456569671631" width="8" height="18" />
+                  </frame>
+                </frame>
+                <frame id="2316:23841" name="Container" x="38.53474426269531" y="0.00006533340638270602" width="533.0704345703125" height="40.140846252441406">
+                  <frame id="2316:23842" name="Paragraph" x="0" y="0" width="533.0704345703125" height="22.478872299194336">
+                    <text id="2316:23843" name="Compliance with FSMA" x="-0.000412632041843608" y="0.00006533340638270602" width="154" height="23" />
+                  </frame>
+                  <frame id="2316:23844" name="Paragraph" x="0" y="22.478872299194336" width="533.0704345703125" height="17.661972045898438">
+                    <text id="2316:23845" name="Target: Q2 2025 | Owner: Quality &amp; Regulatory" x="-0.000412632041843608" y="-0.5352765917778015" width="229" height="18" />
+                  </frame>
+                </frame>
+              </frame>
+              <frame id="2316:23846" name="Container" x="1.0700373649597168" y="71.18299865722656" width="605.859130859375" height="155.21127319335938">
+                <frame id="2316:23847" name="Container" x="0" y="1.0704225301742554" width="605.859130859375" height="34.78873062133789">
+                  <frame id="2316:23848" name="Text" x="17.126760482788086" y="8.563379287719727" width="60.529048919677734" height="17.661972045898438">
+                    <text id="2316:23849" name="INITIATIVE" x="-0.0004676496610045433" y="-0.5353006720542908" width="55" height="18" />
+                  </frame>
+                  <frame id="2316:23850" name="Text" x="555.5659790039062" y="8.563379287719727" width="33.16637420654297" height="17.661972045898438">
+                    <text id="2316:23851" name="COST" x="-0.0006602112553082407" y="-0.5353006720542908" width="31" height="18" />
+                  </frame>
+                </frame>
+                <frame id="2316:23852" name="Container" x="0" y="35.859153747558594" width="605.859130859375" height="119.35211181640625">
+                  <frame id="2316:23853" name="Container" x="0" y="0" width="605.859130859375" height="40.140846252441406">
+                    <frame id="2316:23854" name="Container" x="17.126760482788086" y="10.704225540161133" width="194.0475311279297" height="17.661972045898438">
+                      <frame id="2316:23855" name="Container" x="0" y="0.2676057815551758" width="4.2816901206970215" height="17.126760482788086" />
+                      <frame id="2316:23856" name="Text" x="12.845062255859375" y="0" width="181.2024688720703" height="17.661972045898438">
+                        <text id="2316:23857" name="Food safety modernization audit" x="0.0008527729078195989" y="-0.5351665616035461" width="158" height="18" />
+                      </frame>
+                    </frame>
+                    <frame id="2316:23858" name="Text" x="549.0096435546875" y="10.704225540161133" width="39.72270965576172" height="17.661972045898438">
+                      <text id="2316:23859" name="$340K" x="-0.00035761442268267274" y="-0.5351665616035461" width="38" height="18" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23860" name="Container" x="0" y="40.140846252441406" width="605.859130859375" height="40.140846252441406">
+                    <frame id="2316:23861" name="Container" x="17.126760482788086" y="10.704225540161133" width="210.814697265625" height="17.661972045898438">
+                      <frame id="2316:23862" name="Container" x="0" y="0.2676057815551758" width="4.2816901206970215" height="17.126760482788086" />
+                      <frame id="2316:23863" name="Text" x="12.845062255859375" y="0" width="197.96963500976562" height="17.661972045898438">
+                        <text id="2316:23864" name="Preventive controls implementation" x="0.0008527729078195989" y="-0.5351906418800354" width="172" height="18" />
+                      </frame>
+                    </frame>
+                    <frame id="2316:23865" name="Text" x="549.0933227539062" y="10.704225540161133" width="39.63908386230469" height="17.661972045898438">
+                      <text id="2316:23866" name="$580K" x="-0.0007152288453653455" y="-0.5351906418800354" width="38" height="18" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23867" name="Container" x="0" y="80.28169250488281" width="605.859130859375" height="39.0704231262207">
+                    <frame id="2316:23868" name="Container" x="17.126760482788086" y="10.704225540161133" width="175.716552734375" height="17.661972045898438">
+                      <frame id="2316:23869" name="Container" x="0" y="0.2676057815551758" width="4.2816901206970215" height="17.126760482788086" />
+                      <frame id="2316:23870" name="Text" x="12.845069885253906" y="0" width="162.87147521972656" height="17.661972045898438">
+                        <text id="2316:23871" name="Supplier verification program" x="0.0008527729078195989" y="-0.5352147221565247" width="141" height="18" />
+                      </frame>
+                    </frame>
+                    <frame id="2316:23872" name="Text" x="549.3023681640625" y="10.704225540161133" width="39.43001937866211" height="17.661972045898438">
+                      <text id="2316:23873" name="$420K" x="-0.0006327024893835187" y="-0.5352147221565247" width="37" height="18" />
+                    </frame>
+                  </frame>
+                </frame>
+              </frame>
+            </frame>
+            <frame id="2316:23874" name="Container" x="0" y="480.61968994140625" width="608" height="227.46478271484375">
+              <frame id="2316:23875" name="Container" x="18.19679832458496" y="18.197132110595703" width="571.6056518554688" height="40.140846252441406">
+                <frame id="2316:23876" name="Container" x="-0.0004676496610045433" y="2.1409552097320557" width="25.690141677856445" height="25.690141677856445">
+                  <frame id="2316:23877" name="Text" x="8.864437103271484" y="4.014084815979004" width="7.95290470123291" height="17.661972045898438">
+                    <text id="2316:23878" name="3" x="0.0006877200794406235" y="-0.5352009534835815" width="8" height="18" />
+                  </frame>
+                </frame>
+                <frame id="2316:23879" name="Container" x="38.53474426269531" y="0.00011003520921804011" width="533.0704345703125" height="40.140846252441406">
+                  <frame id="2316:23880" name="Paragraph" x="0" y="0" width="533.0704345703125" height="22.478872299194336">
+                    <text id="2316:23881" name="Increase Nutrition of Top Product Lines" x="-0.000412632041843608" y="0.00011003520921804011" width="255" height="23" />
+                  </frame>
+                  <frame id="2316:23882" name="Paragraph" x="0" y="22.478872299194336" width="533.0704345703125" height="17.661972045898438">
+                    <text id="2316:23883" name="Target: Q4 2025 | Owner: Product Development" x="-0.000412632041843608" y="-0.53523188829422" width="236" height="18" />
+                  </frame>
+                </frame>
+              </frame>
+              <frame id="2316:23884" name="Container" x="1.0700373649597168" y="71.18304443359375" width="605.859130859375" height="155.21127319335938">
+                <frame id="2316:23885" name="Container" x="0" y="1.0704225301742554" width="605.859130859375" height="34.78873062133789">
+                  <frame id="2316:23886" name="Text" x="17.126760482788086" y="8.563379287719727" width="60.529048919677734" height="17.661972045898438">
+                    <text id="2316:23887" name="INITIATIVE" x="-0.0004676496610045433" y="-0.5352559685707092" width="55" height="18" />
+                  </frame>
+                  <frame id="2316:23888" name="Text" x="555.5659790039062" y="8.563379287719727" width="33.16637420654297" height="17.661972045898438">
+                    <text id="2316:23889" name="COST" x="-0.0006602112553082407" y="-0.5352559685707092" width="31" height="18" />
+                  </frame>
+                </frame>
+                <frame id="2316:23890" name="Container" x="0" y="35.859153747558594" width="605.859130859375" height="119.35211181640625">
+                  <frame id="2316:23891" name="Container" x="0" y="0" width="605.859130859375" height="40.140846252441406">
+                    <frame id="2316:23892" name="Container" x="17.126760482788086" y="10.704225540161133" width="239.9502716064453" height="17.661972045898438">
+                      <frame id="2316:23893" name="Container" x="0" y="0.2676057815551758" width="4.2816901206970215" height="17.126760482788086" />
+                      <frame id="2316:23894" name="Text" x="12.845069885253906" y="0" width="227.10519409179688" height="17.661972045898438">
+                        <text id="2316:23895" name="Reformulation R&amp;D for flagship products" x="0.0008527729078195989" y="-0.5351218581199646" width="198" height="18" />
+                      </frame>
+                    </frame>
+                    <frame id="2316:23896" name="Text" x="550.1218872070312" y="10.704225540161133" width="38.6104736328125" height="17.661972045898438">
+                      <text id="2316:23897" name="$730K" x="0.000550176075194031" y="-0.5351218581199646" width="37" height="18" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23898" name="Container" x="0" y="40.140846252441406" width="605.859130859375" height="40.140846252441406">
+                    <frame id="2316:23899" name="Container" x="17.126760482788086" y="10.704225540161133" width="192.3582763671875" height="17.661972045898438">
+                      <frame id="2316:23900" name="Container" x="0" y="0.2676057815551758" width="4.2816901206970215" height="17.126760482788086" />
+                      <frame id="2316:23901" name="Text" x="12.845069885253906" y="0" width="179.51319885253906" height="17.661972045898438">
+                        <text id="2316:23902" name="Fortification ingredient sourcing" x="0.0008527729078195989" y="-0.5351459383964539" width="155" height="18" />
+                      </frame>
+                    </frame>
+                    <frame id="2316:23903" name="Text" x="549.3609008789062" y="10.704225540161133" width="39.37147903442383" height="17.661972045898438">
+                      <text id="2316:23904" name="$290K" x="-0.0006877200794406235" y="-0.5351459383964539" width="37" height="18" />
+                    </frame>
+                  </frame>
+                  <frame id="2316:23905" name="Container" x="0" y="80.28169250488281" width="605.859130859375" height="39.0704231262207">
+                    <frame id="2316:23906" name="Container" x="17.126760482788086" y="10.704225540161133" width="181.44497680664062" height="17.661972045898438">
+                      <frame id="2316:23907" name="Container" x="0" y="0.2676057815551758" width="4.2816901206970215" height="17.126760482788086" />
+                      <frame id="2316:23908" name="Text" x="12.845062255859375" y="0" width="168.59991455078125" height="17.661972045898438">
+                        <text id="2316:23909" name="Consumer testing &amp; validation" x="0.0008527729078195989" y="-0.5351700186729431" width="148" height="18" />
+                      </frame>
+                    </frame>
+                    <frame id="2316:23910" name="Text" x="550.8912963867188" y="10.704225540161133" width="37.84111022949219" height="17.661972045898438">
+                      <text id="2316:23911" name="$180K" x="0.0003851232468150556" y="-0.5351700186729431" width="36" height="18" />
+                    </frame>
+                  </frame>
+                </frame>
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+      </frame>
+      <frame id="2316:23912" name="Container" x="633.6900634765625" y="0" width="513.8027954101562" height="1573.5211181640625">
+        <frame id="2316:23913" name="Container" x="0" y="0" width="513.8027954101562" height="467.774658203125">
+          <frame id="2316:23914" name="Heading 3" x="0" y="0" width="513.8027954101562" height="28.901409149169922">
+            <text id="2316:23915" name="North America" x="0.0003025968326255679" y="3.4647955894470215" width="109" height="21" />
+          </frame>
+          <frame id="2316:23916" name="Container" x="0" y="44.031410217285156" width="513.8027954101562" height="421.7464904785156">
+            <frame id="2316:23917" name="NestedTreeMapChart" x="18.197168350219727" y="18.19718360900879" width="462.42254638671875" height="385.35211181640625">
+              <frame id="2316:23918" name="Group" x="0" y="0" width="131.8331298828125" height="285.5845642089844">
+                <vector id="2316:23919" name="Vector" x="0" y="0" width="131.8331298828125" height="285.5845642089844" />
+                <vector id="2316:23920" name="Vector" x="0" y="0" width="131.8331298828125" height="19.26760482788086" />
+                <text id="2316:23921" name="ABC Tech LLC" x="29.52255630493164" y="2.140862226486206" width="73" height="13" />
+              </frame>
+              <frame id="2316:23922" name="Group" x="3.2119760513305664" y="22.478891372680664" width="125.41059875488281" height="90.8368911743164">
+                <vector id="2316:23923" name="Vector" x="3.2120379461557604" y="22.47889996918093" width="125.41059875488281" height="90.8368911743164" />
+                <text id="2316:23924" name="Dallas TX" x="41.832966804504395" y="48.6297721862793" width="48" height="13" />
+                <text id="2316:23925" name="$1.8M" x="48.790711402893066" y="62.54526329040527" width="35" height="14" />
+              </frame>
+              <frame id="2316:23926" name="Group" x="3.2119760513305664" y="113.31584930419922" width="125.41059875488281" height="70.65090942382812">
+                <vector id="2316:23927" name="Vector" x="3.2120379461557604" y="113.31577709359408" width="125.41059875488281" height="70.65090942382812" />
+                <text id="2316:23928" name="Phoenix AZ" x="37.01606464385986" y="129.37368392944336" width="58" height="13" />
+                <text id="2316:23929" name="$1.4M" x="48.790711402893066" y="143.28917694091797" width="34" height="14" />
+              </frame>
+              <frame id="2316:23930" name="Group" x="3.2119760513305664" y="183.96661376953125" width="64.3131332397461" height="98.40663146972656">
+                <vector id="2316:23931" name="Vector" x="3.2120379461557604" y="183.96666878713586" width="64.3131332397461" height="98.40663146972656" />
+                <text id="2316:23932" name="Seattle WA" x="7.537631988525391" y="213.90243530273438" width="56" height="13" />
+                <text id="2316:23933" name="$1.0M" x="17.241857528686523" y="227.81792831420898" width="36" height="14" />
+              </frame>
+              <frame id="2316:23934" name="Group" x="67.52391815185547" y="183.96661376953125" width="61.097469329833984" height="98.40663146972656">
+                <vector id="2316:23935" name="Vector" x="67.52390783606097" y="183.96666878713586" width="61.097469329833984" height="98.40663146972656" />
+                <text id="2316:23936" name="$0.9M" x="83.08684825897217" y="226.74750518798828" width="31" height="12" />
+              </frame>
+              <frame id="2316:23937" name="Group" x="131.83338928222656" y="0.000017193000530824065" width="161.27159118652344" height="285.5845642089844">
+                <vector id="2316:23938" name="Vector" x="131.83327580842888" y="0.00003438600106164813" width="161.27159118652344" height="285.5845642089844" />
+                <vector id="2316:23939" name="Vector" x="131.83327580842888" y="0.00003438600106164813" width="161.27159118652344" height="19.26760482788086" />
+                <text id="2316:23940" name="XYZ Corp" x="187.84857177734375" y="2.140879419486737" width="49" height="13" />
+              </frame>
+              <frame id="2316:23941" name="Group" x="135.04489135742188" y="22.478891372680664" width="154.84906005859375" height="86.63147735595703">
+                <vector id="2316:23942" name="Vector" x="135.04489135742188" y="22.478891372680664" width="154.84906005859375" height="86.63147735595703" />
+                <text id="2316:23943" name="Chicago IL" x="185.70804595947266" y="46.527082443237305" width="54" height="13" />
+                <text id="2316:23944" name="$2.1M" x="194.87705993652344" y="60.442575454711914" width="35" height="14" />
+              </frame>
+              <frame id="2316:23945" name="Group" x="135.04489135742188" y="109.11046600341797" width="154.84906005859375" height="70.1302490234375">
+                <vector id="2316:23946" name="Vector" x="135.04489135742188" y="109.11046600341797" width="154.84906005859375" height="70.1302490234375" />
+                <text id="2316:23947" name="Atlanta GA" x="185.17283630371094" y="124.9081974029541" width="54" height="13" />
+                <text id="2316:23948" name="$1.7M" x="194.87705993652344" y="138.8236904144287" width="34" height="14" />
+              </frame>
+              <frame id="2316:23949" name="Group" x="135.04489135742188" y="179.2406463623047" width="83.6185073852539" height="103.13270568847656">
+                <vector id="2316:23950" name="Vector" x="135.04489135742188" y="179.2406463623047" width="83.6185073852539" height="103.13270568847656" />
+                <text id="2316:23951" name="Houston TX" x="146.8822317123413" y="211.5393180847168" width="60" height="13" />
+                <text id="2316:23952" name="$1.4M" x="158.72730255126953" y="225.4548110961914" width="36" height="14" />
+              </frame>
+              <frame id="2316:23953" name="Group" x="218.66256713867188" y="179.2406463623047" width="71.23056030273438" height="103.13270568847656">
+                <vector id="2316:23954" name="Vector" x="218.66252931405324" y="179.24057415169955" width="71.23056030273438" height="103.13270568847656" />
+                <text id="2316:23955" name="Detroit MI" x="229.1221466064453" y="211.5393180847168" width="50" height="13" />
+                <text id="2316:23956" name="$1.1M" x="238.75594902038574" y="225.4548110961914" width="31" height="14" />
+              </frame>
+              <frame id="2316:23957" name="Group" x="0.00022007041843608022" y="285.5846252441406" width="293.104736328125" height="99.76753997802734">
+                <vector id="2316:23958" name="Vector" x="0.00022007041843608022" y="285.5846252441406" width="293.104736328125" height="99.76753997802734" />
+                <vector id="2316:23959" name="Vector" x="0.00022007041843608022" y="285.5846252441406" width="293.104736328125" height="19.26760482788086" />
+                <text id="2316:23960" name="Global Trade Inc" x="105.34088779502781" y="287.7253739833832" width="83" height="13" />
+              </frame>
+              <frame id="2316:23961" name="Group" x="3.2119760513305664" y="308.0635070800781" width="86.0046615600586" height="74.07740020751953">
+                <vector id="2316:23962" name="Vector" x="3.2120379461557604" y="308.06352427307866" width="86.0046615600586" height="74.07740020751953" />
+                <text id="2316:23963" name="Los Angeles CA" x="6.074163913726807" y="325.8347339630127" width="80" height="13" />
+                <text id="2316:23964" name="$1.2M" x="29.088248252868652" y="339.7502269744873" width="35" height="14" />
+              </frame>
+              <frame id="2316:23965" name="Group" x="89.21582794189453" y="308.0635070800781" width="64.50350189208984" height="74.07740020751953">
+                <vector id="2316:23966" name="Vector" x="89.21583481907146" y="308.06352427307866" width="64.50350189208984" height="74.07740020751953" />
+                <text id="2316:23967" name="Miami FL" x="98.45450115203857" y="325.8347339630127" width="46" height="13" />
+                <text id="2316:23968" name="$0.9M" x="102.27140235900879" y="339.7502269744873" width="38" height="14" />
+              </frame>
+              <frame id="2316:23969" name="Group" x="153.71875" y="308.0635070800781" width="75.25407409667969" height="74.07740020751953">
+                <vector id="2316:23970" name="Vector" x="153.71875" y="308.0635070800781" width="75.25407409667969" height="74.07740020751953" />
+                <text id="2316:23971" name="San Diego CA" x="156.5578784942627" y="325.8347339630127" width="70" height="13" />
+                <text id="2316:23972" name="$1.1M" x="174.82548332214355" y="339.7502269744873" width="32" height="14" />
+              </frame>
+              <frame id="2316:23973" name="Group" x="228.97447204589844" y="308.0635070800781" width="60.91997146606445" height="74.07740020751953">
+                <vector id="2316:23974" name="Vector" x="228.97447204589844" y="308.0635070800781" width="60.91997146606445" height="74.07740020751953" />
+                <text id="2316:23975" name="$0.8M" x="243.98258781433105" y="338.6798038482666" width="31" height="12" />
+              </frame>
+              <frame id="2316:23976" name="Group" x="293.1059875488281" y="0.000017193000530824065" width="169.3177947998047" height="123.05361938476562">
+                <vector id="2316:23977" name="Vector" x="293.1060184962407" y="0.00003438600106164813" width="169.3177947998047" height="123.05361938476562" />
+                <vector id="2316:23978" name="Vector" x="293.1060184962407" y="0.00003438600106164813" width="169.3177947998047" height="19.26760482788086" />
+                <text id="2316:23979" name="Supply Co" x="351.5402183532715" y="2.140879419486737" width="52" height="13" />
+              </frame>
+              <frame id="2316:23980" name="Group" x="296.3175048828125" y="22.478891372680664" width="62.87187194824219" height="97.36347961425781">
+                <vector id="2316:23981" name="Vector" x="296.31762179522775" y="22.47889996918093" width="62.87187194824219" height="97.36347961425781" />
+                <text id="2316:23982" name="$1.1M" x="314.90785026550293" y="64.73811531066895" width="27" height="12" />
+              </frame>
+              <frame id="2316:23983" name="Group" x="359.1876220703125" y="22.478891372680664" width="45.72495651245117" height="97.36347961425781">
+                <vector id="2316:23984" name="Vector" x="359.1876220703125" y="22.478891372680664" width="45.72495651245117" height="97.36347961425781" />
+                <text id="2316:23985" name="$0.8M" x="366.5984935760498" y="64.73811531066895" width="31" height="12" />
+              </frame>
+              <frame id="2316:23986" name="Group" x="404.9131164550781" y="22.478891372680664" width="54.298431396484375" height="97.36347961425781">
+                <vector id="2316:23987" name="Vector" x="404.9131508410792" y="22.47889996918093" width="54.298431396484375" height="97.36347961425781" />
+                <text id="2316:23988" name="$0.9M" x="417.07666301727295" y="64.73811531066895" width="31" height="12" />
+              </frame>
+              <frame id="2316:23989" name="Group" x="293.1059875488281" y="123.05365753173828" width="169.3177947998047" height="139.24488830566406">
+                <vector id="2316:23990" name="Vector" x="293.1060184962407" y="123.05360595273305" width="169.3177947998047" height="139.24488830566406" />
+                <vector id="2316:23991" name="Vector" x="293.1060184962407" y="123.05360595273305" width="169.3177947998047" height="19.267597198486328" />
+                <text id="2316:23992" name="American Logistics" x="329.59655380249023" y="125.1944510936737" width="96" height="13" />
+              </frame>
+              <frame id="2316:23993" name="Group" x="296.3175048828125" y="145.53253173828125" width="65.6632080078125" height="113.55475616455078">
+                <vector id="2316:23994" name="Vector" x="296.31762179522775" y="145.53259363308462" width="65.6632080078125" height="113.55475616455078" />
+                <text id="2316:23995" name="Memphis TN" x="297.03681194782257" y="183.04233169555664" width="64" height="13" />
+                <text id="2316:23996" name="$1.3M" x="312.0227270126343" y="196.95782470703125" width="35" height="14" />
+              </frame>
+              <frame id="2316:23997" name="Group" x="361.9786682128906" y="145.53253173828125" width="53.035667419433594" height="113.55475616455078">
+                <vector id="2316:23998" name="Vector" x="361.9786682128906" y="145.53253173828125" width="53.035667419433594" height="113.55475616455078" />
+                <text id="2316:23999" name="$1.1M" x="375.6517810821533" y="195.88740158081055" width="27" height="12" />
+              </frame>
+              <frame id="2316:24000" name="Group" x="415.0137634277344" y="145.53253173828125" width="44.19638442993164" height="113.55475616455078">
+                <vector id="2316:24001" name="Vector" x="415.01385970856063" y="145.53259363308462" width="44.19638442993164" height="113.55475616455078" />
+                <text id="2316:24002" name="$0.9M" x="422.1263155937195" y="195.88740158081055" width="31" height="12" />
+              </frame>
+              <frame id="2316:24003" name="Group" x="293.1059875488281" y="262.2984924316406" width="169.3177947998047" height="123.0536117553711">
+                <vector id="2316:24004" name="Vector" x="293.1060184962407" y="262.2983961508289" width="169.3177947998047" height="123.0536117553711" />
+                <vector id="2316:24005" name="Vector" x="293.1060184962407" y="262.2983961508289" width="169.3177947998047" height="19.26760482788086" />
+                <text id="2316:24006" name="Midwest Trading" x="335.48387908935547" y="264.4392411708832" width="85" height="13" />
+              </frame>
+              <frame id="2316:24007" name="Group" x="288.5044250488281" y="284.7773742675781" width="82" height="97.36347198486328">
+                <vector id="2316:24008" name="Vector" x="296.3151955604553" y="284.77739146057866" width="65.72965240478516" height="97.36347198486328" />
+                <text id="2316:24009" name="Minneapolis MN" x="288.5044559962407" y="314.19153594970703" width="82" height="13" />
+                <text id="2316:24010" name="$1.1M" x="312.65938568115234" y="328.10702896118164" width="32" height="14" />
+              </frame>
+              <frame id="2316:24011" name="Group" x="362.0462951660156" y="284.7773742675781" width="52.86952590942383" height="97.36347198486328">
+                <vector id="2316:24012" name="Vector" x="362.04619544663" y="284.77739146057866" width="52.86952590942383" height="97.36347198486328" />
+                <text id="2316:24013" name="$0.9M" x="373.4946985244751" y="327.03660583496094" width="31" height="12" />
+              </frame>
+              <frame id="2316:24014" name="Group" x="414.9146423339844" y="284.7773742675781" width="44.29608154296875" height="97.36347198486328">
+                <vector id="2316:24015" name="Vector" x="414.91472829898703" y="284.77739146057866" width="44.29608154296875" height="97.36347198486328" />
+                <text id="2316:24016" name="$0.8M" x="421.6125717163086" y="327.03660583496094" width="31" height="12" />
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+        <frame id="2316:24017" name="Container" x="0" y="493.46478271484375" width="513.8027954101562" height="339.3239440917969">
+          <frame id="2316:24018" name="Heading 3" x="0" y="0" width="513.8027954101562" height="28.901409149169922">
+            <text id="2316:24019" name="EMEA" x="0.0003025968326255679" y="3.464740514755249" width="46" height="21" />
+          </frame>
+          <frame id="2316:24020" name="Container" x="0" y="46.028167724609375" width="513.8027954101562" height="293.2957763671875">
+            <frame id="2316:24021" name="NestedTreeMapChart" x="18.197168350219727" y="18.19718360900879" width="462.42254638671875" height="256.9013977050781">
+              <frame id="2316:24022" name="Group" x="0" y="0" width="160.84262084960938" height="256.9013977050781">
+                <vector id="2316:24023" name="Vector" x="0" y="0" width="160.84262084960938" height="256.9013977050781" />
+                <vector id="2316:24024" name="Vector" x="0" y="0" width="160.84262084960938" height="19.26760482788086" />
+                <text id="2316:24025" name="EU Holdings GmbH" x="31.71776008605957" y="2.1408071517944336" width="97" height="13" />
+              </frame>
+              <frame id="2316:24026" name="Group" x="3.2119760513305664" y="22.478836059570312" width="154.42007446289062" height="101.1549301147461">
+                <vector id="2316:24027" name="Vector" x="3.2120379461557604" y="22.47891170877847" width="154.42007446289062" height="101.1549301147461" />
+                <text id="2316:24028" name="Berlin" x="65.97182941436768" y="53.78877067565918" width="29" height="13" />
+                <text id="2316:24029" name="$1.4M" x="62.29577350616455" y="67.70426559448242" width="36" height="14" />
+              </frame>
+              <frame id="2316:24030" name="Group" x="3.2119760513305664" y="123.6337661743164" width="154.42007446289062" height="79.47887420654297">
+                <vector id="2316:24031" name="Vector" x="3.2120379461557604" y="123.63374210411348" width="154.42007446289062" height="79.47887420654297" />
+                <text id="2316:24032" name="Munich" x="61.69014072418213" y="144.1055736541748" width="37" height="13" />
+                <text id="2316:24033" name="$1.1M" x="63.90141010284424" y="158.02106475830078" width="32" height="14" />
+              </frame>
+              <frame id="2316:24034" name="Group" x="3.2119760513305664" y="203.11264038085938" width="154.42007446289062" height="50.57746505737305">
+                <vector id="2316:24035" name="Vector" x="3.2120379461557604" y="203.11272978446505" width="154.42007446289062" height="50.57746505737305" />
+                <text id="2316:24036" name="Hamburg" x="56.8732385635376" y="209.13385677337646" width="47" height="13" />
+                <text id="2316:24037" name="$0.7M" x="61.76056385040283" y="223.04934883117676" width="37" height="14" />
+              </frame>
+              <frame id="2316:24038" name="Group" x="160.84375" y="-0.00003782460407819599" width="140.7373046875" height="256.9013977050781">
+                <vector id="2316:24039" name="Vector" x="160.84375" y="-0.00003782460407819599" width="140.7373046875" height="256.9013977050781" />
+                <vector id="2316:24040" name="Vector" x="160.84375" y="-0.00003782460407819599" width="140.7373046875" height="19.26760482788086" />
+                <text id="2316:24041" name="Continental Trading" x="181.43684005737305" y="2.1407693271903554" width="100" height="13" />
+              </frame>
+              <frame id="2316:24042" name="Group" x="164.05526733398438" y="22.478836059570312" width="134.3147735595703" height="132.1207275390625">
+                <vector id="2316:24043" name="Vector" x="164.05535329898703" y="22.47891170877847" width="134.3147735595703" height="132.1207275390625" />
+                <text id="2316:24044" name="Paris" x="218.36675262451172" y="69.27174377441406" width="25" height="13" />
+                <text id="2316:24045" name="$1.6M" x="214.08506393432617" y="83.18723678588867" width="35" height="14" />
+              </frame>
+              <frame id="2316:24046" name="Group" x="164.05526733398438" y="154.5994415283203" width="134.3147735595703" height="99.09053802490234">
+                <vector id="2316:24047" name="Vector" x="164.05535329898703" y="154.59952405472723" width="134.3147735595703" height="99.09053802490234" />
+                <text id="2316:24048" name="Lyon" x="218.9019660949707" y="184.8771152496338" width="24" height="13" />
+                <text id="2316:24049" name="$1.2M" x="214.08506393432617" y="198.79261016845703" width="35" height="14" />
+              </frame>
+              <frame id="2316:24050" name="Group" x="301.5784912109375" y="-0.00003782460407819599" width="160.84262084960938" height="144.50704956054688">
+                <vector id="2316:24051" name="Vector" x="301.5783708599047" y="-0.00007564920815639198" width="160.84262084960938" height="144.50704956054688" />
+                <vector id="2316:24052" name="Vector" x="301.5783708599047" y="-0.00007564920815639198" width="160.84262084960938" height="19.26760482788086" />
+                <text id="2316:24053" name="Nordic Imports" x="344.00013732910156" y="2.1407693271903554" width="76" height="13" />
+              </frame>
+              <frame id="2316:24054" name="Group" x="304.7900085449219" y="22.478836059570312" width="85.7889404296875" height="118.81690216064453">
+                <vector id="2316:24055" name="Vector" x="304.7899741589208" y="22.47891170877847" width="85.7889404296875" height="118.81690216064453" />
+                <text id="2316:24056" name="Stockholm" x="320.9236660003662" y="62.61975860595703" width="54" height="13" />
+                <text id="2316:24057" name="$1.0M" x="329.5574703216553" y="76.53525161743164" width="36" height="14" />
+              </frame>
+              <frame id="2316:24058" name="Group" x="390.5801086425781" y="22.478836059570312" width="68.63114166259766" height="118.81690216064453">
+                <vector id="2316:24059" name="Vector" x="390.5801499057561" y="22.47891170877847" width="68.63114166259766" height="118.81690216064453" />
+                <text id="2316:24060" name="Oslo" x="413.1217441558838" y="62.61975860595703" width="23" height="13" />
+                <text id="2316:24061" name="$0.8M" x="406.23441886901855" y="76.53525161743164" width="38" height="14" />
+              </frame>
+              <frame id="2316:24062" name="Group" x="301.5784912109375" y="144.5070037841797" width="160.84262084960938" height="112.39436340332031">
+                <vector id="2316:24063" name="Vector" x="301.5783708599047" y="144.50692813497153" width="160.84262084960938" height="112.39436340332031" />
+                <vector id="2316:24064" name="Vector" x="301.5783708599047" y="144.50692813497153" width="160.84262084960938" height="19.26760482788086" />
+                <text id="2316:24065" name="Western Supply" x="341.85929107666016" y="146.64777326583862" width="80" height="13" />
+              </frame>
+              <frame id="2316:24066" name="Group" x="304.7900085449219" y="166.98587036132812" width="99.27005767822266" height="86.7042236328125">
+                <vector id="2316:24067" name="Vector" x="304.7899741589208" y="166.9859081859322" width="99.27005767822266" height="86.7042236328125" />
+                <text id="2316:24068" name="Amsterdam" x="324.98792839050293" y="191.07041549682617" width="58" height="13" />
+                <text id="2316:24069" name="$0.9M" x="335.2273635864258" y="204.98590850830078" width="38" height="14" />
+              </frame>
+              <frame id="2316:24070" name="Group" x="404.0610046386719" y="166.98587036132812" width="55.150020599365234" height="86.7042236328125">
+                <vector id="2316:24071" name="Vector" x="404.06096681405324" y="166.9859081859322" width="55.150020599365234" height="86.7042236328125" />
+                <text id="2316:24072" name="$0.5M" x="416.1861867904663" y="203.91548538208008" width="31" height="12" />
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+        <frame id="2316:24073" name="Container" x="0" y="858.4788818359375" width="513.8027954101562" height="339.3239440917969">
+          <frame id="2316:24074" name="Heading 3" x="0" y="0" width="513.8027954101562" height="28.901409149169922">
+            <text id="2316:24075" name="Asia-Pacific" x="0.0003025968326255679" y="-0.5350909233093262" width="103" height="29" />
+          </frame>
+          <frame id="2316:24076" name="Container" x="0" y="46.028167724609375" width="513.8027954101562" height="293.2957763671875">
+            <frame id="2316:24077" name="NestedTreeMapChart" x="18.197168350219727" y="18.19718360900879" width="462.42254638671875" height="256.9013977050781">
+              <frame id="2316:24078" name="Group" x="0" y="0" width="215.2656707763672" height="256.9013977050781">
+                <vector id="2316:24079" name="Vector" x="0" y="0" width="215.2656707763672" height="256.9013977050781" />
+                <vector id="2316:24080" name="Vector" x="0" y="0" width="215.2656707763672" height="19.26760482788086" />
+                <text id="2316:24081" name="APAC Holdings Ltd" x="59.99823760986328" y="2.1407315731048584" width="95" height="13" />
+              </frame>
+              <frame id="2316:24082" name="Group" x="3.2119760513305664" y="22.478759765625" width="114.86372375488281" height="171.26760864257812">
+                <vector id="2316:24083" name="Vector" x="3.2120379461557604" y="22.47875976562409" width="114.86372375488281" height="171.26760864257812" />
+                <text id="2316:24084" name="Shanghai" x="37.09550952911377" y="88.84495544433594" width="47" height="13" />
+                <text id="2316:24085" name="$2.2M" x="42.447625160217285" y="102.76045227050781" width="36" height="14" />
+              </frame>
+              <frame id="2316:24086" name="Group" x="118.07566833496094" y="22.478759765625" width="93.97940826416016" height="171.26760864257812">
+                <vector id="2316:24087" name="Vector" x="118.0756511419313" y="22.47875976562409" width="93.97940826416016" height="171.26760864257812" />
+                <text id="2316:24088" name="Beijing" x="147.9387664794922" y="88.84495544433594" width="34" height="13" />
+                <text id="2316:24089" name="$1.8M" x="147.9387664794922" y="102.76045227050781" width="34" height="14" />
+              </frame>
+              <frame id="2316:24090" name="Group" x="3.2119760513305664" y="193.74636840820312" width="208.8431396484375" height="59.943660736083984">
+                <vector id="2316:24091" name="Vector" x="3.2120379461557604" y="193.74639591700543" width="208.8431396484375" height="59.943660736083984" />
+                <text id="2316:24092" name="Guangzhou" x="78.73118686676025" y="204.45062160491943" width="58" height="13" />
+                <text id="2316:24093" name="$1.4M" x="90.50582981109619" y="218.36611366271973" width="34" height="14" />
+              </frame>
+              <frame id="2316:24094" name="Group" x="215.26620483398438" y="-0.00011347381223458797" width="103.64641571044922" height="256.9013977050781">
+                <vector id="2316:24095" name="Vector" x="215.26629079898703" y="-0.00022694762446917593" width="103.64641571044922" height="256.9013977050781" />
+                <vector id="2316:24096" name="Vector" x="215.26629079898703" y="-0.00022694762446917593" width="103.64641571044922" height="19.26760482788086" />
+                <text id="2316:24097" name="Pacific Trade Corp" x="219.9912028312683" y="2.140618099292624" width="94" height="13" />
+              </frame>
+              <frame id="2316:24098" name="Group" x="218.4779510498047" y="22.478759765625" width="97.22388458251953" height="133.39111328125">
+                <vector id="2316:24099" name="Vector" x="218.477878839185" y="22.47875976562409" width="97.22388458251953" height="133.39111328125" />
+                <text id="2316:24100" name="Tokyo" x="251.56898880004883" y="69.90663146972656" width="31" height="13" />
+                <text id="2316:24101" name="$1.5M" x="249.96335411071777" y="83.82212448120117" width="34" height="14" />
+              </frame>
+              <frame id="2316:24102" name="Group" x="218.4779510498047" y="155.86997985839844" width="97.22388458251953" height="97.82015228271484">
+                <vector id="2316:24103" name="Vector" x="218.477878839185" y="155.8700830164089" width="97.22388458251953" height="97.82015228271484" />
+                <text id="2316:24104" name="Osaka" x="251.03377532958984" y="185.51263427734375" width="32" height="13" />
+                <text id="2316:24105" name="$1.1M" x="251.56898880004883" y="199.42812728881836" width="31" height="14" />
+              </frame>
+              <frame id="2316:24106" name="Group" x="318.9136962890625" y="-0.00011347381223458797" width="143.5104522705078" height="156.9953155517578">
+                <vector id="2316:24107" name="Vector" x="318.9138166400953" y="-0.00022694762446917593" width="143.5104522705078" height="156.9953155517578" />
+                <vector id="2316:24108" name="Vector" x="318.9138166400953" y="-0.00022694762446917593" width="143.5104522705078" height="19.26760482788086" />
+                <text id="2316:24109" name="Southeast Imports" x="343.5711669921875" y="2.140618099292624" width="94" height="13" />
+              </frame>
+              <frame id="2316:24110" name="Group" x="322.1235046386719" y="22.478759765625" width="81.00650024414062" height="131.30517578125">
+                <vector id="2316:24111" name="Vector" x="322.12346681405324" y="22.47875976562409" width="81.00650024414062" height="131.30517578125" />
+                <text id="2316:24112" name="Singapore" x="336.93585681915283" y="68.8636474609375" width="52" height="13" />
+                <text id="2316:24113" name="$1.3M" x="345.4992370605469" y="82.77914047241211" width="34" height="14" />
+              </frame>
+              <frame id="2316:24114" name="Group" x="403.1297912597656" y="22.478759765625" width="56.08141326904297" height="131.30517578125">
+                <vector id="2316:24115" name="Vector" x="403.12968810176244" y="22.47875976562409" width="56.08141326904297" height="131.30517578125" />
+                <text id="2316:24116" name="$0.9M" x="416.1838254928589" y="81.70872116088867" width="30" height="12" />
+              </frame>
+              <frame id="2316:24117" name="Group" x="318.9136962890625" y="156.9952850341797" width="143.5104522705078" height="99.90609741210938">
+                <vector id="2316:24118" name="Vector" x="318.9138166400953" y="156.99520250777277" width="143.5104522705078" height="99.90609741210938" />
+                <vector id="2316:24119" name="Vector" x="318.9138166400953" y="156.99520250777277" width="143.5104522705078" height="19.26760482788086" />
+                <text id="2316:24120" name="Oceania Supply" x="351.06412506103516" y="159.13604760169983" width="79" height="13" />
+              </frame>
+              <frame id="2316:24121" name="Group" x="322.1235046386719" y="179.47415161132812" width="78.3359603881836" height="74.21595764160156">
+                <vector id="2316:24122" name="Vector" x="322.12346681405324" y="179.4741825587298" width="78.3359603881836" height="74.21595764160156" />
+                <text id="2316:24123" name="Sydney" x="342.02454566955566" y="197.3146457672119" width="38" height="13" />
+                <text id="2316:24124" name="$0.8M" x="343.6301784515381" y="211.23013877868652" width="36" height="14" />
+              </frame>
+              <frame id="2316:24125" name="Group" x="400.4599914550781" y="179.47415161132812" width="58.751949310302734" height="74.21595764160156">
+                <vector id="2316:24126" name="Vector" x="400.4600258410792" y="179.4741825587298" width="58.751949310302734" height="74.21595764160156" />
+                <text id="2316:24127" name="$0.6M" x="414.85010051727295" y="210.15971565246582" width="29" height="12" />
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+        <frame id="2316:24128" name="Container" x="0" y="1223.492919921875" width="513.8027954101562" height="79.74647521972656">
+          <frame id="2316:24129" name="Container" x="18.197168350219727" y="18.19718360900879" width="477.408447265625" height="43.35211181640625">
+            <frame id="2316:24130" name="Container" x="0" y="0" width="477.408447265625" height="43.35211181640625">
+              <frame id="2316:24131" name="Paragraph" x="0" y="0" width="477.408447265625" height="17.661972045898438">
+                <text id="2316:24132" name="Risk Level" x="0.00022007041843608022" y="-0.5352491140365601" width="51" height="18" />
+              </frame>
+              <frame id="2316:24133" name="Container" x="0.00022007041843608022" y="26.22531509399414" width="477.408447265625" height="17.126760482788086">
+                <frame id="2316:24134" name="Container" x="0" y="0" width="90.98591613769531" height="17.126760482788086" />
+                <frame id="2316:24135" name="Container" x="95.267822265625" y="-0.00002750880412349943" width="90.98591613769531" height="17.126760482788086" />
+                <frame id="2316:24136" name="Container" x="190.53543090820312" y="-0.00002750880412349943" width="90.98591613769531" height="17.126760482788086" />
+                <frame id="2316:24137" name="Container" x="285.80303955078125" y="-0.00002750880412349943" width="90.98591613769531" height="17.126760482788086" />
+                <frame id="2316:24138" name="Container" x="381.0706481933594" y="-0.00002750880412349943" width="96.33802795410156" height="17.126760482788086" />
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+  </frame>
+  <instance id="2316:24139" name="Switcher" x="51" y="10" width="231" height="30" />
+  <instance id="2316:24140" name="Modal Overlay Scrim" x="-99" y="-49" width="1636" height="1052" />
+  <frame id="2316:24141" name="Modal" x="63" y="94" width="1387" height="794">
+    <frame id="2316:24142" name="Mask group" x="636" y="0" width="1646" height="1081">
+      <rounded-rectangle id="2316:24143" name="Rectangle 2" x="636" y="0" width="751" height="795" />
+      <rounded-rectangle id="2316:24144" name="Rectangle 1" x="481" y="3" width="1400" height="812" />
+      <frame id="2316:24145" name="Residual Risk" x="770" y="99" width="1512" height="982">
+        <frame id="2316:24146" name="Navigation" x="49" y="50" width="236" height="932">
+          <frame id="2316:24147" name="Workplace" x="0" y="0" width="236" height="932">
+            <frame id="2316:24148" name="Nav" x="0" y="0" width="236" height="932">
+              <frame id="2316:24149" name="Nav Section 2" x="13.888888359069824" y="20" width="208.3333282470703" height="59.291664123535156">
+                <instance id="2316:24150" name=".Category" x="0" y="0" width="208.3333282470703" height="28.645832061767578" />
+                <instance id="2316:24151" name="Nav Section 1" x="0" y="30.645832061767578" width="208.3333282470703" height="28.645832061767578" />
+                <instance id="2316:24152" name=".Nav Section Options 6" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+                <instance id="2316:24153" name=".Nav Section Options 7" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+                <instance id="2316:24154" name=".Nav Section Options 8" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+                <instance id="2316:24155" name=".Nav Section Options 9" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+                <instance id="2316:24156" name=".Nav Section Options 10" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+              </frame>
+              <instance id="2316:24157" name="Nav Section 4" x="13.888888359069824" y="719.6180419921875" width="208.3333282470703" height="150.17359924316406" hidden="true" />
+              <instance id="2316:24158" name="Nav Section 5" x="13.888885498046875" y="711.8056640625" width="208.3333282470703" height="150.17359924316406" hidden="true" />
+              <frame id="2316:24159" name="Nav Section 7" x="13.888888359069824" y="103.59722900390625" width="208.3333282470703" height="151.22915649414062">
+                <frame id="2316:24160" name=".Category" x="0" y="0" width="208.3333282470703" height="28.645832061767578">
+                  <text id="2316:24161" name="label" x="8" y="5.822916030883789" width="173.38888549804688" height="17" />
+                  <instance id="2316:24162" name="chevron-down" x="188.3333282470703" y="8.322916030883789" width="12" height="12" />
+                </frame>
+                <instance id="2316:24163" name=".Nav Section Options 1" x="0" y="30.645832061767578" width="208.3333282470703" height="28.645832061767578" />
+                <instance id="2316:24164" name=".Nav Section Options 11" x="0" y="61.291664123535156" width="208.3333282470703" height="28.645832061767578" />
+                <instance id="2316:24165" name=".Nav Section Options 12" x="0" y="91.9375" width="208.3333282470703" height="28.645832061767578" />
+                <instance id="2316:24166" name=".Nav Section Options 2" x="0" y="122.58332824707031" width="208.3333282470703" height="28.645832061767578" />
+                <instance id="2316:24167" name=".Nav Section Options 6" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+                <instance id="2316:24168" name=".Nav Section Options 7" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+                <instance id="2316:24169" name=".Nav Section Options 8" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+                <instance id="2316:24170" name=".Nav Section Options 9" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+                <instance id="2316:24171" name=".Nav Section Options 10" x="0" y="151.91015625" width="222.2222137451172" height="28.645832061767578" hidden="true" />
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+        <instance id="2316:24172" name="Nav 1" x="1" y="51" width="48" height="932" />
+        <frame id="2316:24173" name="Top Navbar" x="285" y="50" width="1229" height="24" />
+        <frame id="2316:24174" name="Top Navbar" x="0" y="0" width="1514" height="50">
+          <frame id="2316:24175" name="End Actions" x="1279" y="0" width="227" height="50">
+            <frame id="2316:24176" name="Actions" x="0" y="5" width="172" height="40">
+              <instance id="2316:24177" name=".Nav Item" x="0" y="0" width="40" height="40" />
+              <instance id="2316:24178" name=".Nav Item" x="44" y="0" width="40" height="40" />
+              <instance id="2316:24179" name=".Nav Item" x="88" y="0" width="40" height="40" />
+              <instance id="2316:24180" name=".Nav Item" x="132" y="0" width="40" height="40" />
+            </frame>
+            <frame id="2316:24181" name="Avatar Menu" x="184" y="5" width="43" height="40">
+              <instance id="2316:24182" name="Avatar" x="0" y="8" width="24" height="24" />
+              <instance id="2316:24183" name="carat-down" x="27" y="12" width="16" height="16" />
+            </frame>
+          </frame>
+          <frame id="2316:24184" name="Group 1" x="612" y="10.8212890625" width="460" height="28">
+            <rounded-rectangle id="2316:24185" name="Rectangle 1" x="612" y="10.8212890625" width="460" height="28" />
+            <frame id="2316:24186" name="Frame 965509" x="1035.158203125" y="15.39605712890625" width="28.8504638671875" height="18.8504638671875">
+              <text id="2316:24187" name="⌘ + K" x="4.425232410430908" y="4.425232410430908" width="20" height="10" />
+            </frame>
+            <text id="2316:24188" name="Search by topic or ask a question" x="645" y="15.4462890625" width="192" height="19" />
+            <instance id="2316:24189" name="search" x="622.158203125" y="18.99993896484375" width="12" height="12" />
+            <text id="2316:24190" name="Text" x="654.158203125" y="15.1962890625" width="0" height="19.25" />
+          </frame>
+          <frame id="2316:24191" name="Nav Bar Option" x="7" y="8" width="34.72222137451172" height="34.72222137451172">
+            <frame id="2316:24192" name="AuditBoard" x="5.208319664001465" y="5.208251953125" width="24.30555534362793" height="24.30555534362793" />
+          </frame>
+        </frame>
+        <instance id="2316:24194" name="Switcher" x="51" y="10" width="231" height="30" />
+      </frame>
+    </frame>
+    <instance id="2316:24195" name="Input Vertical" x="69" y="137" width="473" height="54" />
+    <instance id="2316:24196" name="Button" x="453" y="731" width="99" height="34" />
+    <instance id="2316:24197" name="Button" x="349" y="731" width="99" height="34" />
+    <instance id="2316:24198" name=".Modal Header" x="0" y="0" width="1479" height="41.5" />
+    <frame id="2316:24199" name="Frame 2085662653" x="69" y="213" width="473" height="54">
+      <instance id="2316:24200" name="Input Vertical" x="0" y="0" width="363" height="54" />
+      <instance id="2316:24201" name="Input Vertical" x="373" y="0" width="100" height="54" />
+    </frame>
+    <frame id="2316:24202" name="Label" x="69" y="395" width="176.5" height="16">
+      <frame id="2316:24203" name="Label" x="0" y="0" width="176.5" height="16">
+        <instance id="2316:24204" name="Visibility" x="0" y="4" width="12" height="12" hidden="true" />
+        <frame id="2316:24205" name="Label" x="0" y="0" width="101" height="16">
+          <text id="2316:24206" name="Workspace Type" x="0" y="0" width="94" height="16" />
+          <text id="2316:24207" name="*" x="94" y="0" width="7" height="16" />
+        </frame>
+        <instance id="2316:24208" name="Tooltip" x="35" y="4" width="12" height="12" hidden="true" />
+      </frame>
+      <text id="2316:24209" name="Edit" x="362" y="0" width="22" height="20" hidden="true" />
+    </frame>
+    <frame id="2316:24210" name="Frame 2085662654" x="69" y="277" width="473" height="34">
+      <instance id="2316:24211" name="Input Vertical" x="0" y="0" width="363" height="34" />
+      <instance id="2316:24212" name="Input Vertical" x="373" y="0" width="100" height="34" />
+    </frame>
+    <frame id="2316:24213" name="Frame 965435" x="69" y="422" width="230" height="42">
+      <frame id="2316:24214" name="Frame 965436" x="6" y="6" width="30" height="30">
+        <instance id="2316:24215" name="SoxHub" x="6" y="6" width="18" height="18" />
+      </frame>
+      <frame id="2316:24216" name="Frame 965434" x="46" y="6" width="138" height="30">
+        <frame id="2316:24217" name="Frame 965433" x="0" y="1" width="138" height="16">
+          <instance id="2316:24218" name=".Workspace Header" x="0" y="0" width="125" height="16" />
+        </frame>
+        <frame id="2316:24219" name="Frame 965432" x="0" y="17" width="138" height="12">
+          <instance id="2316:24220" name=".Workspace Header" x="0" y="0" width="136" height="12" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="2316:24221" name="Frame 2085662655" x="69" y="474" width="230" height="42">
+      <frame id="2316:24222" name="Frame 965436" x="6" y="6" width="30" height="30">
+        <instance id="2316:24223" name="OpsAudit" x="6" y="6" width="18" height="18" />
+      </frame>
+      <frame id="2316:24224" name="Frame 965434" x="46" y="6" width="138" height="30">
+        <frame id="2316:24225" name="Frame 965433" x="0" y="1.5" width="138" height="15">
+          <instance id="2316:24226" name=".Workspace Header" x="0" y="0" width="102" height="15" />
+        </frame>
+        <frame id="2316:24227" name="Frame 965432" x="0" y="16.5" width="138" height="12">
+          <instance id="2316:24228" name=".Workspace Header" x="0" y="0" width="123" height="12" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="2316:24229" name="Frame 2085662656" x="69" y="526" width="230" height="42">
+      <frame id="2316:24230" name="Frame 965436" x="6" y="6" width="30" height="30">
+        <instance id="2316:24231" name="ITRM" x="6" y="6" width="18" height="18" />
+      </frame>
+      <frame id="2316:24232" name="Frame 965434" x="46" y="6" width="138" height="30">
+        <frame id="2316:24233" name="Frame 965433" x="0" y="1" width="138" height="16">
+          <instance id="2316:24234" name=".Workspace Header" x="0" y="0" width="132" height="16" />
+        </frame>
+        <frame id="2316:24235" name="Frame 965432" x="0" y="17" width="138" height="12">
+          <instance id="2316:24236" name=".Workspace Header" x="0" y="0" width="103" height="12" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="2316:24237" name="Frame 2085662657" x="69" y="578" width="230" height="42">
+      <frame id="2316:24238" name="Frame 965436" x="6" y="6" width="30" height="30">
+        <instance id="2316:24239" name="TPRM" x="6" y="6" width="18" height="18" />
+      </frame>
+      <frame id="2316:24240" name="Frame 965434" x="46" y="6" width="138" height="30">
+        <frame id="2316:24241" name="Frame 965433" x="0" y="1.5" width="138" height="15">
+          <instance id="2316:24242" name=".Workspace Header" x="0" y="0" width="58" height="15" />
+        </frame>
+        <frame id="2316:24243" name="Frame 965432" x="0" y="16.5" width="138" height="12">
+          <instance id="2316:24244" name=".Workspace Header" x="0" y="0" width="99" height="12" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="2316:24245" name="Frame 2085662662" x="69" y="630" width="230" height="42">
+      <frame id="2316:24246" name="Frame 965436" x="6" y="6" width="30" height="30">
+        <instance id="2316:24247" name="ESG" x="6" y="6" width="18" height="18" />
+      </frame>
+      <frame id="2316:24248" name="Frame 965434" x="46" y="6" width="138" height="30">
+        <frame id="2316:24249" name="Frame 965433" x="0" y="2" width="138" height="15">
+          <instance id="2316:24250" name=".Workspace Header" x="0" y="0" width="143" height="15" />
+        </frame>
+        <frame id="2316:24251" name="Frame 965432" x="0" y="17" width="138" height="11">
+          <instance id="2316:24252" name=".Workspace Header" x="0" y="0" width="120" height="11" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="2316:24253" name="Frame 2085662658" x="313" y="422" width="230" height="42">
+      <frame id="2316:24254" name="Frame 965436" x="6" y="6" width="30" height="30">
+        <instance id="2316:24255" name="RiskOversight" x="6" y="6" width="18" height="18" />
+      </frame>
+      <frame id="2316:24256" name="Frame 965434" x="46" y="6" width="138" height="30">
+        <frame id="2316:24257" name="Frame 965433" x="0" y="1.5" width="138" height="15">
+          <instance id="2316:24258" name=".Workspace Header" x="0" y="0" width="153" height="15" />
+        </frame>
+        <frame id="2316:24259" name="Frame 965432" x="0" y="16.5" width="138" height="12">
+          <instance id="2316:24260" name=".Workspace Header" x="0" y="0" width="139" height="12" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="2316:24261" name="Frame 2085662659" x="313" y="474" width="230" height="42">
+      <frame id="2316:24262" name="Frame 965436" x="6" y="6" width="30" height="30">
+        <instance id="2316:24263" name="CrossComply" x="6" y="6" width="18" height="18" />
+      </frame>
+      <frame id="2316:24264" name="Frame 965434" x="46" y="6" width="138" height="30">
+        <frame id="2316:24265" name="Frame 965433" x="0" y="1.5" width="138" height="15">
+          <instance id="2316:24266" name=".Workspace Header" x="0" y="0" width="135" height="15" />
+        </frame>
+        <frame id="2316:24267" name="Frame 965432" x="0" y="16.5" width="138" height="12">
+          <instance id="2316:24268" name=".Workspace Header" x="0" y="0" width="92" height="12" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="2316:24269" name="Frame 2085662660" x="313" y="526" width="230" height="42">
+      <frame id="2316:24270" name="Frame 965436" x="6" y="6" width="30" height="30">
+        <instance id="2316:24271" name="module-reg-comply" x="6" y="6" width="18" height="18" />
+      </frame>
+      <frame id="2316:24272" name="Frame 965434" x="46" y="6" width="138" height="30">
+        <frame id="2316:24273" name="Frame 965433" x="0" y="1.5" width="138" height="15">
+          <instance id="2316:24274" name=".Workspace Header" x="0" y="0" width="125" height="15" />
+        </frame>
+        <frame id="2316:24275" name="Frame 965432" x="0" y="16.5" width="138" height="12">
+          <instance id="2316:24276" name=".Workspace Header" x="0" y="0" width="78" height="12" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="2316:24277" name="Frame 2085662661" x="313" y="578" width="230" height="42">
+      <frame id="2316:24278" name="Frame 965436" x="6" y="6" width="30" height="30">
+        <instance id="2316:24279" name="Frame" x="6" y="6" width="18" height="18" />
+      </frame>
+      <frame id="2316:24280" name="Frame 965434" x="46" y="6" width="138" height="30">
+        <frame id="2316:24281" name="Frame 965433" x="0" y="1.5" width="138" height="15">
+          <instance id="2316:24282" name=".Workspace Header" x="0" y="0" width="79" height="15" />
+        </frame>
+        <frame id="2316:24283" name="Frame 965432" x="0" y="16.5" width="138" height="12">
+          <instance id="2316:24284" name=".Workspace Header" x="0" y="0" width="86" height="12" />
+        </frame>
+      </frame>
+    </frame>
+    <instance id="2316:24285" name="Button" x="72" y="321" width="77" height="20" />
+    <text id="2316:24286" name="Or set up advanced permissions" x="164" y="324" width="161" height="14" />
+    <text id="2316:24287" name="Create a New Workspace" x="68" y="88" width="600" height="38" />
+  </frame>
+</frame>
+
+### Content Block 2 (Text)
+IMPORTANT: The design was too large to fit into context with get_design_context. Instead you have received a sparse metadata response, you MUST call get_design_context on the IDs of the sublayers to get the full code. Split up the calls to ensure the sublayers do not also exceed the context limit.
+
+</mcp_external_output>

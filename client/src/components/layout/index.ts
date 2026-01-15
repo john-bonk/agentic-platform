@@ -13,3 +13,4 @@ export { LeftIconNavbar } from "./LeftIconNavbar";
 export { SideNavigation } from "./SideNavigation";
 export { SideNavExpandButton } from "./SideNavExpandButton";
 export { PageHeader } from "./PageHeader";
+export { CreateWorkspaceDialog } from "./CreateWorkspaceDialog";
