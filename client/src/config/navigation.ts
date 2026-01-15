@@ -348,7 +348,7 @@ export const modules: ModuleConfig[] = [
         defaultExpanded: true,
         collapsible: true,
         items: [
-          { id: "intelligence-hub", label: "Intelligence Hub", path: "/intelligence" },
+          { id: "intelligence-overview", label: "Overview", path: "/intelligence" },
         ],
       },
       {

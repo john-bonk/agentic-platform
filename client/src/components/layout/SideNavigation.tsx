@@ -126,7 +126,9 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
   const activeModuleIndex = getActiveModuleIndex(location);
 
   const isActive = (path: string) => {
+    // Module indices: Home (0), Global Risk (1), Reporting (2), Intelligence (3), Workflows (4)
     if (activeModuleIndex === 0) {
+      // Home module
       if (path === "/") {
         return location === "/" || location === "/my-dashboard";
       }
@@ -137,27 +139,31 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
     }
     
     if (activeModuleIndex === 1) {
-      if (path === "/workflows") {
-        return location === "/workflows";
-      }
-      if (path === "/workflow/new") {
-        return location === "/workflow/new";
-      }
+      // Global Risk module (CRO, CAE, CISO)
       return location === path || location.startsWith(path + "/");
     }
 
     if (activeModuleIndex === 2) {
+      // Reporting module
+      return location === path || location.startsWith(path + "/");
+    }
+
+    if (activeModuleIndex === 3) {
+      // Intelligence Hub module - exact match for Overview
       if (path === "/intelligence") {
         return location === "/intelligence";
       }
       return location === path || location.startsWith(path + "/");
     }
 
-    if (activeModuleIndex === 3) {
-      return location === path || location.startsWith(path + "/");
-    }
-
     if (activeModuleIndex === 4) {
+      // Workflows module
+      if (path === "/workflows") {
+        return location === "/workflows";
+      }
+      if (path === "/workflow/new") {
+        return location === "/workflow/new";
+      }
       return location === path || location.startsWith(path + "/");
     }
     
