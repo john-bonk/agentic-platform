@@ -75,8 +75,8 @@ export function AppLayout({
             />
           )}
           
-          {/* Universal expand button - shows when side nav is collapsed but not rendered */}
-          {!showSideNav && isCollapsed && <SideNavExpandButton />}
+          {/* Universal expand button - always shows when side nav is collapsed */}
+          {isCollapsed && <SideNavExpandButton />}
           
           <main className="flex flex-col flex-1 min-w-0 overflow-hidden bg-white transition-all duration-300 ease-in-out">
             {children}

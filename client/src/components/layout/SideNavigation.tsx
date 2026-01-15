@@ -202,16 +202,6 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
           ))}
         </div>
       </div>
-
-      {isCollapsed && (
-        <button
-          onClick={() => setCollapsed(false)}
-          className="absolute top-[26px] left-0 w-5 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-r-md shadow-sm hover:bg-gray-50 transition-all duration-300 ease-in-out cursor-pointer"
-          data-testid="nav-collapse-toggle"
-        >
-          <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
-        </button>
-      )}
     </nav>
   );
 }
