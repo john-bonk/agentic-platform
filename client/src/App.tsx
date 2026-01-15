@@ -46,6 +46,7 @@ import {
   MitigationTrackerPage,
   ThreatDetectionPage,
   VulnerabilityScanPage,
+  ComingSoonPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -60,15 +61,15 @@ function Router() {
       <Route path="/global-residual-risk" component={GlobalResidualRiskRouter} />
       <Route path="/inventory" component={AllInventoryPage} />
       <Route path="/coverage-mapping" component={CoverageMappingPage} />
-      <Route path="/controls" component={HomePage} />
-      <Route path="/tests" component={HomePage} />
-      <Route path="/issues" component={HomePage} />
-      <Route path="/financial-accounts" component={HomePage} />
-      <Route path="/risk-control-matrix" component={HomePage} />
-      <Route path="/coso-framework" component={HomePage} />
-      <Route path="/open-tasks" component={HomePage} />
-      <Route path="/financial-accounts-view" component={HomePage} />
-      <Route path="/financial-applications-view" component={HomePage} />
+      <Route path="/controls" component={ComingSoonPage} />
+      <Route path="/tests" component={ComingSoonPage} />
+      <Route path="/issues" component={ComingSoonPage} />
+      <Route path="/financial-accounts" component={ComingSoonPage} />
+      <Route path="/risk-control-matrix" component={ComingSoonPage} />
+      <Route path="/coso-framework" component={ComingSoonPage} />
+      <Route path="/open-tasks" component={ComingSoonPage} />
+      <Route path="/financial-accounts-view" component={ComingSoonPage} />
+      <Route path="/financial-applications-view" component={ComingSoonPage} />
       
       {/* Intelligence Hub Routes */}
       <Route path="/intelligence" component={IntelligenceHubPage} />
