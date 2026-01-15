@@ -106,117 +106,213 @@ const workspaceContent: Record<string, {
     quickActions: [
       { label: "Create new Risk Event", id: "risk-event" },
       { label: "Start new Risk Assessment", id: "risk-assessment" },
-      { label: "Create new Audit", id: "audit" },
+      { label: "Review Risk Register", id: "risk-register" },
     ],
   },
   "enterprise-audit": {
     scenarioPlanning: {
-      title: "Climate Instability (M&A Oversight)",
-      progress: "1/2 Completed",
-      completed: 1,
-      total: 2,
+      title: "Q2 Audit Cycle",
+      progress: "3/8 Completed",
+      completed: 3,
+      total: 8,
     },
     tasks: [
       {
         id: "audit-1",
-        title: "Update Inventory Structure & Coverage Mapping",
-        context: "Inventory: M&A",
+        title: "Complete SOX Control Testing",
+        context: "SOX Compliance: Q2",
         preparers: ["Steven Yeun", "Michelle Tu"],
         dueDate: "10-31-2025",
-        status: "incomplete",
+        status: "complete",
       },
       {
         id: "audit-2",
-        title: "Review Organizational Impact",
-        context: "Overview: M&A",
-        preparers: ["Steven Yeun", "Michelle Tu"],
+        title: "Review Internal Audit Workpapers",
+        context: "Internal Audit: Operations",
+        preparers: ["Steven Yeun"],
         dueDate: "10-31-2025",
-        status: "incomplete",
+        status: "complete",
       },
       {
         id: "audit-3",
-        title: "Review Audit Impact Scenario",
-        context: "Scenario: M&A",
-        preparers: ["Steven Yeun", "Michelle Tu"],
-        dueDate: "10-31-2025",
-        status: "incomplete",
+        title: "Finalize Procurement Audit Findings",
+        context: "Audit: Procurement",
+        preparers: ["Michelle Tu", "Alex Park"],
+        dueDate: "11-05-2025",
+        status: "in-progress",
       },
       {
         id: "audit-4",
-        title: "Update Audit Committee Presentation",
-        context: "Report: M&A",
-        preparers: ["Steven Yeun", "Michelle Tu"],
-        dueDate: "10-31-2025",
-        status: "incomplete",
-      },
-    ],
-    inboxStats: [
-      { label: "My Tasks", value: 4 },
-      { label: "My Issues", value: 0 },
-      { label: "My Controls", value: 0 },
-      { label: "My Narratives", value: 0 },
-      { label: "My Risks", value: 0 },
-      { label: "My Comments", value: 0 },
-    ],
-    quickActions: [
-      { label: "Create new Risk Event", id: "risk-event" },
-      { label: "Start new Risk Assessment", id: "risk-assessment" },
-      { label: "Create new Audit", id: "audit" },
-    ],
-  },
-  "it-security": {
-    scenarioPlanning: {
-      title: "Apache Log4j Response",
-      progress: "2/3 Completed",
-      completed: 2,
-      total: 3,
-    },
-    tasks: [
-      {
-        id: "sec-1",
-        title: "Complete Log4j Vulnerability Assessment",
-        context: "Assessment: Log4j",
-        preparers: ["David Kim", "Rachel Green"],
-        dueDate: "11-01-2025",
-        status: "incomplete",
+        title: "Update Audit Universe Risk Rankings",
+        context: "Planning: Annual",
+        preparers: ["Steven Yeun"],
+        dueDate: "11-10-2025",
+        status: "in-progress",
       },
       {
-        id: "sec-2",
-        title: "Patch Critical Systems for Log4j",
-        context: "Remediation: Log4j",
-        preparers: ["David Kim"],
+        id: "audit-5",
+        title: "Draft IT General Controls Report",
+        context: "ITGC: Annual Review",
+        preparers: ["Alex Park", "Jennifer Liu"],
         dueDate: "11-15-2025",
         status: "incomplete",
       },
       {
-        id: "sec-3",
-        title: "Update Incident Response for Log4j",
-        context: "Response: Log4j",
-        preparers: ["Rachel Green", "Tom Anderson"],
+        id: "audit-6",
+        title: "Conduct Exit Meeting with Finance",
+        context: "Audit: Financial Controls",
+        preparers: ["Michelle Tu"],
+        dueDate: "11-20-2025",
+        status: "incomplete",
+      },
+      {
+        id: "audit-7",
+        title: "Prepare Audit Committee Presentation",
+        context: "Reporting: Board",
+        preparers: ["Steven Yeun", "Michelle Tu"],
         dueDate: "11-30-2025",
         status: "incomplete",
       },
       {
-        id: "sec-4",
-        title: "Executive Briefing on Log4j Impact",
-        context: "Report: Log4j",
-        preparers: ["Tom Anderson"],
-        dueDate: "12-01-2025",
-        status: "incomplete",
+        id: "audit-8",
+        title: "Follow-up on Prior Year Findings",
+        context: "Follow-up: 2024",
+        preparers: ["Jennifer Liu"],
+        dueDate: "12-05-2025",
+        status: "complete",
       },
     ],
     inboxStats: [
-      { label: "My Tasks", value: 4 },
-      { label: "My Issues", value: 0 },
-      { label: "My Controls", value: 0 },
-      { label: "My Narratives", value: 0 },
-      { label: "My Risks", value: 0 },
-      { label: "My Comments", value: 0 },
+      { label: "My Tasks", value: 8 },
+      { label: "My Issues", value: 3 },
+      { label: "My Controls", value: 5 },
+      { label: "My Narratives", value: 2 },
+      { label: "My Risks", value: 1 },
+      { label: "My Comments", value: 4 },
     ],
     quickActions: [
-      { label: "Create new Risk Event", id: "risk-event" },
-      { label: "Start new Risk Assessment", id: "risk-assessment" },
-      { label: "Create new Audit", id: "audit" },
+      { label: "Create new Audit", id: "new-audit" },
+      { label: "Start new Workpaper", id: "new-workpaper" },
+      { label: "Log Audit Finding", id: "new-finding" },
+    ],
+  },
+  "it-security": {
+    scenarioPlanning: {
+      title: "Zero Trust Implementation",
+      progress: "4/12 Completed",
+      completed: 4,
+      total: 12,
+    },
+    tasks: [
+      {
+        id: "sec-1",
+        title: "Complete Vulnerability Scan - Critical Assets",
+        context: "Vulnerability: Q4 Scan",
+        preparers: ["David Kim", "Rachel Green"],
+        dueDate: "10-25-2025",
+        status: "complete",
+      },
+      {
+        id: "sec-2",
+        title: "Remediate High-Risk CVEs",
+        context: "Remediation: Critical",
+        preparers: ["David Kim"],
+        dueDate: "10-31-2025",
+        status: "complete",
+      },
+      {
+        id: "sec-3",
+        title: "Update Firewall Rules per Zero Trust",
+        context: "Zero Trust: Network",
+        preparers: ["Tom Anderson", "David Kim"],
+        dueDate: "11-01-2025",
+        status: "in-progress",
+      },
+      {
+        id: "sec-4",
+        title: "Deploy MFA to All Cloud Services",
+        context: "Identity: MFA Rollout",
+        preparers: ["Rachel Green"],
+        dueDate: "11-05-2025",
+        status: "in-progress",
+      },
+      {
+        id: "sec-5",
+        title: "Conduct Phishing Simulation Test",
+        context: "Awareness: Q4",
+        preparers: ["Sarah Lin", "Tom Anderson"],
+        dueDate: "11-10-2025",
+        status: "complete",
+      },
+      {
+        id: "sec-6",
+        title: "Review Third-Party Vendor Security",
+        context: "Vendor Risk: Assessment",
+        preparers: ["Rachel Green", "James Wu"],
+        dueDate: "11-15-2025",
+        status: "incomplete",
+      },
+      {
+        id: "sec-7",
+        title: "Update Incident Response Playbook",
+        context: "IR: Annual Update",
+        preparers: ["David Kim", "Sarah Lin"],
+        dueDate: "11-20-2025",
+        status: "incomplete",
+      },
+      {
+        id: "sec-8",
+        title: "Complete SOC 2 Evidence Collection",
+        context: "Compliance: SOC 2",
+        preparers: ["James Wu"],
+        dueDate: "11-25-2025",
+        status: "incomplete",
+      },
+      {
+        id: "sec-9",
+        title: "Implement EDR on Legacy Systems",
+        context: "Endpoint: EDR Rollout",
+        preparers: ["Tom Anderson", "David Kim"],
+        dueDate: "11-30-2025",
+        status: "incomplete",
+      },
+      {
+        id: "sec-10",
+        title: "Conduct Penetration Test - Web Apps",
+        context: "Pen Test: Applications",
+        preparers: ["Rachel Green"],
+        dueDate: "12-05-2025",
+        status: "incomplete",
+      },
+      {
+        id: "sec-11",
+        title: "Security Metrics Board Report",
+        context: "Reporting: Executive",
+        preparers: ["David Kim", "Sarah Lin"],
+        dueDate: "12-10-2025",
+        status: "complete",
+      },
+      {
+        id: "sec-12",
+        title: "Annual Security Awareness Training",
+        context: "Training: All Staff",
+        preparers: ["Sarah Lin", "Tom Anderson"],
+        dueDate: "12-15-2025",
+        status: "in-progress",
+      },
+    ],
+    inboxStats: [
+      { label: "My Tasks", value: 12 },
+      { label: "My Issues", value: 7 },
+      { label: "My Controls", value: 15 },
+      { label: "My Narratives", value: 0 },
+      { label: "My Risks", value: 8 },
+      { label: "My Comments", value: 11 },
+    ],
+    quickActions: [
+      { label: "Report Security Incident", id: "new-incident" },
+      { label: "Log Vulnerability", id: "new-vulnerability" },
+      { label: "Create Compliance Gap", id: "new-gap" },
     ],
   },
 };
@@ -245,15 +341,27 @@ const workspaces = [
   },
 ];
 
-function DonutChart({ value, total }: { value: number; total: number }) {
-  const percentage = (value / total) * 100;
+interface TaskStats {
+  incomplete: number;
+  inProgress: number;
+  complete: number;
+  total: number;
+}
+
+function DonutChart({ stats }: { stats: TaskStats }) {
   const circumference = 2 * Math.PI * 45;
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  
+  const incompletePercent = (stats.incomplete / stats.total) * 100;
+  const inProgressPercent = (stats.inProgress / stats.total) * 100;
+  const completePercent = (stats.complete / stats.total) * 100;
+  
+  const incompleteOffset = 0;
+  const inProgressOffset = incompletePercent;
+  const completeOffset = incompletePercent + inProgressPercent;
 
   return (
     <div className="relative w-40 h-40 mx-auto">
-      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+      <svg className="w-full h-full transform -rotate-90 transition-all duration-500 ease-out" viewBox="0 0 100 100">
         <circle
           cx="50"
           cy="50"
@@ -262,24 +370,66 @@ function DonutChart({ value, total }: { value: number; total: number }) {
           stroke="#e5e7eb"
           strokeWidth="10"
         />
-        <circle
-          cx="50"
-          cy="50"
-          r="45"
-          fill="none"
-          stroke="#f59e0b"
-          strokeWidth="10"
-          strokeDasharray={strokeDasharray}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-        />
+        {stats.complete > 0 && (
+          <circle
+            cx="50"
+            cy="50"
+            r="45"
+            fill="none"
+            stroke="#10b981"
+            strokeWidth="10"
+            strokeDasharray={`${(completePercent / 100) * circumference} ${circumference}`}
+            strokeDashoffset={-(completeOffset / 100) * circumference}
+            strokeLinecap="round"
+            className="transition-all duration-500 ease-out"
+          />
+        )}
+        {stats.inProgress > 0 && (
+          <circle
+            cx="50"
+            cy="50"
+            r="45"
+            fill="none"
+            stroke="#3b82f6"
+            strokeWidth="10"
+            strokeDasharray={`${(inProgressPercent / 100) * circumference} ${circumference}`}
+            strokeDashoffset={-(inProgressOffset / 100) * circumference}
+            strokeLinecap="round"
+            className="transition-all duration-500 ease-out"
+          />
+        )}
+        {stats.incomplete > 0 && (
+          <circle
+            cx="50"
+            cy="50"
+            r="45"
+            fill="none"
+            stroke="#f59e0b"
+            strokeWidth="10"
+            strokeDasharray={`${(incompletePercent / 100) * circumference} ${circumference}`}
+            strokeDashoffset={-(incompleteOffset / 100) * circumference}
+            strokeLinecap="round"
+            className="transition-all duration-500 ease-out"
+          />
+        )}
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-4xl font-bold text-gray-900">{value}</span>
+      <div className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-300">
+        <span className="text-4xl font-bold text-gray-900">{stats.total}</span>
         <span className="text-sm text-gray-500">Open Tasks</span>
       </div>
     </div>
   );
+}
+
+function getStatusBadge(status: Task["status"]) {
+  switch (status) {
+    case "complete":
+      return { label: "Complete", className: "text-emerald-600 bg-emerald-50" };
+    case "in-progress":
+      return { label: "In Progress", className: "text-blue-600 bg-blue-50" };
+    default:
+      return { label: "Incomplete", className: "text-amber-600 bg-amber-50" };
+  }
 }
 
 export default function HomePage() {
@@ -288,12 +438,21 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState("My Tasks");
   const [scenarioExpanded, setScenarioExpanded] = useState(true);
   const { setOpen: setAssistantOpen } = useHomeAssistantStore();
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     setActiveTab("My Tasks");
+    setIsTransitioning(true);
+    const timer = setTimeout(() => setIsTransitioning(false), 300);
+    return () => clearTimeout(timer);
   }, [refreshKey]);
 
-  const incompleteTasks = content.tasks.filter(t => t.status === "incomplete").length;
+  const taskStats: TaskStats = {
+    incomplete: content.tasks.filter(t => t.status === "incomplete").length,
+    inProgress: content.tasks.filter(t => t.status === "in-progress").length,
+    complete: content.tasks.filter(t => t.status === "complete").length,
+    total: content.tasks.length,
+  };
 
   return (
     <AppLayout showHeader={true} showSideNav={true}>
@@ -307,7 +466,7 @@ export default function HomePage() {
             <h1 className="text-2xl font-semibold" data-testid="welcome-message">
               Welcome back, {currentWorkspace.persona}
               <span className="ml-4 text-base font-normal text-white/80">
-                {incompleteTasks} New critical{" "}
+                {taskStats.incomplete} New critical{" "}
                 <span className="underline cursor-pointer hover:text-white">tasks to review</span>
               </span>
             </h1>
@@ -390,28 +549,53 @@ export default function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
               {/* Left: Task Overview Donut */}
               <Card className="shadow-sm border border-slate-200" data-testid="task-overview-card">
-                <CardContent className="p-6">
+                <CardContent className={`p-6 transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`}>
                   <h3 className="text-sm font-semibold text-gray-900 mb-1">Task Overview</h3>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                    <span>Incomplete</span>
-                    <span className="w-2 h-2 rounded-full bg-gray-300" />
-                    <span>{incompleteTasks}</span>
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-6 flex-wrap">
+                    {taskStats.incomplete > 0 && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-amber-400" />
+                        <span>{taskStats.incomplete} Incomplete</span>
+                      </div>
+                    )}
+                    {taskStats.inProgress > 0 && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-blue-500" />
+                        <span>{taskStats.inProgress} In Progress</span>
+                      </div>
+                    )}
+                    {taskStats.complete > 0 && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                        <span>{taskStats.complete} Complete</span>
+                      </div>
+                    )}
                   </div>
-                  <DonutChart value={incompleteTasks} total={incompleteTasks || 1} />
-                  <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                    Incomplete
+                  <DonutChart stats={taskStats} />
+                  <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500 flex-wrap">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                      Incomplete
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                      In Progress
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                      Complete
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Right: Scenario Task List */}
               <Card className="shadow-sm border border-slate-200" data-testid="scenario-card">
-                <CardContent className="p-0">
+                <CardContent className="p-0 flex flex-col h-[340px]">
                   {/* Scenario Header */}
                   <button
                     onClick={() => setScenarioExpanded(!scenarioExpanded)}
-                    className="w-full flex items-center gap-2 px-4 py-3 bg-slate-50 border-b border-slate-200 text-left hover:bg-slate-100 transition-colors"
+                    className="w-full flex items-center gap-2 px-4 py-3 bg-slate-50 border-b border-slate-200 text-left hover:bg-slate-100 transition-colors flex-shrink-0"
                     data-testid="button-scenario-toggle"
                   >
                     {scenarioExpanded ? (
@@ -422,30 +606,36 @@ export default function HomePage() {
                     <span className="font-medium text-gray-900">{content.scenarioPlanning.title}</span>
                   </button>
 
-                  {/* Task List */}
+                  {/* Scrollable Task List */}
                   {scenarioExpanded && (
-                    <div className="divide-y divide-slate-100" data-testid="task-list">
-                      {content.tasks.map((task) => (
-                        <div
-                          key={task.id}
-                          className="flex items-start gap-4 px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors"
-                          data-testid={`task-item-${task.id}`}
-                        >
-                          <span className="text-xs text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded mt-0.5">
-                            Incomplete
-                          </span>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-[#266C92] hover:underline cursor-pointer" data-testid={`task-title-${task.id}`}>
-                              {task.title}
+                    <div 
+                      className={`flex-1 overflow-y-auto divide-y divide-slate-100 transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`} 
+                      data-testid="task-list"
+                    >
+                      {content.tasks.map((task) => {
+                        const badge = getStatusBadge(task.status);
+                        return (
+                          <div
+                            key={task.id}
+                            className="flex items-start gap-4 px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors"
+                            data-testid={`task-item-${task.id}`}
+                          >
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded mt-0.5 ${badge.className}`}>
+                              {badge.label}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium text-[#266C92] hover:underline cursor-pointer" data-testid={`task-title-${task.id}`}>
+                                {task.title}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-0.5">{task.context}</div>
                             </div>
-                            <div className="text-xs text-gray-500 mt-0.5">{task.context}</div>
+                            <div className="text-right flex-shrink-0">
+                              <div className="text-xs text-gray-400">Due Date</div>
+                              <div className="text-sm text-gray-700" data-testid={`task-due-${task.id}`}>{task.dueDate}</div>
+                            </div>
                           </div>
-                          <div className="text-right flex-shrink-0">
-                            <div className="text-xs text-gray-400">Due Date</div>
-                            <div className="text-sm text-gray-700" data-testid={`task-due-${task.id}`}>{task.dueDate}</div>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </CardContent>
