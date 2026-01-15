@@ -12,6 +12,12 @@ export interface SlideMetric {
   trendValue?: string;
 }
 
+export interface ChartDataPoint {
+  label: string;
+  value: number;
+  color: string;
+}
+
 export interface Slide {
   id: string;
   title: string;
@@ -19,7 +25,8 @@ export interface Slide {
   type: "title" | "metrics" | "bullets" | "chart" | "summary";
   metrics?: SlideMetric[];
   bulletPoints?: string[];
-  chartData?: { label: string; value: number; color: string }[];
+  chartData?: ChartDataPoint[];
+  chartUnit?: "percent" | "count" | "currency" | "none";
   conclusion?: string;
   cta?: string;
 }
@@ -66,6 +73,7 @@ export const slideDecks: Record<string, Record<string, SlideDeck>> = {
           title: "Exposure by Region",
           subtitle: "Geographic distribution of tariff impact",
           type: "chart",
+          chartUnit: "percent",
           chartData: [
             { label: "China", value: 42, color: "#ef4444" },
             { label: "Southeast Asia", value: 28, color: "#f59e0b" },
@@ -77,8 +85,9 @@ export const slideDecks: Record<string, Record<string, SlideDeck>> = {
         {
           id: "slide-4",
           title: "Quarterly Trend Analysis",
-          subtitle: "Exposure trajectory and mitigation effectiveness",
+          subtitle: "Exposure trajectory and mitigation effectiveness ($M)",
           type: "chart",
+          chartUnit: "currency",
           chartData: [
             { label: "Q1 2025", value: 32, color: "#266C92" },
             { label: "Q2 2025", value: 38, color: "#266C92" },
@@ -147,6 +156,7 @@ export const slideDecks: Record<string, Record<string, SlideDeck>> = {
           title: "Control Testing Progress by Domain",
           subtitle: "Coverage across key control areas",
           type: "chart",
+          chartUnit: "percent",
           chartData: [
             { label: "Financial Reporting", value: 85, color: "#10b981" },
             { label: "IT General Controls", value: 62, color: "#f59e0b" },
@@ -161,6 +171,7 @@ export const slideDecks: Record<string, Record<string, SlideDeck>> = {
           title: "Issues by Risk Rating",
           subtitle: "Distribution of identified control gaps",
           type: "chart",
+          chartUnit: "count",
           chartData: [
             { label: "Critical", value: 1, color: "#ef4444" },
             { label: "High", value: 2, color: "#f59e0b" },
@@ -228,6 +239,7 @@ export const slideDecks: Record<string, Record<string, SlideDeck>> = {
           title: "Vulnerability Distribution by System Type",
           subtitle: "Affected systems across infrastructure categories",
           type: "chart",
+          chartUnit: "count",
           chartData: [
             { label: "Web Servers", value: 48, color: "#ef4444" },
             { label: "Application Servers", value: 35, color: "#f59e0b" },
@@ -242,6 +254,7 @@ export const slideDecks: Record<string, Record<string, SlideDeck>> = {
           title: "Remediation Timeline",
           subtitle: "Patch deployment progress over 30-day window",
           type: "chart",
+          chartUnit: "percent",
           chartData: [
             { label: "Week 1", value: 45, color: "#266C92" },
             { label: "Week 2", value: 78, color: "#266C92" },

@@ -111,6 +111,14 @@ function SlideContent({ slide }: { slide: Slide }) {
 
   if (slide.type === "chart" && slide.chartData) {
     const maxValue = Math.max(...slide.chartData.map(d => d.value));
+    const formatValue = (val: number) => {
+      switch (slide.chartUnit) {
+        case "percent": return `${val}%`;
+        case "currency": return `$${val}M`;
+        case "count": return val.toString();
+        default: return val.toString();
+      }
+    };
     return (
       <div className="flex flex-col h-full p-12">
         <div className="mb-6">
@@ -126,7 +134,7 @@ function SlideContent({ slide }: { slide: Slide }) {
               <div key={idx} className="flex flex-col items-center gap-3" style={{ width: `${100 / slide.chartData!.length}%`, maxWidth: '120px' }}>
                 <div className="relative w-full flex flex-col items-center" style={{ height: '280px' }}>
                   <span className="absolute -top-8 text-lg font-bold text-gray-700 dark:text-gray-300">
-                    {item.value}%
+                    {formatValue(item.value)}
                   </span>
                   <div 
                     className="w-full rounded-t-lg transition-all duration-500 ease-out"
