@@ -111,7 +111,7 @@ const workspaceContent: Record<string, {
   },
   "enterprise-audit": {
     scenarioPlanning: {
-      title: "M&A of Vertical Farming Business to Offset Climate Instability",
+      title: "Vertical Farming M&A",
       progress: "3/8 Completed",
       completed: 3,
       total: 8,
