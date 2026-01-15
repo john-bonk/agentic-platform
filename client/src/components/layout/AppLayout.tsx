@@ -72,7 +72,7 @@ export function AppLayout({
             />
           )}
           
-          <main className="flex flex-col flex-1 min-w-0 overflow-hidden bg-white">
+          <main className="flex flex-col flex-1 min-w-0 overflow-hidden bg-white transition-all duration-300 ease-in-out">
             {children}
           </main>
         </div>

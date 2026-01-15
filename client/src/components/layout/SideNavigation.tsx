@@ -1,11 +1,13 @@
 /**
  * Side Navigation Component
  * 
- * A secondary navigation panel with grouped menu items.
+ * A collapsible secondary navigation panel with grouped menu items.
  * This appears to the right of the icon navbar and shows detailed navigation.
  */
 
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type SideNavSection, getActiveModuleIndex } from "@/config/navigation";
@@ -18,11 +20,11 @@ interface SideNavigationProps {
 
 export function SideNavigation({ sections, title, className = "" }: SideNavigationProps) {
   const [location] = useLocation();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const activeModuleIndex = getActiveModuleIndex(location);
 
   const isActive = (path: string) => {
-    // Home module
     if (activeModuleIndex === 0) {
       if (path === "/") {
         return location === "/" || location === "/my-dashboard";
@@ -33,7 +35,6 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
       return location === path || location.startsWith(path + "/");
     }
     
-    // Workflows module
     if (activeModuleIndex === 1) {
       if (path === "/workflows") {
         return location === "/workflows";
@@ -44,7 +45,6 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
       return location === path || location.startsWith(path + "/");
     }
 
-    // Intelligence Hub module
     if (activeModuleIndex === 2) {
       if (path === "/intelligence") {
         return location === "/intelligence";
@@ -52,12 +52,10 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
       return location === path || location.startsWith(path + "/");
     }
 
-    // Reporting module
     if (activeModuleIndex === 3) {
       return location === path || location.startsWith(path + "/");
     }
 
-    // CRO Workspace module
     if (activeModuleIndex === 4) {
       return location === path || location.startsWith(path + "/");
     }
@@ -67,32 +65,32 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
 
   return (
     <nav 
-      className={`flex w-[272px] items-start relative bg-gray-100 border-r-[3px] border-r-gray-100 border-solid flex-shrink-0 h-full z-30 ${className}`}
+      className={`relative flex items-start bg-gray-100 border-r-[3px] border-r-gray-100 flex-shrink-0 h-full z-30 transition-all duration-300 ease-in-out ${
+        isCollapsed ? "w-0" : "w-[272px]"
+      } ${className}`}
       data-testid="side-navigation"
     >
-      <div className="flex flex-col items-start gap-2 relative flex-1 h-full bg-white overflow-hidden">
-        <header className="flex items-center justify-between pl-6 pr-2 py-6 relative self-stretch w-full flex-[0_0_auto]">
-          <div className="flex flex-col items-start justify-center relative flex-1 grow">
-            <div className="flex items-start relative self-stretch w-full flex-[0_0_auto]">
-              <h1 
-                className="relative font-semibold text-gray-900 text-lg leading-[1.2]" 
-                data-testid="navigation-title"
-              >
-                {title}
-              </h1>
-            </div>
-          </div>
+      <div className={`flex flex-col h-full bg-white overflow-hidden transition-all duration-300 ease-in-out ${
+        isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
+      }`}>
+        <header className="flex items-center justify-between pl-6 pr-2 py-6 flex-shrink-0">
+          <h1 
+            className="font-semibold text-gray-900 text-lg leading-[1.2] whitespace-nowrap" 
+            data-testid="navigation-title"
+          >
+            {title}
+          </h1>
         </header>
 
-        <div className="flex flex-col items-start gap-5 pt-0 pb-6 px-4 relative flex-1 self-stretch w-full grow overflow-y-auto">
+        <div className="flex flex-col gap-5 pt-0 pb-6 px-4 flex-1 overflow-y-auto">
           {sections.map((section) => (
-            <div key={section.title} className="flex flex-col items-start gap-1 w-full">
-              <span className="text-xs font-medium text-gray-400 uppercase tracking-wider px-2 pb-1">
+            <div key={section.title} className="flex flex-col gap-1">
+              <span className="text-xs font-medium text-gray-400 uppercase tracking-wider px-2 pb-1 whitespace-nowrap">
                 {section.title}
               </span>
-              <ul className="flex-col items-start gap-0.5 flex w-full">
+              <ul className="flex flex-col gap-0.5">
                 {section.items.map((item) => (
-                  <li key={item.id} className="w-full">
+                  <li key={item.id}>
                     <Link href={item.path}>
                       <Button
                         variant="ghost"
@@ -104,10 +102,10 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
                         data-testid={`nav-item-${item.id}`}
                       >
                         <span
-                          className={`relative flex-1 text-left text-sm ${
+                          className={`flex-1 text-left text-sm whitespace-nowrap ${
                             isActive(item.path)
-                              ? "font-semibold text-teal-600 leading-[21px]"
-                              : "font-normal text-gray-600 leading-[1.5]"
+                              ? "font-semibold text-teal-600"
+                              : "font-normal text-gray-600"
                           }`}
                         >
                           {item.label}
@@ -130,6 +128,20 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
           ))}
         </div>
       </div>
+
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className={`absolute top-1/2 -translate-y-1/2 w-5 h-10 flex items-center justify-center bg-white border border-gray-200 rounded-r-md shadow-sm hover:bg-gray-50 transition-all duration-300 ease-in-out cursor-pointer ${
+          isCollapsed ? "left-0" : "-right-5"
+        }`}
+        data-testid="nav-collapse-toggle"
+      >
+        {isCollapsed ? (
+          <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
+        ) : (
+          <ChevronLeft className="w-3.5 h-3.5 text-gray-500" />
+        )}
+      </button>
     </nav>
   );
 }
