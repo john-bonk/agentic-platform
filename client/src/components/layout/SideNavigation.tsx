@@ -65,8 +65,8 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
 
   return (
     <nav 
-      className={`relative flex items-start bg-gray-100 border-r-[3px] border-r-gray-100 flex-shrink-0 h-full z-30 transition-all duration-300 ease-in-out ${
-        isCollapsed ? "w-0" : "w-[272px]"
+      className={`relative flex items-start bg-gray-100 flex-shrink-0 h-full z-30 transition-all duration-300 ease-in-out ${
+        isCollapsed ? "w-0 border-r-0" : "w-[272px] border-r-[3px] border-r-gray-100"
       } ${className}`}
       data-testid="side-navigation"
     >
@@ -131,7 +131,7 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
 
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className={`absolute top-1/2 -translate-y-1/2 w-5 h-10 flex items-center justify-center bg-white border border-gray-200 rounded-r-md shadow-sm hover:bg-gray-50 transition-all duration-300 ease-in-out cursor-pointer ${
+        className={`absolute top-[26px] w-5 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-r-md shadow-sm hover:bg-gray-50 transition-all duration-300 ease-in-out cursor-pointer ${
           isCollapsed ? "left-0" : "-right-5"
         }`}
         data-testid="nav-collapse-toggle"
