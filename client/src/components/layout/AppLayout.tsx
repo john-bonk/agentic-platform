@@ -53,7 +53,8 @@ export function AppLayout({
   const workspaceNav = isHomeModule ? getWorkspaceHomeNav(currentWorkspace.persona) : null;
   
   const sideNavSections = workspaceNav ? workspaceNav.sections : currentModule.sideNavSections;
-  const sideNavTitle = workspaceNav ? workspaceNav.title : currentModule.name;
+  // Use the actual workspace name for the title - especially important for custom workspaces
+  const sideNavTitle = isHomeModule ? currentWorkspace.name : currentModule.name;
   
   return (
     <div className={`flex items-start relative h-screen overflow-hidden ${className}`}>
