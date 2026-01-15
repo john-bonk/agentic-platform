@@ -73,13 +73,20 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
       <div className={`flex flex-col h-full bg-white overflow-hidden transition-all duration-300 ease-in-out ${
         isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
       }`}>
-        <header className="flex items-center justify-between pl-6 pr-2 py-6 flex-shrink-0">
+        <header className="flex items-center justify-between pl-6 pr-1 py-6 flex-shrink-0">
           <h1 
             className="font-semibold text-gray-900 text-lg leading-[1.2] whitespace-nowrap" 
             data-testid="navigation-title"
           >
             {title}
           </h1>
+          <button
+            onClick={() => setIsCollapsed(true)}
+            className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer"
+            data-testid="nav-collapse-toggle-inline"
+          >
+            <ChevronLeft className="w-4 h-4 text-gray-400" />
+          </button>
         </header>
 
         <div className="flex flex-col gap-5 pt-0 pb-6 px-4 flex-1 overflow-y-auto">
@@ -129,19 +136,15 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
         </div>
       </div>
 
-      <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className={`absolute top-[26px] w-5 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-r-md shadow-sm hover:bg-gray-50 transition-all duration-300 ease-in-out cursor-pointer ${
-          isCollapsed ? "left-0" : "-right-5"
-        }`}
-        data-testid="nav-collapse-toggle"
-      >
-        {isCollapsed ? (
+      {isCollapsed && (
+        <button
+          onClick={() => setIsCollapsed(false)}
+          className="absolute top-[26px] left-0 w-5 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-r-md shadow-sm hover:bg-gray-50 transition-all duration-300 ease-in-out cursor-pointer"
+          data-testid="nav-collapse-toggle"
+        >
           <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
-        ) : (
-          <ChevronLeft className="w-3.5 h-3.5 text-gray-500" />
-        )}
-      </button>
+        </button>
+      )}
     </nav>
   );
 }
