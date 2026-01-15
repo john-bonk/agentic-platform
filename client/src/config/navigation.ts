@@ -288,16 +288,6 @@ export const modules: ModuleConfig[] = [
           { id: "mitigation-tracker", label: "Mitigation Tracker", path: "/cro/mitigation-tracker" },
         ],
       },
-      {
-        id: "risk-reports",
-        title: "Reports",
-        defaultExpanded: true,
-        collapsible: true,
-        items: [
-          { id: "board-deck", label: "Board Deck", path: "/cro/board-deck" },
-          { id: "quarterly-review", label: "Quarterly Review", path: "/cro/quarterly-review" },
-        ],
-      },
     ],
   },
   {
