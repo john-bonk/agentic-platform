@@ -37,6 +37,42 @@ interface QuickAction {
   color: string;
 }
 
+const genericQuickActions: QuickAction[] = [
+  {
+    id: "create-item",
+    label: "Create New Item",
+    description: "Create a new record in your workspace - risk, control, task, or finding",
+    icon: Plus,
+    type: "create",
+    color: "#266C92",
+  },
+  {
+    id: "start-review",
+    label: "Start Review Process",
+    description: "Initiate a review or assessment workflow for your selected capabilities",
+    icon: Target,
+    type: "create",
+    color: "#f59e0b",
+  },
+  {
+    id: "view-dashboard",
+    label: "View Dashboard",
+    description: "Access your consolidated analytics and metrics dashboard",
+    icon: BarChart3,
+    type: "navigate",
+    route: "/dashboard",
+    color: "#10b981",
+  },
+  {
+    id: "generate-report",
+    label: "Generate Report",
+    description: "Create a summary report based on your workspace activities",
+    icon: FileText,
+    type: "report",
+    color: "#8b5cf6",
+  },
+];
+
 const workspaceQuickActions: Record<string, QuickAction[]> = {
   "enterprise-risk": [
     {
@@ -440,7 +476,9 @@ export function HomeAssistantPanel() {
     }
   }, [buildingReport]);
 
-  const quickActions = workspaceQuickActions[currentWorkspace.id] || workspaceQuickActions["enterprise-risk"];
+  const quickActions = currentWorkspace.isCustom 
+    ? genericQuickActions 
+    : (workspaceQuickActions[currentWorkspace.id] || workspaceQuickActions["enterprise-risk"]);
 
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading) return;

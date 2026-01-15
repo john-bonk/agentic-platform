@@ -1,9 +1,9 @@
 /**
  * Create Workspace Dialog
  * 
- * Dialog for creating a new workspace with name and type selection.
+ * Dialog for creating a new workspace with name and solution capabilities selection.
  * Team member invites are optional (can be configured later).
- * Follows Figma design: workspace name, optional email invites, workspace type grid.
+ * Solution capabilities support multi-select.
  */
 
 import { useState } from "react";
@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -36,7 +37,7 @@ import {
   Plus,
   X,
 } from "lucide-react";
-import { workspaceTypes, type WorkspaceType, type Workspace, useWorkspaceStore } from "@/lib/workspaceStore";
+import { solutionCapabilities, type SolutionCapability, type Workspace, useWorkspaceStore } from "@/lib/workspaceStore";
 
 interface CreateWorkspaceDialogProps {
   open: boolean;
@@ -50,7 +51,7 @@ interface TeamMember {
   role: "Admin" | "Member" | "Viewer";
 }
 
-const getWorkspaceTypeIcon = (iconName: string) => {
+const getCapabilityIcon = (iconName: string) => {
   const iconClass = "w-5 h-5";
   switch (iconName) {
     case "shield-check": return <ShieldCheck className={iconClass} />;
@@ -66,19 +67,10 @@ const getWorkspaceTypeIcon = (iconName: string) => {
   }
 };
 
-const getPersonaTitle = (persona: string): string => {
-  switch (persona) {
-    case "CRO": return "Chief Risk Officer";
-    case "CAE": return "Chief Audit Executive";
-    case "CISO": return "Chief Information Security Officer";
-    default: return "Administrator";
-  }
-};
-
 export function CreateWorkspaceDialog({ open, onOpenChange, onWorkspaceCreated }: CreateWorkspaceDialogProps) {
   const { addWorkspace } = useWorkspaceStore();
   const [workspaceName, setWorkspaceName] = useState("");
-  const [selectedType, setSelectedType] = useState<WorkspaceType | null>(null);
+  const [selectedCapabilities, setSelectedCapabilities] = useState<string[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
     { id: "1", email: "", role: "Member" }
   ]);
@@ -99,15 +91,23 @@ export function CreateWorkspaceDialog({ open, onOpenChange, onWorkspaceCreated }
     ));
   };
 
+  const handleCapabilityToggle = (capabilityId: string) => {
+    setSelectedCapabilities(prev => 
+      prev.includes(capabilityId)
+        ? prev.filter(id => id !== capabilityId)
+        : [...prev, capabilityId]
+    );
+  };
+
   const handleCreate = () => {
-    if (!workspaceName.trim() || !selectedType) return;
+    if (!workspaceName.trim() || selectedCapabilities.length === 0) return;
 
     const newWorkspace: Workspace = {
       id: `custom-${Date.now()}`,
       name: workspaceName.trim(),
-      persona: selectedType.defaultPersona,
-      personaTitle: getPersonaTitle(selectedType.defaultPersona),
-      workspaceType: selectedType,
+      persona: "Custom",
+      personaTitle: "Workspace Administrator",
+      selectedCapabilities: selectedCapabilities,
       isCustom: true,
     };
 
@@ -115,23 +115,23 @@ export function CreateWorkspaceDialog({ open, onOpenChange, onWorkspaceCreated }
     onWorkspaceCreated?.(newWorkspace);
     
     setWorkspaceName("");
-    setSelectedType(null);
+    setSelectedCapabilities([]);
     setTeamMembers([{ id: "1", email: "", role: "Member" }]);
     onOpenChange(false);
   };
 
   const handleCancel = () => {
     setWorkspaceName("");
-    setSelectedType(null);
+    setSelectedCapabilities([]);
     setTeamMembers([{ id: "1", email: "", role: "Member" }]);
     onOpenChange(false);
   };
 
-  const isValid = workspaceName.trim().length > 0 && selectedType !== null;
+  const isValid = workspaceName.trim().length > 0 && selectedCapabilities.length > 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg p-6" data-testid="create-workspace-dialog">
+      <DialogContent className="max-w-lg p-6 max-h-[90vh] overflow-y-auto" data-testid="create-workspace-dialog">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold" data-testid="dialog-title">
             Create a New Workspace
@@ -216,31 +216,38 @@ export function CreateWorkspaceDialog({ open, onOpenChange, onWorkspaceCreated }
 
           <div className="space-y-3">
             <Label className="text-sm font-medium">
-              Workspace Type<span className="text-red-500">*</span>
+              Solution Capabilities<span className="text-red-500">*</span>
+              <span className="text-gray-500 font-normal ml-2">(Select one or more)</span>
             </Label>
-            <div className="grid grid-cols-2 gap-2">
-              {workspaceTypes.map((type) => {
-                const isSelected = selectedType?.id === type.id;
+            <div className="grid grid-cols-1 gap-2">
+              {solutionCapabilities.map((capability) => {
+                const isSelected = selectedCapabilities.includes(capability.id);
                 return (
                   <button
-                    key={type.id}
-                    onClick={() => setSelectedType(type)}
-                    className={`flex items-start gap-3 p-3 rounded-md border text-left transition-colors hover-elevate ${
+                    key={capability.id}
+                    onClick={() => handleCapabilityToggle(capability.id)}
+                    className={`flex items-center gap-3 p-3 rounded-md border text-left transition-colors hover-elevate ${
                       isSelected 
                         ? "border-[#266C92] bg-[#266C92]/5" 
                         : "border-gray-200"
                     }`}
-                    data-testid={`workspace-type-${type.id}`}
+                    data-testid={`capability-${capability.id}`}
                   >
-                    <div className={`mt-0.5 ${isSelected ? "text-[#266C92]" : "text-gray-500"}`}>
-                      {getWorkspaceTypeIcon(type.icon)}
+                    <Checkbox
+                      checked={isSelected}
+                      onCheckedChange={() => handleCapabilityToggle(capability.id)}
+                      className="data-[state=checked]:bg-[#266C92] data-[state=checked]:border-[#266C92]"
+                      data-testid={`checkbox-capability-${capability.id}`}
+                    />
+                    <div className={`${isSelected ? "text-[#266C92]" : "text-gray-500"}`}>
+                      {getCapabilityIcon(capability.icon)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className={`text-sm font-medium truncate ${isSelected ? "text-[#266C92]" : "text-gray-900"}`}>
-                        {type.name}
+                      <div className={`text-sm font-medium ${isSelected ? "text-[#266C92]" : "text-gray-900"}`}>
+                        {capability.name}
                       </div>
-                      <div className="text-xs text-gray-500 truncate">
-                        {type.description}
+                      <div className="text-xs text-gray-500">
+                        {capability.description}
                       </div>
                     </div>
                   </button>

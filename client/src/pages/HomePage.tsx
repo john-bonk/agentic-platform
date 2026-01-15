@@ -7,9 +7,12 @@
  * 3. Inbox section with horizontal stat tabs
  * 4. Two-column: Task Overview donut + Task list
  * 5. Your workspaces section
+ * 
+ * Custom workspaces show "Welcome back!" without persona and
+ * display content based on selected solution capabilities.
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { AppLayout } from "@/components/layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +26,7 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
-import { useWorkspaceStore, workspaces as storeWorkspaces } from "@/lib/workspaceStore";
+import { useWorkspaceStore, workspaces as storeWorkspaces, solutionCapabilities } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 import headerBgImage from "@assets/Welcome_Image_1767849747805.png";
 
@@ -48,12 +51,14 @@ interface InboxStat {
   value: number;
 }
 
-const workspaceContent: Record<string, {
+interface WorkspaceContentData {
   scenarioPlanning: ScenarioPlanning;
   tasks: Task[];
   inboxStats: InboxStat[];
   quickActions: { label: string; id: string }[];
-}> = {
+}
+
+const workspaceContent: Record<string, WorkspaceContentData> = {
   "enterprise-risk": {
     scenarioPlanning: {
       title: "Tariff Mitigation Strategy",
@@ -317,6 +322,106 @@ const workspaceContent: Record<string, {
   },
 };
 
+const capabilityTaskTemplates: Record<string, Task[]> = {
+  "controls-management": [
+    { id: "ctrl-1", title: "Review SOX Control Documentation", context: "Controls: Q4 Review", preparers: ["Control Team"], dueDate: "11-15-2025", status: "incomplete" },
+    { id: "ctrl-2", title: "Update Control Testing Schedule", context: "Planning: Control Testing", preparers: ["Audit Lead"], dueDate: "11-20-2025", status: "in-progress" },
+  ],
+  "enterprise-risk": [
+    { id: "erm-1", title: "Complete Risk Assessment", context: "Risk: Enterprise Review", preparers: ["Risk Team"], dueDate: "11-10-2025", status: "incomplete" },
+    { id: "erm-2", title: "Update Risk Register", context: "Risk: Quarterly Update", preparers: ["Risk Analyst"], dueDate: "11-25-2025", status: "in-progress" },
+  ],
+  "audit-management": [
+    { id: "aud-1", title: "Finalize Audit Workpapers", context: "Audit: Q4 Engagement", preparers: ["Audit Team"], dueDate: "11-12-2025", status: "incomplete" },
+    { id: "aud-2", title: "Review Audit Findings", context: "Report: Findings Summary", preparers: ["CAE"], dueDate: "11-30-2025", status: "incomplete" },
+  ],
+  "cyber-compliance": [
+    { id: "cyber-1", title: "Complete Cyber Risk Assessment", context: "Security: Annual Review", preparers: ["Security Team"], dueDate: "11-08-2025", status: "in-progress" },
+    { id: "cyber-2", title: "Update Security Policies", context: "Compliance: Policy Review", preparers: ["CISO"], dueDate: "11-22-2025", status: "incomplete" },
+  ],
+  "information-technology": [
+    { id: "it-1", title: "Review IT General Controls", context: "IT: Control Assessment", preparers: ["IT Team"], dueDate: "11-18-2025", status: "incomplete" },
+    { id: "it-2", title: "Update System Inventory", context: "IT: Asset Management", preparers: ["IT Admin"], dueDate: "12-01-2025", status: "incomplete" },
+  ],
+  "regulatory-compliance": [
+    { id: "reg-1", title: "ESG Disclosure Review", context: "Compliance: ESG Reporting", preparers: ["Compliance Team"], dueDate: "11-14-2025", status: "in-progress" },
+    { id: "reg-2", title: "Regulatory Filing Preparation", context: "Compliance: Q4 Filing", preparers: ["Legal Team"], dueDate: "12-05-2025", status: "incomplete" },
+  ],
+  "third-party": [
+    { id: "tp-1", title: "Vendor Risk Assessment", context: "Vendor: Annual Review", preparers: ["Vendor Team"], dueDate: "11-16-2025", status: "incomplete" },
+    { id: "tp-2", title: "Update Vendor Contracts", context: "Vendor: Contract Review", preparers: ["Procurement"], dueDate: "11-28-2025", status: "in-progress" },
+  ],
+  "ai-governance": [
+    { id: "ai-1", title: "AI Model Risk Assessment", context: "AI: Governance Review", preparers: ["AI Team"], dueDate: "11-20-2025", status: "incomplete" },
+    { id: "ai-2", title: "Update AI Use Policies", context: "AI: Policy Development", preparers: ["Data Science"], dueDate: "12-10-2025", status: "incomplete" },
+  ],
+  "environmental-compliance": [
+    { id: "env-1", title: "Environmental Impact Assessment", context: "ESG: Environmental Review", preparers: ["ESG Team"], dueDate: "11-22-2025", status: "in-progress" },
+    { id: "env-2", title: "Carbon Emissions Reporting", context: "ESG: Emissions Tracking", preparers: ["Sustainability"], dueDate: "12-15-2025", status: "incomplete" },
+  ],
+};
+
+const capabilityQuickActions: Record<string, { label: string; id: string }[]> = {
+  "controls-management": [{ label: "Create Control", id: "new-control" }, { label: "Start Testing", id: "new-test" }],
+  "enterprise-risk": [{ label: "Create Risk Event", id: "risk-event" }, { label: "Start Assessment", id: "risk-assessment" }],
+  "audit-management": [{ label: "Create Audit", id: "new-audit" }, { label: "Log Finding", id: "new-finding" }],
+  "cyber-compliance": [{ label: "Report Incident", id: "new-incident" }, { label: "Log Vulnerability", id: "new-vuln" }],
+  "information-technology": [{ label: "Create IT Request", id: "it-request" }, { label: "Log Issue", id: "it-issue" }],
+  "regulatory-compliance": [{ label: "Create Filing", id: "new-filing" }, { label: "Log Gap", id: "new-gap" }],
+  "third-party": [{ label: "Add Vendor", id: "new-vendor" }, { label: "Start Review", id: "vendor-review" }],
+  "ai-governance": [{ label: "Log AI Model", id: "new-model" }, { label: "Start AI Review", id: "ai-review" }],
+  "environmental-compliance": [{ label: "Log Emission", id: "new-emission" }, { label: "ESG Report", id: "esg-report" }],
+};
+
+function generateCustomWorkspaceContent(capabilities: string[]): WorkspaceContentData {
+  const tasks: Task[] = [];
+  const quickActionsMap: { [key: string]: { label: string; id: string } } = {};
+  
+  capabilities.forEach(capId => {
+    const capTasks = capabilityTaskTemplates[capId] || [];
+    tasks.push(...capTasks);
+    
+    const capActions = capabilityQuickActions[capId] || [];
+    capActions.forEach(action => {
+      quickActionsMap[action.id] = action;
+    });
+  });
+
+  const uniqueTasks = tasks.slice(0, 8);
+  const quickActions = Object.values(quickActionsMap).slice(0, 4);
+
+  const incomplete = uniqueTasks.filter(t => t.status === "incomplete").length;
+  const inProgress = uniqueTasks.filter(t => t.status === "in-progress").length;
+  const complete = uniqueTasks.filter(t => t.status === "complete").length;
+
+  const capabilityNames = capabilities.map(id => 
+    solutionCapabilities.find(c => c.id === id)?.name || id
+  ).slice(0, 2).join(" & ");
+
+  return {
+    scenarioPlanning: {
+      title: `${capabilityNames} Initiative`,
+      progress: `${complete}/${uniqueTasks.length} Completed`,
+      completed: complete,
+      total: uniqueTasks.length,
+    },
+    tasks: uniqueTasks,
+    inboxStats: [
+      { label: "My Tasks", value: uniqueTasks.length },
+      { label: "My Issues", value: Math.floor(Math.random() * 5) },
+      { label: "My Controls", value: capabilities.includes("controls-management") ? 8 : 2 },
+      { label: "My Narratives", value: capabilities.includes("audit-management") ? 3 : 0 },
+      { label: "My Risks", value: capabilities.includes("enterprise-risk") ? 6 : 1 },
+      { label: "My Comments", value: Math.floor(Math.random() * 8) },
+    ],
+    quickActions: quickActions.length > 0 ? quickActions : [
+      { label: "Create New Item", id: "new-item" },
+      { label: "Start Review", id: "start-review" },
+      { label: "Generate Report", id: "new-report" },
+    ],
+  };
+}
+
 const workspaces = [
   {
     id: "enterprise-risk",
@@ -434,7 +539,14 @@ function getStatusBadge(status: Task["status"]) {
 
 export default function HomePage() {
   const { currentWorkspace, refreshKey, setWorkspace } = useWorkspaceStore();
-  const content = workspaceContent[currentWorkspace.id] || workspaceContent["enterprise-risk"];
+  
+  const content = useMemo(() => {
+    if (currentWorkspace.isCustom && currentWorkspace.selectedCapabilities) {
+      return generateCustomWorkspaceContent(currentWorkspace.selectedCapabilities);
+    }
+    return workspaceContent[currentWorkspace.id] || workspaceContent["enterprise-risk"];
+  }, [currentWorkspace.id, currentWorkspace.isCustom, currentWorkspace.selectedCapabilities]);
+
   const [activeTab, setActiveTab] = useState("My Tasks");
   const [scenarioExpanded, setScenarioExpanded] = useState(true);
   const { setOpen: setAssistantOpen } = useHomeAssistantStore();
@@ -454,6 +566,10 @@ export default function HomePage() {
     total: content.tasks.length,
   };
 
+  const welcomeMessage = currentWorkspace.isCustom 
+    ? "Welcome back!"
+    : `Welcome back, ${currentWorkspace.persona}`;
+
   return (
     <AppLayout showHeader={true} showSideNav={true}>
       <div className="flex flex-col h-full overflow-y-auto" key={refreshKey}>
@@ -464,7 +580,7 @@ export default function HomePage() {
         >
           <div className="max-w-6xl relative z-10">
             <h1 className="text-2xl font-semibold" data-testid="welcome-message">
-              Welcome back, {currentWorkspace.persona}
+              {welcomeMessage}
               <span className="ml-4 text-base font-normal text-white/80">
                 {taskStats.incomplete} New critical{" "}
                 <span className="underline cursor-pointer hover:text-white">tasks to review</span>

@@ -32,6 +32,7 @@ import {
   Users,
   Cpu,
   Leaf,
+  Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,19 +60,8 @@ interface AppHeaderProps {
 }
 
 const getWorkspaceIcon = (workspace: Workspace) => {
-  if (workspace.isCustom && workspace.workspaceType) {
-    switch (workspace.workspaceType.icon) {
-      case "shield-check": return ShieldCheck;
-      case "trending-up": return TrendingUp;
-      case "clipboard-list": return ClipboardList;
-      case "lock": return Lock;
-      case "server": return Server;
-      case "scale": return Scale;
-      case "users": return Users;
-      case "cpu": return Cpu;
-      case "leaf": return Leaf;
-      default: return ClipboardList;
-    }
+  if (workspace.isCustom) {
+    return Briefcase;
   }
   
   switch (workspace.id) {
