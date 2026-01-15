@@ -124,8 +124,7 @@ const workspaceQuickActions: Record<string, QuickAction[]> = {
       label: "Launch Vulnerability Scan",
       description: "Initiate comprehensive Log4j and CVE scan across all systems",
       icon: Search,
-      type: "navigate",
-      route: "/intelligence/vulnerability-scan",
+      type: "create",
       color: "#ef4444",
     },
     {
@@ -133,8 +132,7 @@ const workspaceQuickActions: Record<string, QuickAction[]> = {
       label: "Run Threat Detection Scan",
       description: "AI-powered Zero Day threat analysis and intrusion detection",
       icon: Shield,
-      type: "navigate",
-      route: "/intelligence/threat-detection",
+      type: "analyze",
       color: "#10b981",
     },
     {
@@ -376,7 +374,7 @@ function InteractiveExperience({ type, workspaceId, onClose, onNavigate }: Inter
               <div className="flex gap-2 mt-3">
                 <Button 
                   size="sm" 
-                  className="bg-[#266C92] hover:bg-[#1e5a7a]"
+                  className="bg-[#266C92]"
                   onClick={() => onNavigate(experience.destination)}
                   data-testid="button-view-results"
                 >

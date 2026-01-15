@@ -371,7 +371,7 @@ export const experienceConfigs: Record<string, Record<string, InteractiveExperie
   "it-security": {
     create: {
       title: "Launching Vulnerability Scan",
-      description: "Initiating comprehensive Log4j scan across all systems",
+      description: "Initiating comprehensive Log4j and CVE scan across all systems",
       steps: [
         { label: "Connecting to asset inventory...", duration: 800 },
         { label: "Deploying scanning agents...", duration: 1500 },
@@ -380,12 +380,12 @@ export const experienceConfigs: Record<string, Record<string, InteractiveExperie
         { label: "Generating remediation priorities...", duration: 900 },
       ],
       result: "Scan complete. 14 new vulnerabilities detected. 4 critical, 6 high, 4 medium priority.",
-      destination: "/ciso/global-residual-risk",
-      destinationLabel: "View Security Dashboard",
+      destination: "/intelligence/vulnerability-scan",
+      destinationLabel: "View Vulnerability Dashboard",
     },
     analyze: {
       title: "Running Threat Detection Scan",
-      description: "AI-powered analysis of potential attack vectors and intrusion indicators",
+      description: "AI-powered Zero Day threat analysis and intrusion detection",
       steps: [
         { label: "Connecting to SIEM data feeds...", duration: 900 },
         { label: "Analyzing network traffic patterns...", duration: 1400 },
@@ -394,8 +394,8 @@ export const experienceConfigs: Record<string, Record<string, InteractiveExperie
         { label: "Generating threat assessment...", duration: 1000 },
       ],
       result: "Threat scan complete. 3 potential intrusion attempts blocked. No active compromises detected. Security posture: Strong.",
-      destination: "/ciso/global-residual-risk",
-      destinationLabel: "View Security Dashboard",
+      destination: "/intelligence/threat-detection",
+      destinationLabel: "View Threat Dashboard",
     },
   },
 };
