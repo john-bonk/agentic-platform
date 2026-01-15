@@ -20,10 +20,12 @@
 import { useLocation } from "wouter";
 import { LeftIconNavbar } from "./LeftIconNavbar";
 import { SideNavigation } from "./SideNavigation";
+import { SideNavExpandButton } from "./SideNavExpandButton";
 import { AppHeader } from "./AppHeader";
 import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav } from "@/config/navigation";
 import { type Tab } from "@/lib/tabStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
+import { useSideNavStore } from "@/lib/sideNavStore";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -45,6 +47,7 @@ export function AppLayout({
   const [location] = useLocation();
   const currentModule = getModuleFromPath(location);
   const { currentWorkspace } = useWorkspaceStore();
+  const { isCollapsed } = useSideNavStore();
   
   const isHomeModule = currentModule.id === "home";
   const workspaceNav = isHomeModule ? getWorkspaceHomeNav(currentWorkspace.persona) : null;
@@ -64,13 +67,16 @@ export function AppLayout({
       <div className="flex flex-col flex-1 min-w-0 h-screen overflow-hidden">
         {showHeader && <AppHeader activeTab={activeTab} />}
         
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden relative">
           {showSideNav && (
             <SideNavigation 
               sections={sideNavSections} 
               title={sideNavTitle}
             />
           )}
+          
+          {/* Universal expand button - shows when side nav is collapsed but not rendered */}
+          {!showSideNav && isCollapsed && <SideNavExpandButton />}
           
           <main className="flex flex-col flex-1 min-w-0 overflow-hidden bg-white transition-all duration-300 ease-in-out">
             {children}

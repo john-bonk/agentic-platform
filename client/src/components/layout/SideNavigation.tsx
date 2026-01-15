@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type SideNavSection, getActiveModuleIndex } from "@/config/navigation";
+import { useSideNavStore } from "@/lib/sideNavStore";
 
 interface SideNavigationProps {
   sections: SideNavSection[];
@@ -97,7 +98,7 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive }: Collaps
 
 export function SideNavigation({ sections, title, className = "" }: SideNavigationProps) {
   const [location] = useLocation();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, setCollapsed } = useSideNavStore();
   
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
@@ -181,7 +182,7 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
             {title}
           </h1>
           <button
-            onClick={() => setIsCollapsed(true)}
+            onClick={() => setCollapsed(true)}
             className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer"
             data-testid="nav-collapse-toggle-inline"
           >
@@ -204,7 +205,7 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
 
       {isCollapsed && (
         <button
-          onClick={() => setIsCollapsed(false)}
+          onClick={() => setCollapsed(false)}
           className="absolute top-[26px] left-0 w-5 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-r-md shadow-sm hover:bg-gray-50 transition-all duration-300 ease-in-out cursor-pointer"
           data-testid="nav-collapse-toggle"
         >

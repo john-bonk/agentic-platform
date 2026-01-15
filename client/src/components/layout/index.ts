@@ -11,4 +11,5 @@ export { AppLayout } from "./AppLayout";
 export { AppHeader } from "./AppHeader";
 export { LeftIconNavbar } from "./LeftIconNavbar";
 export { SideNavigation } from "./SideNavigation";
+export { SideNavExpandButton } from "./SideNavExpandButton";
 export { PageHeader } from "./PageHeader";
