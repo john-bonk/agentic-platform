@@ -34,7 +34,7 @@ const mockReports: ReportArtifact[] = [
     type: "board",
     createdAt: "2026-01-05",
     status: "published",
-    slides: 3,
+    slides: 6,
     workspace: "Enterprise Risk",
   },
   {
@@ -44,7 +44,7 @@ const mockReports: ReportArtifact[] = [
     type: "audit",
     createdAt: "2026-01-03",
     status: "draft",
-    slides: 3,
+    slides: 6,
     workspace: "Enterprise Audit",
   },
   {
@@ -54,7 +54,7 @@ const mockReports: ReportArtifact[] = [
     type: "compliance",
     createdAt: "2026-01-02",
     status: "published",
-    slides: 3,
+    slides: 6,
     workspace: "IT Security",
   },
   {

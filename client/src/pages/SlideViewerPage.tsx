@@ -109,17 +109,79 @@ function SlideContent({ slide }: { slide: Slide }) {
     );
   }
 
-  if (slide.type === "chart") {
+  if (slide.type === "chart" && slide.chartData) {
+    const maxValue = Math.max(...slide.chartData.map(d => d.value));
     return (
       <div className="flex flex-col h-full p-12">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">{slide.title}</h2>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-4xl h-80 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-2xl flex items-center justify-center border border-slate-200 dark:border-slate-600">
-            <div className="text-center">
-              <BarChart3 className="w-24 h-24 text-[#266C92] mx-auto mb-4" />
-              <p className="text-xl text-gray-500 dark:text-gray-400">Chart Visualization</p>
-            </div>
+        <div className="mb-6">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{slide.title}</h2>
+          {slide.subtitle && (
+            <p className="text-lg text-gray-500 dark:text-gray-400 mt-2">{slide.subtitle}</p>
+          )}
+        </div>
+        <div className="flex-1 flex items-end justify-center gap-4 pb-8">
+          {slide.chartData.map((item, idx) => {
+            const heightPercent = (item.value / maxValue) * 100;
+            return (
+              <div key={idx} className="flex flex-col items-center gap-3" style={{ width: `${100 / slide.chartData!.length}%`, maxWidth: '120px' }}>
+                <div className="relative w-full flex flex-col items-center" style={{ height: '280px' }}>
+                  <span className="absolute -top-8 text-lg font-bold text-gray-700 dark:text-gray-300">
+                    {item.value}%
+                  </span>
+                  <div 
+                    className="w-full rounded-t-lg transition-all duration-500 ease-out"
+                    style={{ 
+                      height: `${heightPercent}%`,
+                      backgroundColor: item.color,
+                      marginTop: 'auto'
+                    }}
+                  />
+                </div>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400 text-center">
+                  {item.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  if (slide.type === "summary" && slide.bulletPoints) {
+    return (
+      <div className="flex flex-col h-full p-12">
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">{slide.title}</h2>
+        <div className="flex-1 flex flex-col">
+          <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-8 mb-6">
+            <ul className="space-y-4">
+              {slide.bulletPoints.map((bullet: string, idx: number) => (
+                <li key={idx} className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-[#266C92]/10 flex items-center justify-center flex-shrink-0 mt-1">
+                    <CheckCircle2 className="w-4 h-4 text-[#266C92]" />
+                  </div>
+                  <span className="text-xl text-gray-700 dark:text-gray-300">{bullet}</span>
+                </li>
+              ))}
+            </ul>
           </div>
+          {slide.conclusion && (
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6 mb-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <p className="text-lg text-green-800 dark:text-green-300 font-medium">{slide.conclusion}</p>
+              </div>
+            </div>
+          )}
+          {slide.cta && (
+            <div className="bg-[#266C92]/10 rounded-xl p-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-6 h-6 text-[#266C92]" />
+                <span className="text-lg font-semibold text-[#266C92]">Action Required:</span>
+              </div>
+              <span className="text-lg text-gray-900 dark:text-white font-medium">{slide.cta}</span>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -179,12 +241,43 @@ function MiniSlideContent({ slide }: { slide: Slide }) {
     );
   }
 
-  if (slide.type === "chart") {
+  if (slide.type === "chart" && slide.chartData) {
     return (
       <div className="flex flex-col h-full p-1">
         <h2 className="text-[5px] font-bold text-gray-900 dark:text-white mb-1 truncate">{slide.title}</h2>
-        <div className="flex-1 flex items-center justify-center">
-          <BarChart3 className="w-4 h-4 text-[#266C92]" />
+        <div className="flex-1 flex items-end justify-center gap-px px-1 pb-1">
+          {slide.chartData.slice(0, 6).map((item, idx) => {
+            const maxVal = Math.max(...slide.chartData!.map(d => d.value));
+            const h = (item.value / maxVal) * 100;
+            return (
+              <div 
+                key={idx} 
+                className="flex-1 rounded-t-sm"
+                style={{ height: `${h}%`, backgroundColor: item.color, minHeight: '2px' }}
+              />
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  if (slide.type === "summary" && slide.bulletPoints) {
+    return (
+      <div className="flex flex-col h-full p-1">
+        <h2 className="text-[5px] font-bold text-gray-900 dark:text-white mb-1 truncate">{slide.title}</h2>
+        <div className="flex-1 flex flex-col gap-0.5">
+          <div className="flex-1 bg-slate-100 dark:bg-slate-600 rounded-sm p-0.5">
+            {slide.bulletPoints.slice(0, 2).map((_, idx) => (
+              <div key={idx} className="flex items-center gap-0.5 mb-0.5">
+                <div className="w-0.5 h-0.5 rounded-full bg-[#266C92]" />
+                <div className="h-0.5 bg-gray-300 dark:bg-gray-500 rounded flex-1" />
+              </div>
+            ))}
+          </div>
+          {slide.conclusion && (
+            <div className="h-2 bg-green-100 dark:bg-green-900/30 rounded-sm" />
+          )}
         </div>
       </div>
     );
