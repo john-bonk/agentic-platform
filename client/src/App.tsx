@@ -44,6 +44,8 @@ import {
   GlobalResidualRiskRouter,
   RiskHeatmapPage,
   MitigationTrackerPage,
+  ThreatDetectionPage,
+  VulnerabilityScanPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -97,6 +99,8 @@ function Router() {
       {/* Intelligence Hub Sub-Routes */}
       <Route path="/intelligence/vendor-exposure" component={VendorExposurePage} />
       <Route path="/intelligence/org-impact" component={OrgImpactPage} />
+      <Route path="/intelligence/threat-detection" component={ThreatDetectionPage} />
+      <Route path="/intelligence/vulnerability-scan" component={VulnerabilityScanPage} />
       
       {/* CRO Workspace Routes */}
       <Route path="/cro/global-residual-risk" component={GlobalResidualRiskPage} />

@@ -357,10 +357,10 @@ export const modules: ModuleConfig[] = [
         defaultExpanded: true,
         collapsible: true,
         items: [
-          { id: "data-explorer", label: "Data Explorer", path: "/intelligence/data-explorer" },
-          { id: "entity-matrix", label: "Entity Matrix", path: "/intelligence/entity-matrix" },
           { id: "vendor-exposure", label: "Vendor Exposure", path: "/intelligence/vendor-exposure" },
           { id: "org-impact", label: "Org Impact Analysis", path: "/intelligence/org-impact" },
+          { id: "threat-detection", label: "Threat Detection", path: "/intelligence/threat-detection" },
+          { id: "vulnerability-scan", label: "Vulnerability Scan", path: "/intelligence/vulnerability-scan" },
         ],
       },
       {
@@ -369,6 +369,8 @@ export const modules: ModuleConfig[] = [
         defaultExpanded: true,
         collapsible: true,
         items: [
+          { id: "data-explorer", label: "Data Explorer", path: "/intelligence/data-explorer" },
+          { id: "entity-matrix", label: "Entity Matrix", path: "/intelligence/entity-matrix" },
           { id: "intel-config", label: "Configuration", path: "/intelligence/config" },
         ],
       },

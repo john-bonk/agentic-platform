@@ -122,17 +122,19 @@ const workspaceQuickActions: Record<string, QuickAction[]> = {
     {
       id: "vulnerability-scan",
       label: "Launch Vulnerability Scan",
-      description: "Initiate comprehensive Log4j scan across all systems",
+      description: "Initiate comprehensive Log4j and CVE scan across all systems",
       icon: Search,
-      type: "create",
+      type: "navigate",
+      route: "/intelligence/vulnerability-scan",
       color: "#ef4444",
     },
     {
       id: "threat-detection",
       label: "Run Threat Detection Scan",
-      description: "AI-powered analysis of potential attack vectors and intrusion indicators",
+      description: "AI-powered Zero Day threat analysis and intrusion detection",
       icon: Shield,
-      type: "analyze",
+      type: "navigate",
+      route: "/intelligence/threat-detection",
       color: "#10b981",
     },
     {

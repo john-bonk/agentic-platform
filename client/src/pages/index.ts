@@ -31,3 +31,5 @@ export { default as CISOResidualRiskPage } from "./CISOResidualRiskPage";
 export { default as GlobalResidualRiskRouter } from "./GlobalResidualRiskRouter";
 export { default as RiskHeatmapPage } from "./RiskHeatmapPage";
 export { default as MitigationTrackerPage } from "./MitigationTrackerPage";
+export { default as ThreatDetectionPage } from "./ThreatDetectionPage";
+export { default as VulnerabilityScanPage } from "./VulnerabilityScanPage";
