@@ -2,12 +2,12 @@
  * Side Navigation Component
  * 
  * A collapsible secondary navigation panel with grouped menu items.
- * This appears to the right of the icon navbar and shows detailed navigation.
+ * Supports expandable/collapsible section groups driven by configuration.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type SideNavSection, getActiveModuleIndex } from "@/config/navigation";
@@ -18,9 +18,109 @@ interface SideNavigationProps {
   className?: string;
 }
 
+interface CollapsibleSectionProps {
+  section: SideNavSection;
+  isExpanded: boolean;
+  onToggle: () => void;
+  isActive: (path: string) => boolean;
+}
+
+function CollapsibleSection({ section, isExpanded, onToggle, isActive }: CollapsibleSectionProps) {
+  const isCollapsible = section.collapsible !== false;
+
+  return (
+    <div className="flex flex-col">
+      <button
+        onClick={isCollapsible ? onToggle : undefined}
+        className={`flex items-center justify-between px-2 py-1.5 w-full text-left ${
+          isCollapsible ? "cursor-pointer hover:bg-gray-50 rounded transition-colors" : "cursor-default"
+        }`}
+        data-testid={`nav-section-${section.id}`}
+      >
+        <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+          {section.title}
+        </span>
+        {isCollapsible && (
+          <ChevronDown 
+            className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
+              isExpanded ? "" : "-rotate-90"
+            }`}
+          />
+        )}
+      </button>
+      
+      <div 
+        className={`overflow-hidden transition-all duration-200 ease-in-out ${
+          isExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <ul className="flex flex-col gap-0.5 pt-1">
+          {section.items.map((item) => (
+            <li key={item.id}>
+              <Link href={item.path}>
+                <Button
+                  variant="ghost"
+                  className={`h-[33px] w-full items-center gap-2 px-2 py-1.5 rounded flex justify-start ${
+                    isActive(item.path)
+                      ? "bg-teal-50 hover:bg-teal-50" 
+                      : "hover:bg-gray-100"
+                  }`}
+                  data-testid={`nav-item-${item.id}`}
+                >
+                  <span
+                    className={`flex-1 text-left text-sm whitespace-nowrap ${
+                      isActive(item.path)
+                        ? "font-semibold text-teal-600"
+                        : "font-normal text-gray-600"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                  {item.badge && (
+                    <Badge 
+                      variant="secondary" 
+                      className="bg-[#266C92] text-white text-xs h-5 min-w-5 flex items-center justify-center"
+                      data-testid={`nav-badge-${item.id}`}
+                    >
+                      {item.badge}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 export function SideNavigation({ sections, title, className = "" }: SideNavigationProps) {
   const [location] = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    sections.forEach(section => {
+      initial[section.id] = section.defaultExpanded !== false;
+    });
+    return initial;
+  });
+
+  useEffect(() => {
+    const newExpanded: Record<string, boolean> = {};
+    sections.forEach(section => {
+      newExpanded[section.id] = expandedSections[section.id] ?? section.defaultExpanded !== false;
+    });
+    setExpandedSections(newExpanded);
+  }, [sections]);
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
+  };
 
   const activeModuleIndex = getActiveModuleIndex(location);
 
@@ -89,49 +189,15 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
           </button>
         </header>
 
-        <div className="flex flex-col gap-5 pt-0 pb-6 px-4 flex-1 overflow-y-auto">
+        <div className="flex flex-col gap-4 pt-0 pb-6 px-4 flex-1 overflow-y-auto">
           {sections.map((section) => (
-            <div key={section.title} className="flex flex-col gap-1">
-              <span className="text-xs font-medium text-gray-400 uppercase tracking-wider px-2 pb-1 whitespace-nowrap">
-                {section.title}
-              </span>
-              <ul className="flex flex-col gap-0.5">
-                {section.items.map((item) => (
-                  <li key={item.id}>
-                    <Link href={item.path}>
-                      <Button
-                        variant="ghost"
-                        className={`h-[33px] w-full items-center gap-2 px-2 py-1.5 rounded flex justify-start ${
-                          isActive(item.path)
-                            ? "bg-teal-50 hover:bg-teal-50" 
-                            : "hover:bg-gray-100"
-                        }`}
-                        data-testid={`nav-item-${item.id}`}
-                      >
-                        <span
-                          className={`flex-1 text-left text-sm whitespace-nowrap ${
-                            isActive(item.path)
-                              ? "font-semibold text-teal-600"
-                              : "font-normal text-gray-600"
-                          }`}
-                        >
-                          {item.label}
-                        </span>
-                        {item.badge && (
-                          <Badge 
-                            variant="secondary" 
-                            className="bg-[#266C92] text-white text-xs h-5 min-w-5 flex items-center justify-center"
-                            data-testid={`nav-badge-${item.id}`}
-                          >
-                            {item.badge}
-                          </Badge>
-                        )}
-                      </Button>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <CollapsibleSection
+              key={section.id}
+              section={section}
+              isExpanded={expandedSections[section.id] ?? true}
+              onToggle={() => toggleSection(section.id)}
+              isActive={isActive}
+            />
           ))}
         </div>
       </div>
