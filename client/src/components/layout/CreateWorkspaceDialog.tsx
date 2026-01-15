@@ -16,7 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -131,7 +130,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange, onWorkspaceCreated }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg p-6 max-h-[90vh] overflow-y-auto" data-testid="create-workspace-dialog">
+      <DialogContent className="max-w-3xl p-6" data-testid="create-workspace-dialog">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold" data-testid="dialog-title">
             Create a New Workspace
@@ -219,36 +218,27 @@ export function CreateWorkspaceDialog({ open, onOpenChange, onWorkspaceCreated }
               Solution Capabilities<span className="text-red-500">*</span>
               <span className="text-gray-500 font-normal ml-2">(Select one or more)</span>
             </Label>
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-3 gap-3">
               {solutionCapabilities.map((capability) => {
                 const isSelected = selectedCapabilities.includes(capability.id);
                 return (
                   <button
                     key={capability.id}
                     onClick={() => handleCapabilityToggle(capability.id)}
-                    className={`flex items-center gap-3 p-3 rounded-md border text-left transition-colors hover-elevate ${
+                    className={`flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 text-center transition-colors hover-elevate ${
                       isSelected 
                         ? "border-[#266C92] bg-[#266C92]/5" 
-                        : "border-gray-200"
+                        : "border-gray-200 bg-white"
                     }`}
                     data-testid={`capability-${capability.id}`}
                   >
-                    <Checkbox
-                      checked={isSelected}
-                      onCheckedChange={() => handleCapabilityToggle(capability.id)}
-                      className="data-[state=checked]:bg-[#266C92] data-[state=checked]:border-[#266C92]"
-                      data-testid={`checkbox-capability-${capability.id}`}
-                    />
-                    <div className={`${isSelected ? "text-[#266C92]" : "text-gray-500"}`}>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      isSelected ? "bg-[#266C92]/10 text-[#266C92]" : "bg-gray-100 text-gray-500"
+                    }`}>
                       {getCapabilityIcon(capability.icon)}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className={`text-sm font-medium ${isSelected ? "text-[#266C92]" : "text-gray-900"}`}>
-                        {capability.name}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {capability.description}
-                      </div>
+                    <div className={`text-sm font-medium ${isSelected ? "text-[#266C92]" : "text-gray-900"}`}>
+                      {capability.name}
                     </div>
                   </button>
                 );

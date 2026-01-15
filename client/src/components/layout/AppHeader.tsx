@@ -22,17 +22,8 @@ import {
   FileText,
   AlertTriangle,
   ClipboardList,
-  Lock,
   Check,
   Plus,
-  ShieldCheck,
-  TrendingUp,
-  Server,
-  Scale,
-  Users,
-  Cpu,
-  Leaf,
-  Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,22 +50,6 @@ interface AppHeaderProps {
   className?: string;
 }
 
-const getWorkspaceIcon = (workspace: Workspace) => {
-  if (workspace.isCustom) {
-    return Briefcase;
-  }
-  
-  switch (workspace.id) {
-    case "enterprise-risk":
-      return AlertTriangle;
-    case "enterprise-audit":
-      return ClipboardList;
-    case "it-security":
-      return Lock;
-    default:
-      return ClipboardList;
-  }
-};
 
 const quickActions = [
   { id: "risk-event", label: "Create new Risk Event", icon: AlertTriangle, category: "Create" },
@@ -152,23 +127,20 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
     setLocation("/");
   };
 
-  const CurrentWorkspaceIcon = getWorkspaceIcon(currentWorkspace);
-
   return (
     <>
       <header 
         className={`relative flex h-12 items-center justify-between px-3 w-full bg-gray-900 flex-shrink-0 sticky top-0 z-40 ${className}`}
         data-testid="app-header"
       >
-        <div className="flex items-center gap-3 z-10">
+        <div className="flex items-center z-10 ml-1">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="flex items-center gap-2 h-8 px-3 text-white"
+                className="flex items-center gap-2 h-8 px-2 text-white"
                 data-testid="workspace-switcher"
               >
-                <CurrentWorkspaceIcon className="w-4 h-4 text-gray-300" />
                 <span className="text-sm font-medium" data-testid="current-workspace-name">{currentWorkspace.name}</span>
                 <ChevronDownIcon className="w-4 h-4 text-gray-400" />
               </Button>
@@ -177,7 +149,6 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
               <DropdownMenuLabel className="text-xs text-gray-500 font-normal">Your workspaces</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {allWorkspaces.map((workspace) => {
-                const WorkspaceIcon = getWorkspaceIcon(workspace);
                 const isActive = workspace.id === currentWorkspace.id;
                 return (
                   <DropdownMenuItem
@@ -186,7 +157,6 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
                     className="flex items-center gap-2 cursor-pointer"
                     data-testid={`workspace-option-${workspace.id}`}
                   >
-                    <WorkspaceIcon className="w-4 h-4 text-gray-500" />
                     <span>{workspace.name}</span>
                     {isActive && (
                       <Check className="ml-auto w-4 h-4 text-[#266C92]" />
