@@ -414,7 +414,7 @@ function DonutChart({ stats }: { stats: TaskStats }) {
         )}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-300">
-        <span className="text-4xl font-bold text-gray-900">{stats.total}</span>
+        <span className="text-4xl font-bold text-gray-900">{stats.incomplete + stats.inProgress}</span>
         <span className="text-sm text-gray-500">Open Tasks</span>
       </div>
     </div>
