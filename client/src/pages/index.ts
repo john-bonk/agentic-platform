@@ -29,3 +29,5 @@ export { default as GlobalResidualRiskPage } from "./GlobalResidualRiskPage";
 export { default as CAEResidualRiskPage } from "./CAEResidualRiskPage";
 export { default as CISOResidualRiskPage } from "./CISOResidualRiskPage";
 export { default as GlobalResidualRiskRouter } from "./GlobalResidualRiskRouter";
+export { default as RiskHeatmapPage } from "./RiskHeatmapPage";
+export { default as MitigationTrackerPage } from "./MitigationTrackerPage";

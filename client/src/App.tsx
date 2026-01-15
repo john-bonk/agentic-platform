@@ -42,6 +42,8 @@ import {
   CAEResidualRiskPage,
   CISOResidualRiskPage,
   GlobalResidualRiskRouter,
+  RiskHeatmapPage,
+  MitigationTrackerPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -98,6 +100,8 @@ function Router() {
       
       {/* CRO Workspace Routes */}
       <Route path="/cro/global-residual-risk" component={GlobalResidualRiskPage} />
+      <Route path="/cro/risk-heatmap" component={RiskHeatmapPage} />
+      <Route path="/cro/mitigation-tracker" component={MitigationTrackerPage} />
       
       {/* CAE Workspace Routes */}
       <Route path="/cae/global-residual-risk" component={CAEResidualRiskPage} />
