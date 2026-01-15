@@ -207,6 +207,7 @@ export function getWorkspaceHomeNav(persona: string): { title: string; sections:
 /**
  * Module Configurations
  * Each module has its own icon in the left navbar and its own side navigation sections
+ * ORDER: Home, Global Risk, Reports, Intel Hub, Workflows (top to bottom)
  */
 export const modules: ModuleConfig[] = [
   {
@@ -262,55 +263,39 @@ export const modules: ModuleConfig[] = [
     ],
   },
   {
-    id: "workflows",
-    name: "Workflows",
-    icon: { type: "lucide", icon: "workflow", alt: "Workflows", active: false, path: "/workflows", modulePrefix: "/workflow" },
+    id: "residual-risk",
+    name: "Global Risk",
+    icon: { type: "lucide", icon: "shield", alt: "Global Risk", active: false, path: "/cro/global-residual-risk", modulePrefix: "/residual-risk" },
     sideNavSections: [
       {
-        id: "workflow-operations",
-        title: "Workflow Operations",
+        id: "risk-dashboards",
+        title: "Dashboards",
         defaultExpanded: true,
         collapsible: true,
         items: [
-          { id: "workflow-list", label: "All Workflows", path: "/workflows" },
-          { id: "workflow-new", label: "Create New", path: "/workflow/new" },
-        ],
-      },
-    ],
-  },
-  {
-    id: "intelligence",
-    name: "Intelligence Hub",
-    icon: { type: "lucide", icon: "activity", alt: "Intelligence Hub", active: false, path: "/intelligence", modulePrefix: "/intelligence" },
-    sideNavSections: [
-      {
-        id: "intel-command",
-        title: "Command Center",
-        defaultExpanded: true,
-        collapsible: true,
-        items: [
-          { id: "intelligence-hub", label: "Intelligence Hub", path: "/intelligence" },
+          { id: "cro-dashboard", label: "CRO", path: "/cro/global-residual-risk" },
+          { id: "cae-dashboard", label: "CAE", path: "/cae/global-residual-risk" },
+          { id: "ciso-dashboard", label: "CISO", path: "/ciso/global-residual-risk" },
         ],
       },
       {
-        id: "intel-analytics",
+        id: "risk-analytics",
         title: "Analytics",
         defaultExpanded: true,
         collapsible: true,
         items: [
-          { id: "list", label: "Data Explorer", path: "/list" },
-          { id: "hierarchy", label: "Entity Matrix", path: "/hierarchy" },
-          { id: "vendor-exposure", label: "Vendor Exposure", path: "/intelligence/vendor-exposure" },
-          { id: "org-impact", label: "Org Impact Analysis", path: "/intelligence/org-impact" },
+          { id: "risk-heatmap", label: "Risk Heatmap", path: "/cro/risk-heatmap" },
+          { id: "mitigation-tracker", label: "Mitigation Tracker", path: "/cro/mitigation-tracker" },
         ],
       },
       {
-        id: "intel-system",
-        title: "System",
+        id: "risk-reports",
+        title: "Reports",
         defaultExpanded: true,
         collapsible: true,
         items: [
-          { id: "settings", label: "Configuration", path: "/settings" },
+          { id: "board-deck", label: "Board Deck", path: "/cro/board-deck" },
+          { id: "quarterly-review", label: "Quarterly Review", path: "/cro/quarterly-review" },
         ],
       },
     ],
@@ -353,39 +338,55 @@ export const modules: ModuleConfig[] = [
     ],
   },
   {
-    id: "residual-risk",
-    name: "Residual Risk",
-    icon: { type: "lucide", icon: "shield", alt: "Residual Risk", active: false, path: "/cro/global-residual-risk", modulePrefix: "/residual-risk" },
+    id: "intelligence",
+    name: "Intelligence Hub",
+    icon: { type: "lucide", icon: "activity", alt: "Intelligence Hub", active: false, path: "/intelligence", modulePrefix: "/intelligence" },
     sideNavSections: [
       {
-        id: "risk-dashboards",
-        title: "Dashboards",
+        id: "intel-command",
+        title: "Command Center",
         defaultExpanded: true,
         collapsible: true,
         items: [
-          { id: "cro-dashboard", label: "CRO", path: "/cro/global-residual-risk" },
-          { id: "cae-dashboard", label: "CAE", path: "/cae/global-residual-risk" },
-          { id: "ciso-dashboard", label: "CISO", path: "/ciso/global-residual-risk" },
+          { id: "intelligence-hub", label: "Intelligence Hub", path: "/intelligence" },
         ],
       },
       {
-        id: "risk-analytics",
+        id: "intel-analytics",
         title: "Analytics",
         defaultExpanded: true,
         collapsible: true,
         items: [
-          { id: "risk-heatmap", label: "Risk Heatmap", path: "/cro/risk-heatmap" },
-          { id: "mitigation-tracker", label: "Mitigation Tracker", path: "/cro/mitigation-tracker" },
+          { id: "data-explorer", label: "Data Explorer", path: "/intelligence/data-explorer" },
+          { id: "entity-matrix", label: "Entity Matrix", path: "/intelligence/entity-matrix" },
+          { id: "vendor-exposure", label: "Vendor Exposure", path: "/intelligence/vendor-exposure" },
+          { id: "org-impact", label: "Org Impact Analysis", path: "/intelligence/org-impact" },
         ],
       },
       {
-        id: "risk-reports",
-        title: "Reports",
+        id: "intel-system",
+        title: "System",
         defaultExpanded: true,
         collapsible: true,
         items: [
-          { id: "board-deck", label: "Board Deck", path: "/cro/board-deck" },
-          { id: "quarterly-review", label: "Quarterly Review", path: "/cro/quarterly-review" },
+          { id: "intel-config", label: "Configuration", path: "/intelligence/config" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "workflows",
+    name: "Workflows",
+    icon: { type: "lucide", icon: "workflow", alt: "Workflows", active: false, path: "/workflows", modulePrefix: "/workflow" },
+    sideNavSections: [
+      {
+        id: "workflow-operations",
+        title: "Workflow Operations",
+        defaultExpanded: true,
+        collapsible: true,
+        items: [
+          { id: "workflow-list", label: "All Workflows", path: "/workflows" },
+          { id: "workflow-new", label: "Create New", path: "/workflow/new" },
         ],
       },
     ],
@@ -406,23 +407,24 @@ export const sideNavSections: SideNavSection[] = modules[0].sideNavSections;
 /**
  * Get module configuration based on current path
  * Ensures exclusive active state - only one module active at a time
+ * ORDER: Home (0), Global Risk (1), Reporting (2), Intelligence (3), Workflows (4)
  */
 export function getModuleFromPath(path: string): ModuleConfig {
-  // Workflow module: any path starting with /workflow (includes /workflows and /workflow/:id)
-  if (path.startsWith("/workflow")) {
-    return modules[1];
-  }
-  // Intelligence Hub module
-  if (path.startsWith("/intelligence")) {
-    return modules[2];
+  // Residual Risk module (CRO, CAE, CISO direct paths)
+  if (path.startsWith("/cro") || path.startsWith("/cae") || path.startsWith("/ciso")) {
+    return modules[1]; // Global Risk
   }
   // Reporting module
   if (path.startsWith("/reporting")) {
-    return modules[3];
+    return modules[2]; // Reporting
   }
-  // Residual Risk module (CRO, CAE, CISO direct paths)
-  if (path.startsWith("/cro") || path.startsWith("/cae") || path.startsWith("/ciso")) {
-    return modules[4];
+  // Intelligence Hub module
+  if (path.startsWith("/intelligence")) {
+    return modules[3]; // Intelligence Hub
+  }
+  // Workflow module: any path starting with /workflow (includes /workflows and /workflow/:id)
+  if (path.startsWith("/workflow")) {
+    return modules[4]; // Workflows
   }
   // Default to Home
   return modules[0];
@@ -441,27 +443,27 @@ const homePaths = [
 /**
  * Determine which module is active based on path
  * Returns the index of the active module
- * Explicitly maps all paths to ensure only one module is active at a time
+ * ORDER: Home (0), Global Risk (1), Reporting (2), Intelligence (3), Workflows (4)
  */
 export function getActiveModuleIndex(path: string): number {
-  // Workflow module: any path starting with /workflow
-  if (path.startsWith("/workflow")) {
-    return 1; // Workflows module
-  }
-  
-  // Intelligence Hub module
-  if (path.startsWith("/intelligence") || path === "/list" || path === "/hierarchy" || path === "/settings") {
-    return 2; // Intelligence Hub module
+  // Residual Risk module (CRO, CAE, CISO direct paths)
+  if (path.startsWith("/cro") || path.startsWith("/cae") || path.startsWith("/ciso")) {
+    return 1; // Global Risk module
   }
   
   // Reporting module
   if (path.startsWith("/reporting")) {
-    return 3; // Reporting module
+    return 2; // Reporting module
   }
   
-  // Residual Risk module (CRO, CAE, CISO direct paths)
-  if (path.startsWith("/cro") || path.startsWith("/cae") || path.startsWith("/ciso")) {
-    return 4; // Residual Risk module
+  // Intelligence Hub module
+  if (path.startsWith("/intelligence")) {
+    return 3; // Intelligence Hub module
+  }
+  
+  // Workflow module: any path starting with /workflow
+  if (path.startsWith("/workflow")) {
+    return 4; // Workflows module
   }
   
   // Check if path matches Home module paths

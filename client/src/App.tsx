@@ -68,8 +68,9 @@ function Router() {
       
       {/* Intelligence Hub Routes */}
       <Route path="/intelligence" component={IntelligenceHubPage} />
-      <Route path="/list" component={ListPage} />
-      <Route path="/hierarchy" component={HierarchyPage} />
+      <Route path="/intelligence/data-explorer" component={ListPage} />
+      <Route path="/intelligence/entity-matrix" component={HierarchyPage} />
+      <Route path="/intelligence/config" component={SettingsPage} />
       <Route path="/wizard" component={WizardPage} />
       <Route path="/items/:id" component={ItemDetailPage} />
       <Route path="/demo" component={DemoPage} />
