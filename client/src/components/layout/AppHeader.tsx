@@ -120,7 +120,8 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
 
   const handleWorkspaceChange = (workspace: Workspace) => {
     setWorkspace(workspace);
-    setLocation("/");
+    // Navigate to /admin for Admin workspace, / for all others
+    setLocation(workspace.persona === "Admin" ? "/admin" : "/");
   };
 
   const handleWorkspaceCreated = (workspace: Workspace) => {

@@ -38,6 +38,7 @@ export const solutionCapabilities: SolutionCapability[] = [
 ];
 
 export const defaultWorkspaces: Workspace[] = [
+  { id: "admin", name: "Admin", persona: "Admin", personaTitle: "Administrator" },
   { id: "enterprise-risk", name: "Enterprise Risk", persona: "CRO", personaTitle: "Chief Risk Officer" },
   { id: "enterprise-audit", name: "Enterprise Audit", persona: "CAE", personaTitle: "Chief Audit Executive" },
   { id: "it-security", name: "IT Security", persona: "CISO", personaTitle: "Chief Information Security Officer" },
@@ -56,7 +57,8 @@ interface WorkspaceStore {
 }
 
 export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
-  currentWorkspace: defaultWorkspaces[0],
+  // Default to Enterprise Risk (index 1) instead of Admin for the prototype landing view
+  currentWorkspace: defaultWorkspaces[1],
   customWorkspaces: [],
   setWorkspace: (workspace: Workspace) => set({ currentWorkspace: workspace, refreshKey: Date.now() }),
   addWorkspace: (workspace: Workspace) => {

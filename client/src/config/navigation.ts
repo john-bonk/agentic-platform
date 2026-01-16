@@ -43,6 +43,22 @@ export interface ModuleConfig {
  * The Global Residual Risk link routes to the workspace-specific dashboard.
  */
 export const workspaceHomeNav: Record<string, { title: string; sections: SideNavSection[] }> = {
+  "Admin": {
+    title: "Admin",
+    sections: [
+      {
+        id: "admin-management",
+        title: "Management",
+        defaultExpanded: true,
+        collapsible: true,
+        items: [
+          { id: "admin-overview", label: "Overview", path: "/admin" },
+          { id: "admin-workspaces", label: "Workspaces", path: "/admin/workspaces" },
+          { id: "admin-permissions", label: "Permissions", path: "/admin/permissions" },
+        ],
+      },
+    ],
+  },
   "CRO": {
     title: "Enterprise Risk",
     sections: [
@@ -429,7 +445,8 @@ const homePaths = [
   "/", "/my-dashboard", "/inventory", "/coverage-mapping", "/controls", "/tests", 
   "/issues", "/financial-accounts", "/risk-control-matrix", "/coso-framework", 
   "/open-tasks", "/financial-accounts-view", "/financial-applications-view", 
-  "/profile", "/wizard", "/demo", "/items", "/global-residual-risk"
+  "/profile", "/wizard", "/demo", "/items", "/global-residual-risk",
+  "/admin", "/admin/workspaces", "/admin/permissions"
 ];
 
 /**

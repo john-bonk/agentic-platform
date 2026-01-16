@@ -135,6 +135,10 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
       if (path === "/global-residual-risk") {
         return location === "/global-residual-risk";
       }
+      // Admin paths - exact match for overview
+      if (path === "/admin") {
+        return location === "/admin";
+      }
       return location === path || location.startsWith(path + "/");
     }
     

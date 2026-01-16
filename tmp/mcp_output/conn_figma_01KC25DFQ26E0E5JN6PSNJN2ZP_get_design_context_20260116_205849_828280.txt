@@ -1,0 +1,1300 @@
+<mcp_external_output>
+
+### Content Block 1 (Text)
+const imgIcon = "https://www.figma.com/api/mcp/asset/72b4309b-ba1f-4e6f-a09b-4b894112ba0b";
+const imgIcon1 = "https://www.figma.com/api/mcp/asset/3caf95fa-022f-435e-a4c2-3675660a6bd2";
+const imgIcon2 = "https://www.figma.com/api/mcp/asset/e6897dd8-5435-4c18-a654-06c4f027dc52";
+const imgIcon3 = "https://www.figma.com/api/mcp/asset/0838e2cf-5264-49df-b1f4-0b0ed8270b6f";
+const imgVector = "https://www.figma.com/api/mcp/asset/dd0527de-5545-4eef-b7bd-2b91ac161ba8";
+const imgIcon4 = "https://www.figma.com/api/mcp/asset/f0c36ff9-9ad4-44b3-8dc3-ba56ae3eb1c0";
+const imgVector1 = "https://www.figma.com/api/mcp/asset/1c7b8adf-138d-4422-a63d-8a33c1ecfd45";
+const imgVector2 = "https://www.figma.com/api/mcp/asset/11e6c212-6678-40d1-9d8c-1cfbeb2a6223";
+const imgVector3 = "https://www.figma.com/api/mcp/asset/d7121a96-b2bf-46e2-97a2-0356ba7fb6dc";
+const imgVector4 = "https://www.figma.com/api/mcp/asset/9e58089d-edc4-4408-9d55-48f7e835e9c9";
+const imgVector5 = "https://www.figma.com/api/mcp/asset/f4b06bff-c253-4aff-918c-eb191c20a2f4";
+const imgVector6 = "https://www.figma.com/api/mcp/asset/4d18095a-ceeb-4357-94ce-69676ca73df8";
+const imgIcon5 = "https://www.figma.com/api/mcp/asset/0324d61b-9a72-4fb6-a592-c2d629ce6d76";
+const imgIcon6 = "https://www.figma.com/api/mcp/asset/62ed612f-db98-4e95-9cbb-096c934de588";
+const imgGroup = "https://www.figma.com/api/mcp/asset/5b279ab2-cc5d-4376-823b-c8bc71837f33";
+const imgGroup1 = "https://www.figma.com/api/mcp/asset/96e82ed6-4805-4bd9-88eb-3ee50a68a7f3";
+const imgVector7 = "https://www.figma.com/api/mcp/asset/902eea6f-4036-4ffc-8b91-182f51e5ca02";
+const imgVector8 = "https://www.figma.com/api/mcp/asset/efb639ae-ffb6-40d8-9fc0-f6767a767000";
+const imgVector9 = "https://www.figma.com/api/mcp/asset/c22ee7a1-544e-4289-9437-3e41c9ac4246";
+const imgVector10 = "https://www.figma.com/api/mcp/asset/a7547a65-6138-4bf3-baf3-0ad1e9375577";
+const imgVector11 = "https://www.figma.com/api/mcp/asset/0f71a8c8-7458-4536-89c4-4d87268de8ad";
+const imgGroup2 = "https://www.figma.com/api/mcp/asset/d4bb35d4-a3e7-4b25-92f6-7d0addf2780e";
+const imgGroup3 = "https://www.figma.com/api/mcp/asset/1be0ed37-fdfe-45bb-9e82-5b5f737c1668";
+const imgIcon7 = "https://www.figma.com/api/mcp/asset/f5bf1b4f-a24a-424e-8a23-fda8d6297c82";
+const imgIcon8 = "https://www.figma.com/api/mcp/asset/d2fe7f64-ef20-4d61-a893-5263df18934a";
+const imgIcon9 = "https://www.figma.com/api/mcp/asset/06f09310-7029-49f1-ad09-1cce71658bcf";
+const imgIcon10 = "https://www.figma.com/api/mcp/asset/5911cdf3-c608-4ce8-b6fc-b03e0c2acd62";
+const imgIcon11 = "https://www.figma.com/api/mcp/asset/14588e15-7145-4622-b6b6-034f9466c609";
+const imgVector12 = "https://www.figma.com/api/mcp/asset/8221c216-52a3-44f9-9d6d-8c0a914f80d1";
+const imgVector13 = "https://www.figma.com/api/mcp/asset/59e937f4-1481-42ea-8104-1d345010821b";
+const imgGroup4 = "https://www.figma.com/api/mcp/asset/4ff6a6a1-df1d-4109-a601-df5976790dbd";
+const imgGroup5 = "https://www.figma.com/api/mcp/asset/042efa4e-9f71-4ad0-9c4e-488950a1dbe5";
+const imgVector14 = "https://www.figma.com/api/mcp/asset/353ba648-027e-4ba3-93fc-c1a81250a125";
+const imgVector15 = "https://www.figma.com/api/mcp/asset/c77a58f6-685e-40c5-967b-46a2476b12b1";
+const imgVector16 = "https://www.figma.com/api/mcp/asset/40305ca9-6a30-407d-96c4-fc4db2fdd5e4";
+const imgVector17 = "https://www.figma.com/api/mcp/asset/0078ba2b-82af-4aad-9b56-92f5cf16099c";
+const imgGroup6 = "https://www.figma.com/api/mcp/asset/3742d3a8-dbdc-48b9-9218-ea0baacfb0e6";
+const imgGroup7 = "https://www.figma.com/api/mcp/asset/b654201d-7e60-413f-9241-8993d67b4b73";
+const imgGroup8 = "https://www.figma.com/api/mcp/asset/1facc53a-36e6-4905-9c48-50c78abf2837";
+const imgIcon12 = "https://www.figma.com/api/mcp/asset/2e5cb860-125f-420f-ba47-600730f2994d";
+const imgGroup9 = "https://www.figma.com/api/mcp/asset/a4a7e9f0-2e94-453f-8a0e-cd8797a4ba03";
+const imgGroup10 = "https://www.figma.com/api/mcp/asset/3a632374-f853-4fdf-bb8f-e3df7ee6dd6a";
+const imgGroup11 = "https://www.figma.com/api/mcp/asset/6f08f7f4-cb32-4366-b69d-96a4b74f32a5";
+const imgGroup12 = "https://www.figma.com/api/mcp/asset/9ad668b1-0bb1-4c62-a176-8e53467665fd";
+const imgIcon13 = "https://www.figma.com/api/mcp/asset/c5defcd0-0ff1-4f21-bda8-67247e5e6237";
+const imgIcon14 = "https://www.figma.com/api/mcp/asset/49194818-d401-4b16-9ad5-7a841640f354";
+const imgIcon15 = "https://www.figma.com/api/mcp/asset/ca8bf839-3133-4467-a8c6-a499c3152fec";
+const imgIcon16 = "https://www.figma.com/api/mcp/asset/3d93821a-d928-45e1-af01-95650e62e96c";
+const imgIcon17 = "https://www.figma.com/api/mcp/asset/3ff7f53e-3a46-4aa1-8ea5-aad49df20ca0";
+const imgIcon18 = "https://www.figma.com/api/mcp/asset/4b0eb09e-69ba-4b25-98d9-9ab1f73db75f";
+const imgVector18 = "https://www.figma.com/api/mcp/asset/cfae049e-aef8-4427-a711-6958b23dc929";
+const imgVector19 = "https://www.figma.com/api/mcp/asset/f4d2d58a-b960-4167-90f1-bf981fbef10d";
+const imgVector20 = "https://www.figma.com/api/mcp/asset/668b5c96-4ecf-4ecd-8367-0d679f44090f";
+const imgVector21 = "https://www.figma.com/api/mcp/asset/f0d9623f-8d87-48a3-8cec-645cd589bcfe";
+const imgVector22 = "https://www.figma.com/api/mcp/asset/a661ca2b-e021-4458-bc46-f170d94b37cf";
+const imgIcon19 = "https://www.figma.com/api/mcp/asset/0fbaead7-585f-42e2-8280-8d7fd1f5eafc";
+const imgIcon20 = "https://www.figma.com/api/mcp/asset/c7806a1a-2cda-45fb-a8d6-0960e378f966";
+const imgIcon21 = "https://www.figma.com/api/mcp/asset/74e4fc18-7986-464e-afa9-d2c9ea98da1c";
+const imgIcon22 = "https://www.figma.com/api/mcp/asset/9ea821f7-3bb0-4e33-80db-daf2ebf84dcd";
+const imgIcon23 = "https://www.figma.com/api/mcp/asset/0539f80e-9b88-46de-866b-8e7306039e3a";
+
+export default function VoyagerAdmin() {
+  return (
+    <div className="bg-[#0f172a] relative size-full" data-name="Voyager Admin 1" data-node-id="2675:30585">
+      <div className="absolute bg-[#0f172a] content-stretch flex flex-col h-[992px] items-start left-0 overflow-clip pt-[50px] top-0 w-[1728px]" data-name="App" data-node-id="2675:30586">
+        <div className="h-[942px] relative shrink-0 w-full" data-name="Container" data-node-id="2675:30587">
+          <div className="absolute bg-[#f8fafc] content-stretch flex flex-col h-[942px] items-start left-[60px] overflow-clip top-0 w-[1668px]" data-name="Container" data-node-id="2675:30588">
+            <div className="content-stretch flex flex-col gap-[24px] h-[1366px] items-start pt-[32px] px-[32px] relative shrink-0 w-full" data-name="TabbedHomeWorkspace" data-node-id="2675:30589">
+              <div className="h-[48px] relative shrink-0 w-full" data-name="Heading 1" data-node-id="2675:30590">
+                <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[48px] left-0 not-italic text-[#0f172a] text-[32px] top-0" data-node-id="2675:30591">
+                  MegaCorp Admin
+                </p>
+              </div>
+              <div className="border-[#cbd5e1] border-b border-solid h-[49px] relative shrink-0 w-full" data-name="TabNavigation" data-node-id="2675:30592">
+                <div className="absolute h-[48px] left-0 top-0 w-[156.063px]" data-name="Button" data-node-id="2675:30593">
+                  <div className="absolute left-[24px] size-[20px] top-[14px]" data-name="Icon" data-node-id="2675:30594">
+                    <img alt="" className="block max-w-none size-full" src={imgIcon} />
+                  </div>
+                  <div className="absolute h-[24px] left-[52px] top-[12px] w-[80.063px]" data-name="TabNavigation" data-node-id="2675:30599">
+                    <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[24px] left-[40.5px] not-italic text-[#266c92] text-[16px] text-center top-[-0.5px] translate-x-[-50%]" data-node-id="2675:30600">
+                      Dashboard
+                    </p>
+                  </div>
+                  <div className="absolute bg-[#266c92] h-[2px] left-0 top-[46px] w-[156.063px]" data-name="Container" data-node-id="2675:30601" />
+                </div>
+                <div className="absolute content-stretch flex gap-[8px] h-[48px] items-center left-[164.06px] px-[24px] top-0 w-[204.555px]" data-name="Button" data-node-id="2675:30602">
+                  <div className="relative shrink-0 size-[20px]" data-name="Icon" data-node-id="2675:30603">
+                    <img alt="" className="block max-w-none size-full" src={imgIcon1} />
+                  </div>
+                  <div className="flex-[1_0_0] h-[24px] min-h-px min-w-px relative" data-name="TabNavigation" data-node-id="2675:30606">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                      <p className="absolute font-['SF_Pro_Display:Semibold',sans-serif] leading-[24px] left-[45.5px] not-italic text-[#828ca3] text-[16px] text-center top-[-0.5px] translate-x-[-50%]" data-node-id="2675:30607">
+                        Notifications
+                      </p>
+                    </div>
+                  </div>
+                  <div className="bg-[#f8fafc] h-[20px] relative rounded-[16777200px] shrink-0 w-[30.531px]" data-name="TabNavigation" data-node-id="2675:30608">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                      <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[16px] left-[15.5px] not-italic text-[#828ca3] text-[12px] text-center top-[1.5px] translate-x-[-50%]" data-node-id="2675:30609">
+                        47
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute content-stretch flex gap-[8px] h-[48px] items-center left-[376.62px] px-[24px] top-0 w-[129.414px]" data-name="Button" data-node-id="2675:30610">
+                  <div className="relative shrink-0 size-[20px]" data-name="Icon" data-node-id="2675:30611">
+                    <img alt="" className="block max-w-none size-full" src={imgIcon2} />
+                  </div>
+                  <div className="flex-[1_0_0] h-[24px] min-h-px min-w-px relative" data-name="TabNavigation" data-node-id="2675:30613">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                      <p className="absolute font-['SF_Pro_Display:Semibold',sans-serif] leading-[24px] left-[27px] not-italic text-[#828ca3] text-[16px] text-center top-[-0.5px] translate-x-[-50%]" data-node-id="2675:30614">
+                        Activity
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute content-stretch flex gap-[8px] h-[48px] items-center left-[514.03px] px-[24px] top-0 w-[141.531px]" data-name="Button" data-node-id="2675:30615">
+                  <div className="relative shrink-0 size-[20px]" data-name="Icon" data-node-id="2675:30616">
+                    <img alt="" className="block max-w-none size-full" src={imgIcon3} />
+                  </div>
+                  <div className="flex-[1_0_0] h-[24px] min-h-px min-w-px relative" data-name="TabNavigation" data-node-id="2675:30619">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                      <p className="absolute font-['SF_Pro_Display:Semibold',sans-serif] leading-[24px] left-[33px] not-italic text-[#828ca3] text-[16px] text-center top-[-0.5px] translate-x-[-50%]" data-node-id="2675:30620">
+                        Analytics
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="content-stretch flex flex-col gap-[20px] h-[1157px] items-start relative shrink-0 w-full" data-name="Container" data-node-id="2675:30621">
+                <div className="gap-[16px] grid grid-cols-[repeat(4,_minmax(0,_1fr))] grid-rows-[repeat(1,_minmax(0,_1fr))] h-[194px] relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30622">
+                  <div className="bg-white border border-[rgba(38,108,146,0.13)] border-solid col-[1] css-3foyfs overflow-clip relative rounded-[6px] row-[1] self-stretch shrink-0" data-name="Container" data-node-id="2675:30623">
+                    <div className="absolute h-[192px] left-0 opacity-8 top-0 w-[387px]" data-name="Container" data-node-id="2675:30624" style={{ backgroundImage: "linear-gradient(153.6128854543324deg, rgba(38, 108, 146, 0) 0%, rgba(38, 108, 146, 1) 100%)" }} />
+                    <div className="absolute h-[152px] left-[20px] top-[20px] w-[347px]" data-name="DashboardTab" data-node-id="2675:30625">
+                      <div className="absolute content-stretch flex h-[40px] items-start justify-between left-0 top-0 w-[347px]" data-name="Container" data-node-id="2675:30626">
+                        <div className="bg-[rgba(38,108,146,0.13)] relative rounded-[4px] shrink-0 size-[40px]" data-name="Container" data-node-id="2675:30627">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start pt-[10px] px-[10px] relative size-full">
+                            <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon" data-node-id="2675:30628">
+                              <div className="absolute inset-[8.33%_16.67%_8.32%_16.67%]" data-name="Vector" data-node-id="2675:30629">
+                                <div className="absolute inset-[-5%_-6.25%]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector} />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-[rgba(22,163,74,0.13)] h-[24px] relative rounded-[4px] shrink-0 w-[59.805px]" data-name="Container" data-node-id="2675:30630">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                            <div className="absolute left-[8px] size-[12px] top-[6px]" data-name="Icon" data-node-id="2675:30631">
+                              <img alt="" className="block max-w-none size-full" src={imgIcon4} />
+                            </div>
+                            <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[16px] left-[24px] not-italic text-[#16a34a] text-[12px] top-[3.5px] w-[28px] whitespace-pre-wrap" data-node-id="2675:30634">
+                              5.2%
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute h-[16px] left-0 top-[52px] w-[347px]" data-name="Container" data-node-id="2675:30635">
+                        <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px]" data-node-id="2675:30636">
+                          Enterprise Risk Score
+                        </p>
+                      </div>
+                      <div className="absolute h-[36px] left-0 top-[72px] w-[347px]" data-name="Container" data-node-id="2675:30637">
+                        <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[36px] left-0 not-italic text-[#0f172a] text-[30px] top-0 w-[62px] whitespace-pre-wrap" data-node-id="2675:30638">
+                          87%
+                        </p>
+                      </div>
+                      <div className="absolute content-stretch flex gap-[4px] h-[32px] items-end left-0 top-[120px] w-[347px]" data-name="Container" data-node-id="2675:30639">
+                        <div className="bg-[rgba(38,108,146,0.38)] flex-[1_0_0] h-[26.477px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30640" />
+                        <div className="bg-[rgba(38,108,146,0.38)] flex-[1_0_0] h-[27.586px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30641" />
+                        <div className="bg-[rgba(38,108,146,0.38)] flex-[1_0_0] h-[28.688px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30642" />
+                        <div className="bg-[rgba(38,108,146,0.38)] flex-[1_0_0] h-[30.156px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30643" />
+                        <div className="bg-[rgba(38,108,146,0.38)] flex-[1_0_0] h-[31.258px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30644" />
+                        <div className="bg-[#266c92] flex-[1_0_0] h-[32px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30645" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white border border-[rgba(54,132,74,0.13)] border-solid col-[2] css-3foyfs overflow-clip relative rounded-[6px] row-[1] self-stretch shrink-0" data-name="Container" data-node-id="2675:30646">
+                    <div className="absolute h-[192px] left-0 opacity-8 top-0 w-[387px]" data-name="Container" data-node-id="2675:30647" style={{ backgroundImage: "linear-gradient(153.6128854543324deg, rgba(54, 132, 74, 0) 0%, rgba(54, 132, 74, 1) 100%)" }} />
+                    <div className="absolute h-[152px] left-[20px] top-[20px] w-[347px]" data-name="DashboardTab" data-node-id="2675:30648">
+                      <div className="absolute content-stretch flex h-[40px] items-start justify-between left-0 top-0 w-[347px]" data-name="Container" data-node-id="2675:30649">
+                        <div className="bg-[rgba(54,132,74,0.13)] relative rounded-[4px] shrink-0 size-[40px]" data-name="Container" data-node-id="2675:30650">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start pt-[10px] px-[10px] relative size-full">
+                            <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon" data-node-id="2675:30651">
+                              <div className="absolute inset-[8.33%]" data-name="Vector" data-node-id="2675:30652">
+                                <div className="absolute inset-[-5%]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector1} />
+                                </div>
+                              </div>
+                              <div className="absolute inset-1/4" data-name="Vector" data-node-id="2675:30653">
+                                <div className="absolute inset-[-8.33%]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector2} />
+                                </div>
+                              </div>
+                              <div className="absolute inset-[41.67%]" data-name="Vector" data-node-id="2675:30654">
+                                <div className="absolute inset-[-25%]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector3} />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-[rgba(22,163,74,0.13)] h-[24px] relative rounded-[4px] shrink-0 w-[60.188px]" data-name="Container" data-node-id="2675:30655">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                            <div className="absolute left-[8px] size-[12px] top-[6px]" data-name="Icon" data-node-id="2675:30656">
+                              <img alt="" className="block max-w-none size-full" src={imgIcon4} />
+                            </div>
+                            <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[16px] left-[24px] not-italic text-[#16a34a] text-[12px] top-[3.5px] w-[29px] whitespace-pre-wrap" data-node-id="2675:30659">
+                              2.8%
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute h-[16px] left-0 top-[52px] w-[347px]" data-name="Container" data-node-id="2675:30660">
+                        <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px]" data-node-id="2675:30661">
+                          Control Effectiveness
+                        </p>
+                      </div>
+                      <div className="absolute h-[36px] left-0 top-[72px] w-[347px]" data-name="Container" data-node-id="2675:30662">
+                        <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[36px] left-0 not-italic text-[#0f172a] text-[30px] top-0 w-[64px] whitespace-pre-wrap" data-node-id="2675:30663">
+                          94%
+                        </p>
+                      </div>
+                      <div className="absolute content-stretch flex gap-[4px] h-[32px] items-end left-0 top-[120px] w-[347px]" data-name="Container" data-node-id="2675:30664">
+                        <div className="bg-[rgba(54,132,74,0.38)] flex-[1_0_0] h-[29.953px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30665" />
+                        <div className="bg-[rgba(54,132,74,0.38)] flex-[1_0_0] h-[30.297px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30666" />
+                        <div className="bg-[rgba(54,132,74,0.38)] flex-[1_0_0] h-[30.977px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30667" />
+                        <div className="bg-[rgba(54,132,74,0.38)] flex-[1_0_0] h-[31.313px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30668" />
+                        <div className="bg-[rgba(54,132,74,0.38)] flex-[1_0_0] h-[31.656px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30669" />
+                        <div className="bg-[#36844a] flex-[1_0_0] h-[32px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30670" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white border border-[rgba(105,49,227,0.13)] border-solid col-[3] css-3foyfs overflow-clip relative rounded-[6px] row-[1] self-stretch shrink-0" data-name="Container" data-node-id="2675:30671">
+                    <div className="absolute h-[192px] left-0 opacity-8 top-0 w-[387px]" data-name="Container" data-node-id="2675:30672" style={{ backgroundImage: "linear-gradient(153.6128854543324deg, rgba(105, 49, 227, 0) 0%, rgba(105, 49, 227, 1) 100%)" }} />
+                    <div className="absolute h-[152px] left-[20px] top-[20px] w-[347px]" data-name="DashboardTab" data-node-id="2675:30673">
+                      <div className="absolute content-stretch flex h-[40px] items-start justify-between left-0 top-0 w-[347px]" data-name="Container" data-node-id="2675:30674">
+                        <div className="bg-[rgba(105,49,227,0.13)] relative rounded-[4px] shrink-0 size-[40px]" data-name="Container" data-node-id="2675:30675">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start pt-[10px] px-[10px] relative size-full">
+                            <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon" data-node-id="2675:30676">
+                              <div className="absolute inset-[8.33%]" data-name="Vector" data-node-id="2675:30677">
+                                <div className="absolute inset-[-5%]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector4} />
+                                </div>
+                              </div>
+                              <div className="absolute inset-[41.67%_37.5%]" data-name="Vector" data-node-id="2675:30678">
+                                <div className="absolute inset-[-25%_-16.67%]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector5} />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-[rgba(22,163,74,0.13)] h-[24px] relative rounded-[4px] shrink-0 w-[58.195px]" data-name="Container" data-node-id="2675:30679">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                            <div className="absolute left-[8px] size-[12px] top-[6px]" data-name="Icon" data-node-id="2675:30680">
+                              <img alt="" className="block max-w-none size-full" src={imgIcon4} />
+                            </div>
+                            <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[16px] left-[24px] not-italic text-[#16a34a] text-[12px] top-[3.5px] w-[27px] whitespace-pre-wrap" data-node-id="2675:30683">
+                              1.5%
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute h-[16px] left-0 top-[52px] w-[347px]" data-name="Container" data-node-id="2675:30684">
+                        <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px]" data-node-id="2675:30685">
+                          Compliance Coverage
+                        </p>
+                      </div>
+                      <div className="absolute h-[36px] left-0 top-[72px] w-[347px]" data-name="Container" data-node-id="2675:30686">
+                        <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[36px] left-0 not-italic text-[#0f172a] text-[30px] top-0 w-[64px] whitespace-pre-wrap" data-node-id="2675:30687">
+                          96%
+                        </p>
+                      </div>
+                      <div className="absolute content-stretch flex gap-[4px] h-[32px] items-end left-0 top-[120px] w-[347px]" data-name="Container" data-node-id="2675:30688">
+                        <div className="bg-[rgba(105,49,227,0.38)] flex-[1_0_0] h-[30.664px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30689" />
+                        <div className="bg-[rgba(105,49,227,0.38)] flex-[1_0_0] h-[31px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30690" />
+                        <div className="bg-[rgba(105,49,227,0.38)] flex-[1_0_0] h-[31.328px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30691" />
+                        <div className="bg-[rgba(105,49,227,0.38)] flex-[1_0_0] h-[31.664px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30692" />
+                        <div className="bg-[rgba(105,49,227,0.38)] flex-[1_0_0] h-[31.664px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30693" />
+                        <div className="bg-[#6931e3] flex-[1_0_0] h-[32px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30694" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white border border-[rgba(234,103,6,0.13)] border-solid col-[4] css-3foyfs overflow-clip relative rounded-[6px] row-[1] self-stretch shrink-0" data-name="Container" data-node-id="2675:30695">
+                    <div className="absolute h-[192px] left-0 opacity-8 top-0 w-[387px]" data-name="Container" data-node-id="2675:30696" style={{ backgroundImage: "linear-gradient(153.6128854543324deg, rgba(234, 103, 6, 0) 0%, rgba(234, 103, 6, 1) 100%)" }} />
+                    <div className="absolute h-[152px] left-[20px] top-[20px] w-[347px]" data-name="DashboardTab" data-node-id="2675:30697">
+                      <div className="absolute content-stretch flex h-[40px] items-start justify-between left-0 top-0 w-[347px]" data-name="Container" data-node-id="2675:30698">
+                        <div className="bg-[rgba(234,103,6,0.13)] relative rounded-[4px] shrink-0 size-[40px]" data-name="Container" data-node-id="2675:30699">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start pt-[10px] px-[10px] relative size-full">
+                            <div className="h-[20px] overflow-clip relative shrink-0 w-full" data-name="Icon" data-node-id="2675:30700">
+                              <div className="absolute inset-[8.32%_12.49%]" data-name="Vector" data-node-id="2675:30701">
+                                <div className="absolute inset-[-5%_-5.55%]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector6} />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-[rgba(234,103,6,0.13)] h-[24px] relative rounded-[4px] shrink-0 w-[55.383px]" data-name="Container" data-node-id="2675:30702">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                            <div className="absolute left-[8px] size-[12px] top-[6px]" data-name="Icon" data-node-id="2675:30703">
+                              <img alt="" className="block max-w-none size-full" src={imgIcon5} />
+                            </div>
+                            <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[16px] left-[24px] not-italic text-[#ea6706] text-[12px] top-[3.5px] w-[24px] whitespace-pre-wrap" data-node-id="2675:30706">
+                              18%
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute h-[16px] left-0 top-[52px] w-[347px]" data-name="Container" data-node-id="2675:30707">
+                        <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px]" data-node-id="2675:30708">
+                          Incident Response Time
+                        </p>
+                      </div>
+                      <div className="absolute h-[36px] left-0 top-[72px] w-[347px]" data-name="Container" data-node-id="2675:30709">
+                        <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[36px] left-0 not-italic text-[#0f172a] text-[30px] top-0 w-[83px] whitespace-pre-wrap" data-node-id="2675:30710">
+                          12min
+                        </p>
+                      </div>
+                      <div className="absolute content-stretch flex gap-[4px] h-[32px] items-end left-0 top-[120px] w-[347px]" data-name="Container" data-node-id="2675:30711">
+                        <div className="bg-[rgba(234,103,6,0.38)] flex-[1_0_0] h-[32px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30712" />
+                        <div className="bg-[rgba(234,103,6,0.38)] flex-[1_0_0] h-[26.18px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30713" />
+                        <div className="bg-[rgba(234,103,6,0.38)] flex-[1_0_0] h-[23.266px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30714" />
+                        <div className="bg-[rgba(234,103,6,0.38)] flex-[1_0_0] h-[21.813px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30715" />
+                        <div className="bg-[rgba(234,103,6,0.38)] flex-[1_0_0] h-[18.906px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30716" />
+                        <div className="bg-[#ea6706] flex-[1_0_0] h-[17.453px] min-h-px min-w-px rounded-[2px]" data-name="Container" data-node-id="2675:30717" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="h-[517px] relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30718">
+                  <div className="absolute bg-white border border-[#cbd5e1] border-solid content-stretch flex flex-col gap-[16px] h-[517px] items-start left-0 pb-px pt-[25px] px-[25px] rounded-[6px] top-0 w-[521.328px]" data-name="Container" data-node-id="2675:30719">
+                    <div className="content-stretch flex gap-[8px] h-[24px] items-center relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30720">
+                      <div className="relative shrink-0 size-[20px]" data-name="Icon" data-node-id="2675:30721">
+                        <img alt="" className="block max-w-none size-full" src={imgIcon6} />
+                      </div>
+                      <div className="h-[24px] relative shrink-0 w-[109.758px]" data-name="Heading 3" data-node-id="2675:30730">
+                        <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                          <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[24px] left-0 not-italic text-[#0f172a] text-[16px] top-[-0.5px]" data-node-id="2675:30731">
+                            Maturity Model
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-[240px] relative shrink-0 w-full" data-name="Container" data-node-id="2675:30732">
+                      <div className="absolute h-[240px] left-0 overflow-clip top-0 w-[471px]" data-name="Icon" data-node-id="2675:30733">
+                        <div className="absolute contents inset-[11.67%_33.08%]" data-name="Group" data-node-id="2675:30734">
+                          <div className="absolute inset-[11.67%_33.08%]" data-name="Group" data-node-id="2675:30735">
+                            <div className="absolute inset-[-0.31%]">
+                              <img alt="" className="block max-w-none size-full" src={imgGroup} />
+                            </div>
+                          </div>
+                          <div className="absolute inset-[11.67%_33.08%]" data-name="Group" data-node-id="2675:30740">
+                            <div className="absolute inset-[0_-0.16%]">
+                              <img alt="" className="block max-w-none size-full" src={imgGroup1} />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute contents inset-[3.75%_19.72%_4.25%_18.87%]" data-name="Group" data-node-id="2675:30747">
+                          <div className="absolute inset-[11.67%_33.08%]" data-name="Vector" data-node-id="2675:30748">
+                            <img alt="" className="block max-w-none size-full" src={imgVector7} />
+                          </div>
+                          <div className="absolute contents inset-[3.75%_19.72%_4.25%_18.87%]" data-name="Group" data-node-id="2675:30749">
+                            <div className="absolute contents inset-[3.75%_45.33%_88.33%_45.33%]" data-name="Group" data-node-id="2675:30750">
+                              <div className="absolute bottom-[88.33%] left-1/2 right-1/2 top-[8.33%]" data-name="Vector" data-node-id="2675:30751">
+                                <img alt="" className="block max-w-none size-full" src={imgVector8} />
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[3.75%_45.33%_90.83%_45.33%] leading-[normal] not-italic text-[#828ca3] text-[11px] text-center" data-node-id="2675:30752">
+                                Controls
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[26.21%_19.72%_68.37%_66.92%]" data-name="Group" data-node-id="2675:30753">
+                              <div className="absolute inset-[29.17%_31.61%_69.17%_66.92%]" data-name="Vector" data-node-id="2675:30754">
+                                <img alt="" className="block max-w-none size-full" src={imgVector9} />
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[26.21%_19.72%_68.37%_68.39%] leading-[normal] not-italic text-[#828ca3] text-[11px]" data-node-id="2675:30755">
+                                Monitoring
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[67.88%_20.79%_26.71%_66.92%]" data-name="Group" data-node-id="2675:30756">
+                              <div className="absolute inset-[69.17%_31.61%_29.17%_66.92%]" data-name="Vector" data-node-id="2675:30757">
+                                <img alt="" className="block max-w-none size-full" src={imgVector9} />
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[67.88%_20.79%_26.71%_68.39%] leading-[normal] not-italic text-[#828ca3] text-[11px]" data-node-id="2675:30758">
+                                Response
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[88.33%_41.51%_4.25%_41.51%]" data-name="Group" data-node-id="2675:30759">
+                              <div className="absolute bottom-[8.33%] left-1/2 right-1/2 top-[88.33%]" data-name="Vector" data-node-id="2675:30760">
+                                <img alt="" className="block max-w-none size-full" src={imgVector8} />
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[90.34%_41.51%_4.25%_41.51%] leading-[normal] not-italic text-[#828ca3] text-[11px] text-center" data-node-id="2675:30761">
+                                Documentation
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[67.88%_66.92%_26.71%_22.7%]" data-name="Group" data-node-id="2675:30762">
+                              <div className="absolute inset-[69.17%_66.92%_29.17%_31.61%]" data-name="Vector" data-node-id="2675:30763">
+                                <img alt="" className="block max-w-none size-full" src={imgVector10} />
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[67.88%_68.39%_26.71%_22.7%] leading-[normal] not-italic text-[#828ca3] text-[11px] text-right" data-node-id="2675:30764">
+                                Training
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[26.21%_66.92%_68.37%_18.87%]" data-name="Group" data-node-id="2675:30765">
+                              <div className="absolute inset-[29.17%_66.92%_69.17%_31.61%]" data-name="Vector" data-node-id="2675:30766">
+                                <img alt="" className="block max-w-none size-full" src={imgVector10} />
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[26.21%_68.39%_68.37%_18.87%] leading-[normal] not-italic text-[#828ca3] text-[11px] text-right" data-node-id="2675:30767">
+                                Automation
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute bottom-[48.75%] contents left-1/2 right-[45.54%] top-[6.67%]" data-name="Group" data-node-id="2675:30768">
+                          <div className="absolute bottom-1/2 left-1/2 right-1/2 top-[11.67%]" data-name="Vector" data-node-id="2675:30769">
+                            <div className="absolute inset-[0_-0.5px]">
+                              <img alt="" className="block max-w-none size-full" src={imgVector11} />
+                            </div>
+                          </div>
+                          <div className="absolute bottom-[48.75%] contents left-1/2 right-[45.54%] top-[6.67%]" data-name="Group" data-node-id="2675:30770">
+                            <div className="absolute bottom-[48.75%] contents left-1/2 right-[48.3%] top-[45%]" data-name="Group" data-node-id="2675:30771">
+                              <p className="absolute bottom-[48.75%] font-['Inter:Regular',sans-serif] font-normal leading-[normal] left-1/2 not-italic right-[48.3%] text-[#828ca3] text-[12px] top-[45%]" data-node-id="2675:30772">
+                                0
+                              </p>
+                            </div>
+                            <div className="absolute bottom-[58.33%] contents left-1/2 right-[46.82%] top-[35.42%]" data-name="Group" data-node-id="2675:30773">
+                              <p className="absolute bottom-[58.33%] font-['Inter:Regular',sans-serif] font-normal leading-[normal] left-1/2 not-italic right-[46.82%] text-[#828ca3] text-[12px] top-[35.42%]" data-node-id="2675:30774">
+                                25
+                              </p>
+                            </div>
+                            <div className="absolute bottom-[67.92%] contents left-1/2 right-[46.82%] top-[25.83%]" data-name="Group" data-node-id="2675:30775">
+                              <p className="absolute bottom-[67.92%] font-['Inter:Regular',sans-serif] font-normal leading-[normal] left-1/2 not-italic right-[46.82%] text-[#828ca3] text-[12px] top-[25.83%]" data-node-id="2675:30776">
+                                50
+                              </p>
+                            </div>
+                            <div className="absolute bottom-[77.5%] contents left-1/2 right-[46.82%] top-[16.25%]" data-name="Group" data-node-id="2675:30777">
+                              <p className="absolute bottom-[77.5%] font-['Inter:Regular',sans-serif] font-normal leading-[normal] left-1/2 not-italic right-[46.82%] text-[#828ca3] text-[12px] top-[16.25%]" data-node-id="2675:30778">
+                                75
+                              </p>
+                            </div>
+                            <div className="absolute bottom-[87.08%] contents left-1/2 right-[45.54%] top-[6.67%]" data-name="Group" data-node-id="2675:30779">
+                              <p className="absolute bottom-[87.08%] font-['Inter:Regular',sans-serif] font-normal leading-[normal] left-1/2 not-italic right-[45.54%] text-[#828ca3] text-[12px] top-[6.67%]" data-node-id="2675:30780">
+                                100
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute contents inset-[14.73%_35.11%_13.58%_36.13%]" data-name="Group" data-node-id="2675:30781">
+                          <div className="absolute inset-[14.73%_35.11%_13.58%_36.13%]" data-name="Group" data-node-id="2675:30782">
+                            <div className="absolute inset-[-0.35%_-0.38%_-0.37%_-0.38%]">
+                              <img alt="" className="block max-w-none size-full" src={imgGroup2} />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute contents inset-[17.42%_36.13%_15.5%_37.31%]" data-name="Group" data-node-id="2675:30784">
+                          <div className="absolute inset-[17.42%_36.13%_15.5%_37.31%]" data-name="Group" data-node-id="2675:30785">
+                            <div className="absolute inset-[-0.38%_-0.41%_-0.39%_-0.41%]">
+                              <img alt="" className="block max-w-none size-full" src={imgGroup3} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute bg-white border border-[#cbd5e1] border-solid content-stretch flex flex-col gap-[24px] h-[517px] items-start left-[541.33px] pb-px pt-[25px] px-[25px] rounded-[6px] top-0 w-[1062.672px]" data-name="Container" data-node-id="2675:30790">
+                    <div className="content-stretch flex gap-[8px] h-[24px] items-center relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30791">
+                      <div className="relative shrink-0 size-[20px]" data-name="Icon" data-node-id="2675:30792">
+                        <img alt="" className="block max-w-none size-full" src={imgIcon7} />
+                      </div>
+                      <div className="h-[24px] relative shrink-0 w-[193.18px]" data-name="Heading 3" data-node-id="2675:30795">
+                        <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                          <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[24px] left-0 not-italic text-[#0f172a] text-[16px] top-[-0.5px]" data-node-id="2675:30796">
+                            Workspace Health Monitor
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="content-stretch flex flex-col gap-[16px] h-[419px] items-start relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30797">
+                      <div className="bg-[rgba(54,132,74,0.06)] border border-[rgba(54,132,74,0.25)] border-solid content-stretch flex flex-col gap-[12px] h-[129px] items-start overflow-clip pb-px pt-[17px] px-[17px] relative rounded-[6px] shrink-0 w-full" data-name="Container" data-node-id="2675:30798">
+                        <div className="content-stretch flex h-[47px] items-center justify-between relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30799">
+                          <div className="h-[40px] relative shrink-0 w-[126.82px]" data-name="Container" data-node-id="2675:30800">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[11.351px] items-center pl-[-0.649px] relative size-full">
+                              <div className="bg-[#36844a] relative rounded-[4px] shrink-0 size-[41.297px]" data-name="Container" data-node-id="2675:30801">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center relative size-full">
+                                  <div className="relative shrink-0 size-[20.649px]" data-name="Icon" data-node-id="2675:30802">
+                                    <img alt="" className="block max-w-none size-full" src={imgIcon8} />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="h-[37px] relative shrink-0 w-[74.82px]" data-name="Container" data-node-id="2675:30811">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
+                                  <div className="h-[21px] relative shrink-0 w-full" data-name="Heading 4" data-node-id="2675:30812">
+                                    <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[21px] left-0 not-italic text-[#0f172a] text-[14px] top-0" data-node-id="2675:30813">
+                                      IT Security
+                                    </p>
+                                  </div>
+                                  <div className="h-[16px] relative shrink-0 w-full" data-name="Paragraph" data-node-id="2675:30814">
+                                    <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px] w-[75px] whitespace-pre-wrap" data-node-id="2675:30815">
+                                      Status: optimal
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="h-[47px] relative shrink-0 w-[53.844px]" data-name="Container" data-node-id="2675:30816">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
+                              <div className="h-[32px] relative shrink-0 w-full" data-name="Container" data-node-id="2675:30817">
+                                <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[32px] left-[53.91px] not-italic text-[#36844a] text-[24px] text-right top-[-0.5px] translate-x-[-100%] w-[50px] whitespace-pre-wrap" data-node-id="2675:30818">
+                                  95%
+                                </p>
+                              </div>
+                              <div className="h-[15px] relative shrink-0 w-full" data-name="Container" data-node-id="2675:30819">
+                                <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[15px] left-[54px] not-italic text-[#828ca3] text-[10px] text-right top-[0.5px] translate-x-[-100%]" data-node-id="2675:30820">
+                                  Health Score
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-[#f8fafc] content-stretch flex flex-col h-[8px] items-start overflow-clip pr-[48.938px] relative rounded-[16777200px] shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30821">
+                          <div className="bg-[#36844a] h-[8px] rounded-[16777200px] shrink-0 w-full" data-name="Container" data-node-id="2675:30822" />
+                        </div>
+                        <div className="content-stretch flex gap-[16px] h-[16px] items-start relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30823">
+                          <div className="h-[16px] relative shrink-0 w-[70.445px]" data-name="Container" data-node-id="2675:30824">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[6px] items-center relative size-full">
+                              <div className="bg-[#266c92] rounded-[16777200px] shrink-0 size-[6px]" data-name="Container" data-node-id="2675:30825" />
+                              <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:30826">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                                  <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px] w-[52px] whitespace-pre-wrap" data-node-id="2675:30827">
+                                    incidents:
+                                  </p>
+                                  <div className="absolute content-stretch flex h-[14.5px] items-start left-[51.05px] top-[0.5px] w-[7.391px]" data-name="Text" data-node-id="2675:30828">
+                                    <p className="font-['SF_Pro_Display:Semibold',sans-serif] leading-[16px] not-italic relative shrink-0 text-[#0f172a] text-[12px]" data-node-id="2675:30829">
+                                      3
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="h-[16px] relative shrink-0 w-[77.898px]" data-name="Container" data-node-id="2675:30830">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[6px] items-center relative size-full">
+                              <div className="bg-[#266c92] rounded-[16777200px] shrink-0 size-[6px]" data-name="Container" data-node-id="2675:30831" />
+                              <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:30832">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                                  <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px] w-[46px] whitespace-pre-wrap" data-node-id="2675:30833">
+                                    controls:
+                                  </p>
+                                  <div className="absolute content-stretch flex h-[14.5px] items-start left-[45.63px] top-[0.5px] w-[20.266px]" data-name="Text" data-node-id="2675:30834">
+                                    <p className="font-['SF_Pro_Display:Semibold',sans-serif] leading-[16px] not-italic relative shrink-0 text-[#0f172a] text-[12px]" data-node-id="2675:30835">
+                                      142
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-[rgba(234,103,6,0.06)] border border-[rgba(234,103,6,0.25)] border-solid content-stretch flex flex-col gap-[12px] h-[129px] items-start overflow-clip pb-px pt-[17px] px-[17px] relative rounded-[6px] shrink-0 w-full" data-name="Container" data-node-id="2675:30836">
+                        <div className="content-stretch flex h-[47px] items-center justify-between relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30837">
+                          <div className="h-[40px] relative shrink-0 w-[147.406px]" data-name="Container" data-node-id="2675:30838">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[10.594px] items-center pl-[-1.406px] relative size-full">
+                              <div className="bg-[#ea6706] relative rounded-[4px] shrink-0 size-[42.812px]" data-name="Container" data-node-id="2675:30839">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center relative size-full">
+                                  <div className="relative shrink-0 size-[21.406px]" data-name="Icon" data-node-id="2675:30840">
+                                    <img alt="" className="block max-w-none size-full" src={imgIcon9} />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="h-[37px] relative shrink-0 w-[95.406px]" data-name="Container" data-node-id="2675:30849">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
+                                  <div className="h-[21px] relative shrink-0 w-full" data-name="Heading 4" data-node-id="2675:30850">
+                                    <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[21px] left-0 not-italic text-[#0f172a] text-[14px] top-0" data-node-id="2675:30851">
+                                      Enterprise Risk
+                                    </p>
+                                  </div>
+                                  <div className="h-[16px] relative shrink-0 w-full" data-name="Paragraph" data-node-id="2675:30852">
+                                    <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px] w-[75px] whitespace-pre-wrap" data-node-id="2675:30853">
+                                      Status: healthy
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="h-[47px] relative shrink-0 w-[53.844px]" data-name="Container" data-node-id="2675:30854">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
+                              <div className="h-[32px] relative shrink-0 w-full" data-name="Container" data-node-id="2675:30855">
+                                <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[32px] left-[53.96px] not-italic text-[#ea6706] text-[24px] text-right top-[-0.5px] translate-x-[-100%] w-[51px] whitespace-pre-wrap" data-node-id="2675:30856">
+                                  88%
+                                </p>
+                              </div>
+                              <div className="h-[15px] relative shrink-0 w-full" data-name="Container" data-node-id="2675:30857">
+                                <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[15px] left-[54px] not-italic text-[#828ca3] text-[10px] text-right top-[0.5px] translate-x-[-100%]" data-node-id="2675:30858">
+                                  Health Score
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-[#f8fafc] content-stretch flex flex-col h-[8px] items-start overflow-clip pr-[117.445px] relative rounded-[16777200px] shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30859">
+                          <div className="bg-[#ea6706] h-[8px] rounded-[16777200px] shrink-0 w-full" data-name="Container" data-node-id="2675:30860" />
+                        </div>
+                        <div className="content-stretch flex gap-[16px] h-[16px] items-start relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30861">
+                          <div className="h-[16px] relative shrink-0 w-[60.992px]" data-name="Container" data-node-id="2675:30862">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[6px] items-center relative size-full">
+                              <div className="bg-[#266c92] rounded-[16777200px] shrink-0 size-[6px]" data-name="Container" data-node-id="2675:30863" />
+                              <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:30864">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                                  <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px] w-[29px] whitespace-pre-wrap" data-node-id="2675:30865">
+                                    risks:
+                                  </p>
+                                  <div className="absolute content-stretch flex h-[14.5px] items-start left-[28.41px] top-[0.5px] w-[20.578px]" data-name="Text" data-node-id="2675:30866">
+                                    <p className="font-['SF_Pro_Display:Semibold',sans-serif] leading-[16px] not-italic relative shrink-0 text-[#0f172a] text-[12px]" data-node-id="2675:30867">
+                                      143
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="h-[16px] relative shrink-0 w-[97.992px]" data-name="Container" data-node-id="2675:30868">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[6px] items-center relative size-full">
+                              <div className="bg-[#266c92] rounded-[16777200px] shrink-0 size-[6px]" data-name="Container" data-node-id="2675:30869" />
+                              <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:30870">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                                  <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px] w-[72px] whitespace-pre-wrap" data-node-id="2675:30871">
+                                    assessments:
+                                  </p>
+                                  <div className="absolute content-stretch flex h-[14.5px] items-start left-[71.32px] top-[0.5px] w-[14.672px]" data-name="Text" data-node-id="2675:30872">
+                                    <p className="font-['SF_Pro_Display:Semibold',sans-serif] leading-[16px] not-italic relative shrink-0 text-[#0f172a] text-[12px]" data-node-id="2675:30873">
+                                      28
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-[rgba(54,132,74,0.06)] border border-[rgba(54,132,74,0.25)] border-solid content-stretch flex flex-col gap-[12px] h-[129px] items-start overflow-clip pb-px pt-[17px] px-[17px] relative rounded-[6px] shrink-0 w-full" data-name="Container" data-node-id="2675:30874">
+                        <div className="content-stretch flex h-[47px] items-center justify-between relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30875">
+                          <div className="h-[40px] relative shrink-0 w-[154.5px]" data-name="Container" data-node-id="2675:30876">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[10.039px] items-center pl-[-1.961px] relative size-full">
+                              <div className="bg-[#36844a] relative rounded-[4px] shrink-0 size-[43.921px]" data-name="Container" data-node-id="2675:30877">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center relative size-full">
+                                  <div className="relative shrink-0 size-[21.961px]" data-name="Icon" data-node-id="2675:30878">
+                                    <img alt="" className="block max-w-none size-full" src={imgIcon10} />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="h-[37px] relative shrink-0 w-[102.5px]" data-name="Container" data-node-id="2675:30887">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
+                                  <div className="h-[21px] relative shrink-0 w-full" data-name="Heading 4" data-node-id="2675:30888">
+                                    <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[21px] left-0 not-italic text-[#0f172a] text-[14px] top-0" data-node-id="2675:30889">
+                                      Enterprise Audit
+                                    </p>
+                                  </div>
+                                  <div className="h-[16px] relative shrink-0 w-full" data-name="Paragraph" data-node-id="2675:30890">
+                                    <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px] w-[75px] whitespace-pre-wrap" data-node-id="2675:30891">
+                                      Status: optimal
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="h-[47px] relative shrink-0 w-[53.844px]" data-name="Container" data-node-id="2675:30892">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
+                              <div className="h-[32px] relative shrink-0 w-full" data-name="Container" data-node-id="2675:30893">
+                                <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[32px] left-[54.44px] not-italic text-[#36844a] text-[24px] text-right top-[-0.5px] translate-x-[-100%] w-[50px] whitespace-pre-wrap" data-node-id="2675:30894">
+                                  92%
+                                </p>
+                              </div>
+                              <div className="h-[15px] relative shrink-0 w-full" data-name="Container" data-node-id="2675:30895">
+                                <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[15px] left-[54px] not-italic text-[#828ca3] text-[10px] text-right top-[0.5px] translate-x-[-100%]" data-node-id="2675:30896">
+                                  Health Score
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-[#f8fafc] content-stretch flex flex-col h-[8px] items-start overflow-clip pr-[78.297px] relative rounded-[16777200px] shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30897">
+                          <div className="bg-[#36844a] h-[8px] rounded-[16777200px] shrink-0 w-full" data-name="Container" data-node-id="2675:30898" />
+                        </div>
+                        <div className="content-stretch flex gap-[16px] h-[16px] items-start relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30899">
+                          <div className="h-[16px] relative shrink-0 w-[70.195px]" data-name="Container" data-node-id="2675:30900">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[6px] items-center relative size-full">
+                              <div className="bg-[#266c92] rounded-[16777200px] shrink-0 size-[6px]" data-name="Container" data-node-id="2675:30901" />
+                              <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:30902">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                                  <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px] w-[46px] whitespace-pre-wrap" data-node-id="2675:30903">
+                                    findings:
+                                  </p>
+                                  <div className="absolute content-stretch flex h-[14.5px] items-start left-[45.52px] top-[0.5px] w-[12.68px]" data-name="Text" data-node-id="2675:30904">
+                                    <p className="font-['SF_Pro_Display:Semibold',sans-serif] leading-[16px] not-italic relative shrink-0 text-[#0f172a] text-[12px]" data-node-id="2675:30905">
+                                      12
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="h-[16px] relative shrink-0 w-[78.172px]" data-name="Container" data-node-id="2675:30906">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[6px] items-center relative size-full">
+                              <div className="bg-[#266c92] rounded-[16777200px] shrink-0 size-[6px]" data-name="Container" data-node-id="2675:30907" />
+                              <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:30908">
+                                <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                                  <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px] w-[52px] whitespace-pre-wrap" data-node-id="2675:30909">
+                                    coverage:
+                                  </p>
+                                  <div className="absolute content-stretch flex h-[14.5px] items-start left-[51.82px] top-[0.5px] w-[14.352px]" data-name="Text" data-node-id="2675:30910">
+                                    <p className="font-['SF_Pro_Display:Semibold',sans-serif] leading-[16px] not-italic relative shrink-0 text-[#0f172a] text-[12px]" data-node-id="2675:30911">
+                                      87
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="h-[406px] relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30912">
+                  <div className="absolute bg-white border border-[#cbd5e1] border-solid content-stretch flex flex-col gap-[16px] h-[406px] items-start left-0 pb-px pt-[25px] px-[25px] rounded-[6px] top-0 w-[1062.664px]" data-name="Container" data-node-id="2675:30913">
+                    <div className="content-stretch flex h-[27px] items-center justify-between pr-[-2.769px] relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30914">
+                      <div className="h-[27px] relative shrink-0 w-[285.164px]" data-name="Container" data-node-id="2675:30915">
+                        <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[8px] items-center relative size-full">
+                          <div className="relative shrink-0 size-[20px]" data-name="Icon" data-node-id="2675:30916">
+                            <img alt="" className="block max-w-none size-full" src={imgIcon11} />
+                          </div>
+                          <div className="flex-[1_0_0] h-[27px] min-h-px min-w-px relative" data-name="Heading 3" data-node-id="2675:30919">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                              <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[27px] left-0 not-italic text-[#0f172a] text-[18px] top-[-0.5px]" data-node-id="2675:30920">
+                                Cross-Workspace Performance
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center relative shrink-0 size-[28.991px]">
+                        <div className="flex-none rotate-[62.856deg]">
+                          <div className="h-[21.537px] relative w-[21.538px]" data-name="Container" data-node-id="2675:30921">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
+                              <div className="h-[21.538px] overflow-clip relative shrink-0 w-full" data-name="Icon" data-node-id="2675:30922">
+                                <div className="absolute inset-[8.33%]" data-name="Vector" data-node-id="2675:30923">
+                                  <div className="absolute inset-[-5%]">
+                                    <img alt="" className="block max-w-none size-full" src={imgVector12} />
+                                  </div>
+                                </div>
+                                <div className="absolute inset-[45.83%]" data-name="Vector" data-node-id="2675:30924">
+                                  <div className="absolute inset-[-50%]">
+                                    <img alt="" className="block max-w-none size-full" src={imgVector13} />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-[280px] relative shrink-0 w-full" data-name="Container" data-node-id="2675:30925">
+                      <div className="absolute h-[280px] left-0 overflow-clip top-0 w-[1013px]" data-name="Icon" data-node-id="2675:30926">
+                        <div className="absolute contents inset-[1.79%_0.49%_12.5%_6.42%]" data-name="Group" data-node-id="2675:30927">
+                          <div className="absolute inset-[1.79%_0.49%_12.5%_6.42%]" data-name="Group" data-node-id="2675:30928">
+                            <div className="absolute inset-[-0.21%_0]">
+                              <img alt="" className="block max-w-none size-full" src={imgGroup4} />
+                            </div>
+                          </div>
+                          <div className="absolute inset-[1.79%_0.49%_12.5%_6.42%]" data-name="Group" data-node-id="2675:30934">
+                            <div className="absolute inset-[0_-0.05%]">
+                              <img alt="" className="block max-w-none size-full" src={imgGroup5} />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute contents inset-[87.5%_-0.13%_5.53%_5.38%]" data-name="Group" data-node-id="2675:30941">
+                          <div className="absolute inset-[87.5%_0.49%_12.5%_6.42%]" data-name="Vector" data-node-id="2675:30942">
+                            <div className="absolute inset-[-0.5px_0]">
+                              <img alt="" className="block max-w-none size-full" src={imgVector14} />
+                            </div>
+                          </div>
+                          <div className="absolute contents inset-[87.5%_-0.13%_5.53%_5.38%]" data-name="Group" data-node-id="2675:30943">
+                            <div className="absolute contents inset-[87.5%_92.55%_5.53%_5.38%]" data-name="Group" data-node-id="2675:30944">
+                              <div className="absolute inset-[87.5%_93.58%_10.36%_6.42%]" data-name="Vector" data-node-id="2675:30945">
+                                <div className="absolute inset-[0_-0.5px]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector15} />
+                                </div>
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[89.11%_92.55%_5.53%_5.38%] leading-[normal] not-italic text-[#828ca3] text-[12px] text-center" data-node-id="2675:30946">
+                                Jun
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[87.5%_74.13%_5.53%_24.2%]" data-name="Group" data-node-id="2675:30947">
+                              <div className="absolute inset-[87.5%_74.97%_10.36%_25.03%]" data-name="Vector" data-node-id="2675:30948">
+                                <div className="absolute inset-[0_-0.5px]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector15} />
+                                </div>
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[89.11%_74.13%_5.53%_24.2%] leading-[normal] not-italic text-[#828ca3] text-[12px] text-center" data-node-id="2675:30949">
+                                Jul
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[87.5%_55.21%_5.53%_42.52%]" data-name="Group" data-node-id="2675:30950">
+                              <div className="absolute inset-[87.5%_56.35%_10.36%_43.65%]" data-name="Vector" data-node-id="2675:30951">
+                                <div className="absolute inset-[0_-0.5px]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector15} />
+                                </div>
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[89.11%_55.21%_5.53%_42.52%] leading-[normal] not-italic text-[#828ca3] text-[12px] text-center" data-node-id="2675:30952">
+                                Aug
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[87.5%_36.64%_5.53%_61.18%]" data-name="Group" data-node-id="2675:30953">
+                              <div className="absolute inset-[87.5%_37.73%_10.36%_62.27%]" data-name="Vector" data-node-id="2675:30954">
+                                <div className="absolute inset-[0_-0.5px]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector15} />
+                                </div>
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[89.11%_36.64%_5.53%_61.18%] leading-[normal] not-italic text-[#828ca3] text-[12px] text-center" data-node-id="2675:30955">
+                                Sep
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[87.5%_18.08%_5.53%_79.85%]" data-name="Group" data-node-id="2675:30956">
+                              <div className="absolute inset-[87.5%_19.11%_10.36%_80.89%]" data-name="Vector" data-node-id="2675:30957">
+                                <div className="absolute inset-[0_-0.5px]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector15} />
+                                </div>
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[89.11%_18.08%_5.53%_79.85%] leading-[normal] not-italic text-[#828ca3] text-[12px] text-center" data-node-id="2675:30958">
+                                Oct
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[87.5%_-0.13%_5.53%_97.86%]" data-name="Group" data-node-id="2675:30959">
+                              <div className="absolute inset-[87.5%_0.49%_10.36%_99.51%]" data-name="Vector" data-node-id="2675:30960">
+                                <div className="absolute inset-[0_-0.5px]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector15} />
+                                </div>
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[89.11%_-0.13%_5.53%_97.86%] leading-[normal] not-italic text-[#828ca3] text-[12px] text-center" data-node-id="2675:30961">
+                                Nov
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute contents inset-[0.45%_93.58%_9.91%_3.55%]" data-name="Group" data-node-id="2675:30962">
+                          <div className="absolute inset-[1.79%_93.58%_12.5%_6.42%]" data-name="Vector" data-node-id="2675:30963">
+                            <div className="absolute inset-[0_-0.5px]">
+                              <img alt="" className="block max-w-none size-full" src={imgVector16} />
+                            </div>
+                          </div>
+                          <div className="absolute contents inset-[0.45%_93.58%_9.91%_3.55%]" data-name="Group" data-node-id="2675:30964">
+                            <div className="absolute contents inset-[84.74%_93.58%_9.91%_4.84%]" data-name="Group" data-node-id="2675:30965">
+                              <div className="absolute inset-[87.5%_93.58%_12.5%_5.82%]" data-name="Vector" data-node-id="2675:30966">
+                                <div className="absolute inset-[-0.5px_0]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector17} />
+                                </div>
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[84.74%_94.37%_9.91%_4.84%] leading-[normal] not-italic text-[#828ca3] text-[12px] text-right" data-node-id="2675:30967">
+                                0
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[63.31%_93.58%_31.34%_4.15%]" data-name="Group" data-node-id="2675:30968">
+                              <div className="absolute inset-[66.07%_93.58%_33.93%_5.82%]" data-name="Vector" data-node-id="2675:30969">
+                                <div className="absolute inset-[-0.5px_0]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector17} />
+                                </div>
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[63.31%_94.37%_31.34%_4.15%] leading-[normal] not-italic text-[#828ca3] text-[12px] text-right" data-node-id="2675:30970">
+                                25
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[41.88%_93.58%_52.76%_4.15%]" data-name="Group" data-node-id="2675:30971">
+                              <div className="absolute inset-[44.64%_93.58%_55.36%_5.82%]" data-name="Vector" data-node-id="2675:30972">
+                                <div className="absolute inset-[-0.5px_0]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector17} />
+                                </div>
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[41.88%_94.37%_52.76%_4.15%] leading-[normal] not-italic text-[#828ca3] text-[12px] text-right" data-node-id="2675:30973">
+                                50
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[20.45%_93.58%_74.19%_4.15%]" data-name="Group" data-node-id="2675:30974">
+                              <div className="absolute inset-[23.21%_93.58%_76.79%_5.82%]" data-name="Vector" data-node-id="2675:30975">
+                                <div className="absolute inset-[-0.5px_0]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector17} />
+                                </div>
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[20.45%_94.37%_74.19%_4.15%] leading-[normal] not-italic text-[#828ca3] text-[12px] text-right" data-node-id="2675:30976">
+                                75
+                              </p>
+                            </div>
+                            <div className="absolute contents inset-[0.45%_93.58%_94.19%_3.55%]" data-name="Group" data-node-id="2675:30977">
+                              <div className="absolute inset-[1.79%_93.58%_98.21%_5.82%]" data-name="Vector" data-node-id="2675:30978">
+                                <div className="absolute inset-[-0.5px_0]">
+                                  <img alt="" className="block max-w-none size-full" src={imgVector17} />
+                                </div>
+                              </div>
+                              <p className="absolute font-['Inter:Regular',sans-serif] font-normal inset-[0.45%_94.37%_94.19%_3.55%] leading-[normal] not-italic text-[#828ca3] text-[12px] text-right" data-node-id="2675:30979">
+                                100
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute contents inset-[6.07%_0.49%_12.5%_6.42%]" data-name="Group" data-node-id="2675:30980">
+                          <div className="absolute inset-[6.07%_0.49%_12.5%_6.42%]" data-name="Group" data-node-id="2675:30981">
+                            <div className="absolute inset-[-0.44%_0_0_0]">
+                              <img alt="" className="block max-w-none size-full" src={imgGroup6} />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute contents inset-[8.64%_0.49%_12.5%_6.42%]" data-name="Group" data-node-id="2675:30984">
+                          <div className="absolute inset-[8.64%_0.49%_12.5%_6.42%]" data-name="Group" data-node-id="2675:30985">
+                            <div className="absolute inset-[-0.45%_-0.01%_0_0]">
+                              <img alt="" className="block max-w-none size-full" src={imgGroup7} />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute contents inset-[4.36%_0.49%_12.5%_6.42%]" data-name="Group" data-node-id="2675:30988">
+                          <div className="absolute inset-[4.36%_0.49%_12.5%_6.42%]" data-name="Group" data-node-id="2675:30989">
+                            <div className="absolute inset-[-0.43%_0_0_0]">
+                              <img alt="" className="block max-w-none size-full" src={imgGroup8} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="content-stretch flex gap-[24px] h-[16px] items-start justify-center relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:30995">
+                      <div className="h-[16px] relative shrink-0 w-[73.328px]" data-name="Container" data-node-id="2675:30996">
+                        <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[8px] items-center relative size-full">
+                          <div className="bg-[#266c92] rounded-[2px] shrink-0 size-[12px]" data-name="Container" data-node-id="2675:30997" />
+                          <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:30998">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                              <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px]" data-node-id="2675:30999">
+                                IT Security
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="h-[16px] relative shrink-0 w-[94.211px]" data-name="Container" data-node-id="2675:31000">
+                        <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[8px] items-center relative size-full">
+                          <div className="bg-[#ea6706] rounded-[2px] shrink-0 size-[12px]" data-name="Container" data-node-id="2675:31001" />
+                          <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:31002">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                              <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px]" data-node-id="2675:31003">
+                                Enterprise Risk
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="h-[16px] relative shrink-0 w-[99.594px]" data-name="Container" data-node-id="2675:31004">
+                        <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[8px] items-center relative size-full">
+                          <div className="bg-[#36844a] rounded-[2px] shrink-0 size-[12px]" data-name="Container" data-node-id="2675:31005" />
+                          <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:31006">
+                            <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                              <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px]" data-node-id="2675:31007">
+                                Enterprise Audit
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute bg-white border border-[#cbd5e1] border-solid content-stretch flex flex-col gap-[16px] h-[406px] items-start left-[1082.66px] pb-px pt-[25px] px-[25px] rounded-[6px] top-0 w-[521.328px]" data-name="Container" data-node-id="2675:31008">
+                    <div className="content-stretch flex gap-[8px] h-[24px] items-center relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:31009">
+                      <div className="relative shrink-0 size-[20px]" data-name="Icon" data-node-id="2675:31010">
+                        <img alt="" className="block max-w-none size-full" src={imgIcon12} />
+                      </div>
+                      <div className="h-[24px] relative shrink-0 w-[119.391px]" data-name="Heading 3" data-node-id="2675:31014">
+                        <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                          <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[24px] left-0 not-italic text-[#0f172a] text-[16px] top-[-0.5px]" data-node-id="2675:31015">
+                            Risk Distribution
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="h-[220px] relative shrink-0 w-full" data-name="Container" data-node-id="2675:31016">
+                      <div className="absolute h-[220px] left-0 overflow-clip top-0 w-[471px]" data-name="Icon" data-node-id="2675:31017">
+                        <div className="absolute contents inset-[9.09%_30.89%]" data-name="Group" data-node-id="2675:31018">
+                          <div className="absolute contents inset-[9.09%_30.89%]" data-name="Group" data-node-id="2675:31019">
+                            <div className="absolute bottom-1/2 left-[61.99%] right-[30.89%] top-[36.21%]" data-name="Group" data-node-id="2675:31020">
+                              <div className="absolute inset-[-2.11%_-1.49%_-1.65%_-1.91%]">
+                                <img alt="" className="block max-w-none size-full" src={imgGroup9} />
+                              </div>
+                            </div>
+                            <div className="absolute inset-[9.94%_32.24%_60.08%_52.58%]" data-name="Group" data-node-id="2675:31022">
+                              <div className="absolute inset-[-0.9%_-0.91%_-0.98%_-0.83%]">
+                                <img alt="" className="block max-w-none size-full" src={imgGroup10} />
+                              </div>
+                            </div>
+                            <div className="absolute inset-[9.09%_46.78%_42.14%_30.89%]" data-name="Group" data-node-id="2675:31024">
+                              <div className="absolute inset-[-0.47%_-0.55%_-0.55%_-0.48%]">
+                                <img alt="" className="block max-w-none size-full" src={imgGroup11} />
+                              </div>
+                            </div>
+                            <div className="absolute inset-[50.95%_30.9%_9.09%_31.39%]" data-name="Group" data-node-id="2675:31026">
+                              <div className="absolute inset-[-0.59%_-0.29%_-0.57%_-0.34%]">
+                                <img alt="" className="block max-w-none size-full" src={imgGroup12} />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="content-stretch flex flex-col gap-[8px] h-[88px] items-start relative shrink-0 w-full" data-name="DashboardTab" data-node-id="2675:31031">
+                      <div className="content-stretch flex h-[16px] items-center justify-between relative shrink-0 w-full" data-name="Container" data-node-id="2675:31032">
+                        <div className="h-[16px] relative shrink-0 w-[52.93px]" data-name="DashboardTab" data-node-id="2675:31033">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[8px] items-center relative size-full">
+                            <div className="bg-[#dc2626] rounded-[2px] shrink-0 size-[10px]" data-name="Container" data-node-id="2675:31034" />
+                            <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:31035">
+                              <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                                <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px]" data-node-id="2675:31036">
+                                  Critical
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="h-[16px] relative shrink-0 w-[7.828px]" data-name="DashboardTab" data-node-id="2675:31037">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                            <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[16px] left-0 not-italic text-[#0f172a] text-[12px] top-[-0.5px]" data-node-id="2675:31038">
+                              8
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="content-stretch flex h-[16px] items-center justify-between relative shrink-0 w-full" data-name="Container" data-node-id="2675:31039">
+                        <div className="h-[16px] relative shrink-0 w-[41.906px]" data-name="DashboardTab" data-node-id="2675:31040">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[8px] items-center relative size-full">
+                            <div className="bg-[#ea6706] rounded-[2px] shrink-0 size-[10px]" data-name="Container" data-node-id="2675:31041" />
+                            <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:31042">
+                              <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                                <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px]" data-node-id="2675:31043">
+                                  High
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="h-[16px] relative shrink-0 w-[14.797px]" data-name="DashboardTab" data-node-id="2675:31044">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                            <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[16px] left-0 not-italic text-[#0f172a] text-[12px] top-[-0.5px]" data-node-id="2675:31045">
+                              23
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="content-stretch flex h-[16px] items-center justify-between relative shrink-0 w-full" data-name="Container" data-node-id="2675:31046">
+                        <div className="h-[16px] relative shrink-0 w-[59.18px]" data-name="DashboardTab" data-node-id="2675:31047">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[8px] items-center relative size-full">
+                            <div className="bg-[#ca8a04] rounded-[2px] shrink-0 size-[10px]" data-name="Container" data-node-id="2675:31048" />
+                            <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:31049">
+                              <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                                <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px]" data-node-id="2675:31050">
+                                  Medium
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="h-[16px] relative shrink-0 w-[15.281px]" data-name="DashboardTab" data-node-id="2675:31051">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                            <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[16px] left-0 not-italic text-[#0f172a] text-[12px] top-[-0.5px]" data-node-id="2675:31052">
+                              45
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="content-stretch flex h-[16px] items-center justify-between relative shrink-0 w-full" data-name="Container" data-node-id="2675:31053">
+                        <div className="h-[16px] relative shrink-0 w-[39.07px]" data-name="DashboardTab" data-node-id="2675:31054">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[8px] items-center relative size-full">
+                            <div className="bg-[#16a34a] rounded-[2px] shrink-0 size-[10px]" data-name="Container" data-node-id="2675:31055" />
+                            <div className="flex-[1_0_0] h-[16px] min-h-px min-w-px relative" data-name="Text" data-node-id="2675:31056">
+                              <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                                <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16px] left-0 not-italic text-[#828ca3] text-[12px] top-[-0.5px]" data-node-id="2675:31057">
+                                  Low
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="h-[16px] relative shrink-0 w-[14.586px]" data-name="DashboardTab" data-node-id="2675:31058">
+                          <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                            <p className="absolute font-['SF_Pro_Display:Bold',sans-serif] leading-[16px] left-0 not-italic text-[#0f172a] text-[12px] top-[-0.5px]" data-node-id="2675:31059">
+                              67
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="absolute bg-[#0f172a] border-[#cbd5e1] border-r border-solid h-[942px] left-0 top-0 w-[60px]" data-name="Container" data-node-id="2675:31060">
+            <div className="absolute border-[#cbd5e1] border-b border-solid content-stretch flex flex-col h-[241px] items-start left-0 pb-px pt-[12px] px-[12px] top-0 w-[59px]" data-name="CollapsibleSidebar" data-node-id="2675:31061">
+              <div className="content-stretch flex flex-col gap-[4px] h-[216px] items-start relative shrink-0 w-full" data-name="Container" data-node-id="2675:31062">
+                <div className="bg-[#266c92] h-[40px] overflow-clip relative rounded-[4px] shrink-0 w-full" data-name="Button" data-node-id="2675:31063">
+                  <div className="absolute bg-[#266c92] h-[40px] left-0 rounded-[4px] top-0 w-[35px]" data-name="Container" data-node-id="2675:31064" />
+                  <div className="absolute left-[12px] size-[20px] top-[10px]" data-name="Icon" data-node-id="2675:31065">
+                    <img alt="" className="block max-w-none size-full" src={imgIcon13} />
+                  </div>
+                </div>
+                <div className="h-[40px] overflow-clip relative rounded-[4px] shrink-0 w-full" data-name="Button" data-node-id="2675:31068">
+                  <div className="absolute left-[12px] size-[20px] top-[10px]" data-name="Icon" data-node-id="2675:31069">
+                    <img alt="" className="block max-w-none size-full" src={imgIcon14} />
+                  </div>
+                </div>
+                <div className="h-[40px] overflow-clip relative rounded-[4px] shrink-0 w-full" data-name="Button" data-node-id="2675:31073">
+                  <div className="absolute left-[12px] size-[20px] top-[10px]" data-name="Icon" data-node-id="2675:31074">
+                    <img alt="" className="block max-w-none size-full" src={imgIcon15} />
+                  </div>
+                </div>
+                <div className="h-[40px] overflow-clip relative rounded-[4px] shrink-0 w-full" data-name="Button" data-node-id="2675:31078">
+                  <div className="absolute left-[12px] size-[20px] top-[10px]" data-name="Icon" data-node-id="2675:31079">
+                    <img alt="" className="block max-w-none size-full" src={imgIcon16} />
+                  </div>
+                </div>
+                <div className="h-[40px] overflow-clip relative rounded-[4px] shrink-0 w-full" data-name="Button" data-node-id="2675:31082">
+                  <div className="absolute left-[12px] size-[20px] top-[10px]" data-name="Icon" data-node-id="2675:31083">
+                    <img alt="" className="block max-w-none size-full" src={imgIcon17} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="absolute bg-[#266c92] content-stretch flex items-center justify-center left-[47px] rounded-[16777200px] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] size-[24px] top-[24px]" data-name="CollapsibleSidebar" data-node-id="2675:31086">
+              <div className="flex items-center justify-center relative shrink-0">
+                <div className="flex-none rotate-[180deg]">
+                  <div className="relative size-[16px]" data-name="Icon" data-node-id="2675:31087">
+                    <img alt="" className="block max-w-none size-full" src={imgIcon18} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="absolute h-[18px] left-0 top-[-20000px] w-[7.281px]" data-name="Text" data-node-id="2675:31089">
+        <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[18px] left-0 not-italic text-[12px] text-white top-[-0.5px]" data-node-id="2675:31090">
+          0
+        </p>
+      </div>
+      <div className="absolute bg-[#0f172a] h-[50px] left-0 top-0 w-[1728px]" data-name="TopNavbar" data-node-id="2675:31091">
+        <div className="absolute content-stretch flex flex-col items-start left-[7px] pt-[9.547px] px-[9.547px] rounded-[3.472px] size-[43.398px] top-[8px]" data-name="Container" data-node-id="2675:31092">
+          <div className="content-stretch flex flex-col h-[24.305px] items-start relative shrink-0 w-full" data-name="AuditBoardLogo" data-node-id="2675:31093">
+            <div className="h-[24.305px] overflow-clip relative shrink-0 w-full" data-name="Icon" data-node-id="2675:31094">
+              <div className="absolute contents inset-[16.2%_2.78%_20.6%_0]" data-name="AuditBoard" data-node-id="2675:31095">
+                <div className="absolute contents inset-[16.2%_2.78%_20.6%_0]" data-name="Union" data-node-id="2675:31096">
+                  <div className="absolute inset-[16.2%_2.78%_44.84%_19.12%]" data-name="Vector" data-node-id="2675:31097">
+                    <img alt="" className="block max-w-none size-full" src={imgVector18} />
+                  </div>
+                  <div className="absolute inset-[25.63%_9.45%_38.18%_26.61%]" data-name="Vector" data-node-id="2675:31098">
+                    <img alt="" className="block max-w-none size-full" src={imgVector19} />
+                  </div>
+                  <div className="absolute inset-[33.79%_29.39%_30.02%_6.67%]" data-name="Vector" data-node-id="2675:31099">
+                    <img alt="" className="block max-w-none size-full" src={imgVector20} />
+                  </div>
+                  <div className="absolute inset-[40.44%_21.89%_20.6%_0]" data-name="Vector" data-node-id="2675:31100">
+                    <img alt="" className="block max-w-none size-full" src={imgVector21} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="absolute content-stretch flex gap-[6px] h-[17.188px] items-center left-[70px] top-[17px] w-[113.289px]" data-name="Container" data-node-id="2675:31101">
+          <div className="flex-[1_0_0] h-[17.188px] min-h-px min-w-px relative" data-name="Paragraph" data-node-id="2675:31102">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+              <p className="absolute font-['SF_Pro_Display:Semibold',sans-serif] leading-[17.187px] left-0 not-italic text-[11.458px] text-white top-[-0.5px]" data-node-id="2675:31103">
+                MegaCorp
+              </p>
+            </div>
+          </div>
+          <div className="h-[17.188px] relative shrink-0 w-[4.133px]" data-name="Paragraph" data-node-id="2675:31104">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+              <p className="absolute font-['SF_Pro_Display:Semibold',sans-serif] leading-[17.187px] left-0 not-italic text-[#828ca3] text-[11.458px] top-[-0.5px]" data-node-id="2675:31105">
+                /
+              </p>
+            </div>
+          </div>
+          <div className="h-[17.188px] relative shrink-0 w-[43.539px]" data-name="Button" data-node-id="2675:31106">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[3.594px] items-center relative size-full">
+              <div className="flex-[1_0_0] h-[17.188px] min-h-px min-w-px relative" data-name="Paragraph" data-node-id="2675:31107">
+                <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                  <p className="absolute font-['SF_Pro_Display:Semibold',sans-serif] leading-[17.187px] left-[16.5px] not-italic text-[11.458px] text-center text-white top-[-0.5px] translate-x-[-50%]" data-node-id="2675:31108">
+                    Admin
+                  </p>
+                </div>
+              </div>
+              <div className="relative shrink-0 size-[7.195px]" data-name="Container" data-node-id="2675:31109">
+                <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start relative size-full">
+                  <div className="h-[7.195px] overflow-clip relative shrink-0 w-full" data-name="Icon" data-node-id="2675:31110">
+                    <div className="absolute bottom-[37.5%] left-1/4 right-1/4 top-[37.5%]" data-name="Vector" data-node-id="2675:31111">
+                      <div className="absolute inset-[-16.67%_-8.33%]">
+                        <img alt="" className="block max-w-none size-full" src={imgVector22} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="absolute bg-[rgba(255,255,255,0.12)] content-stretch flex gap-[8px] h-[28px] items-center left-[719px] px-[12px] rounded-[4px] top-[11px] w-[460px]" data-name="Container" data-node-id="2675:31112">
+          <div className="relative shrink-0 size-[12px]" data-name="Icon" data-node-id="2675:31113">
+            <img alt="" className="block max-w-none size-full" src={imgIcon19} />
+          </div>
+          <div className="flex-[1_0_0] h-[18px] min-h-px min-w-px relative" data-name="Text Input" data-node-id="2675:31116">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center overflow-clip relative rounded-[inherit] size-full">
+              <p className="font-['SF_Pro_Display:Regular',sans-serif] leading-[normal] not-italic relative shrink-0 text-[12px] text-[rgba(255,255,255,0.75)]" data-node-id="2675:31117">
+                Search by topic or ask a question
+              </p>
+            </div>
+          </div>
+          <div className="bg-[rgba(248,250,252,0.6)] h-[32.844px] opacity-75 relative rounded-[4px] shrink-0 w-[29.617px]" data-name="Container" data-node-id="2675:31118">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex flex-col items-start pt-[14.422px] px-[4.422px] relative size-full">
+              <div className="content-stretch flex h-[9.5px] items-start relative shrink-0 w-full" data-name="Text" data-node-id="2675:31119">
+                <p className="font-['SF_Pro_Display:Medium',sans-serif] leading-[11.948px] not-italic relative shrink-0 text-[#0f172b] text-[7.965px]" data-node-id="2675:31120">
+                  ⌘ + K
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="absolute content-stretch flex gap-[4px] h-[50px] items-center left-[1537px] top-0 w-[183px]" data-name="Container" data-node-id="2675:31121">
+          <div className="relative rounded-[4px] shrink-0 size-[40px]" data-name="Button" data-node-id="2675:31122">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center relative size-full">
+              <div className="relative shrink-0 size-[16px]" data-name="Icon" data-node-id="2675:31123">
+                <img alt="" className="block max-w-none size-full" src={imgIcon20} />
+              </div>
+            </div>
+          </div>
+          <div className="relative rounded-[4px] shrink-0 size-[40px]" data-name="Button" data-node-id="2675:31126">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center relative size-full">
+              <div className="relative shrink-0 size-[16px]" data-name="Icon" data-node-id="2675:31127">
+                <img alt="" className="block max-w-none size-full" src={imgIcon21} />
+              </div>
+            </div>
+          </div>
+          <div className="relative rounded-[4px] shrink-0 size-[40px]" data-name="Button" data-node-id="2675:31130">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center relative size-full">
+              <div className="relative shrink-0 size-[16px]" data-name="Icon" data-node-id="2675:31131">
+                <img alt="" className="block max-w-none size-full" src={imgIcon22} />
+              </div>
+            </div>
+          </div>
+          <div className="flex-[1_0_0] h-[40px] min-h-px min-w-px relative rounded-[4px]" data-name="Container" data-node-id="2675:31133">
+            <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex gap-[3px] items-center px-[4px] relative size-full">
+              <div className="bg-[#62748e] flex-[1_0_0] h-[24px] min-h-px min-w-px relative rounded-[16777200px]" data-name="Container" data-node-id="2675:31134">
+                <div className="bg-clip-padding border-0 border-[transparent] border-solid content-stretch flex items-center justify-center pr-[0.008px] relative size-full">
+                  <div className="h-[16.5px] relative shrink-0 w-[12.102px]" data-name="Text" data-node-id="2675:31135">
+                    <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
+                      <p className="absolute font-['SF_Pro_Display:Regular',sans-serif] leading-[16.5px] left-0 not-italic text-[11px] text-white top-[-0.5px]" data-node-id="2675:31136">
+                        JB
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="relative shrink-0 size-[16px]" data-name="Icon" data-node-id="2675:31137">
+                <img alt="" className="block max-w-none size-full" src={imgIcon23} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+### Content Block 2 (Text)
+SUPER CRITICAL: The generated React+Tailwind code MUST be converted to match the target project's technology stack and styling system.
+1. Analyze the target codebase to identify: technology stack, styling approach, component patterns, and design tokens
+2. Convert React syntax to the target framework/library
+3. Transform all Tailwind classes to the target styling system while preserving exact visual design
+4. Follow the project's existing patterns and conventions
+DO NOT install any Tailwind as a dependency unless the user instructs you to do so.
+
+
+### Content Block 3 (Text)
+Node ids have been added to the code as data attributes, e.g. `data-node-id="1:2"`.
+
+### Content Block 4 (Text)
+Images and SVGs will be stored as constants, e.g. const image = 'https://www.figma.com/api/mcp/asset/550e8400-e29b-41d4-a716-446655440000'. These constants will be used in the code as the source for the image, ex: <img src={image} />. Image assets are stored on a remote server for 7 days and can be fetched using the provided URLs until they expire.
+
+### Content Block 5 (Text)
+IMPORTANT: After you call this tool, you MUST call get_screenshot to get a screenshot of the node for context.
+
+</mcp_external_output>

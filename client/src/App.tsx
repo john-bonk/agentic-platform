@@ -47,6 +47,9 @@ import {
   ThreatDetectionPage,
   VulnerabilityScanPage,
   ComingSoonPage,
+  AdminOverviewPage,
+  AdminWorkspacesPage,
+  AdminPermissionsPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -113,6 +116,11 @@ function Router() {
       
       {/* CISO Workspace Routes */}
       <Route path="/ciso/global-residual-risk" component={CISOResidualRiskPage} />
+      
+      {/* Admin Workspace Routes */}
+      <Route path="/admin" component={AdminOverviewPage} />
+      <Route path="/admin/workspaces" component={AdminWorkspacesPage} />
+      <Route path="/admin/permissions" component={AdminPermissionsPage} />
       
       {/* 404 - Must be last */}
       <Route component={NotFound} />

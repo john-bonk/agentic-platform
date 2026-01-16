@@ -34,3 +34,6 @@ export { default as MitigationTrackerPage } from "./MitigationTrackerPage";
 export { default as ThreatDetectionPage } from "./ThreatDetectionPage";
 export { default as VulnerabilityScanPage } from "./VulnerabilityScanPage";
 export { default as ComingSoonPage } from "./ComingSoonPage";
+export { default as AdminOverviewPage } from "./AdminOverviewPage";
+export { default as AdminWorkspacesPage } from "./AdminWorkspacesPage";
+export { default as AdminPermissionsPage } from "./AdminPermissionsPage";
