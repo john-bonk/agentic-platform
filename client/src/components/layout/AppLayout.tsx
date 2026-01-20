@@ -79,7 +79,7 @@ export function AppLayout({
           {/* Universal expand button - always shows when side nav is collapsed */}
           {isCollapsed && <SideNavExpandButton />}
           
-          <main className="flex flex-col flex-1 min-w-0 overflow-hidden bg-white transition-all duration-300 ease-in-out">
+          <main className="flex flex-col flex-1 min-w-0 overflow-auto bg-white dark:bg-background transition-all duration-300 ease-in-out">
             {children}
           </main>
         </div>
