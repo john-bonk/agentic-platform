@@ -155,16 +155,10 @@ export function AdminOverviewPage() {
                 return (
                   <Card 
                     key={metric.label} 
-                    className={`${colors.border} border overflow-hidden`}
+                    className={`${colors.border} border`}
                     data-testid={`metric-card-${metric.label.toLowerCase().replace(/\s+/g, '-')}`}
                   >
-                    <div 
-                      className={`absolute inset-0 opacity-10`}
-                      style={{ 
-                        background: `linear-gradient(154deg, transparent 0%, ${metric.color === 'teal' ? 'rgba(38,108,146,1)' : metric.color === 'green' ? 'rgba(54,132,74,1)' : metric.color === 'purple' ? 'rgba(105,49,227,1)' : 'rgba(217,119,6,1)'} 100%)`
-                      }}
-                    />
-                    <CardContent className="p-5 relative">
+                    <CardContent className="p-5">
                       <div className="flex items-start justify-between mb-3">
                         <div className={`${colors.icon} p-2.5 rounded`}>
                           <Icon className="w-5 h-5" />
