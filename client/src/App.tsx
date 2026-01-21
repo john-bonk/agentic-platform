@@ -50,6 +50,7 @@ import {
   AdminOverviewPage,
   AdminWorkspacesPage,
   AdminPermissionsPage,
+  PrototypeMetaPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -121,6 +122,9 @@ function Router() {
       <Route path="/admin" component={AdminOverviewPage} />
       <Route path="/admin/workspaces" component={AdminWorkspacesPage} />
       <Route path="/admin/permissions" component={AdminPermissionsPage} />
+      
+      {/* Prototype Meta View */}
+      <Route path="/prototype-meta" component={PrototypeMetaPage} />
       
       {/* 404 - Must be last */}
       <Route component={NotFound} />

@@ -3,6 +3,9 @@
  * 
  * A non-modal overlay AI assistant panel for home pages and general navigation.
  * Workspace-aware with deep interactive quick actions.
+ * 
+ * Quick actions are imported from the centralized quickActionsConfig.ts
+ * which serves as the single source of truth for the Prototype Meta View.
  */
 
 import { useState, useRef, useEffect } from "react";
@@ -12,7 +15,8 @@ import {
   BarChart3, Users, Shield, ChevronRight,
   ExternalLink, Workflow, Plus, Search,
   TrendingUp, AlertCircle, CheckCircle2,
-  Building2, Globe, Zap, Target
+  Building2, Globe, Zap, Target,
+  type LucideIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,199 +29,50 @@ import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { getExperienceConfig } from "@/lib/reportingContent";
+import { 
+  genericQuickActions as configGenericActions,
+  workspaceQuickActions as configWorkspaceActions,
+  type QuickActionConfig 
+} from "@/lib/quickActionsConfig";
 
 interface QuickAction {
   id: string;
   label: string;
   description: string;
-  icon: typeof Bot;
+  icon: LucideIcon;
   type: "workflow" | "navigate" | "create" | "analyze" | "report";
   workflowTemplate?: string;
   route?: string;
   color: string;
 }
 
-const genericQuickActions: QuickAction[] = [
-  {
-    id: "create-item",
-    label: "Create New Item",
-    description: "Create a new record in your workspace - risk, control, task, or finding",
-    icon: Plus,
-    type: "create",
-    color: "#266C92",
-  },
-  {
-    id: "start-review",
-    label: "Start Review Process",
-    description: "Initiate a review or assessment workflow for your selected capabilities",
-    icon: Target,
-    type: "create",
-    color: "#f59e0b",
-  },
-  {
-    id: "view-dashboard",
-    label: "View Dashboard",
-    description: "Access your consolidated analytics and metrics dashboard",
-    icon: BarChart3,
-    type: "navigate",
-    route: "/dashboard",
-    color: "#10b981",
-  },
-  {
-    id: "generate-report",
-    label: "Generate Report",
-    description: "Create a summary report based on your workspace activities",
-    icon: FileText,
-    type: "report",
-    color: "#8b5cf6",
-  },
-];
-
-const workspaceQuickActions: Record<string, QuickAction[]> = {
-  "admin": [
-    {
-      id: "manage-workspaces",
-      label: "Manage Workspaces",
-      description: "Configure and manage platform workspaces and their settings",
-      icon: Building2,
-      type: "navigate",
-      route: "/admin/workspaces",
-      color: "#266C92",
-    },
-    {
-      id: "manage-permissions",
-      label: "Manage Permissions",
-      description: "Configure role-based access control and user permissions",
-      icon: Shield,
-      type: "navigate",
-      route: "/admin/permissions",
-      color: "#f59e0b",
-    },
-    {
-      id: "view-analytics",
-      label: "View Platform Analytics",
-      description: "Access platform-wide usage metrics and activity insights",
-      icon: BarChart3,
-      type: "navigate",
-      route: "/admin",
-      color: "#10b981",
-    },
-    {
-      id: "admin-report",
-      label: "Generate Admin Report",
-      description: "Create a platform health and usage summary report",
-      icon: FileText,
-      type: "report",
-      color: "#8b5cf6",
-    },
-  ],
-  "enterprise-risk": [
-    {
-      id: "open-tariff-workflow",
-      label: "Open Tariff Impact Workflow",
-      description: "View the tariff exposure assessment and mitigation workflow for supply chain risk",
-      icon: Workflow,
-      type: "navigate",
-      route: "/workflow/wf-tariff",
-      color: "#266C92",
-    },
-    {
-      id: "risk-assessment",
-      label: "Start Risk Assessment",
-      description: "Launch comprehensive risk assessment for current tariff scenarios",
-      icon: Target,
-      type: "create",
-      route: "/wizard",
-      color: "#f59e0b",
-    },
-    {
-      id: "vendor-analysis",
-      label: "Analyze Vendor Exposure",
-      description: "Deep-dive analysis of vendor tariff exposure and alternative sourcing",
-      icon: Building2,
-      type: "analyze",
-      color: "#10b981",
-    },
-    {
-      id: "board-report",
-      label: "Generate Board Report",
-      description: "Auto-generate executive summary of tariff risks for board presentation",
-      icon: BarChart3,
-      type: "report",
-      color: "#8b5cf6",
-    },
-  ],
-  "enterprise-audit": [
-    {
-      id: "open-ma-workflow",
-      label: "Open M&A Audit Workflow",
-      description: "View the Singapore vertical farming acquisition oversight workflow",
-      icon: Workflow,
-      type: "navigate",
-      route: "/workflow/wf-ma-audit",
-      color: "#266C92",
-    },
-    {
-      id: "coverage-mapping",
-      label: "Update Coverage Mapping",
-      description: "Map audit coverage for new Singapore entity integration",
-      icon: Globe,
-      type: "create",
-      color: "#10b981",
-    },
-    {
-      id: "org-impact",
-      label: "Assess Organizational Impact",
-      description: "Analyze how acquisition affects current audit structure",
-      icon: Users,
-      type: "analyze",
-      color: "#f59e0b",
-    },
-    {
-      id: "audit-committee-report",
-      label: "Prepare Audit Committee Deck",
-      description: "Generate presentation materials for audit committee review",
-      icon: FileText,
-      type: "report",
-      color: "#8b5cf6",
-    },
-  ],
-  "it-security": [
-    {
-      id: "open-incident-workflow",
-      label: "Open Incident Response Workflow",
-      description: "View the Log4j vulnerability response and remediation workflow",
-      icon: Workflow,
-      type: "navigate",
-      route: "/workflow/wf-incident",
-      color: "#266C92",
-    },
-    {
-      id: "vulnerability-scan",
-      label: "Launch Vulnerability Scan",
-      description: "Initiate comprehensive Log4j and CVE scan across all systems",
-      icon: Search,
-      type: "create",
-      color: "#ef4444",
-    },
-    {
-      id: "threat-detection",
-      label: "Run Threat Detection Scan",
-      description: "AI-powered Zero Day threat analysis and intrusion detection",
-      icon: Shield,
-      type: "analyze",
-      color: "#10b981",
-    },
-    {
-      id: "compliance-report",
-      label: "Generate Compliance Report",
-      description: "Create security compliance report for executive briefing",
-      icon: ClipboardList,
-      type: "report",
-      color: "#8b5cf6",
-    },
-  ],
+const iconMap: Record<string, LucideIcon> = {
+  Plus, Target, BarChart3, FileText, Building2, Shield, Workflow,
+  Globe, Users, Search, ClipboardList, Bot, Sparkles, AlertTriangle,
+  ExternalLink, TrendingUp, AlertCircle, CheckCircle2, Zap
 };
+
+function mapConfigToQuickAction(config: QuickActionConfig): QuickAction {
+  return {
+    id: config.id,
+    label: config.label,
+    description: config.description,
+    icon: iconMap[config.iconName] || Bot,
+    type: config.type,
+    workflowTemplate: config.workflowTemplate,
+    route: config.route,
+    color: config.color,
+  };
+}
+
+const genericQuickActions: QuickAction[] = configGenericActions.map(mapConfigToQuickAction);
+
+const workspaceQuickActions: Record<string, QuickAction[]> = Object.fromEntries(
+  Object.entries(configWorkspaceActions).map(([wsId, actions]) => [
+    wsId,
+    actions.map(mapConfigToQuickAction)
+  ])
+);
 
 interface ActionCardProps {
   action: SuggestedAction;

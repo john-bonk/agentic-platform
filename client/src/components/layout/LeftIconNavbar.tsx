@@ -6,7 +6,7 @@
  */
 
 import { Link, useLocation } from "wouter";
-import { Home, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish, Workflow, Activity, BarChart3, Shield } from "lucide-react";
+import { Home, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish, Workflow, Activity, BarChart3, Shield, Cog } from "lucide-react";
 import { type IconNavItem, getActiveModuleIndex } from "@/config/navigation";
 
 interface LeftIconNavbarProps {
@@ -113,6 +113,17 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
       </nav>
 
       <div className="flex flex-col items-center gap-1">
+        <Link href="/prototype-meta">
+          <div 
+            className={`w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-colors ${
+              location === "/prototype-meta" ? "bg-teal-500" : "hover:bg-gray-800"
+            }`}
+            data-testid="navbar-prototype-meta"
+            title="Prototype Meta View"
+          >
+            <Cog className={`w-4 h-4 ${location === "/prototype-meta" ? "text-white" : "text-gray-400"}`} />
+          </div>
+        </Link>
         <div 
           className="w-10 h-10 rounded flex items-center justify-center hover:bg-gray-800 cursor-pointer" 
           data-testid="navbar-help"

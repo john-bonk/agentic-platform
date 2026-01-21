@@ -13,6 +13,7 @@ import {
   type AssistantSession, type InsertSession,
   type ChatMessage,
 } from "@shared/schema";
+import { SEEDED_WORKFLOW_IDS } from "@shared/seededData";
 import { randomUUID } from "crypto";
 
 /**
@@ -113,22 +114,26 @@ export class MemStorage implements IStorage {
   private seedExampleData() {
     const now = new Date();
     
-    // WORKSPACE-SPECIFIC WORKFLOWS - Fixed IDs for quick action linking
+    // WORKSPACE-SPECIFIC WORKFLOWS - IDs must match SEEDED_WORKFLOW_IDS in shared/seededData.ts
+    // This is the single source of truth for demo workflow IDs
     // wf-tariff: Enterprise Risk (CRO) - Tariff Impact Mitigation
     // wf-ma-audit: Enterprise Audit (CAE) - M&A Audit Workflow  
     // wf-incident: IT Security (CISO) - Incident Response
     
+    // Use the shared source of truth for workflow IDs
+    const [id0, id1, id2, id3, id4, id5, id6, id7, id8, id9] = SEEDED_WORKFLOW_IDS;
+    
     const exampleWorkflows: Workflow[] = [
-      { id: "wf-tariff", name: "Tariff Impact Mitigation Workflow", description: "Automated workflow to assess and mitigate tariff exposure across supply chain with vendor analysis and board reporting", status: "active", tags: ["tariff", "supply-chain", "risk", "mitigation"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
-      { id: "wf-ma-audit", name: "M&A Due Diligence Audit", description: "Comprehensive audit workflow for Singapore vertical farming acquisition oversight with control mapping and integration planning", status: "active", tags: ["ma", "audit", "acquisition", "due-diligence"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
-      { id: "wf-incident", name: "Log4j Incident Response Workflow", description: "Real-time vulnerability response workflow with triage, patching coordination, and compliance reporting", status: "active", tags: ["security", "incident", "vulnerability", "log4j"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
-      { id: "wf4", name: "Audit Evidence Collection", description: "Streamlined audit evidence gathering and validation workflow", status: "active", tags: ["audit", "evidence", "compliance"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
-      { id: "wf5", name: "Vendor Risk Management", description: "Third-party vendor assessment and ongoing monitoring", status: "active", tags: ["vendor", "third-party", "risk"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
-      { id: "wf6", name: "Policy Violation Response", description: "Automated response to detected policy violations", status: "active", tags: ["policy", "violation", "response"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
-      { id: "wf7", name: "SOX Compliance Certification", description: "SOX 404 control certification and sign-off workflow", status: "active", tags: ["sox", "compliance", "certification"], ownerId: null, visibility: "organization", version: 1, createdAt: now, updatedAt: now },
-      { id: "wf8", name: "Incident Escalation Matrix", description: "Multi-tier incident escalation based on severity and impact", status: "active", tags: ["incident", "escalation", "response"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
-      { id: "wf9", name: "Regulatory Change Impact", description: "Assess and implement regulatory requirement changes", status: "active", tags: ["regulatory", "change", "impact"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
-      { id: "wf10", name: "Control Deficiency Remediation", description: "Track and remediate identified control deficiencies", status: "active", tags: ["controls", "deficiency", "remediation"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
+      { id: id0, name: "Tariff Impact Mitigation Workflow", description: "Automated workflow to assess and mitigate tariff exposure across supply chain with vendor analysis and board reporting", status: "active", tags: ["tariff", "supply-chain", "risk", "mitigation"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
+      { id: id1, name: "M&A Due Diligence Audit", description: "Comprehensive audit workflow for Singapore vertical farming acquisition oversight with control mapping and integration planning", status: "active", tags: ["ma", "audit", "acquisition", "due-diligence"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
+      { id: id2, name: "Log4j Incident Response Workflow", description: "Real-time vulnerability response workflow with triage, patching coordination, and compliance reporting", status: "active", tags: ["security", "incident", "vulnerability", "log4j"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
+      { id: id3, name: "Audit Evidence Collection", description: "Streamlined audit evidence gathering and validation workflow", status: "active", tags: ["audit", "evidence", "compliance"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
+      { id: id4, name: "Vendor Risk Management", description: "Third-party vendor assessment and ongoing monitoring", status: "active", tags: ["vendor", "third-party", "risk"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
+      { id: id5, name: "Policy Violation Response", description: "Automated response to detected policy violations", status: "active", tags: ["policy", "violation", "response"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
+      { id: id6, name: "SOX Compliance Certification", description: "SOX 404 control certification and sign-off workflow", status: "active", tags: ["sox", "compliance", "certification"], ownerId: null, visibility: "organization", version: 1, createdAt: now, updatedAt: now },
+      { id: id7, name: "Incident Escalation Matrix", description: "Multi-tier incident escalation based on severity and impact", status: "active", tags: ["incident", "escalation", "response"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
+      { id: id8, name: "Regulatory Change Impact", description: "Assess and implement regulatory requirement changes", status: "active", tags: ["regulatory", "change", "impact"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
+      { id: id9, name: "Control Deficiency Remediation", description: "Track and remediate identified control deficiencies", status: "active", tags: ["controls", "deficiency", "remediation"], ownerId: null, visibility: "team", version: 1, createdAt: now, updatedAt: now },
     ];
     
     exampleWorkflows.forEach(w => this.workflows.set(w.id, w));
