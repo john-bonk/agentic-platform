@@ -386,7 +386,7 @@ function LivePublishReadiness() {
     { 
       id: "quick-actions", 
       label: `${totalQuickActions} Quick Actions (${workspacesWithQuickActions} workspaces)`, 
-      status: totalQuickActions >= PROTOTYPE_EXPECTATIONS.defaultWorkspaceCount * PROTOTYPE_EXPECTATIONS.quickActionsPerWorkspace,
+      status: totalQuickActions >= PROTOTYPE_EXPECTATIONS.minQuickActions,
       actual: `${totalQuickActions} total from ${workspacesWithQuickActions} workspaces`,
       location: "client/src/lib/quickActionsConfig.ts",
       loading: false,
