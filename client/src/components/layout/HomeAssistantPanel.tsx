@@ -74,6 +74,43 @@ const genericQuickActions: QuickAction[] = [
 ];
 
 const workspaceQuickActions: Record<string, QuickAction[]> = {
+  "admin": [
+    {
+      id: "manage-workspaces",
+      label: "Manage Workspaces",
+      description: "Configure and manage platform workspaces and their settings",
+      icon: Building2,
+      type: "navigate",
+      route: "/admin/workspaces",
+      color: "#266C92",
+    },
+    {
+      id: "manage-permissions",
+      label: "Manage Permissions",
+      description: "Configure role-based access control and user permissions",
+      icon: Shield,
+      type: "navigate",
+      route: "/admin/permissions",
+      color: "#f59e0b",
+    },
+    {
+      id: "view-analytics",
+      label: "View Platform Analytics",
+      description: "Access platform-wide usage metrics and activity insights",
+      icon: BarChart3,
+      type: "navigate",
+      route: "/admin",
+      color: "#10b981",
+    },
+    {
+      id: "admin-report",
+      label: "Generate Admin Report",
+      description: "Create a platform health and usage summary report",
+      icon: FileText,
+      type: "report",
+      color: "#8b5cf6",
+    },
+  ],
   "enterprise-risk": [
     {
       id: "open-tariff-workflow",
