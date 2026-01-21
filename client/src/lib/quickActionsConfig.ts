@@ -81,14 +81,6 @@ export const workspaceQuickActions: Record<string, QuickActionConfig[]> = {
       route: "/admin",
       color: "#10b981",
     },
-    {
-      id: "admin-report",
-      label: "Generate Admin Report",
-      description: "Create a platform health and usage summary report",
-      iconName: "FileText",
-      type: "report",
-      color: "#8b5cf6",
-    },
   ],
   "enterprise-risk": [
     {

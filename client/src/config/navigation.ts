@@ -451,10 +451,15 @@ const homePaths = [
 
 /**
  * Determine which module is active based on path
- * Returns the index of the active module
+ * Returns the index of the active module, or -1 for special pages (prototype-meta)
  * ORDER: Home (0), Global Risk (1), Reporting (2), Intelligence (3), Workflows (4)
  */
 export function getActiveModuleIndex(path: string): number {
+  // Special pages that don't belong to any module
+  if (path === "/prototype-meta") {
+    return -1; // No module active - the Cog icon handles its own active state
+  }
+  
   // Residual Risk module (CRO, CAE, CISO direct paths)
   if (path.startsWith("/cro") || path.startsWith("/cae") || path.startsWith("/ciso")) {
     return 1; // Global Risk module

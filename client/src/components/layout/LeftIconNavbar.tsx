@@ -3,11 +3,16 @@
  * 
  * A vertical navigation bar with icons that appears on the left side of the app.
  * This component renders icons for quick navigation between major sections.
+ * 
+ * WORKSPACE BEHAVIOR:
+ * - Admin workspace: Only shows Home icon (navigates to /admin)
+ * - All other workspaces: Shows all module icons
  */
 
 import { Link, useLocation } from "wouter";
 import { Home, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish, Workflow, Activity, BarChart3, Shield, Cog } from "lucide-react";
 import { type IconNavItem, getActiveModuleIndex } from "@/config/navigation";
+import { useWorkspaceStore } from "@/lib/workspaceStore";
 
 interface LeftIconNavbarProps {
   items: IconNavItem[];
@@ -17,6 +22,10 @@ interface LeftIconNavbarProps {
 
 export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavbarProps) {
   const [location] = useLocation();
+  const { currentWorkspace } = useWorkspaceStore();
+  
+  // Admin workspace only shows Home icon
+  const isAdminWorkspace = currentWorkspace.persona === "Admin";
 
   const renderLucideIcon = (icon: string, isActive: boolean) => {
     const colorClass = isActive ? "text-white" : "text-gray-400";
@@ -65,7 +74,7 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
       data-testid="icon-navbar"
     >
       <nav className="flex flex-col items-center gap-1 relative flex-[0_0_auto]">
-        <Link href="/">
+        <Link href={isAdminWorkspace ? "/admin" : "/"}>
           <div 
             className="w-10 h-10 rounded flex items-center justify-center hover-elevate cursor-pointer" 
             data-testid="navbar-logo"
@@ -79,8 +88,17 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
         </Link>
 
         {items.map((item, index) => {
+          // Admin workspace: only show Home icon (index 0)
+          if (isAdminWorkspace && index !== 0) {
+            return null;
+          }
+          
           // Only the module at activeModuleIndex is active
           const active = index === activeModuleIndex;
+          
+          // Admin workspace: Home icon navigates to /admin instead of /
+          const itemPath = isAdminWorkspace && index === 0 ? "/admin" : item.path;
+          
           const content = (
             <div
               className={`w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-colors ${
@@ -100,9 +118,9 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
             </div>
           );
 
-          if (item.path) {
+          if (itemPath) {
             return (
-              <Link key={index} href={item.path}>
+              <Link key={index} href={itemPath}>
                 {content}
               </Link>
             );
