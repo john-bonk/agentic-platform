@@ -15,7 +15,7 @@ import {
   nodeTypeRegistry,
   type ChatMessage,
 } from "@shared/schema";
-import { generateAssistantResponse, generateWorkflowFromDescription, analyzeWorkflow } from "./llm";
+import { generateAssistantResponse, generateWorkflowFromDescription, analyzeWorkflow, generateHomeContextResponse } from "./llm";
 import { getWorkflowTemplate, listWorkflowTemplates } from "./workflow-templates";
 import { randomUUID } from "crypto";
 
@@ -612,24 +612,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       };
 
-      const wsContext = workspaceContexts[workspaceId || "enterprise-risk"];
+      const wsContext = workspaceContexts[workspaceId || "enterprise-risk"] || {
+        scenario: "General GRC Management",
+        focus: "governance, risk, compliance",
+      };
 
-      const response = await generateAssistantResponse(messages, {
-        workflowId: undefined,
-        workflowName: undefined,
-        nodes: undefined,
-        edges: undefined,
-        selectedNodes: undefined,
-        homeContext: {
+      const lastMessage = messages[messages.length - 1];
+      
+      // Use the new intelligent home context response generator
+      const homeResponse = generateHomeContextResponse(
+        lastMessage?.content || "",
+        {
           workspaceId: workspaceId || "enterprise-risk",
           scenario: wsContext.scenario,
           focus: wsContext.focus,
-        },
-      });
+        }
+      );
 
+      // Build suggested actions based on intent and resources
       const suggestedActions = [];
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage && lastMessage.content.toLowerCase().includes("task")) {
+      const lower = (lastMessage?.content || "").toLowerCase();
+      
+      if (lower.includes("task") || lower.includes("pending")) {
         suggestedActions.push({
           id: `action-${Date.now()}`,
           type: "navigate",
@@ -639,7 +643,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           status: "pending",
         });
       }
-      if (lastMessage && lastMessage.content.toLowerCase().includes("dashboard")) {
+      if (lower.includes("dashboard") || lower.includes("metric") || lower.includes("overview")) {
         suggestedActions.push({
           id: `action-${Date.now() + 1}`,
           type: "navigate",
@@ -649,10 +653,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
           status: "pending",
         });
       }
+      if (lower.includes("report") || lower.includes("generate")) {
+        suggestedActions.push({
+          id: `action-${Date.now() + 2}`,
+          type: "navigate",
+          label: "Open Reporting",
+          description: "Generate reports and slide decks",
+          route: "/reporting",
+          status: "pending",
+        });
+      }
+      if (lower.includes("control") || lower.includes("sox") || lower.includes("compliance")) {
+        suggestedActions.push({
+          id: `action-${Date.now() + 3}`,
+          type: "navigate",
+          label: "View Controls",
+          description: "Check control testing status",
+          route: "/controls",
+          status: "pending",
+        });
+      }
+      if (lower.includes("workflow") || lower.includes("automat")) {
+        suggestedActions.push({
+          id: `action-${Date.now() + 4}`,
+          type: "navigate",
+          label: "Create Workflow",
+          description: "Build a new automation workflow",
+          route: "/workflows",
+          status: "pending",
+        });
+      }
 
       res.json({
-        ...response,
-        actions: suggestedActions.length > 0 ? suggestedActions : response.actions,
+        content: homeResponse.content,
+        resources: homeResponse.resources,
+        actions: suggestedActions.length > 0 ? suggestedActions : homeResponse.actions,
       });
     } catch (error) {
       console.error("Home assistant chat error:", error);

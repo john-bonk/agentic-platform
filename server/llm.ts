@@ -600,6 +600,227 @@ export async function generateWorkflowFromDescription(
   return generateAssistantResponse(messages, context || {});
 }
 
+/**
+ * Home Context Intelligence
+ * Keyword-based routing for home page assistant queries
+ */
+
+interface HomeContextResponse {
+  content: string;
+  resources?: Array<{
+    type: "Task" | "Report" | "Control" | "Risk";
+    title: string;
+    id?: string;
+    assignee?: string;
+    dueDate?: string;
+    status?: string;
+    route?: string;
+  }>;
+  actions?: AssistantAction[];
+}
+
+interface HomeContext {
+  workspaceId: string;
+  scenario: string;
+  focus: string;
+}
+
+const HOME_KEYWORDS = {
+  // Task-related keywords
+  tasks: ["task", "tasks", "todo", "to-do", "pending", "my work", "assigned", "overdue", "deadline"],
+  // Control-related keywords
+  controls: ["control", "controls", "sox", "testing", "compliance", "audit control", "deficiency"],
+  // Risk-related keywords  
+  risks: ["risk", "risks", "assessment", "mitigation", "exposure", "threat"],
+  // Report-related keywords
+  reports: ["report", "reports", "summary", "status report", "generate report", "create report", "board report"],
+  // Dashboard-related keywords
+  dashboard: ["dashboard", "metrics", "kpis", "overview", "status"],
+  // Workflow-related keywords
+  workflows: ["workflow", "workflows", "automation", "process", "create workflow"],
+  // Audit-related keywords
+  audit: ["audit", "audits", "finding", "evidence", "walthrough", "sample"],
+  // Help keywords
+  help: ["help", "what can you", "how do i", "assist"],
+};
+
+function detectHomeIntent(message: string): string {
+  const lower = message.toLowerCase();
+  
+  for (const [intent, keywords] of Object.entries(HOME_KEYWORDS)) {
+    for (const keyword of keywords) {
+      if (lower.includes(keyword)) {
+        return intent;
+      }
+    }
+  }
+  
+  return "general";
+}
+
+export function generateHomeContextResponse(
+  message: string,
+  context: HomeContext
+): HomeContextResponse {
+  const intent = detectHomeIntent(message);
+  const { workspaceId, scenario, focus } = context;
+  
+  switch (intent) {
+    case "tasks": {
+      return {
+        content: `Here's a summary of your current tasks related to **${scenario}**:\n\n` +
+          `You have **4 high-priority tasks** requiring attention:\n\n` +
+          `1. **Q4 Access Review Testing** - In Progress, due Nov 15\n` +
+          `2. **Vulnerability Remediation** - Blocked (waiting for vendor patch)\n` +
+          `3. **Revenue Recognition Sample Testing** - In Progress, due Nov 8\n` +
+          `4. **Change Management Evidence** - Pending, due Nov 20\n\n` +
+          `Would you like me to help prioritize these or show more details?`,
+        resources: [
+          { type: "Task", title: "Q4 Access Review Testing", id: "task-1", assignee: "John Smith", dueDate: "Nov 15, 2024", status: "In Progress", route: "/open-tasks" },
+          { type: "Task", title: "Vulnerability Remediation", id: "task-4", assignee: "David Lee", dueDate: "Nov 10, 2024", status: "Blocked", route: "/open-tasks" },
+          { type: "Task", title: "Revenue Recognition Testing", id: "task-5", assignee: "Anna Martinez", dueDate: "Nov 8, 2024", status: "In Progress", route: "/open-tasks" },
+        ],
+      };
+    }
+    
+    case "controls": {
+      return {
+        content: `**Control Testing Status** for ${scenario}:\n\n` +
+          `• **8 total controls** tracked\n` +
+          `• **5 passed** (62.5%)\n` +
+          `• **2 in progress**\n` +
+          `• **1 failed** - requires remediation\n\n` +
+          `**Attention Needed:**\n` +
+          `• Vulnerability Scanning (ISO-SEC-001) - Failed\n` +
+          `• Revenue Recognition Review (SOX-FIN-003) - In Remediation\n\n` +
+          `Would you like me to generate a detailed control status report?`,
+        resources: [
+          { type: "Control", title: "Vulnerability Scanning", id: "ctrl-5", status: "Failed", route: "/controls" },
+          { type: "Control", title: "Revenue Recognition Review", id: "ctrl-8", status: "Remediation", route: "/controls" },
+        ],
+      };
+    }
+    
+    case "risks": {
+      const riskContent = workspaceId === "enterprise-risk" 
+        ? `Based on the **${scenario}** scenario:\n\n` +
+          `**Current Risk Exposure:**\n` +
+          `• 3 High-priority risks requiring executive attention\n` +
+          `• 12 Medium-priority risks under monitoring\n` +
+          `• 45 Low-priority risks tracked\n\n` +
+          `**Key Focus Areas:**\n` +
+          `• Supply chain tariff exposure across 12 vendors\n` +
+          `• Alternative sourcing strategy in progress\n` +
+          `• Board presentation scheduled for next week\n\n` +
+          `I can help you create a risk mitigation workflow or generate a board summary report.`
+        : `**Risk Assessment Status:**\n\n` +
+          `Your organization currently has 60 tracked risks across all domains.\n\n` +
+          `Would you like me to focus on a specific risk category or generate a risk summary report?`;
+      
+      return {
+        content: riskContent,
+        resources: [
+          { type: "Risk", title: "Tariff Exposure Assessment", id: "risk-1", status: "High", route: "/risk-register" },
+          { type: "Risk", title: "Vendor Concentration Risk", id: "risk-2", status: "High", route: "/risk-register" },
+        ],
+      };
+    }
+    
+    case "reports": {
+      return {
+        content: `I can help you generate reports for **${scenario}**. Available options:\n\n` +
+          `📊 **SOX Compliance Status Report** - Control testing summary\n` +
+          `📈 **Risk Assessment Summary** - Current risk landscape\n` +
+          `📋 **Audit Findings Report** - Q4 audit results\n` +
+          `🎯 **Board Summary Report** - Executive presentation deck\n\n` +
+          `Just tell me which report you'd like, or describe what information you need and I'll generate a custom report.`,
+        resources: [
+          { type: "Report", title: "Generate SOX Report", route: "/reporting" },
+          { type: "Report", title: "Generate Risk Report", route: "/reporting" },
+        ],
+      };
+    }
+    
+    case "dashboard": {
+      return {
+        content: `**Dashboard Overview** for ${scenario}:\n\n` +
+          `**Key Metrics:**\n` +
+          `• 94% overall compliance score\n` +
+          `• 847 of 892 controls effective\n` +
+          `• 3 high-priority risks active\n` +
+          `• 12 total findings this quarter\n\n` +
+          `• 10 active workflows running\n` +
+          `• 145 completed today\n` +
+          `• 2.1% error rate\n\n` +
+          `Would you like to drill into any specific area?`,
+      };
+    }
+    
+    case "workflows": {
+      return {
+        content: `I can help you create workflows for **${focus}**. Here are some options:\n\n` +
+          `🔄 **Pre-built Templates:**\n` +
+          `• Risk Assessment Workflow\n` +
+          `• Control Testing Workflow\n` +
+          `• Approval Process\n` +
+          `• Incident Response\n\n` +
+          `Or describe what you need and I'll help build a custom workflow.\n\n` +
+          `Try: "Create a tariff mitigation workflow" or "Build a control testing process"`,
+      };
+    }
+    
+    case "audit": {
+      const auditContent = workspaceId === "enterprise-audit"
+        ? `**M&A Due Diligence Audit** for Singapore acquisition:\n\n` +
+          `**Due Diligence Status:**\n` +
+          `• Financial DD: 85% complete\n` +
+          `• Operational DD: 70% complete\n` +
+          `• Compliance DD: 90% complete\n` +
+          `• IT DD: 60% complete\n\n` +
+          `**Key Findings:** 4 critical, 8 high priority\n\n` +
+          `Would you like me to generate the Audit Committee presentation deck?`
+        : `**Audit Status:**\n\n` +
+          `• 3 active audits in progress\n` +
+          `• 12 findings to address\n` +
+          `• 1 audit pending committee review\n\n` +
+          `I can help you with evidence collection, findings tracking, or audit planning.`;
+      
+      return {
+        content: auditContent,
+        resources: [
+          { type: "Report", title: "Audit Committee Report", route: "/reporting" },
+        ],
+      };
+    }
+    
+    case "help": {
+      return {
+        content: `Welcome to the AuditBoard Assistant! I'm here to help with your **${scenario}** work.\n\n` +
+          `**What I can do:**\n\n` +
+          `📋 **Tasks & Work** - "Show my tasks" or "What's overdue?"\n` +
+          `🎛️ **Controls** - "Control testing status" or "Failed controls"\n` +
+          `⚠️ **Risks** - "Risk assessment summary" or "High-priority risks"\n` +
+          `📊 **Reports** - "Generate SOX report" or "Create board summary"\n` +
+          `🔄 **Workflows** - "Create a new workflow" or "Build approval process"\n` +
+          `📈 **Dashboard** - "Show metrics" or "Dashboard overview"\n\n` +
+          `Just ask naturally - I understand context from your workspace!`,
+      };
+    }
+    
+    default: {
+      return {
+        content: `I'm your AuditBoard Assistant for **${scenario}**.\n\n` +
+          `Based on your current focus on *${focus}*, I can help with:\n\n` +
+          `• Viewing and managing your tasks\n` +
+          `• Checking control testing status\n` +
+          `• Generating reports for stakeholders\n` +
+          `• Creating automation workflows\n\n` +
+          `What would you like to focus on?`,
+      };
+    }
+  }
+}
+
 export async function analyzeWorkflow(
   nodes: WorkflowNode[],
   edges: WorkflowEdge[]
