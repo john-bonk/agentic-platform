@@ -164,9 +164,40 @@ Preferred communication style: Simple, everyday language.
 - TypeScript across the stack
 - Tailwind CSS for styling
 
+## Intelligence System
+
+The AuditBoard Assistant includes an integrated intelligence layer for context-aware responses:
+
+**Backend Services:**
+- `server/llm.ts` - Keyword-based intent detection with `generateHomeContextResponse()` function
+- Keywords: tasks, controls, risks, reports, dashboard, workflows, audit, help
+- Workspace-aware context (enterprise-risk, enterprise-audit, it-security scenarios)
+
+**Intelligence API Routes:**
+- `GET /api/controls` - Fetch all controls
+- `GET /api/tasks` - Fetch all tasks
+- `GET /api/dashboard/metrics` - Dashboard analytics
+- `GET /api/reports` - List generated reports
+- `POST /api/generate-report` - Create new report based on prompt
+
+**Data Schemas (shared/schema.ts):**
+- `controlSchema` / `insertControlSchema` - Audit control data with Zod validation
+- `taskSchema` / `insertTaskSchema` - Task intelligence data
+- `generatedReportSchema` - Report structure with sections and charts
+- `ResourceReference` - Task/Report/Control reference for assistant responses
+
+**Frontend Components:**
+- `HomeAssistantPanel` - AI assistant panel with ResourceCard display
+- `ResourceCard` - Clickable cards for Task/Report/Control references in chat
+
+**Mock Data:**
+- 8 pre-seeded controls (SOX, ISO, GDPR frameworks)
+- 6 tasks with various statuses and assignments
+
 ## Notable Decisions
 
 - Uses wouter instead of React Router for smaller bundle size
 - Prefers Radix UI headless components with Tailwind styling
 - Uses Drizzle ORM for type-safe database access
 - Implements shared types between client and server via `shared` directory
+- Intelligence uses keyword-based routing (no external APIs required)
