@@ -1,0 +1,147 @@
+OBJECTIVE
+Implement a comprehensive Settings system with two components:
+
+Settings Slide-out Panel (Sheet) - Quick access from header via gear icon
+Settings Full Page (/settings route) - Detailed user preferences
+Theme Provider + Hook - Dark/light mode with localStorage persistence
+PART 1: THEME PROVIDER HOOK
+Create client/src/hooks/use-theme.tsx:
+
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+type Theme = "dark" | "light" | "system";
+interface ThemeProviderState {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+}
+const initialState: ThemeProviderState = {
+  theme: "light",
+  setTheme: () => null,
+};
+const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+interface ThemeProviderProps {
+  children: ReactNode;
+  defaultTheme?: Theme;
+  storageKey?: string;
+}
+export function ThemeProvider({
+  children,
+  defaultTheme = "light",
+  storageKey = "app-theme",
+}: ThemeProviderProps) {
+  const [theme, setTheme] = useState<Theme>(
+    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+  );
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove("light", "dark");
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      root.classList.add(systemTheme);
+      return;
+    }
+    root.classList.add(theme);
+  }, [theme]);
+  const value = {
+    theme,
+    setTheme: (theme: Theme) => {
+      localStorage.setItem(storageKey, theme);
+      setTheme(theme);
+    },
+  };
+  return (
+    <ThemeProviderContext.Provider value={value}>
+      {children}
+    </ThemeProviderContext.Provider>
+  );
+}
+export const useTheme = () => {
+  const context = useContext(ThemeProviderContext);
+  if (context === undefined) throw new Error("useTheme must be used within a ThemeProvider");
+  return context;
+};
+INTEGRATION: Wrap your App.tsx root with <ThemeProvider>:
+
+<ThemeProvider defaultTheme="light" storageKey="app-theme">
+  {/* existing app content */}
+</ThemeProvider>
+PART 2: SETTINGS SLIDE-OUT PANEL (Sheet)
+Create client/src/components/settings-panel.tsx:
+
+Required shadcn components: Sheet, Button, Label, Switch, Select, Slider
+
+Required lucide-react icons: Settings, Moon, Sun, Layout, RefreshCw, Bot, Filter
+
+Settings State Interface:
+
+interface SettingsState {
+  refreshInterval: number;      // 0-120, step 15 (0 = manual)
+  layoutEditMode: boolean;      // Enable drag-to-reorder
+  includedStatuses: string[];   // Filter which statuses show
+  agentEnabled: boolean;        // AI agent on/off
+  agentTone: string;            // "professional" | "casual" | "technical"
+}
+Default Values:
+
+const defaultSettings: SettingsState = {
+  refreshInterval: 0,
+  layoutEditMode: false,
+  includedStatuses: ["Not Started", "In Progress", "Pending", "Blocked"],
+  agentEnabled: true,
+  agentTone: "professional",
+};
+Panel Sections (in order, each with icon + label header):
+
+Appearance (Moon/Sun icon) - Dark mode toggle Switch
+Layout (Layout icon) - Layout editing toggle Switch
+Data Refresh (RefreshCw icon) - Slider 0-120 step 15, shows "Manual" or "{n}s"
+Audit Agent (Bot icon) - Enable toggle + tone Select dropdown
+Task Statuses (Filter icon) - Multi-toggle for status filters
+Persistence: Use localStorage key "dashboard-settings", dispatch CustomEvent "settings-updated" on changes.
+
+Trigger: Ghost icon button with Settings icon, opens Sheet from right, width w-80.
+
+Export companion hook: useSettings() that reads localStorage and listens for updates.
+
+PART 3: SETTINGS FULL PAGE
+Create client/src/pages/settings.tsx as a route component.
+
+Preferences Interface:
+
+interface UserPreferences {
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  deadlineReminders: boolean;
+  reminderDays: string;         // "1" | "2" | "3" | "5" | "7"
+  weeklyDigest: boolean;
+  showCompletedTasks: boolean;
+  defaultView: string;          // "home" | "dashboard" | "controls"
+}
+Card Sections (each Card with icon header):
+
+Profile (User icon) - Avatar + read-only user info fields
+Appearance (Palette icon) - Theme Select (Light/Dark) + Default View Select + Show Completed toggle
+Notifications (Bell icon) - Email, Push, Deadline Reminders (with days Select), Weekly Digest toggles
+Security (Shield icon) - 2FA Setup button + Change Password button
+Footer Actions: Log Out button (left, red variant) + Save Changes button (right, shows success state)
+
+Persistence: localStorage key "user-preferences", use toast on save.
+
+TEST IDS TO INCLUDE
+button-settings - Panel trigger
+switch-dark-mode - Dark mode toggle
+switch-layout-edit - Layout edit toggle
+slider-refresh-interval - Refresh slider
+switch-agent-enabled - Agent toggle
+select-agent-tone - Tone dropdown
+switch-status-{status} - Status toggles (lowercase, hyphenated)
+select-theme - Theme dropdown (page)
+switch-email-notifications, switch-push-notifications, switch-deadline-reminders, switch-weekly-digest
+button-save-settings, button-logout
+CRITICAL IMPLEMENTATION NOTES
+Dark mode requires darkMode: ["class"] in tailwind.config.ts
+Theme applies class to document.documentElement
+Settings panel uses Sheet (slide-out), not Dialog
+Both components share useTheme hook for dark mode sync
+Settings page should have Header with breadcrumbs
+All Switches should be right-aligned with flex justify-between
+Use Separator between settings groups within Cards

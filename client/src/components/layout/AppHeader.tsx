@@ -14,8 +14,8 @@ import {
   BellIcon,
   BotIcon,
   ChevronDownIcon,
-  ClockIcon,
-  MailIcon,
+  // ClockIcon, // Temporarily hidden - will re-introduce later
+  // MailIcon,  // Temporarily hidden - will re-introduce later
   User,
   Search,
   Command,
@@ -25,6 +25,7 @@ import {
   Check,
   Plus,
 } from "lucide-react";
+import { SettingsPanel } from "@/components/settings-panel";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -60,8 +61,8 @@ const quickActions = [
 
 const utilityIcons = [
   { icon: "bot", alt: "AI Assistant" },
-  { icon: "clock", alt: "Recent Activity" },
-  { icon: "mail", alt: "Messages" },
+  // { icon: "clock", alt: "Recent Activity" },  // Temporarily hidden - will re-introduce later
+  // { icon: "mail", alt: "Messages" },          // Temporarily hidden - will re-introduce later
   { icon: "bell", alt: "Notifications" },
 ];
 
@@ -101,10 +102,10 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
     switch (iconName) {
       case "bot":
         return <BotIcon className="w-4 h-4 text-gray-400" />;
-      case "clock":
-        return <ClockIcon className="w-4 h-4 text-gray-400" />;
-      case "mail":
-        return <MailIcon className="w-4 h-4 text-gray-400" />;
+      // case "clock":  // Temporarily hidden - will re-introduce later
+      //   return <ClockIcon className="w-4 h-4 text-gray-400" />;
+      // case "mail":   // Temporarily hidden - will re-introduce later
+      //   return <MailIcon className="w-4 h-4 text-gray-400" />;
       case "bell":
         return <BellIcon className="w-4 h-4 text-gray-400" />;
       default:
@@ -271,6 +272,8 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
               {getUtilityIcon(item.icon)}
             </Button>
           ))}
+
+          <SettingsPanel />
 
           <Button
             variant="ghost"

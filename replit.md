@@ -80,6 +80,8 @@ Preferred communication style: Simple, everyday language.
 - React Query (@tanstack/react-query) for server state management
 - Zustand for local UI state (tab management)
 - React Hook Form with Zod resolvers for form validation
+- ThemeProvider context for dark/light mode (localStorage: "app-theme")
+- SettingsPanel with localStorage persistence ("dashboard-settings") and CustomEvent sync
 
 **Routing**: Wouter library for lightweight client-side routing.
 
