@@ -100,8 +100,8 @@ function MetricCard({
         <Icon className="w-5 h-5" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-2xl font-semibold text-gray-900" data-testid={`${testId || `metric-${label.toLowerCase().replace(/\s+/g, '-')}`}-value`}>{value}</div>
-        <div className="text-sm text-gray-500">{label}</div>
+        <div className="text-2xl font-semibold text-gray-900 dark:text-foreground" data-testid={`${testId || `metric-${label.toLowerCase().replace(/\s+/g, '-')}`}-value`}>{value}</div>
+        <div className="text-sm text-gray-500 dark:text-muted-foreground">{label}</div>
       </div>
       {trend !== undefined && (
         <div className={`flex items-center gap-1 text-sm font-medium ${trend >= 0 ? 'text-emerald-600' : 'text-red-600'}`} data-testid={`${testId || `metric-${label.toLowerCase().replace(/\s+/g, '-')}`}-trend`}>
@@ -145,8 +145,8 @@ function ComplianceRing({ progress, size = 120 }: { progress: number; size?: num
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center flex-col">
-        <span className="text-3xl font-bold text-gray-900">{progress}%</span>
-        <span className="text-xs text-gray-500">Compliant</span>
+        <span className="text-3xl font-bold text-gray-900 dark:text-foreground">{progress}%</span>
+        <span className="text-xs text-gray-500 dark:text-muted-foreground">Compliant</span>
       </div>
     </div>
   );
@@ -221,15 +221,15 @@ export default function IntelligenceHubPage() {
       showHeader={true}
       showSideNav={true}
     >
-      <div className="flex flex-col h-full overflow-y-auto bg-gray-50">
-        <div className="sticky top-0 z-40 bg-white border-b border-gray-200" data-testid="header-intelligence-hub">
+      <div className="flex flex-col h-full overflow-y-auto bg-gray-50 dark:bg-background">
+        <div className="sticky top-0 z-40 bg-white dark:bg-card border-b border-gray-200 dark:border-border" data-testid="header-intelligence-hub">
           <div className="flex items-center justify-between px-6 py-4 gap-4">
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-[#266C92] flex items-center justify-center">
                   <Activity className="w-5 h-5 text-white" />
                 </div>
-                <h1 className="text-xl font-semibold text-gray-900" data-testid="text-hub-title">Intelligence Hub</h1>
+                <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground" data-testid="text-hub-title">Intelligence Hub</h1>
               </div>
               <Badge variant="secondary" className="text-xs" data-testid="badge-stardate">
                 {currentTime.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -238,7 +238,7 @@ export default function IntelligenceHubPage() {
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2 text-sm" data-testid="status-systems">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-gray-600">All Systems Operational</span>
+                <span className="text-gray-600 dark:text-muted-foreground">All Systems Operational</span>
               </div>
               {activeAlerts > 0 && (
                 <Badge variant="outline" className="border-amber-300 text-amber-700 bg-amber-50" data-testid="status-alerts">
@@ -246,7 +246,7 @@ export default function IntelligenceHubPage() {
                   <span data-testid="text-alert-count">{activeAlerts} Alerts</span>
                 </Badge>
               )}
-              <span className="text-sm text-gray-500 font-medium" data-testid="text-current-time">
+              <span className="text-sm text-gray-500 dark:text-muted-foreground font-medium" data-testid="text-current-time">
                 {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
@@ -255,9 +255,9 @@ export default function IntelligenceHubPage() {
 
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card data-testid="panel-workflow-engine">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-workflow-engine">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <Zap className="w-4 h-4" />
                   Workflow Engine
                 </CardTitle>
@@ -273,9 +273,9 @@ export default function IntelligenceHubPage() {
               </CardContent>
             </Card>
 
-            <Card data-testid="panel-control-matrix">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-control-matrix">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <Shield className="w-4 h-4" />
                   Control Matrix
                 </CardTitle>
@@ -291,9 +291,9 @@ export default function IntelligenceHubPage() {
               </CardContent>
             </Card>
 
-            <Card data-testid="panel-risk-posture">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-risk-posture">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" />
                   Risk Posture
                 </CardTitle>
@@ -309,9 +309,9 @@ export default function IntelligenceHubPage() {
               </CardContent>
             </Card>
 
-            <Card data-testid="panel-process-queue">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-process-queue">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <Clock className="w-4 h-4" />
                   Process Queue
                 </CardTitle>

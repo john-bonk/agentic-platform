@@ -149,7 +149,7 @@ export function RiskCard({ risk, isExpanded = false, onToggleExpand }: RiskCardP
 
   return (
     <Card 
-      className="overflow-visible border border-gray-200"
+      className="overflow-visible border border-gray-200 dark:border-border bg-white dark:bg-card"
       data-testid={`risk-card-${risk.id}`}
     >
       <div 
@@ -167,14 +167,14 @@ export function RiskCard({ risk, isExpanded = false, onToggleExpand }: RiskCardP
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-sm font-semibold text-gray-900 truncate" data-testid={`text-risk-name-${risk.id}`}>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground truncate" data-testid={`text-risk-name-${risk.id}`}>
                 {risk.name}
               </h3>
-              <span className="text-lg font-bold text-gray-900" data-testid={`text-exposure-${risk.id}`}>
+              <span className="text-lg font-bold text-gray-900 dark:text-foreground" data-testid={`text-exposure-${risk.id}`}>
                 {risk.exposure}
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5 line-clamp-1" data-testid={`text-description-${risk.id}`}>
+            <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5 line-clamp-1" data-testid={`text-description-${risk.id}`}>
               {risk.description}
             </p>
           </div>
@@ -183,7 +183,7 @@ export function RiskCard({ risk, isExpanded = false, onToggleExpand }: RiskCardP
         <div className="flex items-center gap-4 flex-shrink-0">
           <div className="flex flex-col items-end gap-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">Risk Score</span>
+              <span className="text-xs text-gray-500 dark:text-muted-foreground">Risk Score</span>
               <RiskScoreIndicator score={risk.riskScore} />
             </div>
           </div>
@@ -215,25 +215,25 @@ export function RiskCard({ risk, isExpanded = false, onToggleExpand }: RiskCardP
             className="overflow-hidden"
           >
             <Separator />
-            <div className="p-4 bg-gray-50 space-y-4" data-testid={`risk-details-${risk.id}`}>
+            <div className="p-4 bg-gray-50 dark:bg-muted space-y-4" data-testid={`risk-details-${risk.id}`}>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-muted-foreground mb-1">
                     <Calendar className="w-3 h-3" />
                     TIMELINE
                   </div>
-                  <span className="text-sm font-medium text-gray-900" data-testid={`text-timeline-${risk.id}`}>
+                  <span className="text-sm font-medium text-gray-900 dark:text-foreground" data-testid={`text-timeline-${risk.id}`}>
                     {risk.timeline || "TBD"}
                   </span>
                 </div>
                 
                 <div>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-muted-foreground mb-1">
                     <User className="w-3 h-3" />
                     OWNER
                   </div>
                   {risk.owner ? (
-                    <span className="text-sm font-medium text-gray-900" data-testid={`text-owner-${risk.id}`}>
+                    <span className="text-sm font-medium text-gray-900 dark:text-foreground" data-testid={`text-owner-${risk.id}`}>
                       {risk.owner}
                     </span>
                   ) : (
@@ -249,7 +249,7 @@ export function RiskCard({ risk, isExpanded = false, onToggleExpand }: RiskCardP
                 </div>
                 
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">MITIGATION STATUS</div>
+                  <div className="text-xs text-gray-500 dark:text-muted-foreground mb-1">MITIGATION STATUS</div>
                   <Badge 
                     className={`${statusStyle.bg} ${statusStyle.text} text-xs font-medium no-default-hover-elevate no-default-active-elevate`}
                     data-testid={`badge-status-${risk.id}`}
@@ -260,14 +260,14 @@ export function RiskCard({ risk, isExpanded = false, onToggleExpand }: RiskCardP
               </div>
 
               <div>
-                <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+                <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-muted-foreground mb-2">
                   <Lightbulb className="w-3 h-3 text-amber-500" />
                   RECOMMENDED MITIGATIONS
                 </div>
                 <ul className="space-y-1" data-testid={`list-mitigations-${risk.id}`}>
                   {risk.recommendedMitigations.map((mitigation) => (
-                    <li key={mitigation.id} className="flex items-start gap-2 text-sm text-gray-700">
-                      <span className="text-gray-400">•</span>
+                    <li key={mitigation.id} className="flex items-start gap-2 text-sm text-gray-700 dark:text-foreground">
+                      <span className="text-gray-400 dark:text-muted-foreground">•</span>
                       {mitigation.text}
                     </li>
                   ))}
@@ -278,19 +278,19 @@ export function RiskCard({ risk, isExpanded = false, onToggleExpand }: RiskCardP
 
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">COST OF MITIGATION</div>
+                  <div className="text-xs text-gray-500 dark:text-muted-foreground mb-1">COST OF MITIGATION</div>
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-900" data-testid={`text-cost-${risk.id}`}>
+                    <span className="text-lg font-bold text-gray-900 dark:text-foreground" data-testid={`text-cost-${risk.id}`}>
                       {risk.costOfMitigation}
                     </span>
                     {risk.costSource && (
-                      <span className="text-xs text-gray-500">from {risk.costSource}</span>
+                      <span className="text-xs text-gray-500 dark:text-muted-foreground">from {risk.costSource}</span>
                     )}
                   </div>
                 </div>
                 
                 <div className="text-right">
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1 justify-end">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-muted-foreground mb-1 justify-end">
                     <Lightbulb className="w-3 h-3 text-amber-500" />
                     Projected Impact
                   </div>

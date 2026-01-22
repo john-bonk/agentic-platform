@@ -590,21 +590,21 @@ export default function HomePage() {
         </div>
 
         {/* Main Content - negative margin to overlap the header, higher z-index */}
-        <div className="flex-1 bg-slate-50 px-8 py-6 -mt-24 relative z-10">
+        <div className="flex-1 bg-slate-50 dark:bg-background px-8 py-6 -mt-24 relative z-10">
           <div className="max-w-6xl mx-auto space-y-6">
             
             {/* What would you like to do? Card */}
-            <Card className="shadow-sm border border-slate-200 bg-white" data-testid="assistant-card">
+            <Card className="shadow-sm border border-slate-200 dark:border-border bg-white dark:bg-card" data-testid="assistant-card">
               <CardContent className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 text-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground text-center mb-4">
                   What would you like to do?
                 </h2>
                 <div className="flex items-center gap-3 max-w-2xl mx-auto mb-4">
                   <div className="relative flex-1">
-                    <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                     <Input
                       placeholder="Ask AuditBoard Assistant..."
-                      className="pl-10 h-10 bg-slate-50 border-slate-200"
+                      className="pl-10 h-10 bg-slate-50 dark:bg-muted border-slate-200 dark:border-border"
                       data-testid="input-assistant"
                       onFocus={() => setAssistantOpen(true)}
                     />
@@ -622,7 +622,7 @@ export default function HomePage() {
                     <Button
                       key={action.id}
                       variant="ghost"
-                      className="text-sm text-gray-600 gap-2"
+                      className="text-sm text-gray-600 dark:text-muted-foreground gap-2"
                       data-testid={`button-quick-action-${action.id}`}
                       onClick={() => setAssistantOpen(true)}
                     >
@@ -636,8 +636,8 @@ export default function HomePage() {
 
             {/* Inbox Section */}
             <div data-testid="inbox-section">
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">Inbox</h2>
-              <div className="flex items-center gap-1 border-b border-slate-200 overflow-x-auto">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground mb-3">Inbox</h2>
+              <div className="flex items-center gap-1 border-b border-slate-200 dark:border-border overflow-x-auto">
                 {content.inboxStats.map((stat) => (
                   <button
                     key={stat.label}
@@ -645,12 +645,12 @@ export default function HomePage() {
                     className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors relative ${
                       activeTab === stat.label
                         ? "text-[#266C92]"
-                        : "text-gray-500 hover:text-gray-700"
+                        : "text-gray-500 dark:text-muted-foreground hover:text-gray-700 dark:hover:text-foreground"
                     }`}
                     data-testid={`tab-${stat.label.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     {stat.label}{" "}
-                    <span className={`ml-1 ${activeTab === stat.label ? "text-[#266C92]" : "text-gray-400"}`}>
+                    <span className={`ml-1 ${activeTab === stat.label ? "text-[#266C92]" : "text-gray-400 dark:text-muted-foreground"}`}>
                       {stat.value}
                     </span>
                     {activeTab === stat.label && (
@@ -664,9 +664,9 @@ export default function HomePage() {
             {/* Task Overview + Scenario Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
               {/* Left: Task Overview Donut */}
-              <Card className="shadow-sm border border-slate-200" data-testid="task-overview-card">
+              <Card className="shadow-sm border border-slate-200 dark:border-border bg-white dark:bg-card" data-testid="task-overview-card">
                 <CardContent className={`p-6 transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`}>
-                  <h3 className="text-sm font-semibold text-gray-900 mb-1">Task Overview</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">Task Overview</h3>
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-6 flex-wrap">
                     {taskStats.incomplete > 0 && (
                       <div className="flex items-center gap-1.5">

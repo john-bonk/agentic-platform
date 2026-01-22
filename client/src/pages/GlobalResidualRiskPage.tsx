@@ -509,15 +509,15 @@ export default function GlobalResidualRiskPage() {
 
   return (
     <AppLayout showHeader={true} showSideNav={true}>
-      <div className="flex flex-col h-full overflow-hidden bg-gray-50">
-        <div className="sticky top-0 z-40 bg-white border-b border-gray-200" data-testid="header-global-risk">
+      <div className="flex flex-col h-full overflow-hidden bg-gray-50 dark:bg-background">
+        <div className="sticky top-0 z-40 bg-white dark:bg-card border-b border-gray-200 dark:border-border" data-testid="header-global-risk">
           <div className="flex items-center justify-between px-6 py-4 gap-4">
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-[#266C92] flex items-center justify-center">
                   <Shield className="w-5 h-5 text-white" />
                 </div>
-                <h1 className="text-xl font-semibold text-gray-900" data-testid="text-page-title">
+                <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground" data-testid="text-page-title">
                   Global Residual Risk
                 </h1>
               </div>
@@ -529,20 +529,20 @@ export default function GlobalResidualRiskPage() {
             <div className="flex items-center gap-3 flex-wrap">
               <div className="flex items-center gap-4 text-sm">
                 <div className="flex flex-col items-end">
-                  <span className="text-xs text-gray-500">Total Exposure</span>
+                  <span className="text-xs text-gray-500 dark:text-muted-foreground">Total Exposure</span>
                   <span className="font-bold text-red-600" data-testid="text-total-exposure">{totalExposure}</span>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="text-xs text-gray-500">Mitigated</span>
+                  <span className="text-xs text-gray-500 dark:text-muted-foreground">Mitigated</span>
                   <span className="font-bold text-emerald-600" data-testid="text-mitigated">{mitigatedValue}</span>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="text-xs text-gray-500">Residual</span>
+                  <span className="text-xs text-gray-500 dark:text-muted-foreground">Residual</span>
                   <span className="font-bold text-amber-600" data-testid="text-residual">{residualRisk}</span>
                 </div>
               </div>
               
-              <div className="h-6 w-px bg-gray-200" />
+              <div className="h-6 w-px bg-gray-200 dark:bg-border" />
               
               <Button variant="outline" size="sm" data-testid="button-filter">
                 <Filter className="w-4 h-4 mr-1" />
@@ -564,9 +564,9 @@ export default function GlobalResidualRiskPage() {
           <div className="p-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-6">
-                <Card data-testid="panel-top-risks">
+                <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-top-risks">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                    <CardTitle className="text-base font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-red-500" />
                       Top Risks & Mitigation Plans
                       <Badge variant="secondary" className="ml-2 text-xs">

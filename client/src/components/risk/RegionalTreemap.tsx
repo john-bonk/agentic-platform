@@ -107,7 +107,7 @@ function TreemapTooltip({ company, location, onClose, position }: TreemapTooltip
   
   return (
     <div 
-      className="absolute z-50 bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-72"
+      className="absolute z-50 bg-white dark:bg-card rounded-lg shadow-xl border border-gray-200 dark:border-border p-4 w-72"
       style={positionStyles}
       data-testid={`tooltip-${company.id}`}
       onClick={(e) => e.stopPropagation()}
@@ -120,67 +120,67 @@ function TreemapTooltip({ company, location, onClose, position }: TreemapTooltip
         </div>
         <div className="flex items-center gap-1">
           <button 
-            className="p-1 hover:bg-gray-100 rounded"
+            className="p-1 hover:bg-gray-100 dark:hover:bg-accent rounded"
             data-testid={`button-pin-${company.id}`}
           >
-            <Pin className="w-3 h-3 text-gray-400" />
+            <Pin className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
           </button>
           <button 
-            className="p-1 hover:bg-gray-100 rounded"
+            className="p-1 hover:bg-gray-100 dark:hover:bg-accent rounded"
             data-testid={`button-bookmark-${company.id}`}
           >
-            <Bookmark className="w-3 h-3 text-gray-400" />
+            <Bookmark className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
           </button>
           <button 
-            className="p-1 hover:bg-gray-100 rounded"
+            className="p-1 hover:bg-gray-100 dark:hover:bg-accent rounded"
             data-testid={`button-close-${company.id}`}
             onClick={onClose}
           >
-            <X className="w-3 h-3 text-gray-400" />
+            <X className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
           </button>
         </div>
       </div>
       
       {/* Location */}
       {location && (
-        <div className="text-sm text-gray-600 mb-3">{location.name}</div>
+        <div className="text-sm text-gray-600 dark:text-foreground mb-3">{location.name}</div>
       )}
       
       {/* Tariff Risk Row */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500 uppercase">Tariff Risk</span>
-          <span className="text-xl font-bold text-gray-900">{tooltip.tariffRisk}</span>
+          <span className="text-xs text-gray-500 dark:text-muted-foreground uppercase">Tariff Risk</span>
+          <span className="text-xl font-bold text-gray-900 dark:text-foreground">{tooltip.tariffRisk}</span>
           <Badge 
             className={`${getSeverityColor(tooltip.severity)} text-white text-[10px] px-2 py-0.5`}
           >
             {tooltip.severity}
           </Badge>
         </div>
-        <span className="text-lg font-semibold text-gray-900">{tooltip.dollarValue}</span>
+        <span className="text-lg font-semibold text-gray-900 dark:text-foreground">{tooltip.dollarValue}</span>
       </div>
       
       {/* Tariff Rate & Annual Volume */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <div className="text-[10px] text-gray-400 uppercase tracking-wide">Tariff Rate</div>
+          <div className="text-[10px] text-gray-400 dark:text-muted-foreground uppercase tracking-wide">Tariff Rate</div>
           <div className="text-sm font-semibold text-[#266C92]">{tooltip.tariffRate}</div>
         </div>
         <div>
-          <div className="text-[10px] text-gray-400 uppercase tracking-wide">Annual Volume</div>
-          <div className="text-sm font-semibold text-gray-900">{tooltip.annualVolume}</div>
+          <div className="text-[10px] text-gray-400 dark:text-muted-foreground uppercase tracking-wide">Annual Volume</div>
+          <div className="text-sm font-semibold text-gray-900 dark:text-foreground">{tooltip.annualVolume}</div>
         </div>
       </div>
       
       {/* Import Countries */}
       <div className="mb-4">
-        <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Import Countries</div>
+        <div className="text-[10px] text-gray-400 dark:text-muted-foreground uppercase tracking-wide mb-1">Import Countries</div>
         <div className="flex flex-wrap gap-1">
           {tooltip.importCountries.map((country, idx) => (
             <Badge 
               key={idx} 
               variant="outline" 
-              className="text-[10px] px-2 py-0.5 bg-gray-50 border-gray-200 text-gray-700"
+              className="text-[10px] px-2 py-0.5 bg-gray-50 dark:bg-muted border-gray-200 dark:border-border text-gray-700 dark:text-foreground"
             >
               {country}
             </Badge>
@@ -190,10 +190,10 @@ function TreemapTooltip({ company, location, onClose, position }: TreemapTooltip
       
       {/* Affected Product Lines */}
       <div className="mb-4">
-        <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Affected Product Lines</div>
+        <div className="text-[10px] text-gray-400 dark:text-muted-foreground uppercase tracking-wide mb-1">Affected Product Lines</div>
         <ul className="space-y-0.5">
           {tooltip.affectedProductLines.map((line, idx) => (
-            <li key={idx} className="flex items-center gap-2 text-xs text-gray-700">
+            <li key={idx} className="flex items-center gap-2 text-xs text-gray-700 dark:text-foreground">
               <span className="w-1.5 h-1.5 rounded-full bg-[#266C92]"></span>
               {line}
             </li>
@@ -203,10 +203,10 @@ function TreemapTooltip({ company, location, onClose, position }: TreemapTooltip
       
       {/* Recommended Mitigations */}
       <div>
-        <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Recommended Mitigations</div>
+        <div className="text-[10px] text-gray-400 dark:text-muted-foreground uppercase tracking-wide mb-1">Recommended Mitigations</div>
         <ul className="space-y-0.5">
           {tooltip.recommendedMitigations.map((mitigation, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-xs text-gray-700">
+            <li key={idx} className="flex items-start gap-2 text-xs text-gray-700 dark:text-foreground">
               <span className="w-1 h-1 rounded-full bg-yellow-400 mt-1.5 flex-shrink-0"></span>
               {mitigation}
             </li>

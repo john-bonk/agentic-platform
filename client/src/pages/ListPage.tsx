@@ -151,7 +151,7 @@ export function ListPage() {
           }
         />
         
-        <div className="flex items-center justify-between px-8 py-3 bg-white dark:bg-gray-900 flex-wrap gap-2">
+        <div className="flex items-center justify-between px-8 py-3 bg-white dark:bg-card flex-wrap gap-2">
           <div className="flex items-center gap-2 flex-wrap">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -210,9 +210,9 @@ export function ListPage() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto bg-white dark:bg-gray-900 pl-[16px] pr-[16px]">
+        <div className="flex-1 overflow-auto bg-white dark:bg-card pl-[16px] pr-[16px]">
           <div className="min-w-fit">
-            <div className="flex items-center h-10 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10 bg-white dark:bg-gray-900">
+            <div className="flex items-center h-10 border-b border-gray-200 dark:border-border sticky top-0 z-10 bg-white dark:bg-card">
               <div className="w-10 flex-shrink-0 flex items-center justify-center">
                 <Checkbox 
                   checked={selectedRows.size === filteredData.length && filteredData.length > 0}
@@ -221,19 +221,19 @@ export function ListPage() {
                 />
               </div>
               <div className="flex-1 min-w-[280px] flex items-center px-3">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Name</span>
+                <span className="text-xs font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wider">Name</span>
               </div>
               <div className="w-[160px] flex-shrink-0 flex items-center px-3">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</span>
+                <span className="text-xs font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wider">Owner</span>
               </div>
               <div className="w-[120px] flex-shrink-0 flex items-center px-3">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Status</span>
+                <span className="text-xs font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wider">Status</span>
               </div>
               <div className="w-[120px] flex-shrink-0 flex items-center px-3">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Category</span>
+                <span className="text-xs font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wider">Category</span>
               </div>
               <div className="w-[140px] flex-shrink-0 flex items-center px-3">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Last Modified</span>
+                <span className="text-xs font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wider">Last Modified</span>
               </div>
             </div>
 
@@ -283,7 +283,7 @@ export function ListPage() {
             </div>
 
             {filteredData.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+              <div className="flex flex-col items-center justify-center py-16 text-gray-500 dark:text-muted-foreground">
                 <p className="text-lg font-medium">No items found</p>
                 <p className="text-sm mt-1">Try adjusting your search or filters</p>
               </div>
