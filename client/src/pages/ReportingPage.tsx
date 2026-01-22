@@ -102,7 +102,7 @@ export default function ReportingPage() {
 
   return (
     <AppLayout>
-      <div className="flex-1 bg-slate-50 min-h-screen">
+      <div className="flex-1 bg-slate-50 dark:bg-background min-h-screen">
         <PageHeader
           title="Report Library"
           description="Manage and export presentation artifacts across all workspaces"

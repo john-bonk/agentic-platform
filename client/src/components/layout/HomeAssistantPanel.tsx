@@ -195,7 +195,7 @@ function QuickActionCard({ action, onExecute }: QuickActionCardProps) {
   return (
     <button
       onClick={() => onExecute(action)}
-      className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-[#266C92] hover:bg-slate-50 transition-all group"
+      className="w-full text-left p-3 rounded-lg border border-slate-200 dark:border-border hover:border-[#266C92] dark:hover:border-[#266C92] hover:bg-slate-50 dark:hover:bg-muted transition-all group"
       data-testid={`quick-action-${action.id}`}
     >
       <div className="flex items-start gap-3">
@@ -206,14 +206,14 @@ function QuickActionCard({ action, onExecute }: QuickActionCardProps) {
           <Icon className="w-4 h-4" style={{ color: action.color }} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-900 group-hover:text-[#266C92]">
+          <p className="text-sm font-medium text-gray-900 dark:text-foreground group-hover:text-[#266C92]">
             {action.label}
           </p>
-          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+          <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5 line-clamp-2">
             {action.description}
           </p>
         </div>
-        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#266C92] flex-shrink-0 mt-0.5" />
+        <ChevronRight className="w-4 h-4 text-gray-400 dark:text-muted-foreground group-hover:text-[#266C92] flex-shrink-0 mt-0.5" />
       </div>
     </button>
   );

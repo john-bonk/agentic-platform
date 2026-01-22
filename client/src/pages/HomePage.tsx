@@ -519,8 +519,8 @@ function DonutChart({ stats }: { stats: TaskStats }) {
         )}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-300">
-        <span className="text-4xl font-bold text-gray-900">{stats.incomplete + stats.inProgress}</span>
-        <span className="text-sm text-gray-500">Open Tasks</span>
+        <span className="text-4xl font-bold text-gray-900 dark:text-foreground">{stats.incomplete + stats.inProgress}</span>
+        <span className="text-sm text-gray-500 dark:text-muted-foreground">Open Tasks</span>
       </div>
     </div>
   );
@@ -529,11 +529,11 @@ function DonutChart({ stats }: { stats: TaskStats }) {
 function getStatusBadge(status: Task["status"]) {
   switch (status) {
     case "complete":
-      return { label: "Complete", className: "text-emerald-600 bg-emerald-50" };
+      return { label: "Complete", className: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400" };
     case "in-progress":
-      return { label: "In Progress", className: "text-blue-600 bg-blue-50" };
+      return { label: "In Progress", className: "text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400" };
     default:
-      return { label: "Incomplete", className: "text-amber-600 bg-amber-50" };
+      return { label: "Incomplete", className: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400" };
   }
 }
 
