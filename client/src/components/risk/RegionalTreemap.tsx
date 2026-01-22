@@ -327,7 +327,7 @@ function TreemapCell({
       data-testid={`treemap-company-${company.id}`}
       onClick={handleCompanyClick}
     >
-      <div className="p-2 border-b border-white/20">
+      <div className="p-2 border-b border-black/10">
         <div className="text-xs font-semibold truncate" data-testid={`text-company-name-${company.id}`}>
           {company.name}
         </div>

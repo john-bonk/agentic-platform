@@ -198,27 +198,27 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
               </Button>
             </PopoverTrigger>
             <PopoverContent 
-              className="w-[420px] p-0" 
+              className="w-[420px] p-0 bg-white dark:bg-card border border-gray-200 dark:border-border" 
               align="center"
               data-testid="global-search-popover"
             >
-              <div className="p-3 border-b border-gray-200">
-                <div className="flex items-center gap-2 bg-gray-50 rounded-md px-3 py-2">
-                  <Search className="w-4 h-4 text-gray-400" />
+              <div className="p-3 border-b border-gray-200 dark:border-border">
+                <div className="flex items-center gap-2 bg-gray-50 dark:bg-muted rounded-md px-3 py-2">
+                  <Search className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                   <Input
                     ref={searchInputRef}
                     type="text"
                     placeholder="Search by topic or ask a question..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-sm placeholder:text-gray-400"
+                    className="border-0 bg-transparent focus-visible:ring-0 p-0 h-auto text-sm placeholder:text-gray-400 dark:placeholder:text-muted-foreground text-gray-900 dark:text-foreground"
                     data-testid="global-search-input"
                   />
                 </div>
               </div>
               
               <div className="p-2">
-                <div className="text-xs font-medium text-gray-500 px-2 py-1.5">What would you like to do?</div>
+                <div className="text-xs font-medium text-gray-500 dark:text-muted-foreground px-2 py-1.5">What would you like to do?</div>
                 <div className="space-y-0.5">
                   {quickActions.map((action) => {
                     const ActionIcon = action.icon;
@@ -229,18 +229,18 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
                         className="w-full flex items-center gap-3 px-2 py-2 rounded-md text-left transition-colors hover-elevate"
                         data-testid={`quick-action-${action.id}`}
                       >
-                        <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center">
-                          <ActionIcon className="w-4 h-4 text-gray-600" />
+                        <div className="w-8 h-8 rounded-md bg-gray-100 dark:bg-muted flex items-center justify-center">
+                          <ActionIcon className="w-4 h-4 text-gray-600 dark:text-muted-foreground" />
                         </div>
-                        <span className="text-sm text-gray-700">{action.label}</span>
+                        <span className="text-sm text-gray-700 dark:text-foreground">{action.label}</span>
                       </button>
                     );
                   })}
                 </div>
               </div>
               
-              <div className="border-t border-gray-200 p-2">
-                <div className="text-xs font-medium text-gray-500 px-2 py-1.5">ENVIRONMENT</div>
+              <div className="border-t border-gray-200 dark:border-border p-2">
+                <div className="text-xs font-medium text-gray-500 dark:text-muted-foreground px-2 py-1.5">ENVIRONMENT</div>
                 <button
                   onClick={() => handleQuickAction("ask-assistant")}
                   className="w-full flex items-center gap-3 px-2 py-2 rounded-md text-left transition-colors hover-elevate"
@@ -250,8 +250,8 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
                     <BotIcon className="w-4 h-4 text-[#266C92]" />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-700">Ask AuditBoard Assistant...</div>
-                    <div className="text-xs text-gray-500">Get Started</div>
+                    <div className="text-sm text-gray-700 dark:text-foreground">Ask AuditBoard Assistant...</div>
+                    <div className="text-xs text-gray-500 dark:text-muted-foreground">Get Started</div>
                   </div>
                 </button>
               </div>
