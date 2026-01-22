@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useHomeAssistantStore, type ChatMessage, type SuggestedAction } from "@/lib/homeAssistantStore";
+import { useHomeAssistantStore, type ChatMessage, type SuggestedAction, type ResourceReference } from "@/lib/homeAssistantStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
@@ -148,11 +148,81 @@ function ActionCard({ action, onApply, onDismiss }: ActionCardProps) {
   );
 }
 
-interface MessageBubbleProps {
-  message: ChatMessage;
+interface ResourceCardProps {
+  resource: ResourceReference;
+  onNavigate?: (route: string) => void;
 }
 
-function MessageBubble({ message }: MessageBubbleProps) {
+function ResourceCard({ resource, onNavigate }: ResourceCardProps) {
+  const getResourceIcon = () => {
+    switch (resource.type) {
+      case "Task":
+        return <ClipboardList className="w-4 h-4 text-blue-500" />;
+      case "Report":
+        return <FileText className="w-4 h-4 text-purple-500" />;
+      case "Control":
+        return <Shield className="w-4 h-4 text-green-500" />;
+      case "Risk":
+        return <AlertTriangle className="w-4 h-4 text-amber-500" />;
+      default:
+        return <FileText className="w-4 h-4 text-gray-500" />;
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (resource.status?.toLowerCase()) {
+      case "failed":
+      case "blocked":
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+      case "in progress":
+      case "remediation":
+        return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+      case "passed":
+      case "completed":
+        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
+      case "high":
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+      default:
+        return "bg-slate-100 text-slate-700 dark:bg-muted dark:text-muted-foreground";
+    }
+  };
+
+  return (
+    <div 
+      className="flex items-start gap-2 p-2 bg-white dark:bg-card rounded-md border border-slate-200 dark:border-border hover-elevate cursor-pointer"
+      onClick={() => resource.route && onNavigate?.(resource.route)}
+      data-testid={`resource-card-${resource.id || resource.title}`}
+    >
+      <div className="mt-0.5 flex-shrink-0">{getResourceIcon()}</div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-900 dark:text-foreground truncate">{resource.title}</p>
+        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+          {resource.status && (
+            <Badge variant="secondary" className={`text-xs ${getStatusColor()}`}>
+              {resource.status}
+            </Badge>
+          )}
+          {resource.dueDate && (
+            <span className="text-xs text-gray-500 dark:text-muted-foreground">Due: {resource.dueDate}</span>
+          )}
+          {resource.assignee && (
+            <span className="text-xs text-gray-500 dark:text-muted-foreground">• {resource.assignee}</span>
+          )}
+        </div>
+      </div>
+      {resource.route && (
+        <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+      )}
+    </div>
+  );
+}
+
+interface MessageBubbleProps {
+  message: ChatMessage;
+  onResourceNavigate?: (route: string) => void;
+}
+
+function MessageBubble({ message, onResourceNavigate }: MessageBubbleProps) {
   const isUser = message.role === "user";
   
   return (
@@ -162,7 +232,7 @@ function MessageBubble({ message }: MessageBubbleProps) {
           max-w-[85%] rounded-lg px-3 py-2
           ${isUser 
             ? "bg-[#266C92] text-white" 
-            : "bg-slate-100 text-gray-900"
+            : "bg-slate-100 dark:bg-muted text-gray-900 dark:text-foreground"
           }
         `}
       >
@@ -173,7 +243,21 @@ function MessageBubble({ message }: MessageBubbleProps) {
           </div>
         )}
         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-        <p className={`text-xs mt-1 ${isUser ? "text-white/70" : "text-gray-400"}`}>
+        
+        {!isUser && message.resources && message.resources.length > 0 && (
+          <div className="mt-3 space-y-2">
+            <p className="text-xs font-medium text-gray-500 dark:text-muted-foreground">Related Items:</p>
+            {message.resources.map((resource, idx) => (
+              <ResourceCard 
+                key={`${resource.id || resource.title}-${idx}`}
+                resource={resource}
+                onNavigate={onResourceNavigate}
+              />
+            ))}
+          </div>
+        )}
+        
+        <p className={`text-xs mt-1 ${isUser ? "text-white/70" : "text-gray-400 dark:text-muted-foreground"}`}>
           {new Date(message.timestamp).toLocaleTimeString([], { 
             hour: "2-digit", 
             minute: "2-digit" 
@@ -399,6 +483,7 @@ export function HomeAssistantPanel() {
         role: "assistant",
         content: response.content,
         timestamp: new Date().toISOString(),
+        resources: response.resources,
       };
       
       addMessage(assistantMessage);
@@ -616,7 +701,14 @@ export function HomeAssistantPanel() {
           )}
           
           {messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
+            <MessageBubble 
+              key={message.id} 
+              message={message}
+              onResourceNavigate={(route) => {
+                setOpen(false);
+                setLocation(route);
+              }} 
+            />
           ))}
           
           {isLoading && (

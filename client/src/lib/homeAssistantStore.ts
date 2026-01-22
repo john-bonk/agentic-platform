@@ -12,6 +12,17 @@ interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
+  resources?: ResourceReference[];
+}
+
+interface ResourceReference {
+  type: "Task" | "Report" | "Control" | "Risk";
+  title: string;
+  id?: string;
+  assignee?: string;
+  dueDate?: string;
+  status?: string;
+  route?: string;
 }
 
 interface SuggestedAction {
@@ -67,4 +78,4 @@ export const useHomeAssistantStore = create<HomeAssistantState>((set) => ({
   clearChat: () => set({ messages: [], suggestedActions: [] }),
 }));
 
-export type { ChatMessage, SuggestedAction };
+export type { ChatMessage, SuggestedAction, ResourceReference };
