@@ -116,7 +116,7 @@ function ActionCard({ action, onApply, onDismiss }: ActionCardProps) {
           <div className="flex items-center gap-2 mt-3">
             <Button
               size="sm"
-              className="bg-[#266C92] hover:bg-[#1e5a7a]"
+              className="bg-[#266C92]"
               onClick={() => onApply(action)}
               data-testid={`button-apply-action-${action.id}`}
             >
@@ -674,7 +674,7 @@ export function HomeAssistantPanel() {
                       <div className="flex gap-2 mt-3">
                         <Button 
                           size="sm" 
-                          className="bg-[#266C92] hover:bg-[#1e5a7a]"
+                          className="bg-[#266C92]"
                           onClick={() => {
                             setOpen(false);
                             setLocation(`/reporting/view/${buildingReport.deckKey}`);
@@ -757,7 +757,7 @@ export function HomeAssistantPanel() {
               size="icon"
               onClick={handleSend}
               disabled={!inputValue.trim() || isLoading}
-              className="bg-[#266C92] hover:bg-[#1e5a7a]"
+              className="bg-[#266C92]"
               data-testid="button-home-assistant-send"
             >
               {isLoading ? (

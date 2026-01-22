@@ -871,6 +871,8 @@ export const controlSchema = z.object({
 });
 
 export type Control = z.infer<typeof controlSchema>;
+export const insertControlSchema = controlSchema.omit({ id: true });
+export type InsertControl = z.infer<typeof insertControlSchema>;
 
 /**
  * Task Schema - For task intelligence
@@ -892,6 +894,8 @@ export const taskSchema = z.object({
 });
 
 export type Task = z.infer<typeof taskSchema>;
+export const insertTaskSchema = taskSchema.omit({ id: true });
+export type InsertTask = z.infer<typeof insertTaskSchema>;
 
 /**
  * Dashboard Metrics Interface - For intelligence queries
