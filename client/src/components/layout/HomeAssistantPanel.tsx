@@ -475,7 +475,7 @@ export function HomeAssistantPanel() {
       addMessage({
         id: `msg-${Date.now()}-report`,
         role: "assistant",
-        content: `I've generated a comprehensive report: **${report.title}**\n\nThe report includes ${report.sections.length} sections with detailed analysis and visualizations. Click below to view the full report.`,
+        content: `I've generated a comprehensive report: **${report.title}**\n\nThe report includes ${report.sections.length} sections with detailed analysis and visualizations. Click the report card below to view the full report.`,
         timestamp: new Date().toISOString(),
         resources: [{
           type: "Report",
@@ -486,11 +486,7 @@ export function HomeAssistantPanel() {
         }],
       });
       
-      setTimeout(() => {
-        setBuildingReport(null);
-        setOpen(false);
-        setLocation(`/reporting/generated/${report.reportId}`);
-      }, 500);
+      setBuildingReport(null);
     } catch (error) {
       console.error("Report generation error:", error);
       setBuildingReport(null);
