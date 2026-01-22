@@ -594,7 +594,7 @@ export default function GlobalResidualRiskPage() {
               <div className="space-y-6">
                 <Card data-testid="panel-regional-exposure">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                    <CardTitle className="text-base font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
                       <TrendingDown className="w-5 h-5 text-[#266C92]" />
                       Regional Risk Exposure
                       <Badge variant="secondary" className="ml-2 text-xs">

@@ -342,7 +342,7 @@ function TreemapCell({
             <div 
               key={location.id}
               className={`${activeColors.locationBg} rounded-sm p-1.5 flex-1 min-h-[36px] cursor-pointer transition-all hover:opacity-90 ${
-                selectedLocation?.id === location.id ? "ring-2 ring-white ring-opacity-50" : ""
+                selectedLocation?.id === location.id ? "ring-2 ring-[#266C92] ring-opacity-70" : ""
               }`}
               data-testid={`treemap-location-${location.id}`}
               onClick={(e) => handleLocationClick(location, e)}
