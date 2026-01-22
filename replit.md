@@ -187,8 +187,17 @@ The AuditBoard Assistant includes an integrated intelligence layer for context-a
 - `ResourceReference` - Task/Report/Control reference for assistant responses
 
 **Frontend Components:**
-- `HomeAssistantPanel` - AI assistant panel with ResourceCard display
+- `HomeAssistantPanel` - AI assistant panel with ResourceCard display and report generation
 - `ResourceCard` - Clickable cards for Task/Report/Control references in chat
+- `GeneratedReportPage` - Rich report view with sections, charts (bar/pie/line), TOC navigation
+- `ReportingPage` - Lists both template reports and AI-generated reports
+
+**AI Report Generation:**
+- Detects report requests via keywords: "generate", "create", "build" + "report"
+- Supports multiple report types: SOX compliance, tariff/trade, security/cyber, vendor risk, risk assessment, audit findings
+- Dynamic topic extraction from prompts for personalized titles
+- Rich sections with embedded visualizations (pie charts, bar charts, line charts)
+- Reports persist in session storage and appear in Reporting page
 
 **Mock Data:**
 - 8 pre-seeded controls (SOX, ISO, GDPR frameworks)
