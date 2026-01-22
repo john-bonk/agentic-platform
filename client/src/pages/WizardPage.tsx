@@ -121,7 +121,7 @@ function Step1Content({ formData, setFormData }: StepProps) {
   return (
     <div className="space-y-4 max-w-[700px]">
       <div className="space-y-1">
-        <Label htmlFor="item-name" className="text-sm font-medium text-slate-900">Item Name</Label>
+        <Label htmlFor="item-name" className="text-sm font-medium text-slate-900 dark:text-foreground">Item Name</Label>
         <Input
           id="item-name"
           className="h-8 text-[13px]"
@@ -131,7 +131,7 @@ function Step1Content({ formData, setFormData }: StepProps) {
         />
       </div>
       <div className="space-y-1">
-        <Label htmlFor="item-owner" className="text-sm font-medium text-slate-900">Owner</Label>
+        <Label htmlFor="item-owner" className="text-sm font-medium text-slate-900 dark:text-foreground">Owner</Label>
         <Select
           value={formData.itemOwner}
           onValueChange={(value) => setFormData({ ...formData, itemOwner: value })}
@@ -149,36 +149,36 @@ function Step1Content({ formData, setFormData }: StepProps) {
       <div className="grid grid-cols-2 gap-4 pt-2">
         <button
           type="button"
-          className={`bg-white border rounded p-4 cursor-pointer hover-elevate transition-colors h-[113px] ${
+          className={`bg-white dark:bg-card border rounded p-4 cursor-pointer hover-elevate transition-colors h-[113px] ${
             formData.creationMode === "new"
               ? "border-[#266C92]"
-              : "border-slate-200"
+              : "border-slate-200 dark:border-border"
           }`}
           onClick={() => setFormData({ ...formData, creationMode: "new", uploadedFile: null })}
           data-testid="option-create-new"
         >
           <div className="flex flex-col items-center text-center gap-1.5 h-full justify-center">
-            <PlusCircle className="w-3 h-3 text-slate-500" />
-            <p className="text-sm text-slate-900">Create New Item</p>
-            <p className="text-xs text-slate-500/70 leading-relaxed">
+            <PlusCircle className="w-3 h-3 text-slate-500 dark:text-muted-foreground" />
+            <p className="text-sm text-slate-900 dark:text-foreground">Create New Item</p>
+            <p className="text-xs text-slate-500/70 dark:text-muted-foreground leading-relaxed">
               Manually provide information and content for your new item.
             </p>
           </div>
         </button>
         <button
           type="button"
-          className={`bg-white border rounded p-4 cursor-pointer hover-elevate transition-colors h-[113px] ${
+          className={`bg-white dark:bg-card border rounded p-4 cursor-pointer hover-elevate transition-colors h-[113px] ${
             formData.creationMode === "import"
               ? "border-[#266C92]"
-              : "border-slate-200"
+              : "border-slate-200 dark:border-border"
           }`}
           onClick={() => setFormData({ ...formData, creationMode: "import" })}
           data-testid="option-import"
         >
           <div className="flex flex-col items-center text-center gap-1.5 h-full justify-center">
-            <ArrowDownToLine className="w-3 h-3 text-slate-500" />
-            <p className="text-sm text-slate-900">Import Existing Item</p>
-            <p className="text-xs text-slate-500/70 leading-relaxed">
+            <ArrowDownToLine className="w-3 h-3 text-slate-500 dark:text-muted-foreground" />
+            <p className="text-sm text-slate-900 dark:text-foreground">Import Existing Item</p>
+            <p className="text-xs text-slate-500/70 dark:text-muted-foreground leading-relaxed">
               Upload an existing document to import into the system.
             </p>
           </div>
@@ -196,34 +196,34 @@ function Step1Content({ formData, setFormData }: StepProps) {
           />
           {formData.uploadedFile ? (
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-slate-900">Upload Document</Label>
-              <div className="bg-[#266C92]/5 border border-[#266C92]/20 rounded p-3 flex items-center gap-3">
-                <div className="w-10 h-10 bg-white border border-slate-200 rounded flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-5 h-5 text-slate-400" />
+              <Label className="text-sm font-medium text-slate-900 dark:text-foreground">Upload Document</Label>
+              <div className="bg-[#266C92]/5 dark:bg-[#266C92]/10 border border-[#266C92]/20 rounded p-3 flex items-center gap-3">
+                <div className="w-10 h-10 bg-white dark:bg-card border border-slate-200 dark:border-border rounded flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-5 h-5 text-slate-400 dark:text-muted-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-900 truncate">{formData.uploadedFile.name}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-sm font-medium text-slate-900 dark:text-foreground truncate">{formData.uploadedFile.name}</p>
+                  <p className="text-xs text-slate-500 dark:text-muted-foreground">
                     {getFileType(formData.uploadedFile.name)} - {formatFileSize(formData.uploadedFile.size)}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={handleRemoveFile}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"
+                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-muted-foreground dark:hover:text-foreground transition-colors"
                   data-testid="button-remove-file"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-muted-foreground">
                 Supported formats: PDF, Word (.doc, .docx), Excel (.xls, .xlsx)
               </p>
             </div>
           ) : (
             <div
-              className={`bg-slate-50 border border-dashed rounded p-4 transition-colors ${
-                isDragging ? "border-[#266C92] bg-[#266C92]/5" : "border-slate-300"
+              className={`bg-slate-50 dark:bg-muted border border-dashed rounded p-4 transition-colors ${
+                isDragging ? "border-[#266C92] bg-[#266C92]/5 dark:bg-[#266C92]/10" : "border-slate-300 dark:border-border"
               }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -231,8 +231,8 @@ function Step1Content({ formData, setFormData }: StepProps) {
               data-testid="drop-zone"
             >
               <div className="flex items-center justify-center gap-2">
-                <Upload className="w-3.5 h-3.5 text-slate-600" />
-                <span className="text-xs text-slate-900">Drag and drop file or</span>
+                <Upload className="w-3.5 h-3.5 text-slate-600 dark:text-muted-foreground" />
+                <span className="text-xs text-slate-900 dark:text-foreground">Drag and drop file or</span>
                 <Button
                   variant="outline"
                   size="sm"
@@ -363,7 +363,7 @@ function Step3Content({ formData, setFormData }: StepProps) {
           {formData.reviewers.map((reviewer) => (
             <div
               key={reviewer.id}
-              className="flex items-center justify-between p-3 border rounded-md"
+              className="flex items-center justify-between p-3 border border-slate-200 dark:border-border rounded-md bg-white dark:bg-card"
               data-testid={`reviewer-item-${reviewer.id}`}
             >
               <div className="flex items-center gap-3">
@@ -448,7 +448,7 @@ export default function WizardPage() {
         path: `${basePath}/wizard`
       }}
     >
-      <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-gray-900">
+      <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-card">
         <Wizard
           steps={[
             { id: "details", label: "Item Details" },

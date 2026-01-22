@@ -667,7 +667,7 @@ export default function HomePage() {
               <Card className="shadow-sm border border-slate-200 dark:border-border bg-white dark:bg-card" data-testid="task-overview-card">
                 <CardContent className={`p-6 transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`}>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">Task Overview</h3>
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-6 flex-wrap">
+                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-muted-foreground mb-6 flex-wrap">
                     {taskStats.incomplete > 0 && (
                       <div className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-amber-400" />
@@ -688,7 +688,7 @@ export default function HomePage() {
                     )}
                   </div>
                   <DonutChart stats={taskStats} />
-                  <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500 flex-wrap">
+                  <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500 dark:text-muted-foreground flex-wrap">
                     <div className="flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
                       Incomplete
@@ -706,26 +706,26 @@ export default function HomePage() {
               </Card>
 
               {/* Right: Scenario Task List */}
-              <Card className="shadow-sm border border-slate-200" data-testid="scenario-card">
+              <Card className="shadow-sm border border-slate-200 dark:border-border bg-white dark:bg-card" data-testid="scenario-card">
                 <CardContent className="p-0 flex flex-col h-[340px]">
                   {/* Scenario Header */}
                   <button
                     onClick={() => setScenarioExpanded(!scenarioExpanded)}
-                    className="w-full flex items-center gap-2 px-4 py-3 bg-slate-50 border-b border-slate-200 text-left hover:bg-slate-100 transition-colors flex-shrink-0"
+                    className="w-full flex items-center gap-2 px-4 py-3 bg-slate-50 dark:bg-muted border-b border-slate-200 dark:border-border text-left hover-elevate transition-colors flex-shrink-0"
                     data-testid="button-scenario-toggle"
                   >
                     {scenarioExpanded ? (
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
+                      <ChevronDown className="w-4 h-4 text-gray-500 dark:text-muted-foreground" />
                     ) : (
-                      <ChevronRight className="w-4 h-4 text-gray-500" />
+                      <ChevronRight className="w-4 h-4 text-gray-500 dark:text-muted-foreground" />
                     )}
-                    <span className="font-medium text-gray-900">{content.scenarioPlanning.title}</span>
+                    <span className="font-medium text-gray-900 dark:text-foreground">{content.scenarioPlanning.title}</span>
                   </button>
 
                   {/* Scrollable Task List */}
                   {scenarioExpanded && (
                     <div 
-                      className={`flex-1 overflow-y-auto divide-y divide-slate-100 transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`} 
+                      className={`flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-border transition-opacity duration-300 ${isTransitioning ? 'opacity-50' : 'opacity-100'}`} 
                       data-testid="task-list"
                     >
                       {content.tasks.map((task) => {
@@ -733,7 +733,7 @@ export default function HomePage() {
                         return (
                           <div
                             key={task.id}
-                            className="flex items-start gap-4 px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors"
+                            className="flex items-start gap-4 px-4 py-3 hover-elevate cursor-pointer transition-colors"
                             data-testid={`task-item-${task.id}`}
                           >
                             <span className={`text-xs font-medium px-2 py-0.5 rounded mt-0.5 ${badge.className}`}>
@@ -743,11 +743,11 @@ export default function HomePage() {
                               <div className="text-sm font-medium text-[#266C92] hover:underline cursor-pointer" data-testid={`task-title-${task.id}`}>
                                 {task.title}
                               </div>
-                              <div className="text-xs text-gray-500 mt-0.5">{task.context}</div>
+                              <div className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{task.context}</div>
                             </div>
                             <div className="text-right flex-shrink-0">
-                              <div className="text-xs text-gray-400">Due Date</div>
-                              <div className="text-sm text-gray-700" data-testid={`task-due-${task.id}`}>{task.dueDate}</div>
+                              <div className="text-xs text-gray-400 dark:text-muted-foreground">Due Date</div>
+                              <div className="text-sm text-gray-700 dark:text-foreground" data-testid={`task-due-${task.id}`}>{task.dueDate}</div>
                             </div>
                           </div>
                         );
@@ -760,7 +760,7 @@ export default function HomePage() {
 
             {/* Your Workspaces Section */}
             <div data-testid="workspaces-section">
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">Your workspaces</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground mb-2">Your workspaces</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {workspaces.map((ws) => {
                   const Icon = ws.icon;
@@ -769,7 +769,7 @@ export default function HomePage() {
                     <Card
                       key={ws.id}
                       className={`shadow-sm border ${
-                        isActive ? "border-[#266C92] bg-white" : "border-slate-200 bg-white"
+                        isActive ? "border-[#266C92] bg-white dark:bg-card" : "border-slate-200 dark:border-border bg-white dark:bg-card"
                       }`}
                       data-testid={`workspace-card-${ws.id}`}
                     >
@@ -781,8 +781,8 @@ export default function HomePage() {
                           <Icon className="w-4 h-4" style={{ color: ws.color }} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-sm">{ws.name}</h3>
-                          <p className="text-xs text-gray-500 truncate">
+                          <h3 className="font-semibold text-gray-900 dark:text-foreground text-sm">{ws.name}</h3>
+                          <p className="text-xs text-gray-500 dark:text-muted-foreground truncate">
                             {ws.description}
                           </p>
                         </div>

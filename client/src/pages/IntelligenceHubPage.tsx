@@ -328,9 +328,9 @@ export default function IntelligenceHubPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card data-testid="panel-compliance-score-matrix">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-compliance-score-matrix">
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <PieChartIcon className="w-4 h-4" />
                   Compliance Score
                 </CardTitle>
@@ -339,16 +339,16 @@ export default function IntelligenceHubPage() {
                 <div className="flex flex-col items-center justify-center py-4">
                   <ComplianceRing progress={data.compliance.overallScore} size={140} />
                   <div className="mt-4 text-center">
-                    <div className="text-sm text-gray-500">Overall Compliance</div>
+                    <div className="text-sm text-gray-500 dark:text-muted-foreground">Overall Compliance</div>
                     <div className="text-xs text-[#266C92] font-medium mt-1">Target: 95%</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card data-testid="panel-coverage-analysis">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-coverage-analysis">
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <Target className="w-4 h-4" />
                   Coverage Analysis
                 </CardTitle>
@@ -372,9 +372,9 @@ export default function IntelligenceHubPage() {
               </CardContent>
             </Card>
 
-            <Card data-testid="panel-risk-distribution">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-risk-distribution">
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" />
                   Risk Distribution
                 </CardTitle>
@@ -404,7 +404,7 @@ export default function IntelligenceHubPage() {
                   {riskDistribution.map((item) => (
                     <div key={item.name} className="flex items-center gap-2 text-xs">
                       <div className="w-3 h-3 rounded" style={{ backgroundColor: item.color }} />
-                      <span className="text-gray-600">{item.name}: {item.value}</span>
+                      <span className="text-gray-600 dark:text-muted-foreground">{item.name}: {item.value}</span>
                     </div>
                   ))}
                 </div>
@@ -413,9 +413,9 @@ export default function IntelligenceHubPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card data-testid="panel-activity-trends">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-activity-trends">
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <TrendingUp className="w-4 h-4" />
                   Activity Trends
                 </CardTitle>
@@ -436,9 +436,9 @@ export default function IntelligenceHubPage() {
               </CardContent>
             </Card>
 
-            <Card data-testid="panel-risk-heat-matrix">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-risk-heat-matrix">
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <Target className="w-4 h-4" />
                   Risk Heat Matrix
                 </CardTitle>
@@ -461,9 +461,9 @@ export default function IntelligenceHubPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card data-testid="panel-system-status">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-system-status">
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <Cpu className="w-4 h-4" />
                   System Status
                 </CardTitle>
@@ -472,39 +472,39 @@ export default function IntelligenceHubPage() {
                 <div className="space-y-3" data-testid="list-system-status">
                   <div className="flex items-center justify-between gap-2" data-testid="status-database">
                     <div className="flex items-center gap-2">
-                      <Database className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-700">Database Cluster</span>
+                      <Database className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
+                      <span className="text-sm text-gray-700 dark:text-foreground">Database Cluster</span>
                     </div>
-                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 text-xs" data-testid="badge-database-status">Online</Badge>
+                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs" data-testid="badge-database-status">Online</Badge>
                   </div>
                   <div className="flex items-center justify-between gap-2" data-testid="status-compute">
                     <div className="flex items-center gap-2">
-                      <Cpu className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-700">Compute Nodes</span>
+                      <Cpu className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
+                      <span className="text-sm text-gray-700 dark:text-foreground">Compute Nodes</span>
                     </div>
-                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 text-xs" data-testid="badge-compute-status">8/8 Active</Badge>
+                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs" data-testid="badge-compute-status">8/8 Active</Badge>
                   </div>
                   <div className="flex items-center justify-between gap-2" data-testid="status-gateway">
                     <div className="flex items-center gap-2">
-                      <Network className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-700">API Gateway</span>
+                      <Network className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
+                      <span className="text-sm text-gray-700 dark:text-foreground">API Gateway</span>
                     </div>
-                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 text-xs" data-testid="badge-gateway-status">Nominal</Badge>
+                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs" data-testid="badge-gateway-status">Nominal</Badge>
                   </div>
                   <div className="flex items-center justify-between gap-2" data-testid="status-security">
                     <div className="flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-700">Security Layer</span>
+                      <Lock className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
+                      <span className="text-sm text-gray-700 dark:text-foreground">Security Layer</span>
                     </div>
-                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 text-xs" data-testid="badge-security-status">Secured</Badge>
+                    <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs" data-testid="badge-security-status">Secured</Badge>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card data-testid="panel-workflow-pipeline">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-workflow-pipeline">
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <Zap className="w-4 h-4" />
                   Workflow Pipeline
                 </CardTitle>
@@ -513,22 +513,22 @@ export default function IntelligenceHubPage() {
                 <div className="space-y-4">
                   <div data-testid="pipeline-active-executions">
                     <div className="flex items-center justify-between mb-2 gap-2">
-                      <span className="text-sm text-gray-600">Active Executions</span>
-                      <span className="text-sm font-medium text-gray-900" data-testid="text-active-executions">{data.realtime.activeProcesses}</span>
+                      <span className="text-sm text-gray-600 dark:text-muted-foreground">Active Executions</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-foreground" data-testid="text-active-executions">{data.realtime.activeProcesses}</span>
                     </div>
                     <Progress value={75} className="h-2" />
                   </div>
                   <div data-testid="pipeline-queue-depth">
                     <div className="flex items-center justify-between mb-2 gap-2">
-                      <span className="text-sm text-gray-600">Queue Depth</span>
-                      <span className="text-sm font-medium text-gray-900" data-testid="text-queue-depth">{data.realtime.queuedTasks}</span>
+                      <span className="text-sm text-gray-600 dark:text-muted-foreground">Queue Depth</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-foreground" data-testid="text-queue-depth">{data.realtime.queuedTasks}</span>
                     </div>
                     <Progress value={32} className="h-2" />
                   </div>
                   <div data-testid="pipeline-throughput">
                     <div className="flex items-center justify-between mb-2 gap-2">
-                      <span className="text-sm text-gray-600">Throughput (ops/min)</span>
-                      <span className="text-sm font-medium text-gray-900" data-testid="text-throughput">{data.realtime.throughput}</span>
+                      <span className="text-sm text-gray-600 dark:text-muted-foreground">Throughput (ops/min)</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-foreground" data-testid="text-throughput">{data.realtime.throughput}</span>
                     </div>
                     <Progress value={89} className="h-2" />
                   </div>
@@ -536,9 +536,9 @@ export default function IntelligenceHubPage() {
               </CardContent>
             </Card>
 
-            <Card data-testid="panel-alert-stream">
+            <Card className="bg-white dark:bg-card border-gray-200 dark:border-border" data-testid="panel-alert-stream">
               <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                <CardTitle className="text-sm font-medium text-gray-500 dark:text-muted-foreground flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" />
                   Alert Stream
                 </CardTitle>
@@ -548,34 +548,34 @@ export default function IntelligenceHubPage() {
                   <motion.div 
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center gap-2 p-2 rounded-md bg-red-50 border border-red-100"
+                    className="flex items-center gap-2 p-2 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/40"
                     data-testid="alert-item-ctl-847"
                   >
                     <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                    <span className="text-sm text-gray-700 flex-1">Control CTL-847 requires attestation</span>
-                    <span className="text-xs text-gray-400">2m ago</span>
+                    <span className="text-sm text-gray-700 dark:text-foreground flex-1">Control CTL-847 requires attestation</span>
+                    <span className="text-xs text-gray-400 dark:text-muted-foreground">2m ago</span>
                   </motion.div>
                   <motion.div 
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="flex items-center gap-2 p-2 rounded-md bg-amber-50 border border-amber-100"
+                    className="flex items-center gap-2 p-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/40"
                     data-testid="alert-item-rsk-023"
                   >
                     <Clock className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                    <span className="text-sm text-gray-700 flex-1">Risk RSK-023 assessment due</span>
-                    <span className="text-xs text-gray-400">15m ago</span>
+                    <span className="text-sm text-gray-700 dark:text-foreground flex-1">Risk RSK-023 assessment due</span>
+                    <span className="text-xs text-gray-400 dark:text-muted-foreground">15m ago</span>
                   </motion.div>
                   <motion.div 
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 border border-emerald-100"
+                    className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/40"
                     data-testid="alert-item-aud-156"
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    <span className="text-sm text-gray-700 flex-1">Audit AUD-156 completed</span>
-                    <span className="text-xs text-gray-400">1h ago</span>
+                    <span className="text-sm text-gray-700 dark:text-foreground flex-1">Audit AUD-156 completed</span>
+                    <span className="text-xs text-gray-400 dark:text-muted-foreground">1h ago</span>
                   </motion.div>
                 </div>
               </CardContent>
