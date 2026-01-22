@@ -1,0 +1,350 @@
+REPLIT HYPERPROMPT: Audit Agent Intelligence Architecture
+Full-Stack AI Assistant System with Report Generation, Conversational Agent, and In-Context Report Editing
+
+ARCHITECTURE OVERVIEW
+The Audit Agent is a three-tier intelligence system:
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                      PRESENTATION LAYER                              │
+├─────────────────┬─────────────────────┬─────────────────────────────┤
+│  AuditAgent     │  AIAssistantPanel   │     ReportAgent             │
+│  (Prompt Card)  │  (Chat Drawer)      │  (In-Report Editor)         │
+│  → Entry point  │  → Conversational   │  → Context-aware actions    │
+│  → Route to     │  → Keyword-based    │  → Section/chart mutations  │
+│    panel/report │    responses        │  → Search + CRUD            │
+└─────────────────┴─────────────────────┴─────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      BACKEND API LAYER                               │
+│  POST /api/generate-report  → Creates report from prompt            │
+│  GET  /api/reports/:id      → Retrieves report                      │
+│  POST /api/refresh-report   → Regenerates with new context          │
+│  GET  /api/controls         → Fetches control data for agent        │
+│  GET  /api/dashboard/metrics → Fetches metrics for intelligence     │
+│  GET  /api/users            → Fetches users for team queries        │
+└─────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      DATA/STORAGE LAYER                              │
+│  shared/schema.ts   → Zod schemas for all types                     │
+│  server/storage.ts  → In-memory or DB persistence                   │
+│  Reports, Controls, Tasks, Users, Metrics                           │
+└─────────────────────────────────────────────────────────────────────┘
+PART 1: DATA SCHEMAS (shared/schema.ts)
+CRITICAL: Define these types FIRST - they drive the entire intelligence model.
+
+Core Types for Agent Intelligence:
+// === CONTROL SCHEMA ===
+export const controlSchema = z.object({
+  id: z.string(),
+  controlId: z.string(),          // e.g., "FIN-001"
+  name: z.string(),
+  description: z.string(),
+  riskRating: z.enum(["High", "Medium", "Low"]),
+  controlType: z.enum(["Preventive", "Detective", "Corrective"]),
+  owner: z.string(),
+  frequency: z.string(),
+  lastTestDate: z.string().nullable(),
+  nextTestDate: z.string().nullable(),
+  testStatus: z.enum(["Not Started", "In Progress", "Pending Review", "Failed", "Passed", "Remediation"]),
+  framework: z.string(),
+});
+// === TASK SCHEMA ===
+export const taskSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.enum(["Test", "Review", "Evidence", "Remediation", "Walkthrough"]),
+  controlId: z.string(),
+  status: z.enum(["Not Started", "In Progress", "Pending", "Blocked", "Completed"]),
+  dueDate: z.string(),
+  riskRating: z.enum(["High", "Medium", "Low"]),
+  assigneeId: z.string(),
+  assigneeName: z.string(),
+  dependency: z.string().nullable(),
+  blockerReason: z.string().nullable(),
+  sampleSize: z.number().nullable(),
+  evidenceRequired: z.boolean(),
+});
+// === DASHBOARD METRICS INTERFACE ===
+export interface DashboardMetrics {
+  totalControls: number;
+  passedControls: number;
+  failedControls: number;
+  pendingReview: number;
+  overdueTests: number;
+  activeAudits: number;
+  findingsTotal: number;
+  remediationInProgress: number;
+}
+// === REPORT SCHEMAS ===
+export const reportChartSpecSchema = z.object({
+  type: z.enum(["bar", "pie", "line"]),
+  data: z.array(z.number()),
+  labels: z.array(z.string()).optional(),
+  title: z.string().optional(),
+  position: z.enum(["above", "below", "inline"]).optional(),
+});
+export const reportSectionSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  content: z.string(),
+  charts: z.array(reportChartSpecSchema).default([]),
+});
+export const reportSchema = z.object({
+  reportId: z.string(),
+  title: z.string(),
+  sections: z.array(reportSectionSchema),
+  toc: z.array(z.object({ id: z.string(), title: z.string() })),
+  createdAt: z.string(),
+  prompt: z.string().optional(),
+});
+PART 2: COMPONENT 1 - AUDIT AGENT (Entry Point)
+File: client/src/components/home/audit-agent.tsx
+
+Purpose:
+Primary user interface for AI queries
+Routes queries to either report generation or chat panel
+Maintains prompt history in localStorage
+Key Interface:
+interface AuditAgentProps {
+  onOpenPanel?: (prompt: string) => void;
+}
+Intelligence Routing Logic:
+function shouldGenerateReport(prompt: string): boolean {
+  const lowerPrompt = prompt.toLowerCase();
+  return lowerPrompt.includes('report') || lowerPrompt.includes('summary');
+}
+// If report → mutation to POST /api/generate-report → navigate to /report/:id
+// Else → call onOpenPanel(prompt) to open AIAssistantPanel
+Features:
+Input field with send button
+Prompt Library - 4-5 curated suggestions displayed
+History Dialog - Recent commands stored in localStorage (max 5)
+Loading state with Loader2 spinner during report generation
+Gradient card styling with Bot icon and "online" indicator
+Required Icons (lucide-react):
+Bot, Send, Sparkles, History, Wand2, Loader2
+
+PART 3: COMPONENT 2 - AI ASSISTANT PANEL (Chat Interface)
+File: client/src/components/home/ai-assistant-panel.tsx
+
+Purpose:
+Slide-out drawer for conversational Q&A
+Keyword-based response generation
+Displays resource cards with action buttons
+Key Interfaces:
+interface Message {
+  id: string;
+  type: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+  resources?: ResourceReference[];
+}
+interface ResourceReference {
+  type: "Task" | "Report" | "Control" | "PDF" | "Document";
+  title: string;
+  assignee?: string;
+  dueDate?: string;
+  recipients?: string;
+}
+interface AIAssistantPanelProps {
+  isOpen: boolean;
+  onClose: () => void;
+  initialPrompt?: string;
+}
+Intelligence Model (getAIResponse function):
+const getAIResponse = (userMessage: string): { content: string; resources?: ResourceReference[] } => {
+  const lower = userMessage.toLowerCase();
+  
+  // Keyword-based response mapping:
+  if (lower.includes("overdue")) → Return overdue tasks summary + Task resource
+  if (lower.includes("summary") || lower.includes("sox testing")) → Return progress stats + Report resource
+  if (lower.includes("evidence") || lower.includes("documentation")) → Return evidence status + Document resource
+  if (lower.includes("high-risk") || lower.includes("priority")) → Return high-risk controls + Control resource
+  if (lower.includes("qa") || lower.includes("review")) → Return QA summary + Report resource
+  if (lower.includes("task") || lower.includes("assign")) → Confirm task creation + Task resource
+  if (lower.includes("report") || lower.includes("executive")) → Return report summary + Report resource
+  
+  // Default fallback:
+  return generic helpful response asking for clarification
+};
+UI Features:
+Header bar with teal background (#3d6a7a), Bot icon, title, close button
+Message list with user bubbles (right-aligned, gray bg) and assistant text (left, no bg)
+Resource cards - Purple-tinted cards with icon, type badge, title, metadata, "View" button
+Typing indicator - Three bouncing dots with "Thinking..." text
+Input area - Textarea with paperclip attach button, send button, AI disclaimer text
+Keyboard support - Enter to send, Shift+Enter for newline, Escape to close
+PART 4: COMPONENT 3 - REPORT AGENT (In-Context Editor)
+File: client/src/components/report-agent.tsx
+
+This is the most sophisticated component - ~1000+ lines of intelligence logic.
+
+Purpose:
+Embedded in the Report view page
+Allows users to modify generated reports via natural language
+Searches controls, users, metrics in real-time
+Adds/edits/removes sections and charts
+Key Interfaces:
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  action?: {
+    type: "add_section" | "edit_section" | "remove_section" | "search_result";
+    data?: any;
+  };
+  timestamp: Date;
+}
+interface ChartSpec {
+  type: "bar" | "pie" | "line";
+  data: number[];
+  labels?: string[];
+  title?: string;
+  position?: "above" | "below" | "inline";
+}
+interface ReportAgentProps {
+  sections: ReportSection[];
+  onAddSection: (section: Omit<ReportSection, "id">) => void;
+  onEditSection: (sectionId: string, content: string) => void;
+  onRemoveSection: (sectionId: string) => void;
+  onAddChart: (sectionId: string, chartSpec: ChartSpec) => void;
+  onRemoveChart: (sectionId: string, chartIndex: number) => void;
+}
+Intelligence Model (processQuery function):
+The processQuery function (~700 lines) handles:
+
+Search Operations:
+
+"search users" / "search team" → Query users API, return matches
+"search metrics" / "search stats" → Return dashboard metrics
+"search controls" / "find controls" → Filter controls by name/ID/risk/status
+Section Management:
+
+"show sections" / "list sections" → List all sections with chart counts
+"edit section X" → Set pending edit, wait for follow-up
+"add section" / "create section" → Generate new section with title/content
+"remove section X" / "delete section" → Remove section by number/name
+Chart Generation:
+
+Parse chart type: pie, bar, line from keywords
+Parse time range: "last 7 days", "past 30 days" etc.
+Generate contextual data based on metrics:
+Control status breakdown → pie chart
+Testing results → bar chart
+Work completion over time → line chart
+Risk distribution → pie chart
+Findings by severity → bar chart
+Section Finding Helper:
+
+Matches by number: "section 1", "section #2", "sec 1"
+Matches by name: "executive summary", "insights"
+Matches by position: "first section", "last section"
+Data Dependencies:
+The ReportAgent fetches live data via React Query:
+
+const { data: controls } = useQuery<Control[]>({ queryKey: ["/api/controls"] });
+const { data: metrics } = useQuery<DashboardMetrics>({ queryKey: ["/api/dashboard/metrics"] });
+const { data: users } = useQuery<User[]>({ queryKey: ["/api/users"] });
+PART 5: BACKEND API ROUTES
+File: server/routes.ts
+
+Report Generation Endpoint:
+app.post("/api/generate-report", async (req, res) => {
+  // 1. Validate request with Zod schema
+  const parsed = generateReportSchema.safeParse(req.body);
+  
+  // 2. Call LLM function (simulated or real)
+  const llmOutput = await callLLM(prompt);
+  
+  // 3. Store report
+  const report = await storage.createReport({
+    title: llmOutput.title,
+    sections: llmOutput.sections,
+    toc: llmOutput.toc,
+    createdAt: llmOutput.createdAt,
+    prompt,
+  });
+  
+  res.json(report);
+});
+LLM Function Structure:
+async function callLLM(prompt: string): Promise<{
+  title: string;
+  sections: ReportSection[];
+  toc: ReportTocItem[];
+  createdAt: string;
+}> {
+  // Option 1: Simulated response with structured sections
+  // Option 2: Real LLM API call (OpenAI, etc.)
+  
+  return {
+    title: "Audit Cycle Insights",
+    sections: [
+      { id: "sec1", title: "Executive Summary", content: "...", charts: [...] },
+      { id: "sec2", title: "Key Insights", content: "...", charts: [...] },
+      { id: "sec3", title: "Industry News", content: "__NEWS_CARDS__[...]", charts: [] }
+    ],
+    toc: [
+      { id: "sec1", title: "Executive Summary" },
+      ...
+    ],
+    createdAt: new Date().toISOString()
+  };
+}
+PART 6: WIRING IT TOGETHER
+File: client/src/pages/home.tsx
+
+export default function Home() {
+  const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
+  const [aiPanelPrompt, setAIPanelPrompt] = useState<string | undefined>();
+  const handleOpenAIPanel = (prompt: string) => {
+    setAIPanelPrompt(prompt);
+    setIsAIPanelOpen(true);
+  };
+  return (
+    <>
+      {/* In your layout */}
+      <AuditAgent onOpenPanel={handleOpenAIPanel} />
+      
+      {/* At the end, outside main content */}
+      <AIAssistantPanel 
+        isOpen={isAIPanelOpen}
+        onClose={() => { setIsAIPanelOpen(false); setAIPanelPrompt(undefined); }}
+        initialPrompt={aiPanelPrompt}
+      />
+    </>
+  );
+}
+FILES TO EXTRACT AND UPLOAD
+Due to the complexity of the intelligence logic (especially processQuery in ReportAgent), these files should be directly copied:
+
+File	Lines	Reason
+shared/schema.ts	~250	All type definitions
+client/src/components/home/audit-agent.tsx	~220	Entry component
+client/src/components/home/ai-assistant-panel.tsx	~370	Chat panel
+client/src/components/report-agent.tsx	~1100	Full intelligence logic
+server/routes.ts (lines 400-600)	~200	Report generation API
+TEST IDS REQUIRED
+input-audit-agent
+button-submit-query
+button-view-history
+prompt-library-{0-3}
+history-item-{n}
+ai-panel-overlay
+ai-assistant-panel
+button-close-panel
+input-panel-prompt
+button-attach-file
+button-send-message
+button-view-resource-{n}
+IMPLEMENTATION ORDER
+Schema first - Define all types in shared/schema.ts
+Storage layer - Add report CRUD to storage interface
+API routes - Add /api/generate-report and related endpoints
+AuditAgent component - Entry point with prompt routing
+AIAssistantPanel - Chat drawer with keyword intelligence
+ReportAgent - Full in-context editor (most complex)
+Wire into Home page - Connect with state management

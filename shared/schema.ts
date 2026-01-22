@@ -847,6 +847,128 @@ export function getNodeType(typeId: string): NodeTypeDefinition | undefined {
   return nodeTypeRegistry.find((nt) => nt.id === typeId);
 }
 
+// ============================================================================
+// AUDIT AGENT INTELLIGENCE SCHEMAS
+// These schemas power the AI Assistant's intelligence layer
+// ============================================================================
+
+/**
+ * Control Schema - For audit control intelligence
+ */
+export const controlSchema = z.object({
+  id: z.string(),
+  controlId: z.string(),
+  name: z.string(),
+  description: z.string(),
+  riskRating: z.enum(["High", "Medium", "Low"]),
+  controlType: z.enum(["Preventive", "Detective", "Corrective"]),
+  owner: z.string(),
+  frequency: z.string(),
+  lastTestDate: z.string().nullable(),
+  nextTestDate: z.string().nullable(),
+  testStatus: z.enum(["Not Started", "In Progress", "Pending Review", "Failed", "Passed", "Remediation"]),
+  framework: z.string(),
+});
+
+export type Control = z.infer<typeof controlSchema>;
+
+/**
+ * Task Schema - For task intelligence
+ */
+export const taskSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.enum(["Test", "Review", "Evidence", "Remediation", "Walkthrough"]),
+  controlId: z.string(),
+  status: z.enum(["Not Started", "In Progress", "Pending", "Blocked", "Completed"]),
+  dueDate: z.string(),
+  riskRating: z.enum(["High", "Medium", "Low"]),
+  assigneeId: z.string(),
+  assigneeName: z.string(),
+  dependency: z.string().nullable(),
+  blockerReason: z.string().nullable(),
+  sampleSize: z.number().nullable(),
+  evidenceRequired: z.boolean(),
+});
+
+export type Task = z.infer<typeof taskSchema>;
+
+/**
+ * Dashboard Metrics Interface - For intelligence queries
+ */
+export interface DashboardMetrics {
+  totalControls: number;
+  passedControls: number;
+  failedControls: number;
+  pendingReview: number;
+  overdueTests: number;
+  activeAudits: number;
+  findingsTotal: number;
+  remediationInProgress: number;
+}
+
+/**
+ * Report Chart Specification
+ */
+export const reportChartSpecSchema = z.object({
+  type: z.enum(["bar", "pie", "line"]),
+  data: z.array(z.number()),
+  labels: z.array(z.string()).optional(),
+  title: z.string().optional(),
+  position: z.enum(["above", "below", "inline"]).optional(),
+});
+
+export type ReportChartSpec = z.infer<typeof reportChartSpecSchema>;
+
+/**
+ * Report Section Schema
+ */
+export const reportSectionSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  content: z.string(),
+  charts: z.array(reportChartSpecSchema).default([]),
+});
+
+export type ReportSection = z.infer<typeof reportSectionSchema>;
+
+/**
+ * Generated Report Schema
+ */
+export const generatedReportSchema = z.object({
+  reportId: z.string(),
+  title: z.string(),
+  sections: z.array(reportSectionSchema),
+  toc: z.array(z.object({ id: z.string(), title: z.string() })),
+  createdAt: z.string(),
+  prompt: z.string().optional(),
+});
+
+export type GeneratedReport = z.infer<typeof generatedReportSchema>;
+
+/**
+ * Resource Reference - For assistant responses
+ */
+export interface ResourceReference {
+  type: "Task" | "Report" | "Control" | "PDF" | "Document" | "Risk";
+  title: string;
+  id?: string;
+  assignee?: string;
+  dueDate?: string;
+  recipients?: string;
+  status?: string;
+  route?: string;
+}
+
+/**
+ * Assistant Response with Resources
+ */
+export interface IntelligentAssistantResponse {
+  content: string;
+  resources?: ResourceReference[];
+  actions?: AssistantAction[];
+}
+
 /**
  * Group node types by family
  */
