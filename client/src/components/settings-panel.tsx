@@ -113,8 +113,8 @@ export function SettingsPanel() {
           <Wrench className="w-4 h-4 text-gray-400" />
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-80 overflow-y-auto" data-testid="settings-panel">
-        <SheetHeader>
+      <SheetContent className="w-80 overflow-y-auto p-6" data-testid="settings-panel">
+        <SheetHeader className="pb-2">
           <SheetTitle className="flex items-center gap-2">
             <Wrench className="w-5 h-5" />
             Prototype Settings

@@ -27,18 +27,18 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, actions, className = "" }: PageHeaderProps) {
   return (
-    <header className="flex flex-col gap-2 py-6 px-8 w-full bg-white pl-[24px] pr-[24px] pt-[16px] pb-[16px]">
+    <header className={`flex flex-col gap-2 py-6 px-8 w-full bg-white dark:bg-background pl-[24px] pr-[24px] pt-[16px] pb-[16px] ${className}`}>
       <div className="flex gap-4 items-start w-full flex-wrap">
         <div className="flex flex-1 flex-col justify-center min-w-0">
           <h1 
-            className="font-semibold text-gray-900 text-[20px]" 
+            className="font-semibold text-gray-900 dark:text-foreground text-[20px]" 
             data-testid="page-title"
           >
             {title}
           </h1>
           {description && (
             <p 
-              className="text-sm text-gray-500 mt-1"
+              className="text-sm text-gray-500 dark:text-muted-foreground mt-1"
               data-testid="page-description"
             >
               {description}

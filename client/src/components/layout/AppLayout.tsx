@@ -57,7 +57,7 @@ export function AppLayout({
   const sideNavTitle = isHomeModule ? currentWorkspace.name : currentModule.name;
   
   return (
-    <div className={`flex items-start relative h-screen overflow-hidden ${className}`}>
+    <div className={`flex items-start relative h-screen overflow-hidden bg-background ${className}`}>
       {showIconNav && (
         <LeftIconNavbar 
           items={iconNavItems} 

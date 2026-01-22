@@ -19,10 +19,10 @@ export function SideNavExpandButton({ className = "" }: SideNavExpandButtonProps
   return (
     <button
       onClick={() => setCollapsed(false)}
-      className={`fixed top-[74px] left-[60px] z-50 w-5 h-8 flex items-center justify-center bg-white border border-gray-200 rounded-r-md shadow-sm hover:bg-gray-50 transition-all duration-300 ease-in-out cursor-pointer ${className}`}
+      className={`fixed top-[74px] left-[60px] z-50 w-5 h-8 flex items-center justify-center bg-white dark:bg-card border border-gray-200 dark:border-border rounded-r-md shadow-sm hover:bg-gray-50 dark:hover:bg-accent transition-all duration-300 ease-in-out cursor-pointer ${className}`}
       data-testid="nav-expand-button"
     >
-      <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
+      <ChevronRight className="w-3.5 h-3.5 text-gray-500 dark:text-muted-foreground" />
     </button>
   );
 }

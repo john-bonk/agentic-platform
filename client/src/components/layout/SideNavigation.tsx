@@ -34,11 +34,11 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive }: Collaps
       <button
         onClick={isCollapsible ? onToggle : undefined}
         className={`flex items-center justify-between px-2 py-1.5 w-full text-left ${
-          isCollapsible ? "cursor-pointer hover:bg-gray-50 rounded transition-colors" : "cursor-default"
+          isCollapsible ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-accent rounded transition-colors" : "cursor-default"
         }`}
         data-testid={`nav-section-${section.id}`}
       >
-        <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+        <span className="text-xs font-medium text-gray-400 dark:text-muted-foreground uppercase tracking-wider">
           {section.title}
         </span>
         {isCollapsible && (
@@ -63,16 +63,16 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive }: Collaps
                   variant="ghost"
                   className={`h-[33px] w-full items-center gap-2 px-2 py-1.5 rounded flex justify-start ${
                     isActive(item.path)
-                      ? "bg-teal-50 hover:bg-teal-50" 
-                      : "hover:bg-gray-100"
+                      ? "bg-teal-50 dark:bg-primary/10 hover:bg-teal-50 dark:hover:bg-primary/10" 
+                      : "hover:bg-gray-100 dark:hover:bg-accent"
                   }`}
                   data-testid={`nav-item-${item.id}`}
                 >
                   <span
                     className={`flex-1 text-left text-sm whitespace-nowrap ${
                       isActive(item.path)
-                        ? "font-semibold text-teal-600"
-                        : "font-normal text-gray-600"
+                        ? "font-semibold text-teal-600 dark:text-primary"
+                        : "font-normal text-gray-600 dark:text-foreground"
                     }`}
                   >
                     {item.label}
@@ -176,27 +176,27 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
 
   return (
     <nav 
-      className={`relative flex items-start bg-gray-100 flex-shrink-0 h-full z-30 transition-all duration-300 ease-in-out ${
-        isCollapsed ? "w-0 border-r-0" : "w-[272px] border-r-[3px] border-r-gray-100"
+      className={`relative flex items-start bg-gray-100 dark:bg-muted flex-shrink-0 h-full z-30 transition-all duration-300 ease-in-out ${
+        isCollapsed ? "w-0 border-r-0" : "w-[272px] border-r-[3px] border-r-gray-100 dark:border-r-border"
       } ${className}`}
       data-testid="side-navigation"
     >
-      <div className={`flex flex-col h-full bg-white overflow-hidden transition-all duration-300 ease-in-out ${
+      <div className={`flex flex-col h-full bg-white dark:bg-card overflow-hidden transition-all duration-300 ease-in-out ${
         isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
       }`}>
         <header className="flex items-center justify-between pl-6 pr-1 py-6 flex-shrink-0">
           <h1 
-            className="font-semibold text-gray-900 text-lg leading-[1.2] whitespace-nowrap" 
+            className="font-semibold text-gray-900 dark:text-foreground text-lg leading-[1.2] whitespace-nowrap" 
             data-testid="navigation-title"
           >
             {title}
           </h1>
           <button
             onClick={() => setCollapsed(true)}
-            className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded transition-colors cursor-pointer"
+            className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors cursor-pointer"
             data-testid="nav-collapse-toggle-inline"
           >
-            <ChevronLeft className="w-4 h-4 text-gray-400" />
+            <ChevronLeft className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
           </button>
         </header>
 
