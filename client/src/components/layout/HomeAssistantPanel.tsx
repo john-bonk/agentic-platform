@@ -9,6 +9,7 @@
  */
 
 import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import { 
   Send, Bot, Sparkles, X, Loader2, 
   FileText, AlertTriangle, ClipboardList, 
@@ -242,7 +243,9 @@ function MessageBubble({ message, onResourceNavigate }: MessageBubbleProps) {
             <span className="text-xs font-medium text-[#266C92]">AuditBoard Assistant</span>
           </div>
         )}
-        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+        <div className="text-sm prose prose-sm dark:prose-invert max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&_strong]:font-semibold">
+          <ReactMarkdown>{message.content}</ReactMarkdown>
+        </div>
         
         {!isUser && message.resources && message.resources.length > 0 && (
           <div className="mt-3 space-y-2">
@@ -611,34 +614,27 @@ export function HomeAssistantPanel() {
         data-testid="home-assistant-backdrop"
       />
       <div 
-        className="fixed right-4 top-16 bottom-4 w-[420px] bg-white dark:bg-card rounded-lg shadow-xl border border-slate-200 dark:border-border flex flex-col z-50 overflow-hidden"
+        className="fixed right-0 top-0 bottom-0 w-[420px] bg-white dark:bg-card shadow-xl border-l border-slate-200 dark:border-border flex flex-col z-50 overflow-hidden"
         data-testid="home-assistant-panel"
       >
-        <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-[#266C92] to-[#1e5a7a]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-base font-semibold text-white">
-                  AuditBoard Assistant
-                </h3>
-                <p className="text-xs text-white/80">
-                  AI-powered help for {currentWorkspace.name}
-                </p>
-              </div>
+        <div className="h-12 px-3 flex items-center justify-between bg-gray-900 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+              <Bot className="w-4 h-4 text-white" />
             </div>
-            <Button 
-              size="icon" 
-              variant="ghost" 
-              className="text-white hover:bg-white/20"
-              onClick={() => setOpen(false)}
-              data-testid="button-close-assistant"
-            >
-              <X className="w-5 h-5" />
-            </Button>
+            <h3 className="text-sm font-medium text-white">
+              AuditBoard Assistant
+            </h3>
           </div>
+          <Button 
+            size="icon" 
+            variant="ghost" 
+            className="text-gray-400 w-9 h-9"
+            onClick={() => setOpen(false)}
+            data-testid="button-close-assistant"
+          >
+            <X className="w-5 h-5" />
+          </Button>
         </div>
         
         <ScrollArea className="flex-1 p-4">

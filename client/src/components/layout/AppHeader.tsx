@@ -46,6 +46,8 @@ import { useWorkspaceStore, type Workspace } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 import { CreateWorkspaceDialog } from "./CreateWorkspaceDialog";
 
+const ASSISTANT_PANEL_WIDTH = 420;
+
 interface AppHeaderProps {
   activeTab?: Tab | null;
   className?: string;
@@ -68,7 +70,7 @@ const utilityIcons = [
 
 export function AppHeader({ className = "" }: AppHeaderProps) {
   const { currentWorkspace, setWorkspace, getAllWorkspaces, refreshKey } = useWorkspaceStore();
-  const { toggleOpen: toggleAssistant } = useHomeAssistantStore();
+  const { toggleOpen: toggleAssistant, isOpen: isAssistantOpen } = useHomeAssistantStore();
   const [, setLocation] = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -179,7 +181,13 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
           </DropdownMenu>
         </div>
 
-        <div className="absolute left-1/2 -translate-x-1/2 w-full max-w-md px-4">
+        <div 
+          className="absolute w-full max-w-md px-4 transition-all duration-300"
+          style={{ 
+            left: isAssistantOpen ? `calc(50% - ${ASSISTANT_PANEL_WIDTH / 2}px)` : '50%',
+            transform: 'translateX(-50%)'
+          }}
+        >
           <Popover open={searchOpen} onOpenChange={setSearchOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -259,7 +267,10 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
           </Popover>
         </div>
 
-        <div className="flex items-center gap-1 z-10">
+        <div 
+          className="flex items-center gap-1 z-10 transition-all duration-300"
+          style={{ marginRight: isAssistantOpen ? `${ASSISTANT_PANEL_WIDTH}px` : 0 }}
+        >
           {utilityIcons.map((item, index) => (
             <Button
               key={index}
