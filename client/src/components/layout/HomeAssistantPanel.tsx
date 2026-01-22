@@ -458,8 +458,11 @@ export function HomeAssistantPanel() {
 
   const isReportRequest = (text: string): boolean => {
     const lower = text.toLowerCase();
-    const reportKeywords = ["create a report", "generate a report", "make a report", "build a report", "write a report", "produce a report", "create report", "generate report"];
-    return reportKeywords.some(keyword => lower.includes(keyword));
+    // Check for action verbs followed eventually by "report"
+    const actionVerbs = ["create", "generate", "make", "build", "write", "produce", "prepare", "draft", "compile"];
+    const hasActionVerb = actionVerbs.some(verb => lower.includes(verb));
+    const hasReport = lower.includes("report");
+    return hasActionVerb && hasReport;
   };
 
   const handleGenerateReport = async (prompt: string) => {
