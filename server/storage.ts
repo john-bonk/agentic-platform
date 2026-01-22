@@ -12,6 +12,10 @@ import {
   type WorkflowEdge, type InsertEdge,
   type AssistantSession, type InsertSession,
   type ChatMessage,
+  type Control,
+  type Task,
+  type DashboardMetrics,
+  type GeneratedReport,
 } from "@shared/schema";
 import { SEEDED_WORKFLOW_IDS } from "@shared/seededData";
 import { randomUUID } from "crypto";
@@ -89,6 +93,16 @@ export interface IStorage {
   createSession(session: InsertSession): Promise<AssistantSession>;
   updateSession(id: string, session: Partial<InsertSession>): Promise<AssistantSession | undefined>;
   addMessageToSession(sessionId: string, message: ChatMessage): Promise<AssistantSession | undefined>;
+  
+  // Intelligence Layer
+  getControls(): Promise<Control[]>;
+  getControl(id: string): Promise<Control | undefined>;
+  getTasks(): Promise<Task[]>;
+  getTask(id: string): Promise<Task | undefined>;
+  getDashboardMetrics(): Promise<DashboardMetrics>;
+  getReports(): Promise<GeneratedReport[]>;
+  getReport(id: string): Promise<GeneratedReport | undefined>;
+  createReport(report: GeneratedReport): Promise<GeneratedReport>;
 }
 
 /**
@@ -100,6 +114,9 @@ export class MemStorage implements IStorage {
   private nodes: Map<string, WorkflowNode>;
   private edges: Map<string, WorkflowEdge>;
   private sessions: Map<string, AssistantSession>;
+  private controls: Map<string, Control>;
+  private tasks: Map<string, Task>;
+  private reports: Map<string, GeneratedReport>;
 
   constructor() {
     this.users = new Map();
@@ -107,8 +124,40 @@ export class MemStorage implements IStorage {
     this.nodes = new Map();
     this.edges = new Map();
     this.sessions = new Map();
+    this.controls = new Map();
+    this.tasks = new Map();
+    this.reports = new Map();
     
     this.seedExampleData();
+    this.seedIntelligenceData();
+  }
+  
+  private seedIntelligenceData() {
+    // Mock Controls for intelligence queries
+    const mockControls: Control[] = [
+      { id: "ctrl-1", controlId: "SOX-IT-001", name: "Access Management Review", description: "Quarterly review of user access rights across critical systems", riskRating: "High", controlType: "Detective", owner: "John Smith", frequency: "Quarterly", lastTestDate: "2024-09-15", nextTestDate: "2024-12-15", testStatus: "Passed", framework: "SOX" },
+      { id: "ctrl-2", controlId: "SOX-IT-002", name: "Change Management Approval", description: "All production changes require documented approval", riskRating: "High", controlType: "Preventive", owner: "Sarah Johnson", frequency: "Continuous", lastTestDate: "2024-10-01", nextTestDate: "2025-01-01", testStatus: "In Progress", framework: "SOX" },
+      { id: "ctrl-3", controlId: "SOX-FIN-001", name: "Journal Entry Review", description: "Manual journal entries reviewed by controller", riskRating: "High", controlType: "Detective", owner: "Mike Williams", frequency: "Monthly", lastTestDate: "2024-10-15", nextTestDate: "2024-11-15", testStatus: "Pending Review", framework: "SOX" },
+      { id: "ctrl-4", controlId: "SOX-FIN-002", name: "Bank Reconciliation", description: "Monthly bank account reconciliation and approval", riskRating: "Medium", controlType: "Detective", owner: "Emily Brown", frequency: "Monthly", lastTestDate: "2024-10-20", nextTestDate: "2024-11-20", testStatus: "Passed", framework: "SOX" },
+      { id: "ctrl-5", controlId: "ISO-SEC-001", name: "Vulnerability Scanning", description: "Weekly automated vulnerability scans", riskRating: "High", controlType: "Detective", owner: "David Lee", frequency: "Weekly", lastTestDate: "2024-10-25", nextTestDate: "2024-11-01", testStatus: "Failed", framework: "ISO 27001" },
+      { id: "ctrl-6", controlId: "ISO-SEC-002", name: "Incident Response Testing", description: "Annual incident response drill", riskRating: "High", controlType: "Corrective", owner: "Lisa Chen", frequency: "Annual", lastTestDate: "2024-03-15", nextTestDate: "2025-03-15", testStatus: "Passed", framework: "ISO 27001" },
+      { id: "ctrl-7", controlId: "SOX-IT-003", name: "Backup Verification", description: "Weekly backup testing and verification", riskRating: "Medium", controlType: "Detective", owner: "Tom Garcia", frequency: "Weekly", lastTestDate: "2024-10-22", nextTestDate: "2024-10-29", testStatus: "Passed", framework: "SOX" },
+      { id: "ctrl-8", controlId: "SOX-FIN-003", name: "Revenue Recognition Review", description: "Monthly revenue recognition cutoff testing", riskRating: "High", controlType: "Detective", owner: "Anna Martinez", frequency: "Monthly", lastTestDate: "2024-09-30", nextTestDate: "2024-10-31", testStatus: "Remediation", framework: "SOX" },
+    ];
+    
+    mockControls.forEach(c => this.controls.set(c.id, c));
+    
+    // Mock Tasks for intelligence queries
+    const mockTasks: Task[] = [
+      { id: "task-1", name: "Q4 Access Review Testing", type: "Test", controlId: "ctrl-1", status: "In Progress", dueDate: "2024-11-15", riskRating: "High", assigneeId: "user-1", assigneeName: "John Smith", dependency: null, blockerReason: null, sampleSize: 25, evidenceRequired: true },
+      { id: "task-2", name: "Change Management Evidence Collection", type: "Evidence", controlId: "ctrl-2", status: "Pending", dueDate: "2024-11-20", riskRating: "High", assigneeId: "user-2", assigneeName: "Sarah Johnson", dependency: "task-1", blockerReason: null, sampleSize: null, evidenceRequired: true },
+      { id: "task-3", name: "Journal Entry Walkthrough", type: "Walkthrough", controlId: "ctrl-3", status: "Not Started", dueDate: "2024-11-25", riskRating: "High", assigneeId: "user-3", assigneeName: "Mike Williams", dependency: null, blockerReason: null, sampleSize: null, evidenceRequired: false },
+      { id: "task-4", name: "Vulnerability Remediation", type: "Remediation", controlId: "ctrl-5", status: "Blocked", dueDate: "2024-11-10", riskRating: "High", assigneeId: "user-4", assigneeName: "David Lee", dependency: null, blockerReason: "Waiting for vendor patch", sampleSize: null, evidenceRequired: true },
+      { id: "task-5", name: "Revenue Recognition Sample Testing", type: "Test", controlId: "ctrl-8", status: "In Progress", dueDate: "2024-11-08", riskRating: "High", assigneeId: "user-5", assigneeName: "Anna Martinez", dependency: null, blockerReason: null, sampleSize: 30, evidenceRequired: true },
+      { id: "task-6", name: "Backup Verification Review", type: "Review", controlId: "ctrl-7", status: "Completed", dueDate: "2024-10-28", riskRating: "Medium", assigneeId: "user-6", assigneeName: "Tom Garcia", dependency: null, blockerReason: null, sampleSize: null, evidenceRequired: false },
+    ];
+    
+    mockTasks.forEach(t => this.tasks.set(t.id, t));
   }
 
   private seedExampleData() {
@@ -763,6 +812,52 @@ export class MemStorage implements IStorage {
     };
     this.sessions.set(sessionId, updated);
     return updated;
+  }
+  
+  // Intelligence Layer Methods
+  async getControls(): Promise<Control[]> {
+    return Array.from(this.controls.values());
+  }
+  
+  async getControl(id: string): Promise<Control | undefined> {
+    return this.controls.get(id);
+  }
+  
+  async getTasks(): Promise<Task[]> {
+    return Array.from(this.tasks.values());
+  }
+  
+  async getTask(id: string): Promise<Task | undefined> {
+    return this.tasks.get(id);
+  }
+  
+  async getDashboardMetrics(): Promise<DashboardMetrics> {
+    const controls = Array.from(this.controls.values());
+    const tasks = Array.from(this.tasks.values());
+    
+    return {
+      totalControls: controls.length,
+      passedControls: controls.filter(c => c.testStatus === "Passed").length,
+      failedControls: controls.filter(c => c.testStatus === "Failed").length,
+      pendingReview: controls.filter(c => c.testStatus === "Pending Review").length,
+      overdueTests: tasks.filter(t => new Date(t.dueDate) < new Date() && t.status !== "Completed").length,
+      activeAudits: 3,
+      findingsTotal: 12,
+      remediationInProgress: controls.filter(c => c.testStatus === "Remediation").length,
+    };
+  }
+  
+  async getReports(): Promise<GeneratedReport[]> {
+    return Array.from(this.reports.values());
+  }
+  
+  async getReport(id: string): Promise<GeneratedReport | undefined> {
+    return this.reports.get(id);
+  }
+  
+  async createReport(report: GeneratedReport): Promise<GeneratedReport> {
+    this.reports.set(report.reportId, report);
+    return report;
   }
 }
 
