@@ -52,6 +52,7 @@ import {
   AdminWorkspacesPage,
   AdminPermissionsPage,
   PrototypeMetaPage,
+  GeneratedReportPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -94,6 +95,7 @@ function Router() {
       
       {/* Reporting Routes */}
       <Route path="/reporting" component={ReportingPage} />
+      <Route path="/reporting/generated/:reportId" component={GeneratedReportPage} />
       <Route path="/reporting/view/:deckId" component={SlideViewerPage} />
       <Route path="/reporting/board-reports" component={ReportingPage} />
       <Route path="/reporting/audit-committee" component={ReportingPage} />

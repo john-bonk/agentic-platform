@@ -990,42 +990,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reportId = randomUUID();
       const now = new Date().toISOString();
       
-      // Generate report sections based on prompt keywords
+      // Generate report sections based on prompt keywords - dynamic topic detection
       const lowerPrompt = prompt.toLowerCase();
       let title = "Generated Report";
       let sections = [];
       
+      // Extract topic from prompt for dynamic title generation
+      const extractTopic = (text: string): string => {
+        const topicMatch = text.match(/(?:report\s+(?:on|about|for)\s+)([^.!?]+)/i);
+        if (topicMatch) return topicMatch[1].trim();
+        const onMatch = text.match(/(?:on|about)\s+([^.!?]+)/i);
+        if (onMatch) return onMatch[1].trim();
+        return "";
+      };
+      const extractedTopic = extractTopic(prompt);
+      
       if (lowerPrompt.includes("sox") || lowerPrompt.includes("compliance")) {
         title = "SOX Compliance Status Report";
         sections = [
-          { id: "sec1", title: "Executive Summary", content: "This report provides a comprehensive overview of SOX compliance status across all key controls and processes.", charts: [{ type: "pie" as const, data: [75, 15, 10], labels: ["Passed", "In Progress", "Failed"], title: "Control Status" }] },
-          { id: "sec2", title: "Control Testing Results", content: "Of the 8 SOX controls tested this quarter, 5 passed (62.5%), 2 are in progress, and 1 failed requiring remediation.", charts: [] },
-          { id: "sec3", title: "High-Risk Findings", content: "One high-risk finding identified: Vulnerability Scanning (ISO-SEC-001) failed testing and requires immediate attention.", charts: [] },
-          { id: "sec4", title: "Remediation Status", content: "Revenue Recognition Review (SOX-FIN-003) is currently in remediation with an expected completion date of November 30, 2024.", charts: [] },
-          { id: "sec5", title: "Recommendations", content: "1. Prioritize patch deployment for vulnerability scanning failures.\n2. Increase testing sample size for revenue recognition controls.\n3. Consider automation for continuous control monitoring.", charts: [] },
+          { id: "sec1", title: "Executive Summary", content: "This report provides a comprehensive overview of SOX compliance status across all key controls and processes. Our analysis indicates strong overall compliance posture with focused attention needed on remediation activities.", charts: [{ type: "pie" as const, data: [75, 15, 10], labels: ["Passed", "In Progress", "Failed"], title: "Control Status" }] },
+          { id: "sec2", title: "Control Testing Results", content: "Of the 8 SOX controls tested this quarter, 5 passed (62.5%), 2 are in progress, and 1 failed requiring remediation.\n\nKey observations:\n• Access Management controls performing well\n• Financial reporting controls on track\n• IT General Controls require additional attention", charts: [{ type: "bar" as const, data: [5, 2, 1], labels: ["Passed", "In Progress", "Failed"], title: "Q4 Testing Progress" }] },
+          { id: "sec3", title: "High-Risk Findings", content: "One high-risk finding identified: Vulnerability Scanning (ISO-SEC-001) failed testing and requires immediate attention.\n\nRoot Cause: Incomplete patch deployment cycle\nImpact: Potential security exposure\nOwner: IT Security Team", charts: [] },
+          { id: "sec4", title: "Remediation Status", content: "Revenue Recognition Review (SOX-FIN-003) is currently in remediation with an expected completion date of November 30, 2024.\n\nRemediation Progress:\n• Gap analysis completed\n• Control design updated\n• Testing scheduled for Q1 2025", charts: [{ type: "line" as const, data: [20, 45, 65, 78, 90], labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"], title: "Remediation Progress %" }] },
+          { id: "sec5", title: "Recommendations", content: "1. Prioritize patch deployment for vulnerability scanning failures.\n2. Increase testing sample size for revenue recognition controls.\n3. Consider automation for continuous control monitoring.\n4. Implement real-time alerting for control exceptions.\n5. Schedule quarterly compliance review with audit committee.", charts: [] },
+        ];
+      } else if (lowerPrompt.includes("tariff") || lowerPrompt.includes("trade") || lowerPrompt.includes("supply chain")) {
+        title = extractedTopic ? `Tariff Impact Analysis: ${extractedTopic.charAt(0).toUpperCase() + extractedTopic.slice(1)}` : "Tariff & Trade Impact Analysis";
+        sections = [
+          { id: "sec1", title: "Executive Summary", content: "This analysis examines the impact of current and proposed tariff policies on enterprise operations. Key findings indicate significant exposure in APAC supply chains with mitigation strategies recommended.", charts: [{ type: "pie" as const, data: [45, 30, 25], labels: ["APAC", "EMEA", "Americas"], title: "Exposure by Region" }] },
+          { id: "sec2", title: "Current Tariff Landscape", content: "Recent policy changes have increased tariff rates on key categories:\n\n• Electronics components: 25% → 35%\n• Raw materials: 10% → 18%\n• Finished goods: 15% → 22%\n\nTotal estimated annual impact: $18.7M additional costs", charts: [{ type: "bar" as const, data: [35, 18, 22], labels: ["Electronics", "Raw Materials", "Finished Goods"], title: "Tariff Rates %" }] },
+          { id: "sec3", title: "Vendor Exposure Analysis", content: "127 active vendors analyzed across supply chain:\n\n• High Risk (23 vendors): Direct tariff exposure > $500K\n• Medium Risk (45 vendors): Exposure $100K-$500K\n• Low Risk (59 vendors): Exposure < $100K\n\nTop exposed vendors: Supplier A ($3.2M), Supplier B ($2.8M), Supplier C ($2.1M)", charts: [{ type: "bar" as const, data: [23, 45, 59], labels: ["High Risk", "Medium Risk", "Low Risk"], title: "Vendors by Risk Level" }] },
+          { id: "sec4", title: "Mitigation Strategies", content: "Recommended actions to reduce tariff exposure:\n\n1. Diversify supply base - identify alternative suppliers in exempt regions\n2. Reclassification review - work with customs broker on HTS code optimization\n3. Supply chain restructuring - evaluate nearshoring options\n4. Cost pass-through analysis - assess pricing impact on customers\n5. Inventory strategy - pre-purchase critical components before rate increases", charts: [] },
+          { id: "sec5", title: "Financial Impact & Timeline", content: "Implementation of recommended strategies expected to reduce exposure by 40% within 12 months.\n\nProjected savings:\n• Q1: $1.2M\n• Q2: $2.8M\n• Q3: $4.1M\n• Q4: $5.5M", charts: [{ type: "line" as const, data: [1.2, 2.8, 4.1, 5.5], labels: ["Q1", "Q2", "Q3", "Q4"], title: "Projected Savings ($M)" }] },
+        ];
+      } else if (lowerPrompt.includes("security") || lowerPrompt.includes("cyber") || lowerPrompt.includes("vulnerability") || lowerPrompt.includes("log4j")) {
+        title = extractedTopic ? `Cybersecurity Assessment: ${extractedTopic.charAt(0).toUpperCase() + extractedTopic.slice(1)}` : "Cybersecurity & Vulnerability Report";
+        sections = [
+          { id: "sec1", title: "Security Posture Overview", content: "Current security posture analysis indicates moderate risk level with active remediation efforts underway. Critical vulnerabilities down 45% from previous quarter.", charts: [{ type: "pie" as const, data: [12, 28, 60], labels: ["Critical", "Medium", "Low"], title: "Vulnerability Distribution" }] },
+          { id: "sec2", title: "Critical Findings", content: "Active critical vulnerabilities requiring immediate attention:\n\n• CVE-2024-1234: Remote code execution in web framework\n• Log4j variants: 3 systems still pending patches\n• Expired certificates: 2 production systems\n\nMTTR (Mean Time to Remediate): 14 days for critical issues", charts: [{ type: "bar" as const, data: [3, 2, 7], labels: ["RCE Vulns", "Certificate Issues", "Config Issues"], title: "Issues by Category" }] },
+          { id: "sec3", title: "Remediation Progress", content: "Overall remediation rate: 87% complete\n\nLog4j Specific Status:\n• 156 of 162 affected systems patched (96%)\n• 6 systems pending vendor patch availability\n• Compensating controls in place for unpatched systems", charts: [{ type: "line" as const, data: [45, 78, 112, 145, 156], labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"], title: "Systems Patched" }] },
+          { id: "sec4", title: "Risk Mitigation Actions", content: "1. Deploy emergency patches within 48 hours of release\n2. Implement network segmentation for legacy systems\n3. Enable enhanced logging and monitoring\n4. Conduct tabletop exercise for incident response\n5. Review and update incident response playbooks", charts: [] },
+          { id: "sec5", title: "Compliance Status", content: "Security framework compliance:\n\n• SOC 2 Type II: Compliant\n• ISO 27001: Audit scheduled Q1 2025\n• NIST CSF: 82% implementation\n• PCI DSS: Compliant (last audit: Oct 2024)", charts: [{ type: "bar" as const, data: [100, 82, 100, 95], labels: ["SOC 2", "NIST CSF", "PCI DSS", "ISO 27001"], title: "Framework Compliance %" }] },
+        ];
+      } else if (lowerPrompt.includes("vendor") || lowerPrompt.includes("third party") || lowerPrompt.includes("supplier")) {
+        title = extractedTopic ? `Vendor Risk Assessment: ${extractedTopic.charAt(0).toUpperCase() + extractedTopic.slice(1)}` : "Third-Party Vendor Risk Report";
+        sections = [
+          { id: "sec1", title: "Vendor Portfolio Overview", content: "Analysis of 245 active third-party relationships across critical business functions. Risk concentration identified in IT services and cloud infrastructure vendors.", charts: [{ type: "pie" as const, data: [45, 35, 20], labels: ["IT Services", "Cloud/SaaS", "Professional Services"], title: "Vendors by Category" }] },
+          { id: "sec2", title: "Risk Assessment Results", content: "Tiered risk classification:\n\n• Tier 1 (Critical): 18 vendors with high business impact\n• Tier 2 (Significant): 52 vendors with moderate impact\n• Tier 3 (Standard): 175 vendors with lower impact\n\n23% of Tier 1 vendors have outstanding security questionnaires", charts: [{ type: "bar" as const, data: [18, 52, 175], labels: ["Tier 1", "Tier 2", "Tier 3"], title: "Vendors by Risk Tier" }] },
+          { id: "sec3", title: "Due Diligence Status", content: "Annual assessment completion:\n\n• Completed: 189 vendors (77%)\n• In Progress: 38 vendors (16%)\n• Overdue: 18 vendors (7%)\n\nAll Tier 1 vendors current on assessments.", charts: [{ type: "pie" as const, data: [77, 16, 7], labels: ["Completed", "In Progress", "Overdue"], title: "Assessment Status %" }] },
+          { id: "sec4", title: "Concentration Risk", content: "Single-source dependency identified for:\n\n• Cloud infrastructure: 1 provider (AWS)\n• Payment processing: 1 provider (Stripe)\n• HRIS platform: 1 provider (Workday)\n\nRecommendation: Develop contingency plans for Tier 1 single-source vendors", charts: [] },
+          { id: "sec5", title: "Action Items", content: "1. Complete overdue vendor assessments within 30 days\n2. Establish backup provider for critical cloud services\n3. Implement continuous monitoring for Tier 1 vendors\n4. Update contract language to require SOC 2 attestation\n5. Schedule quarterly vendor review meetings", charts: [] },
         ];
       } else if (lowerPrompt.includes("risk") || lowerPrompt.includes("assessment")) {
-        title = "Risk Assessment Summary";
+        title = extractedTopic ? `Risk Assessment: ${extractedTopic.charAt(0).toUpperCase() + extractedTopic.slice(1)}` : "Enterprise Risk Assessment Summary";
         sections = [
-          { id: "sec1", title: "Risk Overview", content: "Current risk landscape shows 3 high-priority risks requiring executive attention.", charts: [{ type: "bar" as const, data: [3, 12, 45], labels: ["High", "Medium", "Low"], title: "Risk Distribution" }] },
-          { id: "sec2", title: "Critical Risks", content: "The following risks have been identified as critical:\n• Tariff exposure in supply chain\n• M&A integration complexity\n• Log4j vulnerability remediation timeline", charts: [] },
-          { id: "sec3", title: "Mitigation Progress", content: "Risk mitigation efforts are 78% complete across all identified risks with expected full remediation by Q1 2025.", charts: [] },
-          { id: "sec4", title: "Next Steps", content: "Schedule quarterly risk review meeting with all stakeholders to assess mitigation effectiveness.", charts: [] },
+          { id: "sec1", title: "Risk Overview", content: "Current risk landscape shows 3 high-priority risks requiring executive attention. Overall risk posture has improved 15% from previous quarter due to successful mitigation efforts.", charts: [{ type: "bar" as const, data: [3, 12, 45], labels: ["High", "Medium", "Low"], title: "Risk Distribution" }] },
+          { id: "sec2", title: "Critical Risks", content: "The following risks have been identified as critical:\n\n• Tariff exposure in supply chain - $18.7M potential impact\n• M&A integration complexity - Timeline at risk\n• Log4j vulnerability remediation timeline - 6 systems pending\n• Key person dependency in finance - Single point of failure", charts: [] },
+          { id: "sec3", title: "Emerging Risks", content: "New risks identified this quarter:\n\n1. AI governance and compliance requirements\n2. Remote work security challenges\n3. Economic uncertainty impact on customer base\n4. Regulatory changes in key markets", charts: [{ type: "bar" as const, data: [8, 6, 7, 5], labels: ["AI Governance", "Remote Security", "Economic", "Regulatory"], title: "Emerging Risk Severity" }] },
+          { id: "sec4", title: "Mitigation Progress", content: "Risk mitigation efforts are 78% complete across all identified risks with expected full remediation by Q1 2025.\n\nTop achievements:\n• Vendor diversification program launched\n• Security patch deployment accelerated\n• Business continuity plans updated", charts: [{ type: "line" as const, data: [35, 52, 68, 78], labels: ["Q1", "Q2", "Q3", "Q4"], title: "Mitigation Progress %" }] },
+          { id: "sec5", title: "Next Steps", content: "1. Schedule quarterly risk review meeting with all stakeholders\n2. Update risk appetite statement for board approval\n3. Implement real-time risk monitoring dashboard\n4. Conduct scenario planning for top 3 risks\n5. Review insurance coverage for identified risks", charts: [] },
         ];
       } else if (lowerPrompt.includes("audit") || lowerPrompt.includes("finding")) {
-        title = "Audit Findings Report";
+        title = extractedTopic ? `Audit Report: ${extractedTopic.charAt(0).toUpperCase() + extractedTopic.slice(1)}` : "Internal Audit Findings Report";
         sections = [
-          { id: "sec1", title: "Audit Scope", content: "This report covers audit findings from Q4 2024 across financial, operational, and IT audit domains.", charts: [] },
-          { id: "sec2", title: "Summary of Findings", content: "12 total findings identified: 2 critical, 4 high, 3 medium, 3 low severity.", charts: [{ type: "bar" as const, data: [2, 4, 3, 3], labels: ["Critical", "High", "Medium", "Low"], title: "Findings by Severity" }] },
-          { id: "sec3", title: "Critical Findings Detail", content: "• Finding #1: Inadequate segregation of duties in financial systems (Remediation in progress)\n• Finding #2: Incomplete vendor risk documentation (Action plan developed)", charts: [] },
-          { id: "sec4", title: "Management Response", content: "Management has committed to addressing all critical and high findings within 60 days.", charts: [] },
+          { id: "sec1", title: "Audit Scope", content: "This report covers audit findings from Q4 2024 across financial, operational, and IT audit domains. 8 audits completed with 12 findings identified.", charts: [] },
+          { id: "sec2", title: "Summary of Findings", content: "12 total findings identified: 2 critical, 4 high, 3 medium, 3 low severity.\n\nBreakdown by domain:\n• Financial Controls: 4 findings\n• IT General Controls: 5 findings\n• Operational: 3 findings", charts: [{ type: "bar" as const, data: [2, 4, 3, 3], labels: ["Critical", "High", "Medium", "Low"], title: "Findings by Severity" }] },
+          { id: "sec3", title: "Critical Findings Detail", content: "Finding #1: Inadequate segregation of duties in financial systems\n• Risk: Potential for unauthorized transactions\n• Status: Remediation in progress\n• Target: December 31, 2024\n\nFinding #2: Incomplete vendor risk documentation\n• Risk: Third-party exposure unknown\n• Status: Action plan developed\n• Target: January 15, 2025", charts: [] },
+          { id: "sec4", title: "Remediation Tracking", content: "Overall finding remediation status:\n\n• Completed: 45%\n• In Progress: 35%\n• Not Started: 20%\n\nAverage remediation time: 42 days", charts: [{ type: "pie" as const, data: [45, 35, 20], labels: ["Completed", "In Progress", "Not Started"], title: "Remediation Status" }] },
+          { id: "sec5", title: "Management Response", content: "Management has committed to addressing all critical and high findings within 60 days. Resource allocation approved for remediation efforts. Monthly progress reviews scheduled with audit committee.", charts: [] },
         ];
       } else {
-        title = "Control Status Report";
+        // Dynamic fallback - use extracted topic or generic
+        title = extractedTopic ? `Analysis Report: ${extractedTopic.charAt(0).toUpperCase() + extractedTopic.slice(1)}` : "Control Status Report";
         sections = [
-          { id: "sec1", title: "Summary", content: `Report generated based on prompt: "${prompt}"`, charts: [] },
-          { id: "sec2", title: "Current Status", content: "8 controls tracked, 5 passed, 2 in progress, 1 failed.", charts: [{ type: "pie" as const, data: [5, 2, 1], labels: ["Passed", "In Progress", "Failed"], title: "Control Status" }] },
-          { id: "sec3", title: "Recommendations", content: "Continue monitoring and testing cadence for all controls.", charts: [] },
+          { id: "sec1", title: "Executive Summary", content: `This report provides analysis based on your request: "${prompt}"\n\nKey areas covered:\n• Current status assessment\n• Risk identification\n• Recommendations for improvement`, charts: [] },
+          { id: "sec2", title: "Current Status", content: "8 controls tracked across the organization:\n\n• Passed: 5 controls (62.5%)\n• In Progress: 2 controls (25%)\n• Failed: 1 control (12.5%)\n\nOverall control effectiveness trending upward.", charts: [{ type: "pie" as const, data: [5, 2, 1], labels: ["Passed", "In Progress", "Failed"], title: "Control Status" }] },
+          { id: "sec3", title: "Key Observations", content: "Analysis reveals the following patterns:\n\n1. Strong performance in financial controls\n2. IT controls require additional attention\n3. Process improvements showing positive results\n4. Resource constraints impacting testing velocity", charts: [{ type: "bar" as const, data: [85, 72, 90, 68], labels: ["Financial", "IT", "Operational", "Compliance"], title: "Control Effectiveness %" }] },
+          { id: "sec4", title: "Risk Areas", content: "The following areas have been identified as requiring attention:\n\n• Documentation gaps in 3 control areas\n• Testing frequency below target for 2 controls\n• Pending remediation actions on 1 failed control", charts: [] },
+          { id: "sec5", title: "Recommendations", content: "1. Continue monitoring and testing cadence for all controls\n2. Allocate additional resources to IT control testing\n3. Implement automated control monitoring where feasible\n4. Schedule quarterly review with control owners\n5. Update control documentation to address gaps", charts: [] },
         ];
       }
       

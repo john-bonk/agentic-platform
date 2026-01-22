@@ -456,6 +456,50 @@ export function HomeAssistantPanel() {
     ? genericQuickActions 
     : (workspaceQuickActions[currentWorkspace.id] || workspaceQuickActions["enterprise-risk"]);
 
+  const isReportRequest = (text: string): boolean => {
+    const lower = text.toLowerCase();
+    const reportKeywords = ["create a report", "generate a report", "make a report", "build a report", "write a report", "produce a report", "create report", "generate report"];
+    return reportKeywords.some(keyword => lower.includes(keyword));
+  };
+
+  const handleGenerateReport = async (prompt: string) => {
+    setBuildingReport({ active: true, deckKey: "generated", step: 0 });
+    
+    try {
+      const res = await apiRequest("POST", "/api/generate-report", { prompt });
+      const report = await res.json();
+      
+      addMessage({
+        id: `msg-${Date.now()}-report`,
+        role: "assistant",
+        content: `I've generated a comprehensive report: **${report.title}**\n\nThe report includes ${report.sections.length} sections with detailed analysis and visualizations. Click below to view the full report.`,
+        timestamp: new Date().toISOString(),
+        resources: [{
+          type: "Report",
+          title: report.title,
+          id: report.reportId,
+          status: "Generated",
+          route: `/reporting/generated/${report.reportId}`,
+        }],
+      });
+      
+      setTimeout(() => {
+        setBuildingReport(null);
+        setOpen(false);
+        setLocation(`/reporting/generated/${report.reportId}`);
+      }, 500);
+    } catch (error) {
+      console.error("Report generation error:", error);
+      setBuildingReport(null);
+      addMessage({
+        id: `msg-${Date.now()}-err`,
+        role: "assistant",
+        content: "I encountered an error generating the report. Please try again.",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  };
+
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading) return;
     
@@ -467,7 +511,14 @@ export function HomeAssistantPanel() {
     };
     
     addMessage(userMessage);
+    const messageText = inputValue.trim();
     setInputValue("");
+    
+    if (isReportRequest(messageText)) {
+      await handleGenerateReport(messageText);
+      return;
+    }
+    
     setLoading(true);
     
     try {

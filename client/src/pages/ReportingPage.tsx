@@ -2,6 +2,7 @@
  * Reporting Page
  * 
  * Central hub for all report artifacts, slide decks, and exports.
+ * Now includes dynamically generated AI reports that session-persist.
  */
 
 import { AppLayout, PageHeader } from "@/components/layout";
@@ -11,9 +12,18 @@ import { Badge } from "@/components/ui/badge";
 import { 
   FileText, Download, Calendar, Clock, 
   BarChart3, PieChart, TrendingUp, Users,
-  Shield, AlertTriangle, CheckCircle2, Plus
+  Shield, AlertTriangle, CheckCircle2, Plus, Sparkles, Bot
 } from "lucide-react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+
+interface GeneratedReport {
+  reportId: string;
+  title: string;
+  sections: { id: string; title: string }[];
+  createdAt: string;
+  prompt?: string;
+}
 
 interface ReportArtifact {
   id: string;
@@ -99,6 +109,11 @@ const getStatusBadge = (status: string) => {
 
 export default function ReportingPage() {
   const [, setLocation] = useLocation();
+  
+  const { data: generatedReports = [] } = useQuery<GeneratedReport[]>({
+    queryKey: ["/api/reports"],
+    refetchInterval: 5000,
+  });
 
   return (
     <AppLayout>
@@ -173,6 +188,72 @@ export default function ReportingPage() {
               </CardContent>
             </Card>
           </div>
+
+          {generatedReports.length > 0 && (
+            <Card data-testid="ai-generated-reports" className="mb-6 border-[#266C92]/20">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#266C92]/10 flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-[#266C92]" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">AI Generated Reports</CardTitle>
+                    <CardDescription className="text-xs">
+                      Reports created by the AuditBoard Assistant
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {generatedReports.map((report) => (
+                    <div 
+                      key={report.reportId}
+                      className="flex items-center justify-between p-4 rounded-lg border border-[#266C92]/20 bg-[#266C92]/5 dark:bg-[#266C92]/10 hover-elevate cursor-pointer"
+                      onClick={() => setLocation(`/reporting/generated/${report.reportId}`)}
+                      data-testid={`ai-report-item-${report.reportId}`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-[#266C92]/20 flex items-center justify-center">
+                          <Bot className="w-5 h-5 text-[#266C92]" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900 dark:text-foreground">{report.title}</h4>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="default" className="bg-[#266C92]/20 text-[#266C92] text-xs">
+                              <Sparkles className="w-3 h-3 mr-1" />
+                              AI Generated
+                            </Badge>
+                            <span className="text-xs text-gray-500 dark:text-muted-foreground">
+                              {report.sections?.length || 0} sections
+                            </span>
+                            <span className="text-xs text-gray-300 dark:text-border">|</span>
+                            <span className="text-xs text-gray-500 dark:text-muted-foreground">
+                              {new Date(report.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          {report.prompt && (
+                            <p className="text-xs text-gray-400 dark:text-muted-foreground mt-1 italic truncate max-w-md">
+                              "{report.prompt}"
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                          <CheckCircle2 className="w-3 h-3 mr-1" />
+                          Ready
+                        </Badge>
+                        <Button size="icon" variant="ghost" data-testid={`button-view-${report.reportId}`}>
+                          <FileText className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card data-testid="reports-list">
             <CardHeader>
