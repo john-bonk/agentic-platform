@@ -208,11 +208,11 @@ function AuditTreemapCell({ company, colorIndex, highlightIntegrationControls }:
 export function AuditRegionalTreemap({ region, onManageInventory, highlightIntegrationControls = false }: AuditRegionalTreemapProps) {
   return (
     <div 
-      className="border border-gray-200 rounded-md bg-white"
+      className="border border-gray-200 dark:border-border rounded-md bg-white dark:bg-card"
       data-testid={`audit-panel-region-${region.id}`}
     >
-      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-100">
-        <div className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-100 dark:border-border">
+        <div className="text-sm font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
           <Globe className="w-4 h-4 text-[#266C92]" />
           {region.name}
           <Badge variant="secondary" className="ml-2 text-xs font-medium">

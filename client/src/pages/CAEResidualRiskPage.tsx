@@ -379,16 +379,16 @@ export default function CAEResidualRiskPage() {
 
   return (
     <AppLayout showHeader={true} showSideNav={true}>
-      <div className="flex flex-col h-full overflow-hidden bg-gray-50">
+      <div className="flex flex-col h-full overflow-hidden bg-gray-50 dark:bg-background">
         {/* Header */}
-        <div className="sticky top-0 z-40 bg-white border-b border-gray-200" data-testid="header-cae-audit">
+        <div className="sticky top-0 z-40 bg-white dark:bg-card border-b border-gray-200 dark:border-border" data-testid="header-cae-audit">
           <div className="flex items-center justify-between px-6 py-4 gap-4">
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-[#266C92] flex items-center justify-center">
                   <ClipboardCheck className="w-5 h-5 text-white" />
                 </div>
-                <h1 className="text-xl font-semibold text-gray-900" data-testid="text-cae-page-title">
+                <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground" data-testid="text-cae-page-title">
                   Overview: M&A Audit and Compliance
                 </h1>
               </div>
@@ -418,7 +418,7 @@ export default function CAEResidualRiskPage() {
               <div className="space-y-6">
                 <Card data-testid="panel-top-audit-risks">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                    <CardTitle className="text-base font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-red-500" />
                       Top Risks and Mitigation Plans
                       <Badge variant="secondary" className="ml-2 text-xs">
@@ -447,7 +447,7 @@ export default function CAEResidualRiskPage() {
               <div className="space-y-6">
                 <Card data-testid="panel-critical-audit-areas">
                   <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                    <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+                    <CardTitle className="text-base font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
                       <TrendingDown className="w-5 h-5 text-[#266C92]" />
                       Critical Audit Areas
                       <Badge variant="secondary" className="ml-2 text-xs">

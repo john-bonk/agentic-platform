@@ -87,20 +87,20 @@ const severityStyles: Record<AuditRiskSeverity, { bg: string; text: string; bord
 
 const statusStyles: Record<AuditStatus, { bg: string; text: string }> = {
   "NOT STARTED": {
-    bg: "bg-gray-200",
-    text: "text-gray-700",
+    bg: "bg-gray-200 dark:bg-gray-700",
+    text: "text-gray-700 dark:text-gray-300",
   },
   "IN PROGRESS": {
-    bg: "bg-blue-100",
-    text: "text-blue-700",
+    bg: "bg-blue-100 dark:bg-blue-900/30",
+    text: "text-blue-700 dark:text-blue-400",
   },
   "COMPLETED": {
-    bg: "bg-green-100",
-    text: "text-green-700",
+    bg: "bg-green-100 dark:bg-green-900/30",
+    text: "text-green-700 dark:text-green-400",
   },
   "ON HOLD": {
-    bg: "bg-amber-100",
-    text: "text-amber-700",
+    bg: "bg-amber-100 dark:bg-amber-900/30",
+    text: "text-amber-700 dark:text-amber-400",
   },
 };
 
@@ -152,7 +152,7 @@ export function AuditRiskCard({ risk, isExpanded = false, onToggleExpand }: Audi
 
   return (
     <Card 
-      className="overflow-visible border border-gray-200"
+      className="overflow-visible border border-gray-200 dark:border-border bg-white dark:bg-card"
       data-testid={`audit-risk-card-${risk.id}`}
     >
       <div 
@@ -170,14 +170,14 @@ export function AuditRiskCard({ risk, isExpanded = false, onToggleExpand }: Audi
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-sm font-semibold text-gray-900 truncate" data-testid={`text-audit-risk-name-${risk.id}`}>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground truncate" data-testid={`text-audit-risk-name-${risk.id}`}>
                 {risk.name}
               </h3>
-              <span className="text-lg font-bold text-gray-900" data-testid={`text-audit-exposure-${risk.id}`}>
+              <span className="text-lg font-bold text-gray-900 dark:text-foreground" data-testid={`text-audit-exposure-${risk.id}`}>
                 {risk.exposure}
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5 line-clamp-1" data-testid={`text-audit-description-${risk.id}`}>
+            <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5 line-clamp-1" data-testid={`text-audit-description-${risk.id}`}>
               {risk.description}
             </p>
           </div>
@@ -186,7 +186,7 @@ export function AuditRiskCard({ risk, isExpanded = false, onToggleExpand }: Audi
         <div className="flex items-center gap-4 flex-shrink-0">
           <div className="flex flex-col items-end gap-1">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">Risk Score</span>
+              <span className="text-xs text-gray-500 dark:text-muted-foreground">Risk Score</span>
               <RiskScoreIndicator score={risk.riskScore} />
             </div>
           </div>
@@ -200,9 +200,9 @@ export function AuditRiskCard({ risk, isExpanded = false, onToggleExpand }: Audi
             data-testid={`button-expand-${risk.id}`}
           >
             {expanded ? (
-              <ChevronUp className="w-4 h-4 text-gray-500" />
+              <ChevronUp className="w-4 h-4 text-gray-500 dark:text-muted-foreground" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-gray-500" />
+              <ChevronDown className="w-4 h-4 text-gray-500 dark:text-muted-foreground" />
             )}
           </Button>
         </div>
@@ -218,28 +218,28 @@ export function AuditRiskCard({ risk, isExpanded = false, onToggleExpand }: Audi
             className="overflow-hidden"
           >
             <Separator />
-            <div className="p-4 bg-gray-50 space-y-4" data-testid={`audit-risk-details-${risk.id}`}>
+            <div className="p-4 bg-gray-50 dark:bg-muted space-y-4" data-testid={`audit-risk-details-${risk.id}`}>
               {/* Audit Metrics Row */}
               <div className="grid grid-cols-4 gap-4">
                 <div>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-muted-foreground mb-1">
                     <Clock className="w-3 h-3" />
                     AUDIT HOURS
                   </div>
-                  <span className="text-sm font-bold text-gray-900" data-testid={`text-audit-hours-${risk.id}`}>
+                  <span className="text-sm font-bold text-gray-900 dark:text-foreground" data-testid={`text-audit-hours-${risk.id}`}>
                     {risk.auditHours?.toLocaleString() || "—"}
                   </span>
                 </div>
                 
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">DEFICIENCIES</div>
-                  <span className="text-sm font-bold text-gray-900" data-testid={`text-deficiencies-${risk.id}`}>
+                  <div className="text-xs text-gray-500 dark:text-muted-foreground mb-1">DEFICIENCIES</div>
+                  <span className="text-sm font-bold text-gray-900 dark:text-foreground" data-testid={`text-deficiencies-${risk.id}`}>
                     {risk.deficiencies || "—"}
                   </span>
                 </div>
                 
                 <div>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-muted-foreground mb-1">
                     <User className="w-3 h-3" />
                     OWNER
                   </div>
@@ -260,7 +260,7 @@ export function AuditRiskCard({ risk, isExpanded = false, onToggleExpand }: Audi
                 </div>
                 
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">STATUS</div>
+                  <div className="text-xs text-gray-500 dark:text-muted-foreground mb-1">STATUS</div>
                   <Badge 
                     className={`${auditStatusStyle.bg} ${auditStatusStyle.text} text-xs font-medium no-default-hover-elevate no-default-active-elevate`}
                     data-testid={`badge-audit-status-${risk.id}`}
@@ -272,14 +272,14 @@ export function AuditRiskCard({ risk, isExpanded = false, onToggleExpand }: Audi
 
               {/* Recommended Mitigations */}
               <div>
-                <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+                <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-muted-foreground mb-2">
                   <Lightbulb className="w-3 h-3 text-amber-500" />
                   RECOMMENDED MITIGATIONS
                 </div>
                 <ul className="space-y-1" data-testid={`list-audit-mitigations-${risk.id}`}>
                   {risk.recommendedMitigations.map((mitigation) => (
-                    <li key={mitigation.id} className="flex items-start gap-2 text-sm text-gray-700">
-                      <span className="text-gray-400">•</span>
+                    <li key={mitigation.id} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                      <span className="text-gray-400 dark:text-gray-500">•</span>
                       {mitigation.text}
                     </li>
                   ))}
@@ -291,29 +291,29 @@ export function AuditRiskCard({ risk, isExpanded = false, onToggleExpand }: Audi
               {/* Cost of Remediation and Control Effectiveness */}
               <div className="flex items-start justify-between gap-6">
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">COST OF REMEDIATION</div>
+                  <div className="text-xs text-gray-500 dark:text-muted-foreground mb-1">COST OF REMEDIATION</div>
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-900" data-testid={`text-remediation-cost-${risk.id}`}>
+                    <span className="text-lg font-bold text-gray-900 dark:text-foreground" data-testid={`text-remediation-cost-${risk.id}`}>
                       {risk.costOfRemediation}
                     </span>
                     {risk.costSource && (
-                      <span className="text-xs text-gray-500">{risk.costSource}</span>
+                      <span className="text-xs text-gray-500 dark:text-muted-foreground">{risk.costSource}</span>
                     )}
                   </div>
                 </div>
                 
                 {/* Control Effectiveness Improvement Box */}
-                <div className="flex-1 max-w-md bg-gradient-to-r from-[#266C92]/10 to-[#266C92]/5 border border-[#266C92]/20 rounded-lg p-3">
+                <div className="flex-1 max-w-md bg-gradient-to-r from-[#266C92]/10 to-[#266C92]/5 dark:from-[#266C92]/20 dark:to-[#266C92]/10 border border-[#266C92]/20 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Sparkles className="w-4 h-4 text-[#266C92]" />
                     <span className="text-sm font-semibold text-[#266C92]">Control effectiveness improvement</span>
                   </div>
-                  <p className="text-xs text-gray-600 mb-2" data-testid={`text-control-description-${risk.id}`}>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2" data-testid={`text-control-description-${risk.id}`}>
                     {risk.controlEffectivenessDescription || "Projected compliance readiness improvement through targeted remediation"}
                   </p>
                   <div className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-emerald-600" />
-                    <span className="text-xl font-bold text-emerald-600" data-testid={`text-control-improvement-${risk.id}`}>
+                    <TrendingUp className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xl font-bold text-emerald-600 dark:text-emerald-400" data-testid={`text-control-improvement-${risk.id}`}>
                       {risk.controlEffectivenessImprovement}
                     </span>
                   </div>

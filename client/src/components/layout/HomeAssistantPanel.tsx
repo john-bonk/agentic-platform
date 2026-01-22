@@ -476,7 +476,7 @@ export function HomeAssistantPanel() {
         data-testid="home-assistant-backdrop"
       />
       <div 
-        className="fixed right-4 top-16 bottom-4 w-[420px] bg-white rounded-lg shadow-xl border border-slate-200 flex flex-col z-50 overflow-hidden"
+        className="fixed right-4 top-16 bottom-4 w-[420px] bg-white dark:bg-card rounded-lg shadow-xl border border-slate-200 dark:border-border flex flex-col z-50 overflow-hidden"
         data-testid="home-assistant-panel"
       >
         <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-[#266C92] to-[#1e5a7a]">
@@ -513,8 +513,8 @@ export function HomeAssistantPanel() {
                 <div className="w-12 h-12 rounded-full bg-[#266C92]/10 flex items-center justify-center mx-auto mb-3">
                   <Sparkles className="w-6 h-6 text-[#266C92]" />
                 </div>
-                <h4 className="font-semibold text-gray-900 mb-1">How can I help you?</h4>
-                <p className="text-sm text-gray-500 max-w-xs mx-auto">
+                <h4 className="font-semibold text-gray-900 dark:text-foreground mb-1">How can I help you?</h4>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground max-w-xs mx-auto">
                   Quick actions for {currentWorkspace.name}
                 </p>
               </div>
@@ -545,14 +545,14 @@ export function HomeAssistantPanel() {
           )}
 
           {buildingReport && (
-            <div className="bg-slate-50 rounded-lg p-4 space-y-4" data-testid="building-report-block">
+            <div className="bg-slate-50 dark:bg-muted rounded-lg p-4 space-y-4" data-testid="building-report-block">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#266C92]/10 flex items-center justify-center">
                   <BarChart3 className="w-5 h-5 text-[#266C92]" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900">Building Report</h4>
-                  <p className="text-xs text-gray-500">Generating presentation slides...</p>
+                  <h4 className="font-medium text-gray-900 dark:text-foreground">Building Report</h4>
+                  <p className="text-xs text-gray-500 dark:text-muted-foreground">Generating presentation slides...</p>
                 </div>
               </div>
 
@@ -581,11 +581,11 @@ export function HomeAssistantPanel() {
               </div>
 
               {buildingReport.step >= reportBuildSteps.length && (
-                <div className="bg-white p-3 rounded-lg border border-green-200">
+                <div className="bg-white dark:bg-card p-3 rounded-lg border border-green-200 dark:border-green-800">
                   <div className="flex items-start gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-green-500 dark:text-green-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm text-gray-700">Report generated successfully. Your presentation is ready to view.</p>
+                      <p className="text-sm text-gray-700 dark:text-foreground">Report generated successfully. Your presentation is ready to view.</p>
                       <div className="flex gap-2 mt-3">
                         <Button 
                           size="sm" 
@@ -632,8 +632,8 @@ export function HomeAssistantPanel() {
         {suggestedActions.filter(a => a.status === "pending").length > 0 && (
           <>
             <Separator />
-            <div className="p-3 bg-slate-50">
-              <p className="text-xs font-medium text-gray-500 mb-2">
+            <div className="p-3 bg-slate-50 dark:bg-muted">
+              <p className="text-xs font-medium text-gray-500 dark:text-muted-foreground mb-2">
                 Suggested Actions
               </p>
               <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -650,7 +650,7 @@ export function HomeAssistantPanel() {
           </>
         )}
         
-        <div className="p-4 border-t border-slate-200 bg-white">
+        <div className="p-4 border-t border-slate-200 dark:border-border bg-white dark:bg-card">
           <div className="flex items-center gap-2">
             <Input
               placeholder="Ask anything..."
@@ -658,7 +658,7 @@ export function HomeAssistantPanel() {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               disabled={isLoading}
-              className="flex-1 border-slate-200 focus-visible:ring-[#266C92]"
+              className="flex-1 border-slate-200 dark:border-border focus-visible:ring-[#266C92]"
               data-testid="input-home-assistant-message"
             />
             <Button

@@ -127,8 +127,8 @@ export default function ReportingPage() {
                     <FileText className="w-5 h-5 text-[#266C92]" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">24</p>
-                    <p className="text-sm text-gray-500">Total Reports</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-foreground">24</p>
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Total Reports</p>
                   </div>
                 </div>
               </CardContent>
@@ -136,12 +136,12 @@ export default function ReportingPage() {
             <Card data-testid="metric-published">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                    <CheckCircle2 className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">18</p>
-                    <p className="text-sm text-gray-500">Published</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-foreground">18</p>
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Published</p>
                   </div>
                 </div>
               </CardContent>
@@ -149,12 +149,12 @@ export default function ReportingPage() {
             <Card data-testid="metric-drafts">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-amber-600" />
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">4</p>
-                    <p className="text-sm text-gray-500">Drafts</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-foreground">4</p>
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Drafts</p>
                   </div>
                 </div>
               </CardContent>
@@ -162,12 +162,12 @@ export default function ReportingPage() {
             <Card data-testid="metric-this-month">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-purple-600" />
+                  <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">7</p>
-                    <p className="text-sm text-gray-500">This Month</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-foreground">7</p>
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">This Month</p>
                   </div>
                 </div>
               </CardContent>
@@ -186,22 +186,22 @@ export default function ReportingPage() {
                 {mockReports.map((report) => (
                   <div 
                     key={report.id}
-                    className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover-elevate cursor-pointer"
+                    className="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card hover-elevate cursor-pointer"
                     onClick={() => setLocation(`/reporting/view/${report.id === "rpt-1" ? "board-report" : report.id === "rpt-2" ? "audit-committee-report" : report.id === "rpt-3" ? "compliance-report" : "board-report"}`)}
                     data-testid={`report-item-${report.id}`}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-muted flex items-center justify-center">
                         {getTypeIcon(report.type)}
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900">{report.title}</h4>
+                        <h4 className="font-medium text-gray-900 dark:text-foreground">{report.title}</h4>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-gray-500">{report.workspace}</span>
-                          <span className="text-xs text-gray-300">|</span>
-                          <span className="text-xs text-gray-500">{report.slides} slides</span>
-                          <span className="text-xs text-gray-300">|</span>
-                          <span className="text-xs text-gray-500">{report.createdAt}</span>
+                          <span className="text-xs text-gray-500 dark:text-muted-foreground">{report.workspace}</span>
+                          <span className="text-xs text-gray-300 dark:text-border">|</span>
+                          <span className="text-xs text-gray-500 dark:text-muted-foreground">{report.slides} slides</span>
+                          <span className="text-xs text-gray-300 dark:text-border">|</span>
+                          <span className="text-xs text-gray-500 dark:text-muted-foreground">{report.createdAt}</span>
                         </div>
                       </div>
                     </div>

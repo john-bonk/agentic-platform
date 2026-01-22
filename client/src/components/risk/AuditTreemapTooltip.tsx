@@ -91,11 +91,11 @@ export function AuditTreemapTooltip({
   const getIssueStatusStyle = (status: string) => {
     switch (status) {
       case "OVERDUE":
-        return "bg-red-100 text-red-700";
+        return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400";
       case "AT RISK":
-        return "bg-amber-100 text-amber-700";
+        return "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400";
       default:
-        return "bg-gray-100 text-gray-700";
+        return "bg-gray-100 dark:bg-muted text-gray-700 dark:text-foreground";
     }
   };
 
@@ -105,14 +105,14 @@ export function AuditTreemapTooltip({
 
   return (
     <div 
-      className={`absolute top-0 ${positionClasses} z-50 w-72 bg-white border border-gray-200 rounded-lg shadow-xl`}
+      className={`absolute top-0 ${positionClasses} z-50 w-72 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-lg shadow-xl`}
       onClick={(e) => e.stopPropagation()}
       data-testid={`audit-tooltip-${locationName || companyName}`}
     >
       {/* Header */}
-      <div className="p-3 bg-gray-50 border-b border-gray-100 rounded-t-lg">
+      <div className="p-3 bg-gray-50 dark:bg-muted border-b border-gray-100 dark:border-border rounded-t-lg">
         <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-muted-foreground">
             <Building2 className="w-3 h-3" />
             FACILITY
           </div>
@@ -129,17 +129,17 @@ export function AuditTreemapTooltip({
         <h4 className="font-semibold text-[#266C92] text-sm" data-testid="text-audit-facility-name">
           {tooltip.facilityName}
         </h4>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-muted-foreground">
           {tooltip.parentCompany} • {tooltip.region}
         </p>
       </div>
 
       {/* Residual Risk Score */}
-      <div className="p-3 border-b border-gray-100">
+      <div className="p-3 border-b border-gray-100 dark:border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">RESIDUAL RISK</span>
-            <span className="text-xl font-bold text-gray-900" data-testid="text-audit-residual-risk">
+            <span className="text-xs text-gray-500 dark:text-muted-foreground">RESIDUAL RISK</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-foreground" data-testid="text-audit-residual-risk">
               {tooltip.residualRisk}
             </span>
             <Badge 
@@ -149,24 +149,24 @@ export function AuditTreemapTooltip({
               {tooltip.severity.toUpperCase()}
             </Badge>
           </div>
-          <span className="text-sm font-bold text-gray-900" data-testid="text-audit-dollar-value">
+          <span className="text-sm font-bold text-gray-900 dark:text-foreground" data-testid="text-audit-dollar-value">
             {tooltip.dollarValue}
           </span>
         </div>
       </div>
 
       {/* Recent Audit Testing */}
-      <div className="p-3 border-b border-gray-100">
-        <div className="text-xs text-gray-500 mb-2">RECENT AUDIT TESTING</div>
+      <div className="p-3 border-b border-gray-100 dark:border-border">
+        <div className="text-xs text-gray-500 dark:text-muted-foreground mb-2">RECENT AUDIT TESTING</div>
         <div className="space-y-1.5" data-testid="list-audit-tests">
           {tooltip.recentAuditTests.map((test) => (
             <div key={test.id} className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
                 <span className="text-[#266C92]">•</span>
-                <span className="text-gray-700">{test.name}</span>
+                <span className="text-gray-700 dark:text-foreground">{test.name}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-gray-400">{test.date}</span>
+                <span className="text-gray-400 dark:text-muted-foreground">{test.date}</span>
                 {getTestStatusIcon(test.status)}
               </div>
             </div>
@@ -176,8 +176,8 @@ export function AuditTreemapTooltip({
 
       {/* Issues Past SLA */}
       {tooltip.issuesPastSLA.length > 0 && (
-        <div className="p-3 border-b border-gray-100">
-          <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+        <div className="p-3 border-b border-gray-100 dark:border-border">
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-muted-foreground mb-2">
             <span>ISSUES PAST SLA</span>
             <Badge 
               variant="destructive" 
@@ -190,14 +190,14 @@ export function AuditTreemapTooltip({
             {tooltip.issuesPastSLA.map((issue) => (
               <div key={issue.id} className="text-xs">
                 <div className="flex items-center justify-between mb-0.5">
-                  <span className="font-medium text-gray-900 truncate max-w-[180px]">{issue.title}</span>
+                  <span className="font-medium text-gray-900 dark:text-foreground truncate max-w-[180px]">{issue.title}</span>
                   <Badge 
                     className={`${getIssueStatusStyle(issue.status)} text-[10px] px-1.5 py-0 no-default-hover-elevate no-default-active-elevate`}
                   >
                     {issue.status}
                   </Badge>
                 </div>
-                <div className="flex items-center gap-2 text-gray-400">
+                <div className="flex items-center gap-2 text-gray-400 dark:text-muted-foreground">
                   <Clock className="w-2.5 h-2.5" />
                   <span>Due: {issue.dueDate}</span>
                   <span>•</span>
@@ -211,25 +211,25 @@ export function AuditTreemapTooltip({
 
       {/* Audit Objectives Summary */}
       <div className="p-3">
-        <div className="text-xs text-gray-500 mb-2">ALL AUDIT OBJECTIVES</div>
+        <div className="text-xs text-gray-500 dark:text-muted-foreground mb-2">ALL AUDIT OBJECTIVES</div>
         <div className="flex items-center gap-3" data-testid="audit-objectives-summary">
           <div className="flex items-center gap-1.5">
-            <span className="w-5 h-5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold flex items-center justify-center">
+            <span className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-[10px] font-bold flex items-center justify-center">
               {tooltip.auditObjectives.complete}
             </span>
-            <span className="text-xs text-gray-600">Complete</span>
+            <span className="text-xs text-gray-600 dark:text-muted-foreground">Complete</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold flex items-center justify-center">
+            <span className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] font-bold flex items-center justify-center">
               {tooltip.auditObjectives.inProgress}
             </span>
-            <span className="text-xs text-gray-600">In Progress</span>
+            <span className="text-xs text-gray-600 dark:text-muted-foreground">In Progress</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-5 h-5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold flex items-center justify-center">
+            <span className="w-5 h-5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[10px] font-bold flex items-center justify-center">
               {tooltip.auditObjectives.overdue}
             </span>
-            <span className="text-xs text-gray-600">Overdue</span>
+            <span className="text-xs text-gray-600 dark:text-muted-foreground">Overdue</span>
           </div>
         </div>
       </div>

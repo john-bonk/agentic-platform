@@ -31,10 +31,10 @@ interface StrategicObjectivesProps {
 function ObjectiveCard({ objective }: { objective: StrategicObjective }) {
   return (
     <div 
-      className="border border-gray-200 rounded-md overflow-hidden"
+      className="border border-gray-200 dark:border-border rounded-md overflow-hidden"
       data-testid={`objective-${objective.id}`}
     >
-      <div className="flex items-start gap-3 p-3 bg-white">
+      <div className="flex items-start gap-3 p-3 bg-white dark:bg-card">
         <div 
           className="w-7 h-7 rounded-full bg-[#266C92] text-white flex items-center justify-center text-sm font-bold flex-shrink-0"
           data-testid={`objective-number-${objective.id}`}
@@ -42,29 +42,29 @@ function ObjectiveCard({ objective }: { objective: StrategicObjective }) {
           {objective.number}
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold text-gray-900" data-testid={`objective-title-${objective.id}`}>
+          <h4 className="text-sm font-semibold text-gray-900 dark:text-foreground" data-testid={`objective-title-${objective.id}`}>
             {objective.title}
           </h4>
-          <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 flex-wrap">
+          <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-muted-foreground flex-wrap">
             <span>
-              Target: <span className="font-medium text-gray-700">{objective.target}</span>
+              Target: <span className="font-medium text-gray-700 dark:text-foreground">{objective.target}</span>
             </span>
-            <span className="text-gray-300">|</span>
+            <span className="text-gray-300 dark:text-border">|</span>
             <span>
-              Owner: <span className="font-medium text-gray-700">{objective.owner}</span>
+              Owner: <span className="font-medium text-gray-700 dark:text-foreground">{objective.owner}</span>
             </span>
           </div>
         </div>
       </div>
       
-      <div className="bg-gray-50 border-t border-gray-200">
+      <div className="bg-gray-50 dark:bg-muted border-t border-gray-200 dark:border-border">
         <table className="w-full text-sm" data-testid={`initiative-table-${objective.id}`}>
           <thead>
-            <tr className="border-b border-gray-200">
-              <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-3 py-2">
+            <tr className="border-b border-gray-200 dark:border-border">
+              <th className="text-left text-xs font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wider px-3 py-2">
                 Initiative
               </th>
-              <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider px-3 py-2 w-24">
+              <th className="text-right text-xs font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wider px-3 py-2 w-24">
                 Cost
               </th>
             </tr>
@@ -73,11 +73,11 @@ function ObjectiveCard({ objective }: { objective: StrategicObjective }) {
             {objective.initiatives.map((initiative, idx) => (
               <tr 
                 key={initiative.id}
-                className={idx < objective.initiatives.length - 1 ? "border-b border-gray-100" : ""}
+                className={idx < objective.initiatives.length - 1 ? "border-b border-gray-100 dark:border-border" : ""}
                 data-testid={`initiative-row-${initiative.id}`}
               >
-                <td className="px-3 py-2 text-gray-700">{initiative.name}</td>
-                <td className="px-3 py-2 text-right font-medium text-gray-900">{initiative.cost}</td>
+                <td className="px-3 py-2 text-gray-700 dark:text-foreground">{initiative.name}</td>
+                <td className="px-3 py-2 text-right font-medium text-gray-900 dark:text-foreground">{initiative.cost}</td>
               </tr>
             ))}
           </tbody>
@@ -91,7 +91,7 @@ export function StrategicObjectives({ objectives }: StrategicObjectivesProps) {
   return (
     <Card data-testid="panel-strategic-objectives">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+        <CardTitle className="text-base font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
           <Target className="w-5 h-5 text-[#266C92]" />
           Strategic Objectives
         </CardTitle>
