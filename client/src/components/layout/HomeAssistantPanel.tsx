@@ -607,16 +607,10 @@ export function HomeAssistantPanel() {
   if (!isOpen) return null;
 
   return (
-    <>
-      <div 
-        className="fixed inset-0 bg-black/20 z-40"
-        onClick={() => setOpen(false)}
-        data-testid="home-assistant-backdrop"
-      />
-      <div 
-        className="fixed right-0 top-0 bottom-0 w-[420px] bg-white dark:bg-card shadow-xl border-l border-slate-200 dark:border-border flex flex-col z-50 overflow-hidden"
-        data-testid="home-assistant-panel"
-      >
+    <div 
+      className="fixed right-0 top-0 bottom-0 w-[420px] bg-white dark:bg-card shadow-xl border-l border-slate-200 dark:border-border flex flex-col z-50 overflow-hidden"
+      data-testid="home-assistant-panel"
+    >
         <div className="h-12 px-3 flex items-center justify-between bg-gray-900 flex-shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
@@ -814,7 +808,6 @@ export function HomeAssistantPanel() {
             </Button>
           </div>
         </div>
-      </div>
-    </>
+    </div>
   );
 }

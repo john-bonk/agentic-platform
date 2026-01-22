@@ -26,6 +26,9 @@ import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav } from 
 import { type Tab } from "@/lib/tabStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { useSideNavStore } from "@/lib/sideNavStore";
+import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
+
+const ASSISTANT_PANEL_WIDTH = 420;
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -48,6 +51,7 @@ export function AppLayout({
   const currentModule = getModuleFromPath(location);
   const { currentWorkspace } = useWorkspaceStore();
   const { isCollapsed } = useSideNavStore();
+  const { isOpen: isAssistantOpen } = useHomeAssistantStore();
   
   const isHomeModule = currentModule.id === "home";
   const workspaceNav = isHomeModule ? getWorkspaceHomeNav(currentWorkspace.persona) : null;
@@ -79,7 +83,10 @@ export function AppLayout({
           {/* Universal expand button - always shows when side nav is collapsed */}
           {isCollapsed && <SideNavExpandButton />}
           
-          <main className="flex flex-col flex-1 min-w-0 overflow-auto bg-white dark:bg-background transition-all duration-300 ease-in-out">
+          <main 
+            className="flex flex-col flex-1 min-w-0 overflow-auto bg-white dark:bg-background transition-all duration-300 ease-in-out"
+            style={{ marginRight: isAssistantOpen ? `${ASSISTANT_PANEL_WIDTH}px` : 0 }}
+          >
             {children}
           </main>
         </div>
