@@ -270,3 +270,61 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* 
+ * Comprehensive Dark Mode Utility Classes
+ * These provide semantic color inversions for consistent theming
+ */
+
+/* Surface colors - use instead of hardcoded bg-white/bg-gray-* */
+.surface-base {
+  @apply bg-white dark:bg-background;
+}
+
+.surface-elevated {
+  @apply bg-white dark:bg-card;
+}
+
+.surface-muted {
+  @apply bg-gray-50 dark:bg-muted;
+}
+
+.surface-subtle {
+  @apply bg-gray-100 dark:bg-accent;
+}
+
+/* Text colors - use instead of hardcoded text-gray-* */
+.text-primary-content {
+  @apply text-gray-900 dark:text-foreground;
+}
+
+.text-secondary-content {
+  @apply text-gray-700 dark:text-foreground/90;
+}
+
+.text-tertiary-content {
+  @apply text-gray-600 dark:text-foreground/80;
+}
+
+.text-muted-content {
+  @apply text-gray-500 dark:text-muted-foreground;
+}
+
+/* Border colors */
+.border-default {
+  @apply border-gray-200 dark:border-border;
+}
+
+.border-subtle {
+  @apply border-gray-100 dark:border-border/50;
+}
+
+/* Card-like containers */
+.card-surface {
+  @apply bg-white dark:bg-card border border-gray-200 dark:border-border;
+}
+
+/* Filter/toolbar backgrounds */
+.toolbar-surface {
+  @apply bg-[#f9fafb] dark:bg-muted/50;
+}

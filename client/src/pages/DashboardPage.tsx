@@ -169,9 +169,9 @@ export function DashboardPage() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-full overflow-y-auto bg-white">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h1 className="text-xl font-semibold text-gray-900" data-testid="text-dashboard-title">Dashboard Template</h1>
+      <div className="flex flex-col h-full overflow-y-auto bg-white dark:bg-background">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-border">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground" data-testid="text-dashboard-title">Dashboard Template</h1>
           <div className="flex items-center gap-2">
             <Button 
               variant="ghost" 
@@ -190,12 +190,12 @@ export function DashboardPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 px-6 py-4 bg-gray-50 flex-wrap">
+        <div className="flex items-center gap-4 px-6 py-4 bg-gray-50 dark:bg-muted/50 flex-wrap">
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500">Category</span>
+            <span className="text-xs text-gray-500 dark:text-muted-foreground">Category</span>
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger 
-                className="w-[200px] h-9 text-sm bg-white"
+                className="w-[200px] h-9 text-sm bg-white dark:bg-card"
                 data-testid="select-category"
               >
                 <SelectValue placeholder="All Categories" />
@@ -211,10 +211,10 @@ export function DashboardPage() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500">Priority</span>
+            <span className="text-xs text-gray-500 dark:text-muted-foreground">Priority</span>
             <Select value={priority} onValueChange={setPriority}>
               <SelectTrigger 
-                className="w-[200px] h-9 text-sm bg-white"
+                className="w-[200px] h-9 text-sm bg-white dark:bg-card"
                 data-testid="select-priority"
               >
                 <SelectValue placeholder="All Priorities" />
@@ -229,10 +229,10 @@ export function DashboardPage() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500">Status</span>
+            <span className="text-xs text-gray-500 dark:text-muted-foreground">Status</span>
             <Select value={status} onValueChange={setStatus}>
               <SelectTrigger 
-                className="w-[200px] h-9 text-sm bg-white"
+                className="w-[200px] h-9 text-sm bg-white dark:bg-card"
                 data-testid="select-status"
               >
                 <SelectValue placeholder="All Statuses" />
@@ -251,7 +251,7 @@ export function DashboardPage() {
               variant="ghost" 
               size="sm"
               onClick={clearFilters}
-              className="text-gray-600"
+              className="text-gray-600 dark:text-muted-foreground"
               data-testid="button-clear-filters"
             >
               Clear Filters
@@ -259,30 +259,30 @@ export function DashboardPage() {
           </div>
         </div>
         
-        <div className="flex-1 p-6 space-y-6 bg-[#f9fafb]">
+        <div className="flex-1 p-6 space-y-6 bg-[#f9fafb] dark:bg-background">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white py-4 text-center border border-gray-200 rounded">
-              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-total-items">{filteredItems.length}</div>
-              <div className="text-sm text-gray-500 mt-1">Total Items</div>
+            <div className="bg-white dark:bg-card py-4 text-center border border-gray-200 dark:border-border rounded">
+              <div className="text-2xl font-semibold text-gray-900 dark:text-foreground" data-testid="metric-total-items">{filteredItems.length}</div>
+              <div className="text-sm text-gray-500 dark:text-muted-foreground mt-1">Total Items</div>
             </div>
-            <div className="bg-white py-4 text-center border border-gray-200 rounded">
-              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-1">92%</div>
-              <div className="text-sm text-gray-500 mt-1">Metric 1</div>
+            <div className="bg-white dark:bg-card py-4 text-center border border-gray-200 dark:border-border rounded">
+              <div className="text-2xl font-semibold text-gray-900 dark:text-foreground" data-testid="metric-1">92%</div>
+              <div className="text-sm text-gray-500 dark:text-muted-foreground mt-1">Metric 1</div>
             </div>
-            <div className="bg-white py-4 text-center border border-gray-200 rounded">
-              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-2">8</div>
-              <div className="text-sm text-gray-500 mt-1">Metric 2</div>
+            <div className="bg-white dark:bg-card py-4 text-center border border-gray-200 dark:border-border rounded">
+              <div className="text-2xl font-semibold text-gray-900 dark:text-foreground" data-testid="metric-2">8</div>
+              <div className="text-sm text-gray-500 dark:text-muted-foreground mt-1">Metric 2</div>
             </div>
-            <div className="bg-white py-4 text-center border border-gray-200 rounded">
-              <div className="text-2xl font-semibold text-gray-900" data-testid="metric-3">1</div>
-              <div className="text-sm text-gray-500 mt-1">Metric 3</div>
+            <div className="bg-white dark:bg-card py-4 text-center border border-gray-200 dark:border-border rounded">
+              <div className="text-2xl font-semibold text-gray-900 dark:text-foreground" data-testid="metric-3">1</div>
+              <div className="text-sm text-gray-500 dark:text-muted-foreground mt-1">Metric 3</div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="border border-gray-200 rounded bg-white">
+            <div className="border border-gray-200 dark:border-border rounded bg-white dark:bg-card">
               <div className="px-4 pt-4 pb-2">
-                <h3 className="text-sm font-medium text-gray-700">Metric by Category</h3>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-foreground">Metric by Category</h3>
               </div>
               <div className="px-4 pb-4">
                 <div className="h-48">
@@ -320,9 +320,9 @@ export function DashboardPage() {
               </div>
             </div>
 
-            <div className="border border-gray-200 rounded bg-white">
+            <div className="border border-gray-200 dark:border-border rounded bg-white dark:bg-card">
               <div className="px-4 pt-4 pb-2">
-                <h3 className="text-sm font-medium text-gray-700">Trend Chart</h3>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-foreground">Trend Chart</h3>
               </div>
               <div className="px-4 pb-4">
                 <div className="h-48">
@@ -355,9 +355,9 @@ export function DashboardPage() {
               </div>
             </div>
 
-            <div className="border border-gray-200 rounded bg-white">
+            <div className="border border-gray-200 dark:border-border rounded bg-white dark:bg-card">
               <div className="px-4 pt-4 pb-2">
-                <h3 className="text-sm font-medium text-gray-700">Distribution</h3>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-foreground">Distribution</h3>
               </div>
               <div className="px-4 pb-4">
                 <div className="h-48 relative">
@@ -381,7 +381,7 @@ export function DashboardPage() {
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-gray-900">61%</span>
+                    <span className="text-2xl font-bold text-gray-900 dark:text-foreground">61%</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-4 mt-2 text-xs">
@@ -402,11 +402,11 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div className="border border-gray-200 rounded bg-white">
+          <div className="border border-gray-200 dark:border-border rounded bg-white dark:bg-card">
             <div className="px-4 pt-4 pb-2">
               <div className="flex items-center justify-between gap-4">
-                <h3 className="text-sm font-medium text-gray-700">Items Overview</h3>
-                <div className="text-xs text-gray-500">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-foreground">Items Overview</h3>
+                <div className="text-xs text-gray-500 dark:text-muted-foreground">
                   <span className="font-medium">{filteredItems.length} items</span>
                   <span className="mx-2">|</span>
                   <span>{highPriorityCount} high priority</span>
@@ -416,30 +416,30 @@ export function DashboardPage() {
             <div className="px-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50 hover:bg-gray-50">
-                    <TableHead className="font-medium text-gray-600">
+                  <TableRow className="bg-gray-50 dark:bg-muted hover:bg-gray-50 dark:hover:bg-muted">
+                    <TableHead className="font-medium text-gray-600 dark:text-muted-foreground">
                       <div className="flex items-center gap-1">
                         Name
                         <ArrowUpDown className="w-3 h-3" />
                       </div>
                     </TableHead>
-                    <TableHead className="font-medium text-gray-600">Category</TableHead>
-                    <TableHead className="font-medium text-gray-600">Priority</TableHead>
-                    <TableHead className="font-medium text-gray-600">Status</TableHead>
-                    <TableHead className="font-medium text-gray-600">
+                    <TableHead className="font-medium text-gray-600 dark:text-muted-foreground">Category</TableHead>
+                    <TableHead className="font-medium text-gray-600 dark:text-muted-foreground">Priority</TableHead>
+                    <TableHead className="font-medium text-gray-600 dark:text-muted-foreground">Status</TableHead>
+                    <TableHead className="font-medium text-gray-600 dark:text-muted-foreground">
                       <div className="flex items-center gap-1">
                         Metric
                         <ArrowUpDown className="w-3 h-3" />
                       </div>
                     </TableHead>
-                    <TableHead className="font-medium text-gray-600">Owner</TableHead>
+                    <TableHead className="font-medium text-gray-600 dark:text-muted-foreground">Owner</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredItems.map((item) => (
                     <TableRow 
                       key={item.id} 
-                      className="hover:bg-gray-50 cursor-pointer"
+                      className="hover:bg-gray-50 dark:hover:bg-muted cursor-pointer"
                       data-testid={`row-item-${item.id}`}
                     >
                       <TableCell>
@@ -451,14 +451,14 @@ export function DashboardPage() {
                           {item.name}
                         </button>
                       </TableCell>
-                      <TableCell className="text-gray-600">{item.category}</TableCell>
+                      <TableCell className="text-gray-600 dark:text-foreground">{item.category}</TableCell>
                       <TableCell>
                         <Badge 
                           variant="outline" 
                           className={`text-xs ${
                             item.priority === "High" 
-                              ? "text-red-600 border-red-200 bg-red-50" 
-                              : "text-blue-600 border-blue-200 bg-blue-50"
+                              ? "text-red-600 border-red-200 bg-red-50 dark:bg-red-950 dark:border-red-800" 
+                              : "text-blue-600 border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800"
                           }`}
                         >
                           {item.priority}
@@ -467,13 +467,13 @@ export function DashboardPage() {
                       <TableCell>
                         <Badge 
                           variant="outline" 
-                          className="text-xs text-gray-600 border-gray-300 bg-gray-100"
+                          className="text-xs text-gray-600 dark:text-muted-foreground border-gray-300 dark:border-border bg-gray-100 dark:bg-muted"
                         >
                           {item.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-gray-600">{item.metric}</TableCell>
-                      <TableCell className="text-gray-600">{item.owner}</TableCell>
+                      <TableCell className="text-gray-600 dark:text-foreground">{item.metric}</TableCell>
+                      <TableCell className="text-gray-600 dark:text-foreground">{item.owner}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
