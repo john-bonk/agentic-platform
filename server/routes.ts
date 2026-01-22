@@ -865,6 +865,153 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   /**
+   * Intelligence Layer API
+   * Controls, Tasks, Metrics, and Report Generation
+   */
+  
+  app.get("/api/controls", async (_req: Request, res: Response) => {
+    try {
+      const controls = await storage.getControls();
+      res.json(controls);
+    } catch (error) {
+      console.error("Controls fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch controls" });
+    }
+  });
+  
+  app.get("/api/controls/:id", async (req: Request, res: Response) => {
+    try {
+      const control = await storage.getControl(req.params.id);
+      if (!control) {
+        return res.status(404).json({ error: "Control not found" });
+      }
+      res.json(control);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch control" });
+    }
+  });
+  
+  app.get("/api/tasks", async (_req: Request, res: Response) => {
+    try {
+      const tasks = await storage.getTasks();
+      res.json(tasks);
+    } catch (error) {
+      console.error("Tasks fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch tasks" });
+    }
+  });
+  
+  app.get("/api/tasks/:id", async (req: Request, res: Response) => {
+    try {
+      const task = await storage.getTask(req.params.id);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+      res.json(task);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch task" });
+    }
+  });
+  
+  app.get("/api/dashboard/metrics", async (_req: Request, res: Response) => {
+    try {
+      const metrics = await storage.getDashboardMetrics();
+      res.json(metrics);
+    } catch (error) {
+      console.error("Metrics fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch metrics" });
+    }
+  });
+  
+  app.get("/api/reports", async (_req: Request, res: Response) => {
+    try {
+      const reports = await storage.getReports();
+      res.json(reports);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch reports" });
+    }
+  });
+  
+  app.get("/api/reports/:id", async (req: Request, res: Response) => {
+    try {
+      const report = await storage.getReport(req.params.id);
+      if (!report) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+      res.json(report);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch report" });
+    }
+  });
+  
+  app.post("/api/generate-report", async (req: Request, res: Response) => {
+    try {
+      const { prompt, reportType } = req.body;
+      
+      if (!prompt || typeof prompt !== "string") {
+        return res.status(400).json({ error: "Prompt is required" });
+      }
+      
+      const reportId = randomUUID();
+      const now = new Date().toISOString();
+      
+      // Generate report sections based on prompt keywords
+      const lowerPrompt = prompt.toLowerCase();
+      let title = "Generated Report";
+      let sections = [];
+      
+      if (lowerPrompt.includes("sox") || lowerPrompt.includes("compliance")) {
+        title = "SOX Compliance Status Report";
+        sections = [
+          { id: "sec1", title: "Executive Summary", content: "This report provides a comprehensive overview of SOX compliance status across all key controls and processes.", charts: [{ type: "pie" as const, data: [75, 15, 10], labels: ["Passed", "In Progress", "Failed"], title: "Control Status" }] },
+          { id: "sec2", title: "Control Testing Results", content: "Of the 8 SOX controls tested this quarter, 5 passed (62.5%), 2 are in progress, and 1 failed requiring remediation.", charts: [] },
+          { id: "sec3", title: "High-Risk Findings", content: "One high-risk finding identified: Vulnerability Scanning (ISO-SEC-001) failed testing and requires immediate attention.", charts: [] },
+          { id: "sec4", title: "Remediation Status", content: "Revenue Recognition Review (SOX-FIN-003) is currently in remediation with an expected completion date of November 30, 2024.", charts: [] },
+          { id: "sec5", title: "Recommendations", content: "1. Prioritize patch deployment for vulnerability scanning failures.\n2. Increase testing sample size for revenue recognition controls.\n3. Consider automation for continuous control monitoring.", charts: [] },
+        ];
+      } else if (lowerPrompt.includes("risk") || lowerPrompt.includes("assessment")) {
+        title = "Risk Assessment Summary";
+        sections = [
+          { id: "sec1", title: "Risk Overview", content: "Current risk landscape shows 3 high-priority risks requiring executive attention.", charts: [{ type: "bar" as const, data: [3, 12, 45], labels: ["High", "Medium", "Low"], title: "Risk Distribution" }] },
+          { id: "sec2", title: "Critical Risks", content: "The following risks have been identified as critical:\n• Tariff exposure in supply chain\n• M&A integration complexity\n• Log4j vulnerability remediation timeline", charts: [] },
+          { id: "sec3", title: "Mitigation Progress", content: "Risk mitigation efforts are 78% complete across all identified risks with expected full remediation by Q1 2025.", charts: [] },
+          { id: "sec4", title: "Next Steps", content: "Schedule quarterly risk review meeting with all stakeholders to assess mitigation effectiveness.", charts: [] },
+        ];
+      } else if (lowerPrompt.includes("audit") || lowerPrompt.includes("finding")) {
+        title = "Audit Findings Report";
+        sections = [
+          { id: "sec1", title: "Audit Scope", content: "This report covers audit findings from Q4 2024 across financial, operational, and IT audit domains.", charts: [] },
+          { id: "sec2", title: "Summary of Findings", content: "12 total findings identified: 2 critical, 4 high, 3 medium, 3 low severity.", charts: [{ type: "bar" as const, data: [2, 4, 3, 3], labels: ["Critical", "High", "Medium", "Low"], title: "Findings by Severity" }] },
+          { id: "sec3", title: "Critical Findings Detail", content: "• Finding #1: Inadequate segregation of duties in financial systems (Remediation in progress)\n• Finding #2: Incomplete vendor risk documentation (Action plan developed)", charts: [] },
+          { id: "sec4", title: "Management Response", content: "Management has committed to addressing all critical and high findings within 60 days.", charts: [] },
+        ];
+      } else {
+        title = "Control Status Report";
+        sections = [
+          { id: "sec1", title: "Summary", content: `Report generated based on prompt: "${prompt}"`, charts: [] },
+          { id: "sec2", title: "Current Status", content: "8 controls tracked, 5 passed, 2 in progress, 1 failed.", charts: [{ type: "pie" as const, data: [5, 2, 1], labels: ["Passed", "In Progress", "Failed"], title: "Control Status" }] },
+          { id: "sec3", title: "Recommendations", content: "Continue monitoring and testing cadence for all controls.", charts: [] },
+        ];
+      }
+      
+      const report = {
+        reportId,
+        title,
+        sections,
+        toc: sections.map(s => ({ id: s.id, title: s.title })),
+        createdAt: now,
+        prompt,
+      };
+      
+      await storage.createReport(report);
+      res.status(201).json(report);
+    } catch (error) {
+      console.error("Report generation error:", error);
+      res.status(500).json({ error: "Failed to generate report" });
+    }
+  });
+
+  /**
    * Health Check
    */
   app.get("/api/health", (_req: Request, res: Response) => {
