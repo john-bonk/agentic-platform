@@ -224,8 +224,8 @@ export function AuditRegionalTreemap({ region, onManageInventory, highlightInteg
         </div>
       </div>
       
-      <div className="p-3">
-        <div className="flex gap-1 min-h-[120px]" data-testid={`audit-treemap-container-${region.id}`}>
+      <div className="p-3 overflow-x-auto">
+        <div className="flex gap-1 min-h-[120px] min-w-[600px]" data-testid={`audit-treemap-container-${region.id}`}>
           {region.companies.map((company, index) => (
             <AuditTreemapCell 
               key={company.id} 

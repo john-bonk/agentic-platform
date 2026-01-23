@@ -395,9 +395,9 @@ export function RegionalTreemap({ region, onViewBreakdown, highlightTariffs = fa
           </Button>
         )}
       </div>
-      <div className="p-4">
+      <div className="p-4 overflow-x-auto">
         <div 
-          className="flex gap-1 h-48 overflow-visible"
+          className="flex gap-1 h-48 overflow-visible min-w-[600px]"
           data-testid={`treemap-container-${region.id}`}
         >
           {region.companies.map((company, index) => (
