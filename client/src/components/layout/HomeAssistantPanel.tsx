@@ -16,7 +16,7 @@ import {
   BarChart3, Users, Shield, ChevronRight,
   ExternalLink, Workflow, Plus, Search,
   TrendingUp, AlertCircle, CheckCircle2,
-  Building2, Globe, Zap, Target,
+  Building2, Globe, Zap, Target, RefreshCcw,
   type LucideIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -438,6 +438,7 @@ export function HomeAssistantPanel() {
     setSuggestedActions,
     updateActionStatus,
     setLoading,
+    clearChat,
   } = useHomeAssistantStore();
 
   const { currentWorkspace } = useWorkspaceStore();
@@ -620,15 +621,32 @@ export function HomeAssistantPanel() {
               AuditBoard Assistant
             </h3>
           </div>
-          <Button 
-            size="icon" 
-            variant="ghost" 
-            className="text-gray-400 w-9 h-9"
-            onClick={() => setOpen(false)}
-            data-testid="button-close-assistant"
-          >
-            <X className="w-5 h-5" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              className="text-gray-400 w-9 h-9"
+              onClick={() => {
+                clearChat();
+                setActiveExperience(null);
+                setBuildingReport(null);
+                setInputValue("");
+              }}
+              data-testid="button-refresh-assistant"
+              title="Reset chat"
+            >
+              <RefreshCcw className="w-4 h-4" />
+            </Button>
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              className="text-gray-400 w-9 h-9"
+              onClick={() => setOpen(false)}
+              data-testid="button-close-assistant"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
         
         <ScrollArea className="flex-1 p-4">
