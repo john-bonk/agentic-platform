@@ -8,6 +8,7 @@
  * - Audit Objectives summary
  */
 
+import { createPortal } from "react-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -55,7 +56,7 @@ interface AuditTreemapTooltipProps {
   locationName?: string;
   tooltip: AuditTooltipData;
   onClose: () => void;
-  position?: "left" | "right";
+  anchorRect: DOMRect | null;
 }
 
 export function AuditTreemapTooltip({ 
@@ -63,7 +64,7 @@ export function AuditTreemapTooltip({
   locationName, 
   tooltip, 
   onClose,
-  position = "right" 
+  anchorRect
 }: AuditTreemapTooltipProps) {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -99,13 +100,20 @@ export function AuditTreemapTooltip({
     }
   };
 
-  const positionClasses = position === "left" 
-    ? "right-full mr-2" 
-    : "left-full ml-2";
+  if (!anchorRect) return null;
 
-  return (
+  const tooltipWidth = 288;
+  const viewportWidth = window.innerWidth;
+  const spaceOnRight = viewportWidth - anchorRect.right;
+  
+  const positionStyles: React.CSSProperties = spaceOnRight >= tooltipWidth + 20
+    ? { top: anchorRect.top + window.scrollY, left: anchorRect.right + 8 }
+    : { top: anchorRect.top + window.scrollY, left: anchorRect.left - tooltipWidth - 8 };
+
+  return createPortal(
     <div 
-      className={`absolute top-0 ${positionClasses} z-50 w-72 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-lg shadow-xl`}
+      className="fixed z-[9999] w-72 bg-white dark:bg-card border border-gray-200 dark:border-border rounded-lg shadow-xl"
+      style={positionStyles}
       onClick={(e) => e.stopPropagation()}
       data-testid={`audit-tooltip-${locationName || companyName}`}
     >
@@ -233,6 +241,7 @@ export function AuditTreemapTooltip({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

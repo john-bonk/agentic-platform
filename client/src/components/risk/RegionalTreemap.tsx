@@ -6,6 +6,7 @@
  */
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Globe, Pin, Bookmark, MoreHorizontal, X } from "lucide-react";
@@ -95,20 +96,24 @@ interface TreemapTooltipProps {
   company: CompanyData;
   location?: LocationData;
   onClose: () => void;
-  position: "right" | "left";
+  anchorRect: DOMRect | null;
 }
 
-function TreemapTooltip({ company, location, onClose, position }: TreemapTooltipProps) {
+function TreemapTooltip({ company, location, onClose, anchorRect }: TreemapTooltipProps) {
   const tooltip = company.tooltip;
-  if (!tooltip) return null;
+  if (!tooltip || !anchorRect) return null;
   
-  const positionStyles = position === "right" 
-    ? { top: "-10px", left: "calc(100% + 4px)" }
-    : { top: "-10px", right: "calc(100% + 4px)" };
+  const tooltipWidth = 288;
+  const viewportWidth = window.innerWidth;
+  const spaceOnRight = viewportWidth - anchorRect.right;
   
-  return (
+  const positionStyles: React.CSSProperties = spaceOnRight >= tooltipWidth + 20
+    ? { top: anchorRect.top + window.scrollY, left: anchorRect.right + 8 }
+    : { top: anchorRect.top + window.scrollY, left: anchorRect.left - tooltipWidth - 8 };
+  
+  return createPortal(
     <div 
-      className="absolute z-50 bg-white dark:bg-card rounded-lg shadow-xl border border-gray-200 dark:border-border p-4 w-72"
+      className="fixed z-[9999] bg-white dark:bg-card rounded-lg shadow-xl border border-gray-200 dark:border-border p-4 w-72"
       style={positionStyles}
       data-testid={`tooltip-${company.id}`}
       onClick={(e) => e.stopPropagation()}
@@ -214,7 +219,8 @@ function TreemapTooltip({ company, location, onClose, position }: TreemapTooltip
           ))}
         </ul>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -229,7 +235,7 @@ function TreemapCell({
 }) {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [tooltipPosition, setTooltipPosition] = useState<"right" | "left">("right");
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const cellRef = useRef<HTMLDivElement>(null);
   const colors = companyColors[colorIndex % companyColors.length];
   const hasLocations = company.locations.length > 0;
@@ -242,29 +248,17 @@ function TreemapCell({
   // Select color scheme based on highlighting state
   let activeColors;
   if (highlightTariffs) {
-    // When tariff highlighting is active, use red for affected, gray for non-affected
     activeColors = isHighTariffRisk 
       ? affectedColors[colorIndex % affectedColors.length]
       : inactiveColors[colorIndex % inactiveColors.length];
   } else {
-    // Normal mode - use teal color scheme
     activeColors = colors;
   }
 
-  // Calculate tooltip position based on available space
-  const calculateTooltipPosition = () => {
+  // Capture anchor rect for portal positioning
+  const captureAnchorRect = () => {
     if (cellRef.current) {
-      const rect = cellRef.current.getBoundingClientRect();
-      const tooltipWidth = 288; // w-72 = 18rem = 288px
-      const viewportWidth = window.innerWidth;
-      const spaceOnRight = viewportWidth - rect.right;
-      
-      // If not enough space on right, show on left
-      if (spaceOnRight < tooltipWidth + 20) {
-        setTooltipPosition("left");
-      } else {
-        setTooltipPosition("right");
-      }
+      setAnchorRect(cellRef.current.getBoundingClientRect());
     }
   };
 
@@ -288,11 +282,9 @@ function TreemapCell({
 
   const handleCompanyClick = () => {
     if (isOpen && selectedLocation === null) {
-      // If tooltip is open at company level, close it
       setIsOpen(false);
     } else {
-      // Open tooltip at company level
-      calculateTooltipPosition();
+      captureAnchorRect();
       setSelectedLocation(null);
       setIsOpen(true);
     }
@@ -301,12 +293,10 @@ function TreemapCell({
   const handleLocationClick = (location: LocationData, e: React.MouseEvent) => {
     e.stopPropagation();
     if (isOpen && selectedLocation?.id === location.id) {
-      // Clicking same location closes tooltip
       setIsOpen(false);
       setSelectedLocation(null);
     } else {
-      // Open/switch to new location
-      calculateTooltipPosition();
+      captureAnchorRect();
       setSelectedLocation(location);
       setIsOpen(true);
     }
@@ -361,7 +351,7 @@ function TreemapCell({
           company={company} 
           location={selectedLocation || undefined} 
           onClose={handleClose}
-          position={tooltipPosition}
+          anchorRect={anchorRect}
         />
       )}
     </div>

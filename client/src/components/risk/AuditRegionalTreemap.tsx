@@ -86,7 +86,7 @@ interface AuditTreemapCellProps {
 function AuditTreemapCell({ company, colorIndex, highlightIntegrationControls }: AuditTreemapCellProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<AuditLocationData | null>(null);
-  const [tooltipPosition, setTooltipPosition] = useState<"left" | "right">("right");
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const cellRef = useRef<HTMLDivElement>(null);
   const colors = companyColors[colorIndex % companyColors.length];
   const hasLocations = company.locations.length > 0;
@@ -106,12 +106,9 @@ function AuditTreemapCell({ company, colorIndex, highlightIntegrationControls }:
     activeColors = colors;
   }
 
-  const calculateTooltipPosition = () => {
+  const captureAnchorRect = () => {
     if (cellRef.current) {
-      const rect = cellRef.current.getBoundingClientRect();
-      const viewportWidth = window.innerWidth;
-      const spaceOnRight = viewportWidth - rect.right;
-      setTooltipPosition(spaceOnRight < 300 ? "left" : "right");
+      setAnchorRect(cellRef.current.getBoundingClientRect());
     }
   };
 
@@ -133,7 +130,7 @@ function AuditTreemapCell({ company, colorIndex, highlightIntegrationControls }:
     if (isOpen && selectedLocation === null) {
       setIsOpen(false);
     } else {
-      calculateTooltipPosition();
+      captureAnchorRect();
       setSelectedLocation(null);
       setIsOpen(true);
     }
@@ -145,7 +142,7 @@ function AuditTreemapCell({ company, colorIndex, highlightIntegrationControls }:
       setIsOpen(false);
       setSelectedLocation(null);
     } else {
-      calculateTooltipPosition();
+      captureAnchorRect();
       setSelectedLocation(location);
       setIsOpen(true);
     }
@@ -201,7 +198,7 @@ function AuditTreemapCell({ company, colorIndex, highlightIntegrationControls }:
           locationName={selectedLocation?.name}
           tooltip={company.tooltip}
           onClose={handleClose}
-          position={tooltipPosition}
+          anchorRect={anchorRect}
         />
       )}
     </div>
