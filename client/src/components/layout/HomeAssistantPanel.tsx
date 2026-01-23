@@ -109,8 +109,8 @@ function ActionCard({ action, onApply, onDismiss }: ActionCardProps) {
         <div className="flex items-start gap-2">
           <div className="mt-0.5">{getActionIcon()}</div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900">{action.label}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{action.description}</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-foreground">{action.label}</p>
+            <p className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{action.description}</p>
           </div>
         </div>
         {action.status === "pending" && (
@@ -353,15 +353,15 @@ function InteractiveExperience({ type, workspaceId, onClose, onNavigate }: Inter
   }
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg border border-slate-200" data-testid="interactive-experience">
+    <div className="p-4 bg-slate-50 dark:bg-muted rounded-lg border border-slate-200 dark:border-border" data-testid="interactive-experience">
       <div className="flex items-center justify-between mb-3">
-        <h4 className="font-medium text-gray-900">{experience.title}</h4>
+        <h4 className="font-medium text-gray-900 dark:text-foreground">{experience.title}</h4>
         <Button size="icon" variant="ghost" onClick={onClose}>
           <X className="w-4 h-4" />
         </Button>
       </div>
       
-      <p className="text-sm text-gray-500 mb-4">{experience.description}</p>
+      <p className="text-sm text-gray-500 dark:text-muted-foreground mb-4">{experience.description}</p>
       
       <div className="space-y-2 mb-4">
         {experience.steps.map((stepConfig, idx) => (
@@ -371,9 +371,9 @@ function InteractiveExperience({ type, workspaceId, onClose, onNavigate }: Inter
             ) : idx === step && !completed ? (
               <Loader2 className="w-4 h-4 text-[#266C92] animate-spin flex-shrink-0" />
             ) : (
-              <div className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0" />
+              <div className="w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600 flex-shrink-0" />
             )}
-            <span className={`text-sm ${idx <= step ? "text-gray-700" : "text-gray-400"}`}>
+            <span className={`text-sm ${idx <= step ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-500"}`}>
               {stepConfig.label}
             </span>
           </div>

@@ -51,16 +51,16 @@ function LiveWorkspaceInventory() {
   const quickActionCounts = getQuickActionCounts();
   
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="p-4 bg-slate-50 border-b">
+    <div className="border dark:border-border rounded-lg overflow-hidden">
+      <div className="p-4 bg-slate-50 dark:bg-muted border-b dark:border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[#266C92]/10 flex items-center justify-center">
               <Building2 className="w-5 h-5 text-[#266C92]" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Workspaces (Live Count)</h3>
-              <p className="text-sm text-gray-500">From workspaceStore.ts defaultWorkspaces</p>
+              <h3 className="font-semibold text-gray-900 dark:text-foreground">Workspaces (Live Count)</h3>
+              <p className="text-sm text-gray-500 dark:text-muted-foreground">From workspaceStore.ts defaultWorkspaces</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -69,12 +69,12 @@ function LiveWorkspaceInventory() {
           </div>
         </div>
       </div>
-      <div className="divide-y">
+      <div className="divide-y dark:divide-border">
         {defaultWorkspaces.map((ws) => (
           <div key={ws.id} className="p-4 flex items-center justify-between">
             <div>
-              <span className="font-medium text-gray-900">{ws.name}</span>
-              <span className="text-sm text-gray-500 ml-2">({ws.persona} - {ws.personaTitle})</span>
+              <span className="font-medium text-gray-900 dark:text-foreground">{ws.name}</span>
+              <span className="text-sm text-gray-500 dark:text-muted-foreground ml-2">({ws.persona} - {ws.personaTitle})</span>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="text-xs font-mono">{ws.id}</Badge>
@@ -85,9 +85,9 @@ function LiveWorkspaceInventory() {
           </div>
         ))}
       </div>
-      <div className="p-4 bg-gray-50 border-t">
+      <div className="p-4 bg-gray-50 dark:bg-muted/50 border-t dark:border-border">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">Solution Capabilities Available</span>
+          <span className="text-sm text-gray-600 dark:text-muted-foreground">Solution Capabilities Available</span>
           <Badge variant="secondary">{capabilityCount} capabilities</Badge>
         </div>
       </div>
@@ -100,16 +100,16 @@ function LiveQuickActionsInventory() {
   const totalCount = getTotalQuickActionCount();
   
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="p-4 bg-slate-50 border-b">
+    <div className="border dark:border-border rounded-lg overflow-hidden">
+      <div className="p-4 bg-slate-50 dark:bg-muted border-b dark:border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[#266C92]/10 flex items-center justify-center">
               <Bot className="w-5 h-5 text-[#266C92]" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Quick Actions (Live Count)</h3>
-              <p className="text-sm text-gray-500">From lib/quickActionsConfig.ts</p>
+              <h3 className="font-semibold text-gray-900 dark:text-foreground">Quick Actions (Live Count)</h3>
+              <p className="text-sm text-gray-500 dark:text-muted-foreground">From lib/quickActionsConfig.ts</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -118,7 +118,7 @@ function LiveQuickActionsInventory() {
           </div>
         </div>
       </div>
-      <div className="divide-y">
+      <div className="divide-y dark:divide-border">
         {Object.entries(workspaceQuickActions).map(([wsId, actions]) => (
           <div key={wsId} className="p-4">
             <div className="flex items-center justify-between mb-2">
@@ -129,7 +129,7 @@ function LiveQuickActionsInventory() {
             </div>
             <div className="grid grid-cols-2 gap-2">
               {actions.map((action) => (
-                <div key={action.id} className="text-sm text-gray-600 flex items-center gap-1.5">
+                <div key={action.id} className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: action.color }} />
                   {action.label}
                 </div>
@@ -138,9 +138,9 @@ function LiveQuickActionsInventory() {
           </div>
         ))}
       </div>
-      <div className="p-4 bg-gray-50 border-t">
+      <div className="p-4 bg-gray-50 dark:bg-muted/50 border-t dark:border-border">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">Generic Quick Actions (for custom workspaces)</span>
+          <span className="text-sm text-gray-600 dark:text-muted-foreground">Generic Quick Actions (for custom workspaces)</span>
           <Badge variant="secondary">{genericQuickActions.length} actions</Badge>
         </div>
       </div>
@@ -153,16 +153,16 @@ function LiveNavigationInventory() {
   const homeNavCount = Object.keys(workspaceHomeNav).length;
   
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="p-4 bg-slate-50 border-b">
+    <div className="border dark:border-border rounded-lg overflow-hidden">
+      <div className="p-4 bg-slate-50 dark:bg-muted border-b dark:border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[#266C92]/10 flex items-center justify-center">
               <Layers className="w-5 h-5 text-[#266C92]" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Navigation (Live Count)</h3>
-              <p className="text-sm text-gray-500">From config/navigation.ts modules</p>
+              <h3 className="font-semibold text-gray-900 dark:text-foreground">Navigation (Live Count)</h3>
+              <p className="text-sm text-gray-500 dark:text-muted-foreground">From config/navigation.ts modules</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -171,29 +171,29 @@ function LiveNavigationInventory() {
           </div>
         </div>
       </div>
-      <div className="divide-y">
+      <div className="divide-y dark:divide-border">
         {modules.map((mod, idx) => (
           <div key={mod.id} className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center">
-                {idx === 0 && <Home className="w-4 h-4 text-gray-600" />}
-                {idx === 1 && <Shield className="w-4 h-4 text-gray-600" />}
-                {idx === 2 && <BarChart3 className="w-4 h-4 text-gray-600" />}
-                {idx === 3 && <Activity className="w-4 h-4 text-gray-600" />}
-                {idx === 4 && <Workflow className="w-4 h-4 text-gray-600" />}
+              <div className="w-8 h-8 rounded bg-gray-100 dark:bg-muted flex items-center justify-center">
+                {idx === 0 && <Home className="w-4 h-4 text-gray-600 dark:text-gray-400" />}
+                {idx === 1 && <Shield className="w-4 h-4 text-gray-600 dark:text-gray-400" />}
+                {idx === 2 && <BarChart3 className="w-4 h-4 text-gray-600 dark:text-gray-400" />}
+                {idx === 3 && <Activity className="w-4 h-4 text-gray-600 dark:text-gray-400" />}
+                {idx === 4 && <Workflow className="w-4 h-4 text-gray-600 dark:text-gray-400" />}
               </div>
               <div>
-                <span className="font-medium text-gray-900">{mod.name}</span>
-                <span className="text-sm text-gray-500 ml-2">({mod.sideNavSections.length} nav sections)</span>
+                <span className="font-medium text-gray-900 dark:text-foreground">{mod.name}</span>
+                <span className="text-sm text-gray-500 dark:text-muted-foreground ml-2">({mod.sideNavSections.length} nav sections)</span>
               </div>
             </div>
             <Badge variant="outline" className="text-xs font-mono">{mod.id}</Badge>
           </div>
         ))}
       </div>
-      <div className="p-4 bg-gray-50 border-t">
+      <div className="p-4 bg-gray-50 dark:bg-muted/50 border-t dark:border-border">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">Workspace Home Navs (workspaceHomeNav)</span>
+          <span className="text-sm text-gray-600 dark:text-muted-foreground">Workspace Home Navs (workspaceHomeNav)</span>
           <Badge variant="secondary">{homeNavCount} configurations</Badge>
         </div>
       </div>
@@ -211,16 +211,16 @@ function LiveReportingInventory() {
   });
 
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="p-4 bg-slate-50 border-b">
+    <div className="border dark:border-border rounded-lg overflow-hidden">
+      <div className="p-4 bg-slate-50 dark:bg-muted border-b dark:border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[#266C92]/10 flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-[#266C92]" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Reporting Content (Live Count)</h3>
-              <p className="text-sm text-gray-500">From lib/reportingContent.ts slideDecks</p>
+              <h3 className="font-semibold text-gray-900 dark:text-foreground">Reporting Content (Live Count)</h3>
+              <p className="text-sm text-gray-500 dark:text-muted-foreground">From lib/reportingContent.ts slideDecks</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -229,13 +229,13 @@ function LiveReportingInventory() {
           </div>
         </div>
       </div>
-      <div className="divide-y">
+      <div className="divide-y dark:divide-border">
         {allDecks.map(({ workspaceId, deckKey, deck }) => (
           <div key={deck.id} className="p-4">
             <div className="flex items-start justify-between">
               <div>
-                <span className="font-medium text-gray-900">{deck.title}</span>
-                <p className="text-sm text-gray-500 mt-0.5">{deck.description}</p>
+                <span className="font-medium text-gray-900 dark:text-foreground">{deck.title}</span>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5">{deck.description}</p>
               </div>
               <div className="flex flex-col items-end gap-1">
                 <Badge variant="outline" className="text-xs">{workspaceId}</Badge>
@@ -263,16 +263,16 @@ function LiveWorkflowInventory() {
 
   return (
     <div className="space-y-4">
-      <div className="border rounded-lg overflow-hidden">
-        <div className="p-4 bg-slate-50 border-b">
+      <div className="border dark:border-border rounded-lg overflow-hidden">
+        <div className="p-4 bg-slate-50 dark:bg-muted border-b dark:border-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-[#266C92]/10 flex items-center justify-center">
                 <Workflow className="w-5 h-5 text-[#266C92]" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">Seeded Workflows (Live API Check)</h3>
-                <p className="text-sm text-gray-500">Verified from /api/workflows endpoint</p>
+                <h3 className="font-semibold text-gray-900 dark:text-foreground">Seeded Workflows (Live API Check)</h3>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground">Verified from /api/workflows endpoint</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -289,11 +289,11 @@ function LiveWorkflowInventory() {
         </div>
 
         {error ? (
-          <div className="p-4 text-red-600">Failed to load workflows from API</div>
+          <div className="p-4 text-red-600 dark:text-red-400">Failed to load workflows from API</div>
         ) : isLoading ? (
-          <div className="p-4 text-gray-500">Loading workflows...</div>
+          <div className="p-4 text-gray-500 dark:text-muted-foreground">Loading workflows...</div>
         ) : (
-          <div className="divide-y">
+          <div className="divide-y dark:divide-border">
             {expectedIds.map((expectedId) => {
               const found = workflows.find(w => w.id === expectedId);
               return (
@@ -305,11 +305,11 @@ function LiveWorkflowInventory() {
                       <CircleX className="w-5 h-5 text-red-500" />
                     )}
                     <div>
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium text-gray-900 dark:text-foreground">
                         {found?.name || expectedId}
                       </span>
                       {found?.description && (
-                        <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">{found.description}</p>
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5 line-clamp-1">{found.description}</p>
                       )}
                     </div>
                   </div>
@@ -470,21 +470,21 @@ function LivePublishReadiness() {
       <CardContent>
         <div className="space-y-2">
           {checks.map((check) => (
-            <div key={check.id} className="flex items-center justify-between py-2 border-b last:border-0">
+            <div key={check.id} className="flex items-center justify-between py-2 border-b dark:border-border last:border-0">
               <div className="flex items-center gap-3">
                 {check.loading ? (
-                  <div className="w-5 h-5 rounded-full border-2 border-gray-300 border-t-[#266C92] animate-spin" />
+                  <div className="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-[#266C92] animate-spin" />
                 ) : check.status ? (
                   <CheckCircle2 className="w-5 h-5 text-green-500" />
                 ) : (
                   <AlertCircle className="w-5 h-5 text-red-500" />
                 )}
                 <div>
-                  <span className="text-sm font-medium">{check.label}</span>
-                  <span className="text-xs text-gray-500 ml-2">({check.actual})</span>
+                  <span className="text-sm font-medium text-foreground">{check.label}</span>
+                  <span className="text-xs text-gray-500 dark:text-muted-foreground ml-2">({check.actual})</span>
                 </div>
               </div>
-              <code className="text-xs text-gray-400 font-mono max-w-[200px] truncate" title={check.location}>
+              <code className="text-xs text-gray-400 dark:text-gray-500 font-mono max-w-[200px] truncate" title={check.location}>
                 {check.location}
               </code>
             </div>
@@ -537,14 +537,14 @@ function DataArchitecture() {
           <Separator />
 
           <div>
-            <h4 className="font-medium mb-2">Data Flow on Server Start</h4>
+            <h4 className="font-medium mb-2 text-foreground">Data Flow on Server Start</h4>
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <Badge className="bg-[#266C92]">Server Start</Badge>
-              <ChevronRight className="w-4 h-4 text-gray-400" />
+              <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               <Badge variant="secondary">MemStorage Constructor</Badge>
-              <ChevronRight className="w-4 h-4 text-gray-400" />
+              <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               <Badge variant="secondary">seedExampleData()</Badge>
-              <ChevronRight className="w-4 h-4 text-gray-400" />
+              <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               <Badge className="bg-green-600 text-white">{SEEDED_WORKFLOW_IDS.length} Workflows Ready</Badge>
             </div>
           </div>
@@ -561,21 +561,21 @@ function DataArchitecture() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="font-medium text-sm text-gray-700">Client-Side Hardcoded</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li><code className="bg-gray-100 px-1 rounded">lib/workspaceStore.ts</code> - {defaultWorkspaces.length} Workspaces</li>
-                <li><code className="bg-gray-100 px-1 rounded">config/navigation.ts</code> - {modules.length} Modules</li>
-                <li><code className="bg-gray-100 px-1 rounded">lib/reportingContent.ts</code> - Slide Decks</li>
-                <li><code className="bg-gray-100 px-1 rounded">HomeAssistantPanel.tsx</code> - Quick Actions</li>
+              <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300">Client-Side Hardcoded</h4>
+              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">lib/workspaceStore.ts</code> - {defaultWorkspaces.length} Workspaces</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">config/navigation.ts</code> - {modules.length} Modules</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">lib/reportingContent.ts</code> - Slide Decks</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">HomeAssistantPanel.tsx</code> - Quick Actions</li>
               </ul>
             </div>
             <div className="space-y-2">
-              <h4 className="font-medium text-sm text-gray-700">Server-Side Hardcoded</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li><code className="bg-gray-100 px-1 rounded">server/storage.ts</code> - {SEEDED_WORKFLOW_IDS.length} Workflows</li>
-                <li><code className="bg-gray-100 px-1 rounded">server/storage.ts</code> - Workflow Nodes</li>
-                <li><code className="bg-gray-100 px-1 rounded">server/storage.ts</code> - Workflow Edges</li>
-                <li><code className="bg-gray-100 px-1 rounded">server/routes.ts</code> - API Endpoints</li>
+              <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300">Server-Side Hardcoded</h4>
+              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">server/storage.ts</code> - {SEEDED_WORKFLOW_IDS.length} Workflows</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">server/storage.ts</code> - Workflow Nodes</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">server/storage.ts</code> - Workflow Edges</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">server/routes.ts</code> - API Endpoints</li>
               </ul>
             </div>
           </div>
@@ -648,7 +648,7 @@ export default function PrototypeMetaPage() {
               <CheckCircle2 className="w-5 h-5 text-[#266C92] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium text-[#266C92]">Published Prototype Guarantee</p>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   All items shown as <strong>"Verified"</strong> on the Publish Readiness tab are hardcoded in the source 
                   code and will be available to all visitors when published. The live API checks confirm workflows are 
                   properly seeded on server start.
