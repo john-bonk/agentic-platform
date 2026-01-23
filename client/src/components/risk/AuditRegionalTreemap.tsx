@@ -47,31 +47,34 @@ interface AuditRegionalTreemapsProps {
   highlightIntegrationControls?: boolean;
 }
 
+// Light mode: vibrant teal, Dark mode: muted, elegant teal with transparency
 const companyColors = [
-  { bg: "bg-[#266C92]", text: "text-white", locationBg: "bg-[#1a5270]" },
-  { bg: "bg-[#3a8ab5]", text: "text-white", locationBg: "bg-[#266C92]" },
-  { bg: "bg-[#5ca3c7]", text: "text-white", locationBg: "bg-[#3a8ab5]" },
-  { bg: "bg-[#7ebdd8]", text: "text-gray-800", locationBg: "bg-[#5ca3c7]" },
-  { bg: "bg-[#a0d4e8]", text: "text-gray-800", locationBg: "bg-[#7ebdd8]" },
-  { bg: "bg-[#c2e8f5]", text: "text-gray-800", locationBg: "bg-[#a0d4e8]" },
+  { bg: "bg-[#266C92] dark:bg-[#266C92]/40", text: "text-white dark:text-gray-100", locationBg: "bg-[#1a5270] dark:bg-[#1a5270]/50" },
+  { bg: "bg-[#3a8ab5] dark:bg-[#3a8ab5]/35", text: "text-white dark:text-gray-100", locationBg: "bg-[#266C92] dark:bg-[#266C92]/40" },
+  { bg: "bg-[#5ca3c7] dark:bg-[#5ca3c7]/30", text: "text-white dark:text-gray-100", locationBg: "bg-[#3a8ab5] dark:bg-[#3a8ab5]/35" },
+  { bg: "bg-[#7ebdd8] dark:bg-[#7ebdd8]/25", text: "text-gray-800 dark:text-gray-200", locationBg: "bg-[#5ca3c7] dark:bg-[#5ca3c7]/30" },
+  { bg: "bg-[#a0d4e8] dark:bg-[#a0d4e8]/20", text: "text-gray-800 dark:text-gray-200", locationBg: "bg-[#7ebdd8] dark:bg-[#7ebdd8]/25" },
+  { bg: "bg-[#c2e8f5] dark:bg-[#c2e8f5]/15", text: "text-gray-800 dark:text-gray-300", locationBg: "bg-[#a0d4e8] dark:bg-[#a0d4e8]/20" },
 ];
 
+// Red color scheme for high risk (affected) tiles - muted in dark mode
 const affectedColors = [
-  { bg: "bg-red-600", text: "text-white", locationBg: "bg-red-700" },
-  { bg: "bg-red-500", text: "text-white", locationBg: "bg-red-600" },
-  { bg: "bg-red-400", text: "text-white", locationBg: "bg-red-500" },
-  { bg: "bg-red-300", text: "text-gray-800", locationBg: "bg-red-400" },
-  { bg: "bg-red-200", text: "text-gray-800", locationBg: "bg-red-300" },
-  { bg: "bg-red-100", text: "text-gray-800", locationBg: "bg-red-200" },
+  { bg: "bg-red-600 dark:bg-red-600/50", text: "text-white dark:text-gray-100", locationBg: "bg-red-700 dark:bg-red-700/50" },
+  { bg: "bg-red-500 dark:bg-red-500/45", text: "text-white dark:text-gray-100", locationBg: "bg-red-600 dark:bg-red-600/50" },
+  { bg: "bg-red-400 dark:bg-red-400/40", text: "text-white dark:text-gray-100", locationBg: "bg-red-500 dark:bg-red-500/45" },
+  { bg: "bg-red-300 dark:bg-red-300/35", text: "text-gray-800 dark:text-gray-200", locationBg: "bg-red-400 dark:bg-red-400/40" },
+  { bg: "bg-red-200 dark:bg-red-200/30", text: "text-gray-800 dark:text-gray-200", locationBg: "bg-red-300 dark:bg-red-300/35" },
+  { bg: "bg-red-100 dark:bg-red-100/25", text: "text-gray-800 dark:text-gray-300", locationBg: "bg-red-200 dark:bg-red-200/30" },
 ];
 
+// Gray color scheme for non-affected tiles - subtle in dark mode
 const inactiveColors = [
-  { bg: "bg-gray-400", text: "text-white", locationBg: "bg-gray-500" },
-  { bg: "bg-gray-300", text: "text-gray-700", locationBg: "bg-gray-400" },
-  { bg: "bg-gray-200", text: "text-gray-700", locationBg: "bg-gray-300" },
-  { bg: "bg-gray-200", text: "text-gray-600", locationBg: "bg-gray-300" },
-  { bg: "bg-gray-100", text: "text-gray-600", locationBg: "bg-gray-200" },
-  { bg: "bg-gray-100", text: "text-gray-500", locationBg: "bg-gray-200" },
+  { bg: "bg-gray-400 dark:bg-gray-600/40", text: "text-white dark:text-gray-200", locationBg: "bg-gray-500 dark:bg-gray-500/40" },
+  { bg: "bg-gray-300 dark:bg-gray-500/35", text: "text-gray-700 dark:text-gray-300", locationBg: "bg-gray-400 dark:bg-gray-600/40" },
+  { bg: "bg-gray-200 dark:bg-gray-500/30", text: "text-gray-700 dark:text-gray-300", locationBg: "bg-gray-300 dark:bg-gray-500/35" },
+  { bg: "bg-gray-200 dark:bg-gray-500/25", text: "text-gray-600 dark:text-gray-300", locationBg: "bg-gray-300 dark:bg-gray-500/30" },
+  { bg: "bg-gray-100 dark:bg-gray-500/20", text: "text-gray-600 dark:text-gray-400", locationBg: "bg-gray-200 dark:bg-gray-500/25" },
+  { bg: "bg-gray-100 dark:bg-gray-500/15", text: "text-gray-500 dark:text-gray-400", locationBg: "bg-gray-200 dark:bg-gray-500/20" },
 ];
 
 interface AuditTreemapCellProps {
