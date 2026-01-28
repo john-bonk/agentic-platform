@@ -654,6 +654,7 @@ export function WorkspaceCreationWizard({
       type: "custom",
       persona: "custom",
       icon: "layout-dashboard",
+      isCustom: true,
       moduleConfig: {
         selectedBuckets,
         enabledModules,
