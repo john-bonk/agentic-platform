@@ -476,9 +476,9 @@ function ConfigurationSummary({
   };
   
   return (
-    <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-4">
+    <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-4 h-full flex flex-col">
       {/* Header with workspace name and inline stats */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 shrink-0">
         <div>
           <p className="text-[10px] text-gray-400 dark:text-muted-foreground uppercase tracking-wide">Workspace</p>
           <p className="font-semibold text-gray-900 dark:text-foreground">{workspaceName || "Untitled"}</p>
@@ -486,12 +486,12 @@ function ConfigurationSummary({
         <div className="flex items-center gap-3 text-xs">
           <div className="text-center">
             <span className="font-bold text-[#266C92]">{stats.bucketCount}</span>
-            <span className="text-gray-400 ml-1">capabilities</span>
+            <span className="text-gray-400 ml-1">modules</span>
           </div>
           <div className="h-3 w-px bg-gray-200 dark:bg-border" />
           <div className="text-center">
             <span className="font-bold text-[#266C92]">{stats.totalModules}</span>
-            <span className="text-gray-400 ml-1">modules</span>
+            <span className="text-gray-400 ml-1">capabilities</span>
           </div>
           <div className="h-3 w-px bg-gray-200 dark:bg-border" />
           <div className="text-center">
@@ -501,10 +501,10 @@ function ConfigurationSummary({
         </div>
       </div>
       
-      {/* Module utilization bar */}
-      <div className="mb-3">
+      {/* Capability utilization bar */}
+      <div className="mb-3 shrink-0">
         <div className="flex items-center justify-between text-[10px] mb-1">
-          <span className="text-gray-500 dark:text-muted-foreground">Module Utilization</span>
+          <span className="text-gray-500 dark:text-muted-foreground">Capability Utilization</span>
           <span className="font-medium text-gray-700 dark:text-gray-300">{moduleUtilization}% enabled</span>
         </div>
         <div className="h-1.5 bg-gray-100 dark:bg-muted rounded-full overflow-hidden">
@@ -515,8 +515,8 @@ function ConfigurationSummary({
         </div>
       </div>
       
-      {/* Capability breakdown - expandable cards */}
-      <div className="space-y-2 max-h-[180px] overflow-y-auto">
+      {/* Module breakdown - expandable cards */}
+      <div className="space-y-2 flex-1 overflow-y-auto">
         {selectedBucketData.map(bucket => {
           const modules = enabledModules[bucket.id] || [];
           const totalBucketModules = bucket.moduleCapabilities.length;
@@ -1073,8 +1073,8 @@ export function WorkspaceCreationWizard({
               </div>
               
               <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
-                {/* Configuration Summary - wider section */}
-                <div className="flex-1 overflow-auto">
+                {/* Configuration Summary - wider section, same height as preview */}
+                <div className="flex-1 flex flex-col min-h-0">
                   <ConfigurationSummary
                     workspaceName={workspaceName}
                     selectedBuckets={selectedBuckets}
