@@ -1,17 +1,14 @@
 /**
  * Workspace Creation Wizard
  * 
- * Multi-stage wizard for creating custom workspaces with:
- * - Stage 1: Product capability bucket selection
- * - Stage 2: Module capability configuration per bucket
- * - Stage 3: Review with live navigation preview
+ * Full-screen multi-stage wizard for creating custom workspaces with:
+ * - Stage 1: Workspace naming
+ * - Stage 2: Product capability bucket selection (9 buckets in 3x3 grid)
+ * - Stage 3: Module capability configuration per bucket (9+ modules per bucket)
+ * - Stage 4: Review with live navigation preview
  */
 
 import { useState, useMemo, useCallback, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +48,47 @@ import {
   Activity,
   BarChart2,
   Cloud,
+  Database,
+  Cpu,
+  Brain,
+  X,
+  Library,
+  UserCheck,
+  GitBranch,
+  Folder,
+  Globe,
+  FileSignature,
+  CheckCircle,
+  Clock,
+  Server,
+  Key,
+  PieChart,
+  GraduationCap,
+  HardDrive,
+  Layers,
+  GitPullRequest,
+  BookOpen,
+  ShieldOff,
+  Kanban,
+  Book,
+  EyeOff,
+  Search,
+  Send,
+  UserPlus,
+  Star,
+  Network,
+  UserMinus,
+  MessageSquare,
+  GitMerge,
+  Thermometer,
+  Truck,
+  Trees,
+  Droplet,
+  Heart,
+  Gauge,
+  GitCompare,
+  Presentation,
+  Link,
 } from "lucide-react";
 import {
   productCapabilityBuckets,
@@ -79,16 +117,19 @@ const stepLabels: Record<WizardStep, string> = {
   preview: "Preview",
 };
 
-const getBucketIcon = (iconName: string, className: string = "w-5 h-5") => {
-  switch (iconName) {
-    case "trending-up": return <TrendingUp className={className} />;
-    case "clipboard-list": return <ClipboardList className={className} />;
-    case "scale": return <Scale className={className} />;
-    case "lock": return <Lock className={className} />;
-    case "users": return <Users className={className} />;
-    case "leaf": return <Leaf className={className} />;
-    default: return <LayoutDashboard className={className} />;
-  }
+const getBucketIcon = (iconName: string, className: string = "w-6 h-6") => {
+  const icons: Record<string, JSX.Element> = {
+    "trending-up": <TrendingUp className={className} />,
+    "clipboard-list": <ClipboardList className={className} />,
+    "scale": <Scale className={className} />,
+    "lock": <Lock className={className} />,
+    "users": <Users className={className} />,
+    "leaf": <Leaf className={className} />,
+    "shield-check": <ShieldCheck className={className} />,
+    "database": <Database className={className} />,
+    "brain": <Brain className={className} />,
+  };
+  return icons[iconName] || <LayoutDashboard className={className} />;
 };
 
 const getModuleIcon = (iconName: string, className: string = "w-4 h-4") => {
@@ -113,13 +154,53 @@ const getModuleIcon = (iconName: string, className: string = "w-4 h-4") => {
     "activity": <Activity className={className} />,
     "bar-chart-2": <BarChart2 className={className} />,
     "cloud": <Cloud className={className} />,
+    "library": <Library className={className} />,
+    "user-check": <UserCheck className={className} />,
+    "git-branch": <GitBranch className={className} />,
+    "folder": <Folder className={className} />,
+    "globe": <Globe className={className} />,
+    "file-signature": <FileSignature className={className} />,
+    "check-circle": <CheckCircle className={className} />,
+    "users": <Users className={className} />,
+    "clock": <Clock className={className} />,
+    "server": <Server className={className} />,
+    "key": <Key className={className} />,
+    "pie-chart": <PieChart className={className} />,
+    "graduation-cap": <GraduationCap className={className} />,
+    "hard-drive": <HardDrive className={className} />,
+    "layers": <Layers className={className} />,
+    "git-pull-request": <GitPullRequest className={className} />,
+    "book-open": <BookOpen className={className} />,
+    "shield-off": <ShieldOff className={className} />,
+    "kanban": <Kanban className={className} />,
+    "book": <Book className={className} />,
+    "eye-off": <EyeOff className={className} />,
+    "search": <Search className={className} />,
+    "send": <Send className={className} />,
+    "user-plus": <UserPlus className={className} />,
+    "star": <Star className={className} />,
+    "network": <Network className={className} />,
+    "user-minus": <UserMinus className={className} />,
+    "cpu": <Cpu className={className} />,
+    "message-square": <MessageSquare className={className} />,
+    "git-merge": <GitMerge className={className} />,
+    "scale": <Scale className={className} />,
+    "thermometer": <Thermometer className={className} />,
+    "truck": <Truck className={className} />,
+    "trees": <Trees className={className} />,
+    "droplet": <Droplet className={className} />,
+    "heart": <Heart className={className} />,
+    "gauge": <Gauge className={className} />,
+    "git-compare": <GitCompare className={className} />,
+    "presentation": <Presentation className={className} />,
+    "link": <Link className={className} />,
   };
   return icons[iconName] || <LayoutDashboard className={className} />;
 };
 
 function StepIndicator({ currentStep, completedSteps }: { currentStep: WizardStep; completedSteps: Set<WizardStep> }) {
   return (
-    <div className="flex items-center gap-1" data-testid="wizard-step-indicator">
+    <div className="flex items-center justify-center gap-2" data-testid="wizard-step-indicator">
       {stepOrder.map((step, index) => {
         const isActive = step === currentStep;
         const isCompleted = completedSteps.has(step);
@@ -128,26 +209,26 @@ function StepIndicator({ currentStep, completedSteps }: { currentStep: WizardSte
         return (
           <div key={step} className="flex items-center">
             <div
-              className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium transition-colors ${
+              className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors ${
                 isActive
                   ? "bg-[#266C92] text-white"
                   : isCompleted
                   ? "bg-[#266C92]/20 text-[#266C92] dark:bg-[#266C92]/30"
-                  : "bg-gray-100 dark:bg-muted text-gray-400 dark:text-muted-foreground"
+                  : "bg-gray-200 dark:bg-muted text-gray-500 dark:text-muted-foreground"
               }`}
               data-testid={`step-${step}`}
             >
-              {isCompleted ? <Check className="w-3.5 h-3.5" /> : stepIndex}
+              {isCompleted ? <Check className="w-4 h-4" /> : stepIndex}
             </div>
             <span
-              className={`ml-1.5 text-xs font-medium hidden sm:inline ${
+              className={`ml-2 text-sm font-medium ${
                 isActive ? "text-[#266C92]" : "text-gray-500 dark:text-muted-foreground"
               }`}
             >
               {stepLabels[step]}
             </span>
             {index < stepOrder.length - 1 && (
-              <ChevronRight className="w-4 h-4 mx-2 text-gray-300 dark:text-muted-foreground" />
+              <ChevronRight className="w-5 h-5 mx-3 text-gray-300 dark:text-muted-foreground" />
             )}
           </div>
         );
@@ -168,41 +249,32 @@ function BucketCard({
   return (
     <button
       onClick={onToggle}
-      className={`flex flex-col p-4 rounded-lg border-2 text-left transition-all hover-elevate ${
+      className={`flex flex-col items-center justify-center p-6 rounded-xl border-2 text-center transition-all hover-elevate ${
         isSelected
-          ? "border-[#266C92] bg-[#266C92]/5 dark:bg-[#266C92]/10"
-          : "border-gray-200 dark:border-border bg-white dark:bg-card"
+          ? "border-[#266C92] bg-[#266C92]/5 dark:bg-[#266C92]/10 shadow-md"
+          : "border-gray-200 dark:border-border bg-white dark:bg-card hover:border-gray-300 dark:hover:border-muted-foreground/30"
       }`}
       data-testid={`bucket-${bucket.id}`}
     >
-      <div className="flex items-start justify-between mb-2">
-        <div
-          className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-            isSelected ? "bg-[#266C92]/15 text-[#266C92]" : "bg-gray-100 dark:bg-muted text-gray-500 dark:text-muted-foreground"
-          }`}
-          style={isSelected ? { backgroundColor: `${bucket.color}15`, color: bucket.color } : {}}
-        >
-          {getBucketIcon(bucket.icon, "w-5 h-5")}
-        </div>
-        <div
-          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-            isSelected
-              ? "border-[#266C92] bg-[#266C92]"
-              : "border-gray-300 dark:border-border"
-          }`}
-        >
-          {isSelected && <Check className="w-3 h-3 text-white" />}
-        </div>
+      <div
+        className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-colors ${
+          isSelected 
+            ? "bg-[#266C92]/10 text-[#266C92]" 
+            : "bg-gray-100 dark:bg-muted text-gray-400 dark:text-muted-foreground"
+        }`}
+      >
+        {getBucketIcon(bucket.icon, "w-6 h-6")}
       </div>
-      <div className={`font-medium text-sm ${isSelected ? "text-[#266C92]" : "text-gray-900 dark:text-foreground"}`}>
+      <div className={`font-medium text-sm ${isSelected ? "text-[#266C92]" : "text-gray-700 dark:text-foreground"}`}>
         {bucket.name}
       </div>
-      <div className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5 line-clamp-2">
-        {bucket.description}
-      </div>
-      <div className="mt-2 text-[10px] text-gray-400 dark:text-muted-foreground">
-        {bucket.moduleCapabilities.length} modules available
-      </div>
+      {isSelected && (
+        <div className="absolute top-2 right-2">
+          <div className="w-5 h-5 rounded-full bg-[#266C92] flex items-center justify-center">
+            <Check className="w-3 h-3 text-white" />
+          </div>
+        </div>
+      )}
     </button>
   );
 }
@@ -229,7 +301,7 @@ function ModuleCard({
       data-testid={`module-${module.id}`}
     >
       <div
-        className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 ${
+        className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
           isEnabled ? "text-[#266C92]" : "bg-gray-100 dark:bg-muted text-gray-400 dark:text-muted-foreground"
         }`}
         style={isEnabled ? { backgroundColor: `${bucketColor}15`, color: bucketColor } : {}}
@@ -241,7 +313,7 @@ function ModuleCard({
           {module.name}
         </div>
         <div className="text-xs text-gray-500 dark:text-muted-foreground truncate">
-          {module.navContribution.items.length} nav items
+          {module.description}
         </div>
       </div>
       <div
@@ -280,27 +352,27 @@ function NavigationPreview({ sections }: { sections: SideNavSection[] }) {
 
   return (
     <div
-      className="bg-gray-50 dark:bg-muted/50 rounded-lg border border-gray-200 dark:border-border overflow-hidden"
+      className="bg-gray-50 dark:bg-muted/30 rounded-xl border border-gray-200 dark:border-border overflow-hidden"
       data-testid="nav-preview"
     >
-      <div className="px-3 py-2 bg-gray-100 dark:bg-muted border-b border-gray-200 dark:border-border">
-        <span className="text-xs font-medium text-gray-600 dark:text-muted-foreground uppercase tracking-wide">
+      <div className="px-4 py-3 bg-gray-100 dark:bg-muted border-b border-gray-200 dark:border-border">
+        <span className="text-sm font-medium text-gray-700 dark:text-foreground">
           Navigation Preview
         </span>
       </div>
-      <ScrollArea className="h-[320px]">
-        <div className="p-2 space-y-1">
+      <ScrollArea className="h-[400px]">
+        <div className="p-3 space-y-1">
           {sections.map(section => {
             const isExpanded = expandedSections.has(section.id);
             return (
               <div key={section.id} data-testid={`preview-section-${section.id}`}>
                 <button
                   onClick={() => toggleSection(section.id)}
-                  className="flex items-center gap-1.5 w-full px-2 py-1.5 text-left rounded hover-elevate"
+                  className="flex items-center gap-2 w-full px-3 py-2 text-left rounded-lg hover-elevate"
                 >
                   {section.collapsible && (
                     <ChevronDown
-                      className={`w-3.5 h-3.5 text-gray-400 transition-transform ${
+                      className={`w-4 h-4 text-gray-400 transition-transform ${
                         isExpanded ? "" : "-rotate-90"
                       }`}
                     />
@@ -310,16 +382,16 @@ function NavigationPreview({ sections }: { sections: SideNavSection[] }) {
                   </span>
                 </button>
                 {isExpanded && (
-                  <div className="ml-5 space-y-0.5">
+                  <div className="ml-6 space-y-0.5">
                     {section.items.map(item => (
                       <div
                         key={item.id}
-                        className="flex items-center justify-between px-2 py-1.5 rounded text-sm text-gray-700 dark:text-foreground hover:bg-gray-100 dark:hover:bg-muted/80 transition-colors"
+                        className="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-foreground hover:bg-gray-100 dark:hover:bg-muted/80 transition-colors"
                         data-testid={`preview-item-${item.id}`}
                       >
                         <span className="truncate">{item.label}</span>
                         {item.badge && (
-                          <Badge variant="secondary" className="text-[10px] h-4 px-1.5 ml-2">
+                          <Badge variant="secondary" className="text-[10px] h-5 px-2 ml-2">
                             {item.badge}
                           </Badge>
                         )}
@@ -347,65 +419,72 @@ function ConfigurationSummary({
   enabledModules: Record<string, string[]>;
   stats: { totalModules: number; totalNavItems: number; bucketCount: number };
 }) {
+  const selectedBucketData = productCapabilityBuckets.filter(b => selectedBuckets.includes(b.id));
+  
   return (
-    <div className="space-y-4" data-testid="config-summary">
-      <div>
-        <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase tracking-wide">Workspace Name</Label>
-        <div className="mt-1 font-semibold text-lg text-gray-900 dark:text-foreground">{workspaceName}</div>
-      </div>
+    <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-5">
+      <h3 className="font-semibold text-gray-900 dark:text-foreground mb-4">Configuration Summary</h3>
       
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-[#266C92]/5 dark:bg-[#266C92]/10 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-[#266C92]">{stats.bucketCount}</div>
-          <div className="text-xs text-gray-500 dark:text-muted-foreground">Capabilities</div>
+      <div className="space-y-4">
+        <div>
+          <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase">Workspace Name</Label>
+          <p className="font-medium text-gray-900 dark:text-foreground">{workspaceName || "Untitled Workspace"}</p>
         </div>
-        <div className="bg-[#266C92]/5 dark:bg-[#266C92]/10 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-[#266C92]">{stats.totalModules}</div>
-          <div className="text-xs text-gray-500 dark:text-muted-foreground">Modules</div>
+        
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-gray-50 dark:bg-muted/50 rounded-lg p-3 text-center">
+            <p className="text-2xl font-bold text-[#266C92]">{stats.bucketCount}</p>
+            <p className="text-xs text-gray-500 dark:text-muted-foreground">Capabilities</p>
+          </div>
+          <div className="bg-gray-50 dark:bg-muted/50 rounded-lg p-3 text-center">
+            <p className="text-2xl font-bold text-[#266C92]">{stats.totalModules}</p>
+            <p className="text-xs text-gray-500 dark:text-muted-foreground">Modules</p>
+          </div>
+          <div className="bg-gray-50 dark:bg-muted/50 rounded-lg p-3 text-center">
+            <p className="text-2xl font-bold text-[#266C92]">{stats.totalNavItems}</p>
+            <p className="text-xs text-gray-500 dark:text-muted-foreground">Nav Items</p>
+          </div>
         </div>
-        <div className="bg-[#266C92]/5 dark:bg-[#266C92]/10 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-[#266C92]">{stats.totalNavItems + 4}</div>
-          <div className="text-xs text-gray-500 dark:text-muted-foreground">Nav Items</div>
+        
+        <div>
+          <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase mb-2 block">Selected Capabilities</Label>
+          <div className="flex flex-wrap gap-2">
+            {selectedBucketData.map(bucket => (
+              <Badge 
+                key={bucket.id} 
+                variant="secondary"
+                className="text-xs"
+              >
+                {bucket.name}
+              </Badge>
+            ))}
+          </div>
         </div>
-      </div>
-
-      <div>
-        <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase tracking-wide mb-2 block">
-          Selected Capabilities
-        </Label>
-        <div className="space-y-2">
-          {selectedBuckets.map(bucketId => {
-            const bucket = productCapabilityBuckets.find(b => b.id === bucketId);
-            if (!bucket) return null;
-            const modules = enabledModules[bucketId] || [];
-            
-            return (
-              <div key={bucketId} className="bg-white dark:bg-card rounded-lg border border-gray-200 dark:border-border p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <div
-                    className="w-6 h-6 rounded flex items-center justify-center"
-                    style={{ backgroundColor: `${bucket.color}15`, color: bucket.color }}
-                  >
-                    {getBucketIcon(bucket.icon, "w-3.5 h-3.5")}
+        
+        <div>
+          <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase mb-2 block">Enabled Modules</Label>
+          <div className="space-y-2 max-h-[200px] overflow-y-auto">
+            {selectedBucketData.map(bucket => {
+              const modules = enabledModules[bucket.id] || [];
+              if (modules.length === 0) return null;
+              
+              return (
+                <div key={bucket.id}>
+                  <p className="text-xs font-medium text-gray-600 dark:text-muted-foreground mb-1">{bucket.name}</p>
+                  <div className="flex flex-wrap gap-1">
+                    {modules.map(moduleId => {
+                      const module = bucket.moduleCapabilities.find(m => m.id === moduleId);
+                      return module ? (
+                        <Badge key={moduleId} variant="outline" className="text-[10px]">
+                          {module.name}
+                        </Badge>
+                      ) : null;
+                    })}
                   </div>
-                  <span className="font-medium text-sm text-gray-900 dark:text-foreground">{bucket.name}</span>
-                  <Badge variant="secondary" className="text-[10px] h-4 ml-auto">
-                    {modules.length} modules
-                  </Badge>
                 </div>
-                <div className="flex flex-wrap gap-1">
-                  {modules.map(moduleId => {
-                    const module = bucket.moduleCapabilities.find(m => m.id === moduleId);
-                    return module ? (
-                      <Badge key={moduleId} variant="outline" className="text-[10px]">
-                        {module.name}
-                      </Badge>
-                    ) : null;
-                  })}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -417,92 +496,82 @@ export function WorkspaceCreationWizard({
   onOpenChange,
   onWorkspaceCreated,
 }: WorkspaceCreationWizardProps) {
-  const { addWorkspace } = useWorkspaceStore();
-  
   const [currentStep, setCurrentStep] = useState<WizardStep>("name");
   const [workspaceName, setWorkspaceName] = useState("");
   const [selectedBuckets, setSelectedBuckets] = useState<string[]>([]);
   const [enabledModules, setEnabledModules] = useState<Record<string, string[]>>({});
-  const [activeBucketTab, setActiveBucketTab] = useState<string>("");
+  const [activeBucketTab, setActiveBucketTab] = useState<string | null>(null);
+  
+  const addWorkspace = useWorkspaceStore(state => state.addWorkspace);
 
   const completedSteps = useMemo(() => {
     const completed = new Set<WizardStep>();
-    if (workspaceName.trim().length > 0) completed.add("name");
+    if (workspaceName.trim()) completed.add("name");
     if (selectedBuckets.length > 0) completed.add("buckets");
-    const hasAnyModules = Object.values(enabledModules).some(arr => arr.length > 0);
-    if (hasAnyModules) completed.add("modules");
+    const totalModules = Object.values(enabledModules).reduce((sum, arr) => sum + arr.length, 0);
+    if (totalModules > 0) completed.add("modules");
     return completed;
   }, [workspaceName, selectedBuckets, enabledModules]);
 
-  const navSections = useMemo(
-    () => generateNavSections(selectedBuckets, enabledModules),
+  const stats = useMemo(() => 
+    getCapabilityStats(selectedBuckets, enabledModules),
     [selectedBuckets, enabledModules]
   );
 
-  const stats = useMemo(
-    () => getCapabilityStats(selectedBuckets, enabledModules),
+  const navSections = useMemo(() => 
+    generateNavSections(selectedBuckets, enabledModules),
     [selectedBuckets, enabledModules]
   );
 
-  const handleBucketToggle = useCallback((bucketId: string) => {
+  const toggleBucket = useCallback((bucketId: string) => {
     setSelectedBuckets(prev => {
-      const isSelected = prev.includes(bucketId);
-      if (isSelected) {
-        const next = prev.filter(id => id !== bucketId);
+      if (prev.includes(bucketId)) {
+        const newSelected = prev.filter(id => id !== bucketId);
         setEnabledModules(current => {
           const updated = { ...current };
           delete updated[bucketId];
           return updated;
         });
         if (activeBucketTab === bucketId) {
-          setActiveBucketTab(next[0] || "");
+          setActiveBucketTab(newSelected[0] || null);
         }
-        return next;
+        return newSelected;
       } else {
-        const bucket = productCapabilityBuckets.find(b => b.id === bucketId);
-        if (bucket) {
-          const defaultModules = bucket.moduleCapabilities
-            .filter(m => m.defaultEnabled)
-            .map(m => m.id);
-          setEnabledModules(current => ({ ...current, [bucketId]: defaultModules }));
-        }
+        const newSelected = [...prev, bucketId];
+        setEnabledModules(current => ({
+          ...current,
+          ...initializeEnabledModules([bucketId]),
+        }));
         if (!activeBucketTab) {
           setActiveBucketTab(bucketId);
         }
-        return [...prev, bucketId];
+        return newSelected;
       }
     });
   }, [activeBucketTab]);
 
-  const handleModuleToggle = useCallback((bucketId: string, moduleId: string) => {
+  const toggleModule = useCallback((bucketId: string, moduleId: string) => {
     setEnabledModules(prev => {
       const current = prev[bucketId] || [];
-      const isEnabled = current.includes(moduleId);
-      return {
-        ...prev,
-        [bucketId]: isEnabled
-          ? current.filter(id => id !== moduleId)
-          : [...current, moduleId],
-      };
+      if (current.includes(moduleId)) {
+        return { ...prev, [bucketId]: current.filter(id => id !== moduleId) };
+      } else {
+        return { ...prev, [bucketId]: [...current, moduleId] };
+      }
     });
   }, []);
 
   const canProceed = useMemo(() => {
     switch (currentStep) {
-      case "name":
-        return workspaceName.trim().length > 0;
-      case "buckets":
-        return selectedBuckets.length > 0;
-      case "modules":
-        return Object.values(enabledModules).some(arr => arr.length > 0);
-      case "preview":
-        return true;
-      default:
-        return false;
+      case "name": return workspaceName.trim().length > 0;
+      case "buckets": return selectedBuckets.length > 0;
+      case "modules": return Object.values(enabledModules).some(arr => arr.length > 0);
+      case "preview": return true;
+      default: return false;
     }
   }, [currentStep, workspaceName, selectedBuckets, enabledModules]);
 
-  const handleNext = useCallback(() => {
+  const goNext = () => {
     const currentIndex = stepOrder.indexOf(currentStep);
     if (currentIndex < stepOrder.length - 1) {
       const nextStep = stepOrder[currentIndex + 1];
@@ -511,272 +580,314 @@ export function WorkspaceCreationWizard({
         setActiveBucketTab(selectedBuckets[0]);
       }
     }
-  }, [currentStep, selectedBuckets, activeBucketTab]);
+  };
 
-  const handleBack = useCallback(() => {
+  const goBack = () => {
     const currentIndex = stepOrder.indexOf(currentStep);
     if (currentIndex > 0) {
       setCurrentStep(stepOrder[currentIndex - 1]);
     }
-  }, [currentStep]);
-
-  const handleCreate = useCallback(() => {
-    const newWorkspace: Workspace = {
-      id: `custom-${Date.now()}`,
-      name: workspaceName.trim(),
-      persona: "Custom",
-      personaTitle: "Workspace Administrator",
-      selectedCapabilities: selectedBuckets,
-      moduleConfig: {
-        selectedBuckets: [...selectedBuckets],
-        enabledModules: { ...enabledModules },
-      },
-      isCustom: true,
-    };
-
-    addWorkspace(newWorkspace);
-    onWorkspaceCreated?.(newWorkspace);
-    
-    setWorkspaceName("");
-    setSelectedBuckets([]);
-    setEnabledModules({});
-    setCurrentStep("name");
-    setActiveBucketTab("");
-    onOpenChange(false);
-  }, [workspaceName, selectedBuckets, enabledModules, addWorkspace, onWorkspaceCreated, onOpenChange]);
-
-  const handleCancel = useCallback(() => {
-    setWorkspaceName("");
-    setSelectedBuckets([]);
-    setEnabledModules({});
-    setCurrentStep("name");
-    setActiveBucketTab("");
-    onOpenChange(false);
-  }, [onOpenChange]);
-
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case "name":
-        return (
-          <div className="space-y-4 py-4">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#266C92]/10 flex items-center justify-center">
-                <Sparkles className="w-8 h-8 text-[#266C92]" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-foreground">Create Your Workspace</h3>
-              <p className="text-sm text-gray-500 dark:text-muted-foreground mt-1">
-                Build a customized workspace tailored to your needs
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="workspace-name" className="text-sm font-medium">
-                Workspace Name<span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="workspace-name"
-                value={workspaceName}
-                onChange={(e) => setWorkspaceName(e.target.value)}
-                placeholder="e.g., Cyber Security Operations"
-                className="h-11 text-base"
-                autoFocus
-                data-testid="input-workspace-name"
-              />
-              <p className="text-xs text-gray-500 dark:text-muted-foreground">
-                Choose a descriptive name that reflects the workspace's purpose
-              </p>
-            </div>
-          </div>
-        );
-
-      case "buckets":
-        return (
-          <div className="space-y-4 py-2">
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-foreground">Select Product Capabilities</h3>
-              <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5">
-                Choose the core capability areas for your workspace
-              </p>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {productCapabilityBuckets.map(bucket => (
-                <BucketCard
-                  key={bucket.id}
-                  bucket={bucket}
-                  isSelected={selectedBuckets.includes(bucket.id)}
-                  onToggle={() => handleBucketToggle(bucket.id)}
-                />
-              ))}
-            </div>
-            {selectedBuckets.length > 0 && (
-              <div className="flex items-center gap-2 pt-2">
-                <Badge variant="secondary" className="text-xs">
-                  {selectedBuckets.length} selected
-                </Badge>
-                <span className="text-xs text-gray-500 dark:text-muted-foreground">
-                  Configure modules in the next step
-                </span>
-              </div>
-            )}
-          </div>
-        );
-
-      case "modules":
-        return (
-          <div className="flex gap-4 py-2 h-[400px]">
-            <div className="flex-1 flex flex-col min-w-0">
-              <div className="mb-3">
-                <h3 className="font-semibold text-gray-900 dark:text-foreground">Configure Modules</h3>
-                <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5">
-                  Enable the specific modules you need for each capability
-                </p>
-              </div>
-              
-              <div className="flex gap-1 mb-3 flex-wrap">
-                {selectedBuckets.map(bucketId => {
-                  const bucket = productCapabilityBuckets.find(b => b.id === bucketId);
-                  if (!bucket) return null;
-                  const isActive = activeBucketTab === bucketId;
-                  const enabledCount = (enabledModules[bucketId] || []).length;
-                  
-                  return (
-                    <button
-                      key={bucketId}
-                      onClick={() => setActiveBucketTab(bucketId)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                        isActive
-                          ? "bg-[#266C92] text-white"
-                          : "bg-gray-100 dark:bg-muted text-gray-700 dark:text-muted-foreground hover:bg-gray-200 dark:hover:bg-muted/80"
-                      }`}
-                      data-testid={`tab-${bucketId}`}
-                    >
-                      {getBucketIcon(bucket.icon, "w-3.5 h-3.5")}
-                      <span className="hidden sm:inline">{bucket.name}</span>
-                      <Badge
-                        variant={isActive ? "outline" : "secondary"}
-                        className={`text-[10px] h-4 px-1 ml-1 ${isActive ? "border-white/50 text-white" : ""}`}
-                      >
-                        {enabledCount}
-                      </Badge>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <ScrollArea className="flex-1">
-                <div className="space-y-2 pr-2">
-                  {activeBucketTab && (() => {
-                    const bucket = productCapabilityBuckets.find(b => b.id === activeBucketTab);
-                    if (!bucket) return null;
-                    return bucket.moduleCapabilities.map(module => (
-                      <ModuleCard
-                        key={module.id}
-                        module={module}
-                        isEnabled={(enabledModules[activeBucketTab] || []).includes(module.id)}
-                        onToggle={() => handleModuleToggle(activeBucketTab, module.id)}
-                        bucketColor={bucket.color}
-                      />
-                    ));
-                  })()}
-                </div>
-              </ScrollArea>
-            </div>
-
-            <div className="w-64 shrink-0">
-              <NavigationPreview sections={navSections} />
-            </div>
-          </div>
-        );
-
-      case "preview":
-        return (
-          <div className="flex gap-6 py-2 h-[400px]">
-            <div className="flex-1 min-w-0">
-              <div className="mb-3">
-                <h3 className="font-semibold text-gray-900 dark:text-foreground">Review Configuration</h3>
-                <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5">
-                  Confirm your workspace setup before creating
-                </p>
-              </div>
-              <ScrollArea className="h-[350px] pr-2">
-                <ConfigurationSummary
-                  workspaceName={workspaceName}
-                  selectedBuckets={selectedBuckets}
-                  enabledModules={enabledModules}
-                  stats={stats}
-                />
-              </ScrollArea>
-            </div>
-
-            <div className="w-72 shrink-0">
-              <NavigationPreview sections={navSections} />
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
   };
 
+  const handleCreate = () => {
+    if (!workspaceName.trim()) return;
+    
+    const newWorkspace: Workspace = {
+      id: `workspace-${Date.now()}`,
+      name: workspaceName.trim(),
+      type: "custom",
+      persona: "custom",
+      icon: "layout-dashboard",
+      moduleConfig: {
+        selectedBuckets,
+        enabledModules,
+      },
+    };
+    
+    addWorkspace(newWorkspace);
+    onWorkspaceCreated?.(newWorkspace);
+    onOpenChange(false);
+    
+    setCurrentStep("name");
+    setWorkspaceName("");
+    setSelectedBuckets([]);
+    setEnabledModules({});
+    setActiveBucketTab(null);
+  };
+
+  const handleClose = () => {
+    onOpenChange(false);
+    setCurrentStep("name");
+    setWorkspaceName("");
+    setSelectedBuckets([]);
+    setEnabledModules({});
+    setActiveBucketTab(null);
+  };
+
+  if (!open) return null;
+
+  const activeBucketData = activeBucketTab 
+    ? productCapabilityBuckets.find(b => b.id === activeBucketTab) 
+    : null;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="max-w-4xl p-0 gap-0 overflow-hidden"
-        data-testid="workspace-creation-wizard"
-      >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-border bg-gray-50 dark:bg-muted/50">
-          <div className="font-semibold text-lg text-gray-900 dark:text-foreground">Create Workspace</div>
-          <StepIndicator currentStep={currentStep} completedSteps={completedSteps} />
-        </div>
-
-        <div className="px-6 py-4 min-h-[300px]">
-          {renderStepContent()}
-        </div>
-
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-border bg-gray-50 dark:bg-muted/50">
-          <Button
-            variant="ghost"
-            onClick={handleCancel}
-            data-testid="button-cancel"
-          >
-            Cancel
-          </Button>
-          
-          <div className="flex items-center gap-2">
-            {currentStep !== "name" && (
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                data-testid="button-back"
-              >
-                <ArrowLeft className="w-4 h-4 mr-1.5" />
-                Back
-              </Button>
-            )}
-            
-            {currentStep === "preview" ? (
-              <Button
-                onClick={handleCreate}
-                className="bg-[#266C92]"
-                data-testid="button-create"
-              >
-                <Sparkles className="w-4 h-4 mr-1.5" />
-                Create Workspace
-              </Button>
-            ) : (
-              <Button
-                onClick={handleNext}
-                disabled={!canProceed}
-                className="bg-[#266C92]"
-                data-testid="button-next"
-              >
-                Next
-                <ArrowRight className="w-4 h-4 ml-1.5" />
-              </Button>
-            )}
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      data-testid="workspace-wizard"
+    >
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={handleClose}
+      />
+      
+      {/* Full-screen Modal */}
+      <div className="relative w-full h-full max-w-[1400px] max-h-[900px] m-4 bg-white dark:bg-background rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-8 py-5 border-b border-gray-200 dark:border-border">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground">Create New Workspace</h1>
+            <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5">Configure your workspace capabilities</p>
+          </div>
+          <div className="flex items-center gap-6">
+            <StepIndicator currentStep={currentStep} completedSteps={completedSteps} />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleClose}
+              className="text-gray-500 hover:text-gray-700 dark:text-muted-foreground"
+              data-testid="button-close-wizard"
+            >
+              <X className="w-5 h-5" />
+            </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+        
+        {/* Content */}
+        <div className="flex-1 overflow-hidden">
+          {currentStep === "name" && (
+            <div className="flex items-center justify-center h-full p-8">
+              <div className="w-full max-w-md space-y-6">
+                <div className="text-center mb-8">
+                  <div className="w-16 h-16 rounded-2xl bg-[#266C92]/10 flex items-center justify-center mx-auto mb-4">
+                    <Sparkles className="w-8 h-8 text-[#266C92]" />
+                  </div>
+                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-foreground">Name Your Workspace</h2>
+                  <p className="text-gray-500 dark:text-muted-foreground mt-2">
+                    Choose a name that reflects the purpose of this workspace
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="workspace-name" className="text-sm font-medium">Workspace Name</Label>
+                  <Input
+                    id="workspace-name"
+                    value={workspaceName}
+                    onChange={e => setWorkspaceName(e.target.value)}
+                    placeholder="e.g., Enterprise Risk & Compliance"
+                    className="mt-2 h-12 text-lg"
+                    data-testid="input-workspace-name"
+                    autoFocus
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {currentStep === "buckets" && (
+            <div className="h-full p-8 overflow-auto">
+              <div className="max-w-4xl mx-auto">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-foreground">Select Capabilities</h2>
+                  <p className="text-gray-500 dark:text-muted-foreground mt-2">
+                    Choose the product capabilities to include in your workspace
+                  </p>
+                </div>
+                
+                {/* 3x3 Grid of Buckets */}
+                <div className="grid grid-cols-3 gap-4">
+                  {productCapabilityBuckets.map(bucket => (
+                    <div key={bucket.id} className="relative">
+                      <BucketCard
+                        bucket={bucket}
+                        isSelected={selectedBuckets.includes(bucket.id)}
+                        onToggle={() => toggleBucket(bucket.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
+                
+                {selectedBuckets.length > 0 && (
+                  <div className="mt-6 text-center">
+                    <Badge variant="secondary" className="text-sm px-4 py-1.5">
+                      {selectedBuckets.length} {selectedBuckets.length === 1 ? "capability" : "capabilities"} selected
+                    </Badge>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {currentStep === "modules" && (
+            <div className="h-full flex">
+              {/* Bucket Tabs Sidebar */}
+              <div className="w-64 border-r border-gray-200 dark:border-border bg-gray-50 dark:bg-muted/30 p-4">
+                <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase mb-3 block">
+                  Configure Modules
+                </Label>
+                <div className="space-y-1">
+                  {selectedBuckets.map(bucketId => {
+                    const bucket = productCapabilityBuckets.find(b => b.id === bucketId);
+                    if (!bucket) return null;
+                    const moduleCount = enabledModules[bucketId]?.length || 0;
+                    
+                    return (
+                      <button
+                        key={bucketId}
+                        onClick={() => setActiveBucketTab(bucketId)}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
+                          activeBucketTab === bucketId
+                            ? "bg-[#266C92]/10 text-[#266C92]"
+                            : "text-gray-700 dark:text-foreground hover:bg-gray-100 dark:hover:bg-muted"
+                        }`}
+                        data-testid={`tab-${bucketId}`}
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-muted flex items-center justify-center">
+                          {getBucketIcon(bucket.icon, "w-4 h-4")}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{bucket.name}</p>
+                          <p className="text-xs text-gray-500 dark:text-muted-foreground">
+                            {moduleCount} / {bucket.moduleCapabilities.length} modules
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              {/* Module Grid */}
+              <div className="flex-1 p-6 overflow-auto">
+                {activeBucketData ? (
+                  <div>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div 
+                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: `${activeBucketData.color}15`, color: activeBucketData.color }}
+                      >
+                        {getBucketIcon(activeBucketData.icon)}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-foreground">{activeBucketData.name}</h3>
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground">{activeBucketData.description}</p>
+                      </div>
+                      <div className="ml-auto">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const allModuleIds = activeBucketData.moduleCapabilities.map(m => m.id);
+                            const currentEnabled = enabledModules[activeBucketData.id] || [];
+                            if (currentEnabled.length === allModuleIds.length) {
+                              setEnabledModules(prev => ({ ...prev, [activeBucketData.id]: [] }));
+                            } else {
+                              setEnabledModules(prev => ({ ...prev, [activeBucketData.id]: allModuleIds }));
+                            }
+                          }}
+                          data-testid="button-toggle-all"
+                        >
+                          {(enabledModules[activeBucketData.id]?.length || 0) === activeBucketData.moduleCapabilities.length
+                            ? "Deselect All"
+                            : "Select All"}
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {/* 3x3 Module Grid */}
+                    <div className="grid grid-cols-3 gap-3">
+                      {activeBucketData.moduleCapabilities.map(module => (
+                        <ModuleCard
+                          key={module.id}
+                          module={module}
+                          isEnabled={(enabledModules[activeBucketData.id] || []).includes(module.id)}
+                          onToggle={() => toggleModule(activeBucketData.id, module.id)}
+                          bucketColor={activeBucketData.color}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500 dark:text-muted-foreground">
+                    Select a capability from the left to configure its modules
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {currentStep === "preview" && (
+            <div className="h-full p-8 overflow-auto">
+              <div className="max-w-6xl mx-auto">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-foreground">Review Your Workspace</h2>
+                  <p className="text-gray-500 dark:text-muted-foreground mt-2">
+                    Review your configuration and navigation structure before creating
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-8">
+                  <ConfigurationSummary
+                    workspaceName={workspaceName}
+                    selectedBuckets={selectedBuckets}
+                    enabledModules={enabledModules}
+                    stats={stats}
+                  />
+                  <NavigationPreview sections={navSections} />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Footer */}
+        <div className="flex items-center justify-between px-8 py-5 border-t border-gray-200 dark:border-border bg-gray-50 dark:bg-muted/30">
+          <Button
+            variant="outline"
+            onClick={goBack}
+            disabled={currentStep === "name"}
+            className="gap-2"
+            data-testid="button-back"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+          
+          <div className="text-sm text-gray-500 dark:text-muted-foreground">
+            Step {stepOrder.indexOf(currentStep) + 1} of {stepOrder.length}
+          </div>
+          
+          {currentStep === "preview" ? (
+            <Button
+              onClick={handleCreate}
+              className="gap-2 bg-[#266C92] hover:bg-[#1e5a7a]"
+              data-testid="button-create"
+            >
+              <Sparkles className="w-4 h-4" />
+              Create Workspace
+            </Button>
+          ) : (
+            <Button
+              onClick={goNext}
+              disabled={!canProceed}
+              className="gap-2"
+              data-testid="button-next"
+            >
+              Next
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

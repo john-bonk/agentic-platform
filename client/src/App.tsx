@@ -53,6 +53,7 @@ import {
   AdminPermissionsPage,
   PrototypeMetaPage,
   GeneratedReportPage,
+  CustomWorkspaceHome,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 
@@ -64,6 +65,7 @@ function Router() {
       
       {/* Home Module Routes */}
       <Route path="/my-dashboard" component={HomePage} />
+      <Route path="/custom-workspace" component={CustomWorkspaceHome} />
       <Route path="/global-residual-risk" component={GlobalResidualRiskRouter} />
       <Route path="/inventory" component={AllInventoryPage} />
       <Route path="/coverage-mapping" component={CoverageMappingPage} />

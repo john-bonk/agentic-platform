@@ -17,7 +17,9 @@ export interface Workspace {
   id: string;
   name: string;
   persona: string;
-  personaTitle: string;
+  personaTitle?: string;
+  type?: "default" | "custom";
+  icon?: string;
   selectedCapabilities?: string[];
   moduleConfig?: WorkspaceModuleConfig;
   isCustom?: boolean;
@@ -60,6 +62,8 @@ interface WorkspaceStore {
   getAllWorkspaces: () => Workspace[];
   refreshKey: number;
   refreshWorkspace: () => void;
+  activeWorkspace: string | null;
+  workspaces: Workspace[];
 }
 
 export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
@@ -78,4 +82,10 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   },
   refreshKey: 0,
   refreshWorkspace: () => set({ refreshKey: Date.now() }),
+  get activeWorkspace() {
+    return get().currentWorkspace?.id || null;
+  },
+  get workspaces() {
+    return get().getAllWorkspaces();
+  },
 }));

@@ -10,6 +10,11 @@
  * Global Residual Risk dashboard.
  */
 
+import { 
+  generateNavSections as generateWizardNavSections,
+  productCapabilityBuckets,
+} from "./workspaceWizardConfig";
+
 export type IconNavItem = 
   | { type: "image"; src: string; alt: string; active: boolean; path?: string; modulePrefix?: string }
   | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity" | "bar-chart-3" | "shield"; alt: string; active: boolean; path?: string; modulePrefix?: string };
@@ -215,7 +220,8 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
 
 /**
  * Get workspace-specific home navigation
- * For custom workspaces with moduleConfig, generate dynamic nav from config
+ * For custom workspaces with moduleConfig, uses generateWizardNavSections from
+ * workspaceWizardConfig to generate dynamic navigation with full bucket/module support.
  */
 export function getWorkspaceHomeNav(
   persona: string, 
@@ -224,190 +230,10 @@ export function getWorkspaceHomeNav(
   if (moduleConfig && moduleConfig.selectedBuckets.length > 0) {
     return {
       title: "Custom Workspace",
-      sections: generateCustomNavSections(moduleConfig.selectedBuckets, moduleConfig.enabledModules),
+      sections: generateWizardNavSections(moduleConfig.selectedBuckets, moduleConfig.enabledModules),
     };
   }
   return workspaceHomeNav[persona] || workspaceHomeNav["CRO"];
-}
-
-/**
- * Generate navigation sections for custom workspaces
- * Uses the inline capability mapping to generate navigation structure
- */
-function generateCustomNavSections(
-  selectedBuckets: string[],
-  enabledModules: Record<string, string[]>
-): SideNavSection[] {
-  const dashboardSection: SideNavSection = {
-    id: "workspace-dashboards",
-    title: "Dashboards",
-    defaultExpanded: true,
-    collapsible: true,
-    items: [
-      { id: "my-dashboard", label: "My Dashboard", path: "/" },
-      { id: "global-residual-risk", label: "Global Residual Risk", path: "/global-residual-risk" },
-    ],
-  };
-  
-  const capabilityNavMap: Record<string, Record<string, { title: string; items: SideNavItem[] }>> = {
-    "risk-management": {
-      "risk-register": { title: "Risk Inventory", items: [
-        { id: "risk-register", label: "Risk Register", path: "/risk-register" },
-        { id: "risk-categories", label: "Risk Categories", path: "/risk-categories" },
-      ]},
-      "risk-assessment": { title: "Analysis", items: [
-        { id: "risk-heatmap", label: "Risk Heatmap", path: "/risk-heatmap" },
-        { id: "risk-scoring", label: "Risk Scoring", path: "/risk-scoring" },
-        { id: "impact-analysis", label: "Impact Analysis", path: "/impact-analysis" },
-      ]},
-      "risk-mitigation": { title: "Mitigation", items: [
-        { id: "treatment-plans", label: "Treatment Plans", path: "/treatment-plans" },
-        { id: "mitigation-tracker", label: "Mitigation Tracker", path: "/mitigation-tracker" },
-      ]},
-      "risk-appetite": { title: "Governance", items: [
-        { id: "risk-appetite", label: "Risk Appetite", path: "/risk-appetite" },
-        { id: "key-risk-indicators", label: "Key Risk Indicators", path: "/key-risk-indicators" },
-      ]},
-    },
-    "audit-management": {
-      "audit-planning": { title: "Planning", items: [
-        { id: "audit-universe", label: "Audit Universe", path: "/audit-universe" },
-        { id: "annual-plan", label: "Annual Plan", path: "/annual-plan" },
-        { id: "resource-allocation", label: "Resource Allocation", path: "/resource-allocation" },
-      ]},
-      "audit-execution": { title: "Execution", items: [
-        { id: "active-audits", label: "Active Audits", path: "/active-audits" },
-        { id: "workpapers", label: "Workpapers", path: "/workpapers" },
-        { id: "testing", label: "Testing", path: "/testing" },
-      ]},
-      "audit-findings": { title: "Findings", items: [
-        { id: "findings", label: "All Findings", path: "/findings" },
-        { id: "recommendations", label: "Recommendations", path: "/recommendations" },
-        { id: "follow-ups", label: "Follow-ups", path: "/follow-ups", badge: "3" },
-      ]},
-      "audit-reporting": { title: "Reporting", items: [
-        { id: "draft-reports", label: "Draft Reports", path: "/draft-reports" },
-        { id: "published-reports", label: "Published Reports", path: "/published-reports" },
-        { id: "stakeholder-reports", label: "Stakeholder Reports", path: "/stakeholder-reports" },
-      ]},
-    },
-    "compliance-management": {
-      "controls-library": { title: "Controls", items: [
-        { id: "all-controls", label: "All Controls", path: "/controls" },
-        { id: "control-testing", label: "Control Testing", path: "/control-testing" },
-        { id: "control-gaps", label: "Control Gaps", path: "/control-gaps" },
-      ]},
-      "regulatory-tracking": { title: "Regulatory", items: [
-        { id: "regulations", label: "Regulations", path: "/regulations" },
-        { id: "obligations", label: "Obligations", path: "/obligations" },
-        { id: "compliance-calendar", label: "Compliance Calendar", path: "/compliance-calendar" },
-      ]},
-      "policy-management": { title: "Policies", items: [
-        { id: "policy-library", label: "Policy Library", path: "/policy-library" },
-        { id: "attestations", label: "Attestations", path: "/attestations" },
-      ]},
-      "sox-compliance": { title: "SOX", items: [
-        { id: "sox-controls", label: "SOX Controls", path: "/sox-controls" },
-        { id: "walkthroughs", label: "Walkthroughs", path: "/walkthroughs" },
-        { id: "section-302", label: "Section 302", path: "/section-302" },
-        { id: "section-404", label: "Section 404", path: "/section-404" },
-      ]},
-    },
-    "security-operations": {
-      "vulnerability-management": { title: "Vulnerabilities", items: [
-        { id: "vulnerability-scanner", label: "Scanner Results", path: "/vulnerability-scanner" },
-        { id: "vulnerability-queue", label: "Remediation Queue", path: "/remediation-queue" },
-        { id: "cve-tracking", label: "CVE Tracking", path: "/cve-tracking" },
-      ]},
-      "threat-intelligence": { title: "Threat Intel", items: [
-        { id: "threat-feed", label: "Threat Feed", path: "/threat-feed" },
-        { id: "ioc-database", label: "IOC Database", path: "/ioc-database" },
-        { id: "threat-actors", label: "Threat Actors", path: "/threat-actors" },
-      ]},
-      "incident-response": { title: "Incidents", items: [
-        { id: "active-incidents", label: "Active Incidents", path: "/active-incidents", badge: "2" },
-        { id: "incident-playbooks", label: "Playbooks", path: "/playbooks" },
-        { id: "post-mortems", label: "Post-mortems", path: "/post-mortems" },
-      ]},
-      "security-assessments": { title: "Assessments", items: [
-        { id: "pen-tests", label: "Penetration Tests", path: "/pen-tests" },
-        { id: "security-reviews", label: "Security Reviews", path: "/security-reviews" },
-        { id: "vendor-assessments", label: "Vendor Assessments", path: "/vendor-assessments" },
-      ]},
-    },
-    "third-party-risk": {
-      "vendor-inventory": { title: "Vendors", items: [
-        { id: "all-vendors", label: "All Vendors", path: "/vendors" },
-        { id: "vendor-tiers", label: "Vendor Tiers", path: "/vendor-tiers" },
-        { id: "contracts", label: "Contracts", path: "/contracts" },
-      ]},
-      "vendor-assessments": { title: "Assessments", items: [
-        { id: "assessment-queue", label: "Assessment Queue", path: "/assessment-queue" },
-        { id: "questionnaires", label: "Questionnaires", path: "/questionnaires" },
-        { id: "due-diligence", label: "Due Diligence", path: "/due-diligence" },
-      ]},
-      "vendor-monitoring": { title: "Monitoring", items: [
-        { id: "risk-signals", label: "Risk Signals", path: "/risk-signals" },
-        { id: "news-monitoring", label: "News Monitoring", path: "/news-monitoring" },
-        { id: "financial-health", label: "Financial Health", path: "/financial-health" },
-      ]},
-    },
-    "esg-sustainability": {
-      "esg-metrics": { title: "Metrics", items: [
-        { id: "esg-dashboard", label: "ESG Dashboard", path: "/esg-dashboard" },
-        { id: "environmental", label: "Environmental", path: "/environmental" },
-        { id: "social", label: "Social", path: "/social" },
-        { id: "governance", label: "Governance", path: "/governance" },
-      ]},
-      "carbon-tracking": { title: "Carbon", items: [
-        { id: "emissions-inventory", label: "Emissions Inventory", path: "/emissions" },
-        { id: "scope-tracking", label: "Scope Tracking", path: "/scope-tracking" },
-        { id: "net-zero-plan", label: "Net Zero Plan", path: "/net-zero" },
-      ]},
-      "esg-reporting": { title: "Reporting", items: [
-        { id: "frameworks", label: "Frameworks", path: "/frameworks" },
-        { id: "disclosures", label: "Disclosures", path: "/disclosures" },
-        { id: "stakeholder-reports", label: "Stakeholder Reports", path: "/esg-reports" },
-      ]},
-    },
-  };
-
-  const sections: SideNavSection[] = [dashboardSection];
-  let sectionIndex = 0;
-  
-  for (const bucketId of selectedBuckets) {
-    const bucketModules = enabledModules[bucketId] || [];
-    const bucketNav = capabilityNavMap[bucketId];
-    
-    if (bucketNav) {
-      for (const moduleId of bucketModules) {
-        const moduleNav = bucketNav[moduleId];
-        if (moduleNav) {
-          sections.push({
-            id: `${bucketId}-${moduleId}-${sectionIndex++}`,
-            title: moduleNav.title,
-            defaultExpanded: true,
-            collapsible: true,
-            items: moduleNav.items,
-          });
-        }
-      }
-    }
-  }
-  
-  const viewsSection: SideNavSection = {
-    id: "workspace-views",
-    title: "Views",
-    defaultExpanded: true,
-    collapsible: true,
-    items: [
-      { id: "open-tasks", label: "Open Tasks", path: "/open-tasks", badge: "4" },
-      { id: "activity-log", label: "Activity Log", path: "/activity-log" },
-    ],
-  };
-  sections.push(viewsSection);
-  
-  return sections;
 }
 
 /**
