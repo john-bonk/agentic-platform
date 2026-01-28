@@ -249,29 +249,63 @@ function BucketCard({
   return (
     <button
       onClick={onToggle}
-      className={`flex flex-col items-center justify-center p-6 rounded-xl border-2 text-center transition-all hover-elevate ${
+      className={`relative aspect-square flex flex-col items-center justify-center rounded-2xl border-2 text-center transition-all overflow-visible hover-elevate active-elevate-2 ${
         isSelected
-          ? "border-[#266C92] bg-[#266C92]/5 dark:bg-[#266C92]/10 shadow-md"
-          : "border-gray-200 dark:border-border bg-white dark:bg-card hover:border-gray-300 dark:hover:border-muted-foreground/30"
+          ? "border-[#266C92] shadow-lg shadow-[#266C92]/20"
+          : "border-gray-200 dark:border-border"
       }`}
       data-testid={`bucket-${bucket.id}`}
     >
-      <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-colors ${
-          isSelected 
-            ? "bg-[#266C92]/10 text-[#266C92]" 
-            : "bg-gray-100 dark:bg-muted text-gray-400 dark:text-muted-foreground"
-        }`}
-      >
-        {getBucketIcon(bucket.icon, "w-6 h-6")}
-      </div>
-      <div className={`font-medium text-sm ${isSelected ? "text-[#266C92]" : "text-gray-700 dark:text-foreground"}`}>
-        {bucket.name}
-      </div>
+      {/* Background gradient - static based on selection */}
       {isSelected && (
-        <div className="absolute top-2 right-2">
-          <div className="w-5 h-5 rounded-full bg-[#266C92] flex items-center justify-center">
-            <Check className="w-3 h-3 text-white" />
+        <div 
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{ 
+            background: `linear-gradient(135deg, ${bucket.color}08 0%, ${bucket.color}15 100%)`
+          }}
+        />
+      )}
+      
+      {/* Decorative corner accent - only when selected */}
+      {isSelected && (
+        <div 
+          className="absolute -top-12 -right-12 w-24 h-24 rounded-full opacity-20 pointer-events-none"
+          style={{ backgroundColor: bucket.color }}
+        />
+      )}
+      
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-center">
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3"
+          style={{ 
+            backgroundColor: isSelected ? `${bucket.color}20` : undefined,
+            color: isSelected ? bucket.color : undefined
+          }}
+        >
+          <div className={isSelected ? "" : "text-gray-400 dark:text-muted-foreground"}>
+            {getBucketIcon(bucket.icon, "w-7 h-7")}
+          </div>
+        </div>
+        <div 
+          className={`font-semibold text-sm px-2 ${isSelected ? "" : "text-gray-700 dark:text-foreground"}`}
+          style={{ color: isSelected ? bucket.color : undefined }}
+        >
+          {bucket.name}
+        </div>
+        <div className="text-[10px] text-gray-400 dark:text-muted-foreground mt-1 px-3 text-center leading-tight">
+          {bucket.moduleCapabilities.length} modules
+        </div>
+      </div>
+      
+      {/* Selection indicator */}
+      {isSelected && (
+        <div className="absolute top-3 right-3 z-20">
+          <div 
+            className="w-6 h-6 rounded-full flex items-center justify-center shadow-md"
+            style={{ backgroundColor: bucket.color }}
+          >
+            <Check className="w-3.5 h-3.5 text-white" />
           </div>
         </div>
       )}
@@ -293,7 +327,7 @@ function ModuleCard({
   return (
     <button
       onClick={onToggle}
-      className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-all hover-elevate ${
+      className={`flex items-center gap-3 p-3 rounded-lg border text-left overflow-visible hover-elevate active-elevate-2 ${
         isEnabled
           ? "border-[#266C92] bg-[#266C92]/5 dark:bg-[#266C92]/10"
           : "border-gray-200 dark:border-border bg-white dark:bg-card"
@@ -352,58 +386,102 @@ function NavigationPreview({ sections }: { sections: SideNavSection[] }) {
 
   return (
     <div
-      className="bg-gray-50 dark:bg-muted/30 rounded-xl border border-gray-200 dark:border-border overflow-hidden"
+      className="relative bg-gray-900 dark:bg-gray-950 rounded-xl border border-gray-700 dark:border-gray-800 overflow-hidden shadow-2xl h-full flex flex-col"
       data-testid="nav-preview"
     >
-      <div className="px-4 py-3 bg-gray-100 dark:bg-muted border-b border-gray-200 dark:border-border">
-        <span className="text-sm font-medium text-gray-700 dark:text-foreground">
-          Navigation Preview
-        </span>
+      {/* Mini window chrome */}
+      <div className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 dark:bg-gray-900 border-b border-gray-700 shrink-0">
+        <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+        <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+        <span className="ml-3 text-[10px] text-gray-400 font-medium">Side Navigation Panel</span>
       </div>
-      <ScrollArea className="h-[400px]">
-        <div className="p-3 space-y-1">
-          {sections.map(section => {
-            const isExpanded = expandedSections.has(section.id);
-            return (
-              <div key={section.id} data-testid={`preview-section-${section.id}`}>
-                <button
-                  onClick={() => toggleSection(section.id)}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-left rounded-lg hover-elevate"
-                >
-                  {section.collapsible && (
-                    <ChevronDown
-                      className={`w-4 h-4 text-gray-400 transition-transform ${
-                        isExpanded ? "" : "-rotate-90"
-                      }`}
-                    />
-                  )}
-                  <span className="text-xs font-semibold text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
-                    {section.title}
-                  </span>
-                </button>
-                {isExpanded && (
-                  <div className="ml-6 space-y-0.5">
-                    {section.items.map(item => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-foreground hover:bg-gray-100 dark:hover:bg-muted/80 transition-colors"
-                        data-testid={`preview-item-${item.id}`}
-                      >
-                        <span className="truncate">{item.label}</span>
-                        {item.badge && (
-                          <Badge variant="secondary" className="text-[10px] h-5 px-2 ml-2">
-                            {item.badge}
-                          </Badge>
-                        )}
-                      </div>
-                    ))}
+      
+      {/* Miniature panel - scaled representation */}
+      <div className="relative flex-1 overflow-hidden">
+        <div 
+          className="absolute inset-0 origin-top-left bg-white dark:bg-[#1a1f2e] overflow-y-auto"
+          style={{ 
+            transform: "scale(0.7)", 
+            transformOrigin: "top left",
+            width: "142.86%",
+            height: "142.86%"
+          }}
+        >
+          {/* Mock app header */}
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 sticky top-0 z-10">
+            <div className="w-8 h-8 rounded-lg bg-[#266C92] flex items-center justify-center">
+              <LayoutDashboard className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-gray-900 dark:text-white">Custom Workspace</div>
+              <div className="text-[10px] text-gray-500 dark:text-gray-400">{sections.length} sections</div>
+            </div>
+          </div>
+          
+          {/* Full navigation sections - no truncation */}
+          <div className="p-3 space-y-1">
+            {sections.map(section => {
+              const isExpanded = section.collapsible ? expandedSections.has(section.id) : true;
+              return (
+                <div key={section.id} data-testid={`preview-section-${section.id}`}>
+                  <div
+                    className={`flex items-center gap-2 w-full px-3 py-1.5 text-left rounded-md ${section.collapsible ? "hover-elevate" : ""}`}
+                    onClick={section.collapsible ? () => toggleSection(section.id) : undefined}
+                    onKeyDown={section.collapsible ? (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        toggleSection(section.id);
+                      }
+                    } : undefined}
+                    role={section.collapsible ? "button" : undefined}
+                    tabIndex={section.collapsible ? 0 : undefined}
+                    style={{ cursor: section.collapsible ? "pointer" : "default" }}
+                    data-testid={section.collapsible ? `preview-toggle-${section.id}` : undefined}
+                  >
+                    {section.collapsible && (
+                      <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isExpanded ? "" : "-rotate-90"}`} />
+                    )}
+                    <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      {section.title}
+                    </span>
                   </div>
-                )}
-              </div>
-            );
-          })}
+                  {isExpanded && (
+                    <div className="ml-5 space-y-0.5">
+                      {section.items.map((item, idx) => (
+                        <div
+                          key={item.id}
+                          className={`flex items-center justify-between px-3 py-1.5 rounded-md text-xs ${
+                            idx === 0 
+                              ? "bg-[#266C92]/10 text-[#266C92] font-medium" 
+                              : "text-gray-600 dark:text-gray-300"
+                          }`}
+                          data-testid={`preview-item-${item.id}`}
+                        >
+                          <span className="truncate">{item.label}</span>
+                          {item.badge && (
+                            <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-[#266C92]/20 text-[#266C92] font-medium">
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </ScrollArea>
+        
+        {/* Gradient overlay to indicate scrollable content */}
+        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-gray-900 dark:from-gray-950 to-transparent pointer-events-none" />
+      </div>
+      
+      {/* "1:1 Preview" label */}
+      <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-[#266C92]/90 text-[9px] font-bold text-white uppercase tracking-wide">
+        Actual Panel Layout
+      </div>
     </div>
   );
 }
@@ -694,35 +772,68 @@ export function WorkspaceCreationWizard({
           )}
           
           {currentStep === "buckets" && (
-            <div className="h-full p-8 overflow-auto">
-              <div className="max-w-4xl mx-auto">
+            <div className="h-full p-8 overflow-auto flex items-center justify-center">
+              <div className="w-full max-w-[640px]">
                 <div className="text-center mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-foreground">Select Capabilities</h2>
-                  <p className="text-gray-500 dark:text-muted-foreground mt-2">
-                    Choose the product capabilities to include in your workspace
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#266C92]/10 text-[#266C92] text-sm font-medium mb-4">
+                    <Sparkles className="w-4 h-4" />
+                    Product Capabilities
+                  </div>
+                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-foreground">Select Your Capabilities</h2>
+                  <p className="text-gray-500 dark:text-muted-foreground mt-2 max-w-md mx-auto">
+                    Choose which product areas to include in your workspace. Each capability unlocks specialized modules and workflows.
                   </p>
                 </div>
                 
-                {/* 3x3 Grid of Buckets */}
-                <div className="grid grid-cols-3 gap-4">
+                {/* Perfect 3x3 Grid of Buckets - Fixed Size Squares */}
+                <div className="grid grid-cols-3 gap-4 w-full">
                   {productCapabilityBuckets.map(bucket => (
-                    <div key={bucket.id} className="relative">
-                      <BucketCard
-                        bucket={bucket}
-                        isSelected={selectedBuckets.includes(bucket.id)}
-                        onToggle={() => toggleBucket(bucket.id)}
-                      />
-                    </div>
+                    <BucketCard
+                      key={bucket.id}
+                      bucket={bucket}
+                      isSelected={selectedBuckets.includes(bucket.id)}
+                      onToggle={() => toggleBucket(bucket.id)}
+                    />
                   ))}
                 </div>
                 
-                {selectedBuckets.length > 0 && (
-                  <div className="mt-6 text-center">
-                    <Badge variant="secondary" className="text-sm px-4 py-1.5">
-                      {selectedBuckets.length} {selectedBuckets.length === 1 ? "capability" : "capabilities"} selected
-                    </Badge>
+                {/* Selection indicator */}
+                <div className="mt-8 flex items-center justify-center gap-4">
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
+                  <div className="flex items-center gap-2 text-sm">
+                    {selectedBuckets.length > 0 ? (
+                      <>
+                        <div className="flex -space-x-1">
+                          {selectedBuckets.slice(0, 3).map(bucketId => {
+                            const bucket = productCapabilityBuckets.find(b => b.id === bucketId);
+                            return bucket ? (
+                              <div 
+                                key={bucketId}
+                                className="w-6 h-6 rounded-full border-2 border-white dark:border-background flex items-center justify-center"
+                                style={{ backgroundColor: bucket.color }}
+                              >
+                                <Check className="w-3 h-3 text-white" />
+                              </div>
+                            ) : null;
+                          })}
+                          {selectedBuckets.length > 3 && (
+                            <div className="w-6 h-6 rounded-full border-2 border-white dark:border-background bg-gray-200 dark:bg-muted flex items-center justify-center text-[10px] font-bold text-gray-600">
+                              +{selectedBuckets.length - 3}
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-gray-600 dark:text-muted-foreground font-medium">
+                          {selectedBuckets.length} {selectedBuckets.length === 1 ? "capability" : "capabilities"} selected
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-gray-400 dark:text-muted-foreground">
+                        Click tiles to select capabilities
+                      </span>
+                    )}
                   </div>
-                )}
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
+                </div>
               </div>
             </div>
           )}
@@ -827,22 +938,42 @@ export function WorkspaceCreationWizard({
           
           {currentStep === "preview" && (
             <div className="h-full p-8 overflow-auto">
-              <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-8">
+              <div className="max-w-6xl mx-auto h-full flex flex-col">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium mb-4">
+                    <CheckCircle className="w-4 h-4" />
+                    Ready to Create
+                  </div>
                   <h2 className="text-2xl font-semibold text-gray-900 dark:text-foreground">Review Your Workspace</h2>
                   <p className="text-gray-500 dark:text-muted-foreground mt-2">
-                    Review your configuration and navigation structure before creating
+                    Your workspace is configured and ready. The navigation panel preview shows exactly how it will appear.
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-8">
-                  <ConfigurationSummary
-                    workspaceName={workspaceName}
-                    selectedBuckets={selectedBuckets}
-                    enabledModules={enabledModules}
-                    stats={stats}
-                  />
-                  <NavigationPreview sections={navSections} />
+                <div className="flex-1 grid grid-cols-5 gap-6 min-h-0">
+                  {/* Configuration Summary - narrower */}
+                  <div className="col-span-2">
+                    <ConfigurationSummary
+                      workspaceName={workspaceName}
+                      selectedBuckets={selectedBuckets}
+                      enabledModules={enabledModules}
+                      stats={stats}
+                    />
+                  </div>
+                  
+                  {/* Navigation Preview - wider, emphasized as the true preview */}
+                  <div className="col-span-3 flex flex-col">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
+                      <span className="text-xs font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
+                        Live Panel Preview
+                      </span>
+                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
+                    </div>
+                    <div className="flex-1">
+                      <NavigationPreview sections={navSections} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -869,7 +1000,7 @@ export function WorkspaceCreationWizard({
           {currentStep === "preview" ? (
             <Button
               onClick={handleCreate}
-              className="gap-2 bg-[#266C92] hover:bg-[#1e5a7a]"
+              className="gap-2 bg-[#266C92]"
               data-testid="button-create"
             >
               <Sparkles className="w-4 h-4" />
