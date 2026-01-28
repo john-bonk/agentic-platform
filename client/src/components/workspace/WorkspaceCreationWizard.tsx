@@ -457,10 +457,23 @@ function ConfigurationSummary({
   stats: { totalModules: number; totalNavItems: number; bucketCount: number };
 }) {
   const selectedBucketData = productCapabilityBuckets.filter(b => selectedBuckets.includes(b.id));
+  const [expandedCapabilities, setExpandedCapabilities] = useState<Set<string>>(new Set());
   
   // Calculate additional metrics
   const totalPossibleModules = selectedBucketData.reduce((acc, b) => acc + b.moduleCapabilities.length, 0);
   const moduleUtilization = totalPossibleModules > 0 ? Math.round((stats.totalModules / totalPossibleModules) * 100) : 0;
+  
+  const toggleCapability = (bucketId: string) => {
+    setExpandedCapabilities(prev => {
+      const next = new Set(prev);
+      if (next.has(bucketId)) {
+        next.delete(bucketId);
+      } else {
+        next.add(bucketId);
+      }
+      return next;
+    });
+  };
   
   return (
     <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-4">
@@ -473,7 +486,7 @@ function ConfigurationSummary({
         <div className="flex items-center gap-3 text-xs">
           <div className="text-center">
             <span className="font-bold text-[#266C92]">{stats.bucketCount}</span>
-            <span className="text-gray-400 ml-1">caps</span>
+            <span className="text-gray-400 ml-1">capabilities</span>
           </div>
           <div className="h-3 w-px bg-gray-200 dark:bg-border" />
           <div className="text-center">
@@ -502,44 +515,72 @@ function ConfigurationSummary({
         </div>
       </div>
       
-      {/* Capability breakdown - compact list */}
+      {/* Capability breakdown - expandable cards */}
       <div className="space-y-2 max-h-[180px] overflow-y-auto">
         {selectedBucketData.map(bucket => {
           const modules = enabledModules[bucket.id] || [];
           const totalBucketModules = bucket.moduleCapabilities.length;
           const enabledCount = modules.length;
+          const isExpanded = expandedCapabilities.has(bucket.id);
           
           return (
             <div 
               key={bucket.id} 
-              className="flex items-start gap-2 p-2 rounded-lg bg-gray-50 dark:bg-muted/30"
+              className="rounded-lg bg-gray-50 dark:bg-muted/30"
             >
-              <div className="w-6 h-6 rounded bg-[#266C92]/10 flex items-center justify-center shrink-0 mt-0.5">
-                <Layers className="w-3 h-3 text-[#266C92]" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-medium text-gray-800 dark:text-foreground truncate">{bucket.name}</span>
-                  <span className="text-[10px] text-gray-500 dark:text-muted-foreground shrink-0">
-                    {enabledCount}/{totalBucketModules}
-                  </span>
+              <div 
+                className="flex items-center gap-2 p-2 cursor-pointer rounded-lg hover-elevate"
+                onClick={() => toggleCapability(bucket.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleCapability(bucket.id);
+                  }
+                }}
+                data-testid={`toggle-capability-${bucket.id}`}
+              >
+                <div className="w-6 h-6 rounded bg-[#266C92]/10 flex items-center justify-center shrink-0">
+                  <Layers className="w-3 h-3 text-[#266C92]" />
                 </div>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {modules.slice(0, 4).map(moduleId => {
-                    const module = bucket.moduleCapabilities.find(m => m.id === moduleId);
-                    return module ? (
-                      <span key={moduleId} className="text-[9px] px-1.5 py-0.5 rounded bg-white dark:bg-muted border border-gray-200 dark:border-border text-gray-600 dark:text-gray-300">
-                        {module.name}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-medium text-gray-800 dark:text-foreground truncate">{bucket.name}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-[10px] text-gray-500 dark:text-muted-foreground">
+                        {enabledCount}/{totalBucketModules}
                       </span>
-                    ) : null;
-                  })}
-                  {modules.length > 4 && (
-                    <span className="text-[9px] px-1.5 py-0.5 text-gray-400 dark:text-muted-foreground">
-                      +{modules.length - 4} more
-                    </span>
-                  )}
+                      <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isExpanded ? "" : "-rotate-90"}`} />
+                    </div>
+                  </div>
                 </div>
               </div>
+              
+              {isExpanded && (
+                <div className="px-2 pb-2 pt-0">
+                  <div className="pl-8 space-y-1.5">
+                    {modules.map(moduleId => {
+                      const module = bucket.moduleCapabilities.find(m => m.id === moduleId);
+                      return module ? (
+                        <div 
+                          key={moduleId} 
+                          className="flex items-start gap-2 p-1.5 rounded bg-white dark:bg-muted border border-gray-100 dark:border-border"
+                        >
+                          <CheckCircle className="w-3 h-3 text-[#266C92] shrink-0 mt-0.5" />
+                          <div className="min-w-0">
+                            <p className="text-[10px] font-medium text-gray-700 dark:text-foreground">{module.name}</p>
+                            <p className="text-[9px] text-gray-400 dark:text-muted-foreground line-clamp-1">{module.description}</p>
+                          </div>
+                        </div>
+                      ) : null;
+                    })}
+                    {modules.length === 0 && (
+                      <p className="text-[10px] text-gray-400 dark:text-muted-foreground italic">No modules enabled</p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
