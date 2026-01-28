@@ -363,7 +363,7 @@ function ModuleCard({
   );
 }
 
-function NavigationPreview({ sections }: { sections: SideNavSection[] }) {
+function NavigationPreview({ sections, workspaceName }: { sections: SideNavSection[]; workspaceName: string }) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(sections.filter(s => s.defaultExpanded).map(s => s.id))
   );
@@ -386,41 +386,23 @@ function NavigationPreview({ sections }: { sections: SideNavSection[] }) {
 
   return (
     <div
-      className="relative bg-gray-900 dark:bg-gray-950 rounded-xl border border-gray-700 dark:border-gray-800 overflow-hidden shadow-2xl h-full flex flex-col"
+      className="relative bg-sidebar dark:bg-sidebar rounded-xl border border-border overflow-hidden h-full flex flex-col"
       data-testid="nav-preview"
     >
-      {/* Mini window chrome */}
-      <div className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 dark:bg-gray-900 border-b border-gray-700 shrink-0">
-        <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-        <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-        <span className="ml-3 text-[10px] text-gray-400 font-medium">Side Navigation Panel</span>
+      {/* Panel header - matches actual SideNavigation header */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-sidebar-accent/50 shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-[#266C92] flex items-center justify-center">
+          <LayoutDashboard className="w-4 h-4 text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-semibold text-sidebar-foreground truncate">{workspaceName || "Custom Workspace"}</div>
+          <div className="text-[10px] text-sidebar-foreground/60">{sections.length} sections</div>
+        </div>
       </div>
       
-      {/* Miniature panel - scaled representation */}
-      <div className="relative flex-1 overflow-hidden">
-        <div 
-          className="absolute inset-0 origin-top-left bg-white dark:bg-[#1a1f2e] overflow-y-auto"
-          style={{ 
-            transform: "scale(0.7)", 
-            transformOrigin: "top left",
-            width: "142.86%",
-            height: "142.86%"
-          }}
-        >
-          {/* Mock app header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 sticky top-0 z-10">
-            <div className="w-8 h-8 rounded-lg bg-[#266C92] flex items-center justify-center">
-              <LayoutDashboard className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-gray-900 dark:text-white">Custom Workspace</div>
-              <div className="text-[10px] text-gray-500 dark:text-gray-400">{sections.length} sections</div>
-            </div>
-          </div>
-          
-          {/* Full navigation sections - no truncation */}
-          <div className="p-3 space-y-1">
+      {/* Navigation sections - matches actual SideNavigation */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-3 space-y-1">
             {sections.map(section => {
               const isExpanded = section.collapsible ? expandedSections.has(section.id) : true;
               return (
@@ -473,14 +455,10 @@ function NavigationPreview({ sections }: { sections: SideNavSection[] }) {
             })}
           </div>
         </div>
-        
-        {/* Gradient overlay to indicate scrollable content */}
-        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-gray-900 dark:from-gray-950 to-transparent pointer-events-none" />
-      </div>
       
       {/* "1:1 Preview" label */}
       <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-[#266C92]/90 text-[9px] font-bold text-white uppercase tracking-wide">
-        Actual Panel Layout
+        Live Preview
       </div>
     </div>
   );
@@ -971,7 +949,7 @@ export function WorkspaceCreationWizard({
                       <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
                     </div>
                     <div className="flex-1">
-                      <NavigationPreview sections={navSections} />
+                      <NavigationPreview sections={navSections} workspaceName={workspaceName} />
                     </div>
                   </div>
                 </div>

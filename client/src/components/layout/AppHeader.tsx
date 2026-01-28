@@ -123,12 +123,23 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
 
   const handleWorkspaceChange = (workspace: Workspace) => {
     setWorkspace(workspace);
-    // Navigate to /admin for Admin workspace, / for all others
-    setLocation(workspace.persona === "Admin" ? "/admin" : "/");
+    // Navigate based on workspace type
+    if (workspace.isCustom) {
+      setLocation("/custom-workspace");
+    } else if (workspace.persona === "Admin") {
+      setLocation("/admin");
+    } else {
+      setLocation("/");
+    }
   };
 
   const handleWorkspaceCreated = (workspace: Workspace) => {
-    setLocation("/");
+    // Navigate to custom workspace home for custom workspaces
+    if (workspace.isCustom) {
+      setLocation("/custom-workspace");
+    } else {
+      setLocation("/");
+    }
   };
 
   return (

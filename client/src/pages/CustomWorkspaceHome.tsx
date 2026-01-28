@@ -436,16 +436,19 @@ const getBucketIcon = (bucketId: string) => {
 };
 
 export default function CustomWorkspaceHome() {
-  const activeWorkspace = useWorkspaceStore(state => state.activeWorkspace);
-  const workspaces = useWorkspaceStore(state => state.workspaces);
+  // Use currentWorkspace directly - the reactive state field, not the getter
+  const currentWorkspace = useWorkspaceStore(state => state.currentWorkspace);
+  const refreshKey = useWorkspaceStore(state => state.refreshKey);
   
-  const workspace = useMemo(() => {
-    if (!activeWorkspace) return null;
-    return workspaces.find(w => w.id === activeWorkspace);
-  }, [activeWorkspace, workspaces]);
+  // Extract module config from current workspace
+  const selectedBuckets = useMemo(() => {
+    return currentWorkspace?.moduleConfig?.selectedBuckets || [];
+  }, [currentWorkspace?.moduleConfig?.selectedBuckets, refreshKey]);
   
-  const selectedBuckets = workspace?.moduleConfig?.selectedBuckets || [];
-  const enabledModules = workspace?.moduleConfig?.enabledModules || {};
+  const enabledModules = useMemo(() => {
+    return currentWorkspace?.moduleConfig?.enabledModules || {};
+  }, [currentWorkspace?.moduleConfig?.enabledModules, refreshKey]);
+  
   
   const tasks = useMemo(
     () => generateTasksFromModules(selectedBuckets, enabledModules),
@@ -489,7 +492,7 @@ export default function CustomWorkspaceHome() {
                   <span className="text-sm font-medium text-white/80">Custom Workspace</span>
                 </div>
                 <h1 className="text-2xl font-bold mb-1">
-                  {workspace?.name || "Your Workspace"}
+                  {currentWorkspace?.name || "Your Workspace"}
                 </h1>
                 <p className="text-white/70 text-sm max-w-lg">
                   Your personalized hub for {selectedBuckets.length} capabilities and {totalModules} active modules
