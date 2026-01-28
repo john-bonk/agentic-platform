@@ -415,19 +415,15 @@ function NavigationPreview({ sections, workspaceName }: { sections: SideNavSecti
                   </div>
                   {isExpanded && (
                     <div className="ml-5 space-y-0.5">
-                      {section.items.map((item, idx) => (
+                      {section.items.map((item) => (
                         <div
                           key={item.id}
-                          className={`flex items-center justify-between px-3 py-1.5 rounded-md text-xs ${
-                            idx === 0 
-                              ? "bg-[#266C92]/10 text-[#266C92] font-medium" 
-                              : "text-gray-600 dark:text-gray-300"
-                          }`}
+                          className="flex items-center justify-between px-3 py-1.5 rounded-md text-xs text-gray-600 dark:text-gray-300"
                           data-testid={`preview-item-${item.id}`}
                         >
                           <span className="truncate">{item.label}</span>
                           {item.badge && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-[#266C92]/20 text-[#266C92] font-medium">
+                            <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
                               {item.badge}
                             </span>
                           )}
@@ -462,71 +458,91 @@ function ConfigurationSummary({
 }) {
   const selectedBucketData = productCapabilityBuckets.filter(b => selectedBuckets.includes(b.id));
   
+  // Calculate additional metrics
+  const totalPossibleModules = selectedBucketData.reduce((acc, b) => acc + b.moduleCapabilities.length, 0);
+  const moduleUtilization = totalPossibleModules > 0 ? Math.round((stats.totalModules / totalPossibleModules) * 100) : 0;
+  
   return (
-    <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-5">
-      <h3 className="font-semibold text-gray-900 dark:text-foreground mb-4">Configuration Summary</h3>
+    <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-4">
+      {/* Header with workspace name and inline stats */}
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <p className="text-[10px] text-gray-400 dark:text-muted-foreground uppercase tracking-wide">Workspace</p>
+          <p className="font-semibold text-gray-900 dark:text-foreground">{workspaceName || "Untitled"}</p>
+        </div>
+        <div className="flex items-center gap-3 text-xs">
+          <div className="text-center">
+            <span className="font-bold text-[#266C92]">{stats.bucketCount}</span>
+            <span className="text-gray-400 ml-1">caps</span>
+          </div>
+          <div className="h-3 w-px bg-gray-200 dark:bg-border" />
+          <div className="text-center">
+            <span className="font-bold text-[#266C92]">{stats.totalModules}</span>
+            <span className="text-gray-400 ml-1">modules</span>
+          </div>
+          <div className="h-3 w-px bg-gray-200 dark:bg-border" />
+          <div className="text-center">
+            <span className="font-bold text-[#266C92]">{stats.totalNavItems}</span>
+            <span className="text-gray-400 ml-1">nav</span>
+          </div>
+        </div>
+      </div>
       
-      <div className="space-y-4">
-        <div>
-          <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase">Workspace Name</Label>
-          <p className="font-medium text-gray-900 dark:text-foreground">{workspaceName || "Untitled Workspace"}</p>
+      {/* Module utilization bar */}
+      <div className="mb-3">
+        <div className="flex items-center justify-between text-[10px] mb-1">
+          <span className="text-gray-500 dark:text-muted-foreground">Module Utilization</span>
+          <span className="font-medium text-gray-700 dark:text-gray-300">{moduleUtilization}% enabled</span>
         </div>
-        
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-gray-50 dark:bg-muted/50 rounded-lg p-3 text-center">
-            <p className="text-2xl font-bold text-[#266C92]">{stats.bucketCount}</p>
-            <p className="text-xs text-gray-500 dark:text-muted-foreground">Capabilities</p>
-          </div>
-          <div className="bg-gray-50 dark:bg-muted/50 rounded-lg p-3 text-center">
-            <p className="text-2xl font-bold text-[#266C92]">{stats.totalModules}</p>
-            <p className="text-xs text-gray-500 dark:text-muted-foreground">Modules</p>
-          </div>
-          <div className="bg-gray-50 dark:bg-muted/50 rounded-lg p-3 text-center">
-            <p className="text-2xl font-bold text-[#266C92]">{stats.totalNavItems}</p>
-            <p className="text-xs text-gray-500 dark:text-muted-foreground">Nav Items</p>
-          </div>
+        <div className="h-1.5 bg-gray-100 dark:bg-muted rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-[#266C92] rounded-full transition-all duration-300"
+            style={{ width: `${moduleUtilization}%` }}
+          />
         </div>
-        
-        <div>
-          <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase mb-2 block">Selected Capabilities</Label>
-          <div className="flex flex-wrap gap-2">
-            {selectedBucketData.map(bucket => (
-              <Badge 
-                key={bucket.id} 
-                variant="secondary"
-                className="text-xs"
-              >
-                {bucket.name}
-              </Badge>
-            ))}
-          </div>
-        </div>
-        
-        <div>
-          <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase mb-2 block">Enabled Modules</Label>
-          <div className="space-y-2 max-h-[200px] overflow-y-auto">
-            {selectedBucketData.map(bucket => {
-              const modules = enabledModules[bucket.id] || [];
-              if (modules.length === 0) return null;
-              
-              return (
-                <div key={bucket.id}>
-                  <p className="text-xs font-medium text-gray-600 dark:text-muted-foreground mb-1">{bucket.name}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {modules.map(moduleId => {
-                      const module = bucket.moduleCapabilities.find(m => m.id === moduleId);
-                      return module ? (
-                        <Badge key={moduleId} variant="outline" className="text-[10px]">
-                          {module.name}
-                        </Badge>
-                      ) : null;
-                    })}
-                  </div>
+      </div>
+      
+      {/* Capability breakdown - compact list */}
+      <div className="space-y-2 max-h-[180px] overflow-y-auto">
+        {selectedBucketData.map(bucket => {
+          const modules = enabledModules[bucket.id] || [];
+          const totalBucketModules = bucket.moduleCapabilities.length;
+          const enabledCount = modules.length;
+          
+          return (
+            <div 
+              key={bucket.id} 
+              className="flex items-start gap-2 p-2 rounded-lg bg-gray-50 dark:bg-muted/30"
+            >
+              <div className="w-6 h-6 rounded bg-[#266C92]/10 flex items-center justify-center shrink-0 mt-0.5">
+                <Layers className="w-3 h-3 text-[#266C92]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-medium text-gray-800 dark:text-foreground truncate">{bucket.name}</span>
+                  <span className="text-[10px] text-gray-500 dark:text-muted-foreground shrink-0">
+                    {enabledCount}/{totalBucketModules}
+                  </span>
                 </div>
-              );
-            })}
-          </div>
-        </div>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {modules.slice(0, 4).map(moduleId => {
+                    const module = bucket.moduleCapabilities.find(m => m.id === moduleId);
+                    return module ? (
+                      <span key={moduleId} className="text-[9px] px-1.5 py-0.5 rounded bg-white dark:bg-muted border border-gray-200 dark:border-border text-gray-600 dark:text-gray-300">
+                        {module.name}
+                      </span>
+                    ) : null;
+                  })}
+                  {modules.length > 4 && (
+                    <span className="text-[9px] px-1.5 py-0.5 text-gray-400 dark:text-muted-foreground">
+                      +{modules.length - 4} more
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -1027,7 +1043,7 @@ export function WorkspaceCreationWizard({
                 </div>
                 
                 {/* Navigation Preview - fixed width to match actual nav panel */}
-                <div className="w-[260px] shrink-0 flex flex-col min-h-0">
+                <div className="w-[312px] shrink-0 flex flex-col min-h-0">
                   <div className="flex items-center gap-2 mb-2 shrink-0">
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
                     <span className="text-[10px] font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
