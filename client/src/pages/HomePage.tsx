@@ -13,6 +13,7 @@
  */
 
 import { useState, useEffect, useMemo } from "react";
+import { useLocation } from "wouter";
 import { AppLayout } from "@/components/layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -539,13 +540,19 @@ function getStatusBadge(status: Task["status"]) {
 
 export default function HomePage() {
   const { currentWorkspace, refreshKey, setWorkspace } = useWorkspaceStore();
+  const [, setLocation] = useLocation();
+  
+  // Redirect custom workspaces to their dedicated page
+  useEffect(() => {
+    if (currentWorkspace.isCustom) {
+      setLocation("/custom-workspace");
+    }
+  }, [currentWorkspace.isCustom, setLocation]);
   
   const content = useMemo(() => {
-    if (currentWorkspace.isCustom && currentWorkspace.selectedCapabilities) {
-      return generateCustomWorkspaceContent(currentWorkspace.selectedCapabilities);
-    }
+    // This should not be reached for custom workspaces due to redirect above
     return workspaceContent[currentWorkspace.id] || workspaceContent["enterprise-risk"];
-  }, [currentWorkspace.id, currentWorkspace.isCustom, currentWorkspace.selectedCapabilities]);
+  }, [currentWorkspace.id]);
 
   const [activeTab, setActiveTab] = useState("My Tasks");
   const [scenarioExpanded, setScenarioExpanded] = useState(true);

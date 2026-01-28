@@ -458,7 +458,7 @@ export function getModuleFromPath(path: string): ModuleConfig {
  * Home paths - all paths that belong to the Home module
  */
 const homePaths = [
-  "/", "/my-dashboard", "/inventory", "/coverage-mapping", "/controls", "/tests", 
+  "/", "/my-dashboard", "/custom-workspace", "/inventory", "/coverage-mapping", "/controls", "/tests", 
   "/issues", "/financial-accounts", "/risk-control-matrix", "/coso-framework", 
   "/open-tasks", "/financial-accounts-view", "/financial-applications-view", 
   "/profile", "/wizard", "/demo", "/items", "/global-residual-risk",

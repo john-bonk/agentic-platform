@@ -26,6 +26,10 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
   
   // Admin workspace only shows Home icon
   const isAdminWorkspace = currentWorkspace.persona === "Admin";
+  const isCustomWorkspace = currentWorkspace.isCustom === true;
+  
+  // Determine home path based on workspace type
+  const homePath = isAdminWorkspace ? "/admin" : isCustomWorkspace ? "/custom-workspace" : "/";
 
   const renderLucideIcon = (icon: string, isActive: boolean) => {
     const colorClass = isActive ? "text-white" : "text-gray-400";
@@ -74,7 +78,7 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
       data-testid="icon-navbar"
     >
       <nav className="flex flex-col items-center gap-1 relative flex-[0_0_auto]">
-        <Link href={isAdminWorkspace ? "/admin" : "/"}>
+        <Link href={homePath}>
           <div 
             className="w-10 h-10 rounded flex items-center justify-center hover-elevate cursor-pointer" 
             data-testid="navbar-logo"
@@ -96,8 +100,8 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
           // Only the module at activeModuleIndex is active
           const active = index === activeModuleIndex;
           
-          // Admin workspace: Home icon navigates to /admin instead of /
-          const itemPath = isAdminWorkspace && index === 0 ? "/admin" : item.path;
+          // Navigate home based on workspace type
+          const itemPath = index === 0 ? homePath : item.path;
           
           const content = (
             <div

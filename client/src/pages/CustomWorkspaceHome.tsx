@@ -449,11 +449,10 @@ export default function CustomWorkspaceHome() {
     return currentWorkspace?.moduleConfig?.enabledModules || {};
   }, [currentWorkspace?.moduleConfig?.enabledModules, refreshKey]);
   
-  
-  const tasks = useMemo(
-    () => generateTasksFromModules(selectedBuckets, enabledModules),
-    [selectedBuckets, enabledModules]
-  );
+  const tasks = useMemo(() => {
+    const generatedTasks = generateTasksFromModules(selectedBuckets, enabledModules);
+    return generatedTasks;
+  }, [selectedBuckets, enabledModules]);
   
   const metrics = useMemo(
     () => generateMetricsFromModules(selectedBuckets, enabledModules),
@@ -478,7 +477,7 @@ export default function CustomWorkspaceHome() {
   
   return (
     <AppLayout>
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6" data-testid="page-custom-workspace-home">
         {/* Hero Welcome Section */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#266C92] via-[#1e5a7a] to-[#164557] p-6 text-white">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -487,15 +486,11 @@ export default function CustomWorkspaceHome() {
           <div className="relative z-10">
             <div className="flex items-start justify-between">
               <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-5 h-5 text-white/80" />
-                  <span className="text-sm font-medium text-white/80">Custom Workspace</span>
-                </div>
                 <h1 className="text-2xl font-bold mb-1">
-                  {currentWorkspace?.name || "Your Workspace"}
+                  Welcome back!
                 </h1>
                 <p className="text-white/70 text-sm max-w-lg">
-                  Your personalized hub for {selectedBuckets.length} capabilities and {totalModules} active modules
+                  {currentWorkspace?.name} • {selectedBuckets.length} capabilities • {totalModules} active modules
                 </p>
               </div>
               
