@@ -119,8 +119,8 @@ type WizardStep = "name" | "buckets" | "modules" | "preview";
 const stepOrder: WizardStep[] = ["name", "buckets", "modules", "preview"];
 const stepLabels: Record<WizardStep, string> = {
   name: "Name",
-  buckets: "Capabilities",
-  modules: "Modules",
+  buckets: "Modules",
+  modules: "Capabilities",
   preview: "Preview",
 };
 
@@ -282,7 +282,7 @@ function BucketCard({
           {bucket.name}
         </div>
         <div className="text-[9px] text-gray-400 dark:text-muted-foreground mt-0.5">
-          {bucket.moduleCapabilities.length} modules
+          {bucket.moduleCapabilities.length} capabilities
         </div>
       </div>
       
@@ -576,7 +576,7 @@ function ConfigurationSummary({
                       ) : null;
                     })}
                     {modules.length === 0 && (
-                      <p className="text-[10px] text-gray-400 dark:text-muted-foreground italic">No modules enabled</p>
+                      <p className="text-[10px] text-gray-400 dark:text-muted-foreground italic">No capabilities enabled</p>
                     )}
                   </div>
                 </div>
@@ -782,7 +782,7 @@ export function WorkspaceCreationWizard({
         <div className="flex items-center justify-between px-8 py-5 border-b border-gray-200 dark:border-border">
           <div>
             <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground">Create New Workspace</h1>
-            <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5">Configure your workspace capabilities</p>
+            <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5">Configure your workspace modules</p>
           </div>
           <div className="flex items-center gap-6">
             <StepIndicator currentStep={currentStep} completedSteps={completedSteps} />
@@ -900,11 +900,11 @@ export function WorkspaceCreationWizard({
                 <div className="text-center mb-8">
                   <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#266C92]/10 text-[#266C92] text-sm font-medium mb-4">
                     <Sparkles className="w-4 h-4" />
-                    Product Capabilities
+                    Product Modules
                   </div>
-                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-foreground">Select Your Capabilities</h2>
+                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-foreground">Select Your Modules</h2>
                   <p className="text-gray-500 dark:text-muted-foreground mt-2 max-w-md mx-auto">
-                    Choose which product areas to include in your workspace. Each capability unlocks specialized modules and workflows.
+                    Choose which product areas to include in your workspace. Each module unlocks specialized capabilities and workflows.
                   </p>
                 </div>
                 
@@ -946,12 +946,12 @@ export function WorkspaceCreationWizard({
                           )}
                         </div>
                         <span className="text-gray-600 dark:text-muted-foreground font-medium">
-                          {selectedBuckets.length} {selectedBuckets.length === 1 ? "capability" : "capabilities"} selected
+                          {selectedBuckets.length} {selectedBuckets.length === 1 ? "module" : "modules"} selected
                         </span>
                       </>
                     ) : (
                       <span className="text-gray-400 dark:text-muted-foreground">
-                        Click tiles to select capabilities
+                        Click tiles to select modules
                       </span>
                     )}
                   </div>
@@ -966,7 +966,7 @@ export function WorkspaceCreationWizard({
               {/* Bucket Tabs Sidebar */}
               <div className="w-64 border-r border-gray-200 dark:border-border bg-gray-50 dark:bg-muted/30 p-4">
                 <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase mb-3 block">
-                  Configure Modules
+                  Configure Capabilities
                 </Label>
                 <div className="space-y-1">
                   {selectedBuckets.map(bucketId => {
@@ -991,7 +991,7 @@ export function WorkspaceCreationWizard({
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{bucket.name}</p>
                           <p className="text-xs text-gray-500 dark:text-muted-foreground">
-                            {moduleCount} / {bucket.moduleCapabilities.length} modules
+                            {moduleCount} / {bucket.moduleCapabilities.length} capabilities
                           </p>
                         </div>
                       </button>
@@ -1052,7 +1052,7 @@ export function WorkspaceCreationWizard({
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-500 dark:text-muted-foreground">
-                    Select a capability from the left to configure its modules
+                    Select a module from the left to configure its capabilities
                   </div>
                 )}
               </div>
