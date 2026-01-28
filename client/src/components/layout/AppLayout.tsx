@@ -54,7 +54,9 @@ export function AppLayout({
   const { isOpen: isAssistantOpen } = useHomeAssistantStore();
   
   const isHomeModule = currentModule.id === "home";
-  const workspaceNav = isHomeModule ? getWorkspaceHomeNav(currentWorkspace.persona) : null;
+  const workspaceNav = isHomeModule 
+    ? getWorkspaceHomeNav(currentWorkspace.persona, currentWorkspace.moduleConfig) 
+    : null;
   
   const sideNavSections = workspaceNav ? workspaceNav.sections : currentModule.sideNavSections;
   // Use the actual workspace name for the title - especially important for custom workspaces

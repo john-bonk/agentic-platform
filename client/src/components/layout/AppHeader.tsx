@@ -44,7 +44,7 @@ import { Input } from "@/components/ui/input";
 import { type Tab } from "@/lib/tabStore";
 import { useWorkspaceStore, type Workspace } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
-import { CreateWorkspaceDialog } from "./CreateWorkspaceDialog";
+import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreationWizard";
 
 const ASSISTANT_PANEL_WIDTH = 420;
 
@@ -299,7 +299,7 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
         </div>
       </header>
 
-      <CreateWorkspaceDialog
+      <WorkspaceCreationWizard
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         onWorkspaceCreated={handleWorkspaceCreated}

@@ -8,12 +8,18 @@
 
 import { create } from 'zustand';
 
+export interface WorkspaceModuleConfig {
+  selectedBuckets: string[];
+  enabledModules: Record<string, string[]>;
+}
+
 export interface Workspace {
   id: string;
   name: string;
   persona: string;
   personaTitle: string;
   selectedCapabilities?: string[];
+  moduleConfig?: WorkspaceModuleConfig;
   isCustom?: boolean;
 }
 
