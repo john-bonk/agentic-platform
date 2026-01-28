@@ -96,7 +96,7 @@ const pivotTabs: PivotTab[] = [
   { id: "workspace", label: "By Workspace", icon: Building2 },
 ];
 
-const roleFilters = ["Admin", "Executive", "Manager", "Auditor", "Analyst", "Viewer"];
+const roleFilters = ["Org Admin", "Workspace Admin", "Executive", "Manager", "Auditor", "Analyst", "Viewer"];
 const workspaceFilters = ["IT Security", "Enterprise Risk", "Enterprise Audit", "Admin"];
 
 interface User {
@@ -111,15 +111,15 @@ interface User {
 }
 
 const users: User[] = [
-  { id: "1", name: "James Smith", email: "james.smith@company.com", initials: "JS", role: "Admin", workspaces: ["IT Security", "Enterprise Risk", "Enterprise Audit", "Admin"], lastLogin: "Yesterday", status: "active" },
-  { id: "2", name: "Mary Smith", email: "mary.smith@company.com", initials: "MS", role: "Admin", workspaces: ["IT Security", "Enterprise Risk", "Enterprise Audit", "Admin"], lastLogin: "4 days ago", status: "active" },
+  { id: "1", name: "James Smith", email: "james.smith@company.com", initials: "JS", role: "Org Admin", workspaces: ["IT Security", "Enterprise Risk", "Enterprise Audit", "Admin"], lastLogin: "Yesterday", status: "active" },
+  { id: "2", name: "Mary Smith", email: "mary.smith@company.com", initials: "MS", role: "Org Admin", workspaces: ["IT Security", "Enterprise Risk", "Enterprise Audit", "Admin"], lastLogin: "4 days ago", status: "active" },
   { id: "3", name: "John Smith", email: "john.smith@company.com", initials: "JS", role: "Executive", workspaces: ["Enterprise Risk", "Enterprise Audit"], lastLogin: "2 days ago", status: "active" },
   { id: "4", name: "Emily Chen", email: "emily.chen@company.com", initials: "EC", role: "Manager", workspaces: ["IT Security", "Enterprise Risk"], lastLogin: "1 week ago", status: "active" },
   { id: "5", name: "Robert Johnson", email: "robert.johnson@company.com", initials: "RJ", role: "Auditor", workspaces: ["Enterprise Audit"], lastLogin: "3 days ago", status: "active" },
   { id: "6", name: "Sarah Williams", email: "sarah.williams@company.com", initials: "SW", role: "Analyst", workspaces: ["IT Security", "Enterprise Risk"], lastLogin: "Yesterday", status: "active" },
   { id: "7", name: "Michael Brown", email: "michael.brown@company.com", initials: "MB", role: "Viewer", workspaces: ["Enterprise Risk"], lastLogin: "2 weeks ago", status: "inactive" },
   { id: "8", name: "Lisa Davis", email: "lisa.davis@company.com", initials: "LD", role: "Auditor", workspaces: ["Enterprise Audit", "IT Security"], lastLogin: "5 days ago", status: "active" },
-  { id: "9", name: "David Wilson", email: "david.wilson@company.com", initials: "DW", role: "Manager", workspaces: ["Enterprise Risk", "Admin"], lastLogin: "Today", status: "active" },
+  { id: "9", name: "David Wilson", email: "david.wilson@company.com", initials: "DW", role: "Workspace Admin", workspaces: ["Enterprise Risk", "Admin"], lastLogin: "Today", status: "active" },
   { id: "10", name: "Jennifer Taylor", email: "jennifer.taylor@company.com", initials: "JT", role: "Analyst", workspaces: ["IT Security"], lastLogin: "3 weeks ago", status: "inactive" },
 ];
 
@@ -127,12 +127,13 @@ const summaryMetrics = [
   { label: "Total Users", value: "90", icon: Users, color: "text-primary" },
   { label: "Active Users", value: "45", icon: UserCheck, color: "text-green-600" },
   { label: "Inactive (14+ days)", value: "45", icon: UserX, color: "text-amber-600" },
-  { label: "Active Roles", value: "6", icon: Shield, color: "text-purple-600" },
+  { label: "Active Roles", value: "7", icon: Shield, color: "text-purple-600" },
 ];
 
 function getRoleBadgeColor(role: string): string {
   const colors: Record<string, string> = {
-    Admin: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
+    "Org Admin": "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
+    "Workspace Admin": "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-400",
     Executive: "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-400",
     Manager: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
     Auditor: "bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-400",
@@ -363,19 +364,31 @@ function ByUserView() {
 }
 
 function ByRoleView() {
-  const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set(["admin"]));
+  const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set(["org-admin"]));
 
   const roles = [
     {
-      id: "admin",
-      name: "Administrator",
-      description: "Full system access with ability to manage all configurations and users",
+      id: "org-admin",
+      name: "Org Admin",
+      description: "Full organization-wide access with ability to manage all configurations, workspaces, and users",
       userCount: 2,
       color: "bg-red-500",
       permissions: {
-        system: ["Full Configuration Access", "User Management", "Role Management", "Audit Log Access", "System Integrations", "API Key Management"],
+        system: ["Full Configuration Access", "User Management", "Role Management", "Audit Log Access", "System Integrations", "API Key Management", "Workspace Creation"],
         data: ["All Data Read/Write", "Delete Records", "Export All Data", "Bulk Operations", "Data Classification Override"],
         workflows: ["Create/Edit All Workflows", "Delete Workflows", "Execute System Workflows", "Workflow Templates"],
+      }
+    },
+    {
+      id: "workspace-admin",
+      name: "Workspace Admin",
+      description: "Full access within assigned workspaces with ability to manage workspace-specific configurations and users",
+      userCount: 3,
+      color: "bg-orange-500",
+      permissions: {
+        system: ["Workspace Configuration", "Workspace User Management", "Workspace Role Assignment", "Workspace Integrations"],
+        data: ["Workspace Data Read/Write", "Delete Workspace Records", "Export Workspace Data", "Workspace Bulk Operations"],
+        workflows: ["Create/Edit Workspace Workflows", "Delete Workspace Workflows", "Execute Workspace Workflows"],
       }
     },
     {
@@ -611,36 +624,36 @@ function ByDataClassificationView() {
   const accessMatrix = {
     confidential: {
       view: {
-        Admin: true, Executive: true, Manager: true, Auditor: true, Analyst: false, Viewer: false,
+        "Org Admin": true, "Workspace Admin": true, Executive: true, Manager: true, Auditor: true, Analyst: false, Viewer: false,
       },
       edit: {
-        Admin: true, Executive: false, Manager: true, Auditor: false, Analyst: false, Viewer: false,
+        "Org Admin": true, "Workspace Admin": true, Executive: false, Manager: true, Auditor: false, Analyst: false, Viewer: false,
       },
       delete: {
-        Admin: true, Executive: false, Manager: false, Auditor: false, Analyst: false, Viewer: false,
+        "Org Admin": true, "Workspace Admin": false, Executive: false, Manager: false, Auditor: false, Analyst: false, Viewer: false,
       },
       export: {
-        Admin: true, Executive: true, Manager: true, Auditor: true, Analyst: false, Viewer: false,
+        "Org Admin": true, "Workspace Admin": true, Executive: true, Manager: true, Auditor: true, Analyst: false, Viewer: false,
       },
       share: {
-        Admin: true, Executive: false, Manager: true, Auditor: false, Analyst: false, Viewer: false,
+        "Org Admin": true, "Workspace Admin": true, Executive: false, Manager: true, Auditor: false, Analyst: false, Viewer: false,
       },
     },
     restricted: {
       view: {
-        Admin: true, Executive: true, Manager: false, Auditor: true, Analyst: false, Viewer: false,
+        "Org Admin": true, "Workspace Admin": false, Executive: true, Manager: false, Auditor: true, Analyst: false, Viewer: false,
       },
       edit: {
-        Admin: true, Executive: false, Manager: false, Auditor: false, Analyst: false, Viewer: false,
+        "Org Admin": true, "Workspace Admin": false, Executive: false, Manager: false, Auditor: false, Analyst: false, Viewer: false,
       },
       delete: {
-        Admin: true, Executive: false, Manager: false, Auditor: false, Analyst: false, Viewer: false,
+        "Org Admin": true, "Workspace Admin": false, Executive: false, Manager: false, Auditor: false, Analyst: false, Viewer: false,
       },
       export: {
-        Admin: true, Executive: false, Manager: false, Auditor: false, Analyst: false, Viewer: false,
+        "Org Admin": true, "Workspace Admin": false, Executive: false, Manager: false, Auditor: false, Analyst: false, Viewer: false,
       },
       share: {
-        Admin: true, Executive: false, Manager: false, Auditor: false, Analyst: false, Viewer: false,
+        "Org Admin": true, "Workspace Admin": false, Executive: false, Manager: false, Auditor: false, Analyst: false, Viewer: false,
       },
     },
   };
@@ -782,7 +795,7 @@ function ByDataClassificationView() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {["Admin", "Executive", "Manager", "Auditor", "Analyst", "Viewer"].map((role) => {
+                {["Org Admin", "Workspace Admin", "Executive", "Manager", "Auditor", "Analyst", "Viewer"].map((role) => {
                   const matrix = accessMatrix[selectedClassification as keyof typeof accessMatrix] || accessMatrix.confidential;
                   return (
                     <TableRow key={role} data-testid={`matrix-row-${role.toLowerCase()}`}>

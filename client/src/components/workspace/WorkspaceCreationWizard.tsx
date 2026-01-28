@@ -15,6 +15,13 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   TrendingUp,
   ClipboardList,
   Scale,
@@ -249,63 +256,41 @@ function BucketCard({
   return (
     <button
       onClick={onToggle}
-      className={`relative aspect-square flex flex-col items-center justify-center rounded-2xl border-2 text-center transition-all overflow-visible hover-elevate active-elevate-2 ${
+      className={`relative p-3 flex flex-col items-center justify-center rounded-xl border text-center transition-all hover-elevate active-elevate-2 ${
         isSelected
-          ? "border-[#266C92] shadow-lg shadow-[#266C92]/20"
-          : "border-gray-200 dark:border-border"
+          ? "border-[#266C92] bg-[#266C92]/5 dark:bg-[#266C92]/10"
+          : "border-gray-200 dark:border-border bg-white dark:bg-card"
       }`}
       data-testid={`bucket-${bucket.id}`}
     >
-      {/* Background gradient - static based on selection */}
-      {isSelected && (
-        <div 
-          className="absolute inset-0 rounded-2xl pointer-events-none"
-          style={{ 
-            background: `linear-gradient(135deg, ${bucket.color}08 0%, ${bucket.color}15 100%)`
-          }}
-        />
-      )}
-      
-      {/* Decorative corner accent - only when selected */}
-      {isSelected && (
-        <div 
-          className="absolute -top-12 -right-12 w-24 h-24 rounded-full opacity-20 pointer-events-none"
-          style={{ backgroundColor: bucket.color }}
-        />
-      )}
-      
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center">
+      <div className="flex flex-col items-center">
         <div
-          className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3"
-          style={{ 
-            backgroundColor: isSelected ? `${bucket.color}20` : undefined,
-            color: isSelected ? bucket.color : undefined
-          }}
+          className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 ${
+            isSelected 
+              ? "bg-[#266C92]/10 text-[#266C92]" 
+              : "bg-gray-100 dark:bg-muted text-gray-400 dark:text-muted-foreground"
+          }`}
         >
-          <div className={isSelected ? "" : "text-gray-400 dark:text-muted-foreground"}>
-            {getBucketIcon(bucket.icon, "w-7 h-7")}
-          </div>
+          {getBucketIcon(bucket.icon, "w-5 h-5")}
         </div>
         <div 
-          className={`font-semibold text-sm px-2 ${isSelected ? "" : "text-gray-700 dark:text-foreground"}`}
-          style={{ color: isSelected ? bucket.color : undefined }}
+          className={`font-medium text-xs px-1 ${
+            isSelected ? "text-[#266C92]" : "text-gray-700 dark:text-foreground"
+          }`}
         >
           {bucket.name}
         </div>
-        <div className="text-[10px] text-gray-400 dark:text-muted-foreground mt-1 px-3 text-center leading-tight">
+        <div className="text-[9px] text-gray-400 dark:text-muted-foreground mt-0.5">
           {bucket.moduleCapabilities.length} modules
         </div>
       </div>
       
-      {/* Selection indicator */}
+      {/* Selection checkmark */}
       {isSelected && (
-        <div className="absolute top-3 right-3 z-20">
-          <div 
-            className="w-6 h-6 rounded-full flex items-center justify-center shadow-md"
-            style={{ backgroundColor: bucket.color }}
-          >
-            <Check className="w-3.5 h-3.5 text-white" />
+        <div className="absolute top-2 right-2">
+          <div className="w-4 h-4 rounded-full bg-[#266C92] flex items-center justify-center">
+            <Check className="w-2.5 h-2.5 text-white" />
           </div>
         </div>
       )}
@@ -547,6 +532,22 @@ function ConfigurationSummary({
   );
 }
 
+interface WorkspaceMember {
+  id: string;
+  email: string;
+  role: string;
+}
+
+const WORKSPACE_ROLES = [
+  "Org Admin",
+  "Workspace Admin", 
+  "Executive",
+  "Manager",
+  "Auditor",
+  "Analyst",
+  "Viewer",
+];
+
 export function WorkspaceCreationWizard({
   open,
   onOpenChange,
@@ -557,8 +558,28 @@ export function WorkspaceCreationWizard({
   const [selectedBuckets, setSelectedBuckets] = useState<string[]>([]);
   const [enabledModules, setEnabledModules] = useState<Record<string, string[]>>({});
   const [activeBucketTab, setActiveBucketTab] = useState<string | null>(null);
+  const [workspaceMembers, setWorkspaceMembers] = useState<WorkspaceMember[]>([
+    { id: "1", email: "admin@company.org", role: "Org Admin" }
+  ]);
   
   const addWorkspace = useWorkspaceStore(state => state.addWorkspace);
+  
+  const addMember = () => {
+    setWorkspaceMembers(prev => [
+      ...prev,
+      { id: `member-${Date.now()}`, email: "", role: "Viewer" }
+    ]);
+  };
+  
+  const removeMember = (id: string) => {
+    setWorkspaceMembers(prev => prev.filter(m => m.id !== id));
+  };
+  
+  const updateMember = (id: string, field: "email" | "role", value: string) => {
+    setWorkspaceMembers(prev => 
+      prev.map(m => m.id === id ? { ...m, [field]: value } : m)
+    );
+  };
 
   const completedSteps = useMemo(() => {
     const completed = new Set<WizardStep>();
@@ -723,17 +744,19 @@ export function WorkspaceCreationWizard({
         {/* Content */}
         <div className="flex-1 overflow-hidden">
           {currentStep === "name" && (
-            <div className="flex items-center justify-center h-full p-8">
-              <div className="w-full max-w-md space-y-6">
-                <div className="text-center mb-8">
-                  <div className="w-16 h-16 rounded-2xl bg-[#266C92]/10 flex items-center justify-center mx-auto mb-4">
-                    <Sparkles className="w-8 h-8 text-[#266C92]" />
+            <div className="flex items-center justify-center h-full p-8 overflow-auto">
+              <div className="w-full max-w-xl space-y-6">
+                <div className="text-center mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-[#266C92]/10 flex items-center justify-center mx-auto mb-3">
+                    <Sparkles className="w-7 h-7 text-[#266C92]" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-foreground">Name Your Workspace</h2>
-                  <p className="text-gray-500 dark:text-muted-foreground mt-2">
-                    Choose a name that reflects the purpose of this workspace
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-foreground">Create Your Workspace</h2>
+                  <p className="text-gray-500 dark:text-muted-foreground mt-1 text-sm">
+                    Name your workspace and add initial team members
                   </p>
                 </div>
+                
+                {/* Workspace Name */}
                 <div>
                   <Label htmlFor="workspace-name" className="text-sm font-medium">Workspace Name</Label>
                   <Input
@@ -741,10 +764,74 @@ export function WorkspaceCreationWizard({
                     value={workspaceName}
                     onChange={e => setWorkspaceName(e.target.value)}
                     placeholder="e.g., Enterprise Risk & Compliance"
-                    className="mt-2 h-12 text-lg"
+                    className="mt-2 h-11"
                     data-testid="input-workspace-name"
                     autoFocus
                   />
+                </div>
+                
+                {/* Initial Users */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="text-sm font-medium">Initial Users</Label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={addMember}
+                      className="gap-1 text-[#266C92]"
+                      data-testid="button-add-member"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      Add User
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                    {workspaceMembers.map((member, index) => (
+                      <div 
+                        key={member.id}
+                        className="flex items-center gap-2 p-2 rounded-lg border border-gray-200 dark:border-border bg-gray-50 dark:bg-muted/30"
+                      >
+                        <Input
+                          value={member.email}
+                          onChange={e => updateMember(member.id, "email", e.target.value)}
+                          placeholder="email@company.org"
+                          className="flex-1 h-8 text-sm"
+                          data-testid={`input-member-email-${index}`}
+                        />
+                        <Select
+                          value={member.role}
+                          onValueChange={value => updateMember(member.id, "role", value)}
+                        >
+                          <SelectTrigger className="w-[140px] h-8 text-xs" data-testid={`select-member-role-${index}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {WORKSPACE_ROLES.map(role => (
+                              <SelectItem key={role} value={role} className="text-xs">
+                                {role}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {workspaceMembers.length > 1 && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeMember(member.id)}
+                            className="text-gray-400 hover:text-red-500"
+                            data-testid={`button-remove-member-${index}`}
+                          >
+                            <UserMinus className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <p className="text-xs text-gray-400 dark:text-muted-foreground mt-2">
+                    Users will receive an invitation to join this workspace
+                  </p>
                 </div>
               </div>
             </div>
@@ -916,42 +1003,40 @@ export function WorkspaceCreationWizard({
           )}
           
           {currentStep === "preview" && (
-            <div className="h-full p-8 overflow-auto">
-              <div className="max-w-6xl mx-auto h-full flex flex-col">
-                <div className="text-center mb-6">
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium mb-4">
-                    <CheckCircle className="w-4 h-4" />
-                    Ready to Create
-                  </div>
-                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-foreground">Review Your Workspace</h2>
-                  <p className="text-gray-500 dark:text-muted-foreground mt-2">
-                    Your workspace is configured and ready. The navigation panel preview shows exactly how it will appear.
-                  </p>
+            <div className="h-full p-6 overflow-hidden flex flex-col">
+              <div className="text-center mb-4 shrink-0">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium mb-3">
+                  <CheckCircle className="w-4 h-4" />
+                  Ready to Create
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-foreground">Review Your Workspace</h2>
+                <p className="text-gray-500 dark:text-muted-foreground mt-1 text-sm">
+                  Your workspace is configured and ready. The navigation panel preview shows exactly how it will appear.
+                </p>
+              </div>
+              
+              <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
+                {/* Configuration Summary - wider section */}
+                <div className="flex-1 overflow-auto">
+                  <ConfigurationSummary
+                    workspaceName={workspaceName}
+                    selectedBuckets={selectedBuckets}
+                    enabledModules={enabledModules}
+                    stats={stats}
+                  />
                 </div>
                 
-                <div className="flex-1 grid grid-cols-5 gap-6 min-h-0">
-                  {/* Configuration Summary - narrower */}
-                  <div className="col-span-2">
-                    <ConfigurationSummary
-                      workspaceName={workspaceName}
-                      selectedBuckets={selectedBuckets}
-                      enabledModules={enabledModules}
-                      stats={stats}
-                    />
+                {/* Navigation Preview - fixed width to match actual nav panel */}
+                <div className="w-[260px] shrink-0 flex flex-col min-h-0">
+                  <div className="flex items-center gap-2 mb-2 shrink-0">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
+                    <span className="text-[10px] font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
+                      Live Preview
+                    </span>
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
                   </div>
-                  
-                  {/* Navigation Preview - wider, emphasized as the true preview */}
-                  <div className="col-span-3 flex flex-col">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
-                      <span className="text-xs font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
-                        Live Panel Preview
-                      </span>
-                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
-                    </div>
-                    <div className="flex-1">
-                      <NavigationPreview sections={navSections} workspaceName={workspaceName} />
-                    </div>
+                  <div className="flex-1 min-h-0 overflow-hidden">
+                    <NavigationPreview sections={navSections} workspaceName={workspaceName} />
                   </div>
                 </div>
               </div>
