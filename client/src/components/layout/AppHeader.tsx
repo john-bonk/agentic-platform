@@ -141,13 +141,14 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
         data-testid="app-header"
       >
         {/* Workspace Switcher - Animated slide-up/fade when collapsed */}
-        {/* Positioned after global nav (56px) + collapsed panel (36px) = 92px, using left-24 (96px) */}
+        {/* Positioned to align with side panel: global nav (56px) + panel padding (12px) = 68px */}
         <div 
-          className={`absolute left-24 flex items-center transition-all duration-300 ease-out ${
+          className={`absolute flex items-center transition-all duration-300 ease-out ${
             isCollapsed 
               ? "opacity-100 translate-y-0 pointer-events-auto" 
-              : "opacity-0 -translate-y-3 pointer-events-none"
+              : "opacity-0 translate-y-3 pointer-events-none"
           }`}
+          style={{ left: '68px' }}
           data-testid="header-workspace-switcher-container"
         >
           <DropdownMenu>
