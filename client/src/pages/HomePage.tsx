@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { useWorkspaceStore, workspaces as storeWorkspaces, solutionCapabilities } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
-import headerBgImage from "@assets/Welcome_Image_1767849747805.png";
+import headerBgImage from "@/assets/header-background.png";
 
 interface Task {
   id: string;
