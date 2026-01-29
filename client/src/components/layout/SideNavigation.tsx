@@ -328,8 +328,10 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
           </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="flex flex-col flex-1 h-full bg-white dark:bg-card border-r border-gray-200 dark:border-border">
+        {/* Main Content Area - Slides left when collapsed */}
+        <div className={`flex flex-col h-full bg-white dark:bg-card border-r border-gray-200 dark:border-border transition-all duration-300 ease-in-out ${
+          isCollapsed ? "w-0 overflow-hidden" : "w-[236px]"
+        }`}>
           {/* Panel Header - Dark background matching header, with Workspace Switcher */}
           <div 
             className="flex items-center justify-between h-12 px-3 flex-shrink-0 transition-all duration-300 ease-in-out"
