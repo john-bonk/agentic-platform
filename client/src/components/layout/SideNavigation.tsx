@@ -273,19 +273,22 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
   return (
     <>
       <nav 
-        className={`flex h-screen flex-shrink-0 z-30 transition-all duration-300 ease-in-out ${className}`}
+        className={`flex flex-col h-screen flex-shrink-0 z-30 transition-all duration-300 ease-in-out ${
+          isCollapsed ? "w-[272px]" : "w-[272px]"
+        } ${className}`}
+        style={{ width: isCollapsed ? '272px' : '272px' }}
         data-testid="side-navigation"
       >
-        {/* Collapsed Toolbar - Narrow vertical strip, full height */}
+        {/* Dark Header Bar - Always full width, contains collapsed toolbar + workspace switcher */}
         <div 
-          className={`flex flex-col bg-white dark:bg-card border-r border-gray-200 dark:border-border h-full transition-all duration-300 ease-in-out ${
-            isCollapsed ? "w-[36px] opacity-100" : "w-0 opacity-0 overflow-hidden"
-          }`}
+          className="flex items-center h-12 flex-shrink-0"
+          style={{ backgroundColor: '#101827' }}
         >
-          {/* Dark header section matching top header */}
+          {/* Collapsed Toolbar Section */}
           <div 
-            className="flex items-center justify-center h-12 flex-shrink-0"
-            style={{ backgroundColor: '#101827' }}
+            className={`flex items-center justify-center h-full border-r border-gray-700 transition-all duration-300 ease-in-out ${
+              isCollapsed ? "w-[36px]" : "w-0 overflow-hidden opacity-0"
+            }`}
           >
             <button
               onClick={() => setCollapsed(false)}
@@ -296,47 +299,8 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
             </button>
           </div>
 
-          {/* Quick access icons */}
-          <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
-            <Link href={currentWorkspace.isCustom ? "/custom-workspace" : "/"}>
-              <button
-                className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${
-                  isHomeActive 
-                    ? "bg-teal-50 dark:bg-primary/10" 
-                    : "hover:bg-gray-100 dark:hover:bg-accent"
-                }`}
-                data-testid="nav-collapsed-home"
-                title="Home"
-              >
-                <Home className={`w-3 h-3 ${isHomeActive ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
-              </button>
-            </Link>
-            <button
-              className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
-              data-testid="nav-collapsed-recent"
-              title="Recent"
-            >
-              <Clock className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
-            </button>
-            <button
-              className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
-              data-testid="nav-collapsed-favorites"
-              title="Favorites"
-            >
-              <Star className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
-            </button>
-          </div>
-        </div>
-
-        {/* Main Content Area - Slides left when collapsed */}
-        <div className={`flex flex-col h-full bg-white dark:bg-card border-r border-gray-200 dark:border-border transition-all duration-300 ease-in-out ${
-          isCollapsed ? "w-0 overflow-hidden" : "w-[236px]"
-        }`}>
-          {/* Panel Header - Dark background matching header, with Workspace Switcher */}
-          <div 
-            className="flex items-center justify-between h-12 px-3 flex-shrink-0 transition-all duration-300 ease-in-out"
-            style={{ backgroundColor: '#101827' }}
-          >
+          {/* Workspace Switcher - Shifts right when collapsed */}
+          <div className="flex items-center justify-between flex-1 px-3 transition-all duration-300 ease-in-out">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -344,7 +308,7 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
                   className="flex items-center gap-1.5 h-8 px-2 text-white hover:bg-gray-700"
                   data-testid="sidenav-workspace-switcher"
                 >
-                  <span className="text-sm font-semibold truncate max-w-[160px]">{currentWorkspace.name}</span>
+                  <span className="text-sm font-semibold truncate max-w-[180px]">{currentWorkspace.name}</span>
                   <ChevronDownIcon className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
                 </Button>
               </DropdownMenuTrigger>
@@ -389,40 +353,83 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
               <PanelLeftClose className="w-4 h-4 text-gray-400" />
             </button>
           </div>
+        </div>
 
-          {/* Quick Access Items - Home, Recent, Favorites */}
-          <div className={`flex flex-col gap-0.5 px-3 pt-3 pb-2 border-b border-gray-100 dark:border-border transition-all duration-300 ease-in-out ${
-            isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
-          }`}>
-            <QuickAccessItem 
-              icon={Home} 
-              label="Home" 
-              path={currentWorkspace.isCustom ? "/custom-workspace" : "/"} 
-              isActive={isHomeActive}
-            />
-            <QuickAccessItem 
-              icon={Clock} 
-              label="Recent" 
-            />
-            <QuickAccessItem 
-              icon={Star} 
-              label="Favorites" 
-            />
+        {/* Content Area Below Header */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Collapsed Quick Access Icons */}
+          <div 
+            className={`flex flex-col bg-white dark:bg-card border-r border-gray-200 dark:border-border h-full transition-all duration-300 ease-in-out ${
+              isCollapsed ? "w-[36px]" : "w-0 overflow-hidden opacity-0"
+            }`}
+          >
+            <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
+              <Link href={currentWorkspace.isCustom ? "/custom-workspace" : "/"}>
+                <button
+                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${
+                    isHomeActive 
+                      ? "bg-teal-50 dark:bg-primary/10" 
+                      : "hover:bg-gray-100 dark:hover:bg-accent"
+                  }`}
+                  data-testid="nav-collapsed-home"
+                  title="Home"
+                >
+                  <Home className={`w-3 h-3 ${isHomeActive ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
+                </button>
+              </Link>
+              <button
+                className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
+                data-testid="nav-collapsed-recent"
+                title="Recent"
+              >
+                <Clock className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
+              </button>
+              <button
+                className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
+                data-testid="nav-collapsed-favorites"
+                title="Favorites"
+              >
+                <Star className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
+              </button>
+            </div>
           </div>
 
-          {/* Scrollable Navigation Sections */}
-          <div className={`flex flex-col gap-4 pt-3 pb-6 px-3 flex-1 overflow-y-auto transition-all duration-300 ease-in-out ${
-            isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
-          }`}>
-            {filteredSections.map((section) => (
-              <CollapsibleSection
-                key={section.id}
-                section={section}
-                isExpanded={expandedSections[section.id] ?? true}
-                onToggle={() => toggleSection(section.id)}
-                isActive={isActive}
+          {/* Expanded Navigation Content - Slides left when collapsed */}
+          <div 
+            className={`flex flex-col bg-white dark:bg-card border-r border-gray-200 dark:border-border h-full transition-all duration-300 ease-in-out ${
+              isCollapsed ? "w-0 overflow-hidden opacity-0" : "w-[236px] opacity-100"
+            }`}
+          >
+            {/* Quick Access Items - Home, Recent, Favorites */}
+            <div className="flex flex-col gap-0.5 px-3 pt-3 pb-2 border-b border-gray-100 dark:border-border">
+              <QuickAccessItem 
+                icon={Home} 
+                label="Home" 
+                path={currentWorkspace.isCustom ? "/custom-workspace" : "/"} 
+                isActive={isHomeActive}
               />
-            ))}
+              <QuickAccessItem 
+                icon={Clock} 
+                label="Recent" 
+              />
+              <QuickAccessItem 
+                icon={Star} 
+                label="Favorites" 
+              />
+            </div>
+
+            {/* Scrollable Navigation Sections */}
+            <div className="flex flex-col gap-4 pt-3 pb-6 px-3 flex-1 overflow-y-auto">
+              {filteredSections.map((section) => (
+                <CollapsibleSection
+                  key={section.id}
+                  section={section}
+                  isExpanded={expandedSections[section.id] ?? true}
+                  onToggle={() => toggleSection(section.id)}
+                  isActive={isActive}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </nav>
