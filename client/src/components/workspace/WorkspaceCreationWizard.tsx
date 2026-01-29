@@ -437,10 +437,6 @@ function NavigationPreview({ sections, workspaceName }: { sections: SideNavSecti
           </div>
         </div>
       
-      {/* "1:1 Preview" label */}
-      <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-[#266C92]/90 text-[9px] font-bold text-white uppercase tracking-wide">
-        Live Preview
-      </div>
     </div>
   );
 }
@@ -457,7 +453,15 @@ function ConfigurationSummary({
   stats: { totalModules: number; totalNavItems: number; bucketCount: number };
 }) {
   const selectedBucketData = productCapabilityBuckets.filter(b => selectedBuckets.includes(b.id));
-  const [expandedCapabilities, setExpandedCapabilities] = useState<Set<string>>(new Set());
+  // Default to all expanded
+  const [expandedCapabilities, setExpandedCapabilities] = useState<Set<string>>(
+    new Set(selectedBuckets)
+  );
+  
+  // Keep expanded state in sync with selected buckets
+  useEffect(() => {
+    setExpandedCapabilities(new Set(selectedBuckets));
+  }, [selectedBuckets.join(",")]);
   
   // Calculate additional metrics
   const totalPossibleModules = selectedBucketData.reduce((acc, b) => acc + b.moduleCapabilities.length, 0);
@@ -604,6 +608,127 @@ const WORKSPACE_ROLES = [
   "Analyst",
   "Viewer",
 ];
+
+// Role capability descriptions
+const ROLE_CAPABILITIES: Record<string, string[]> = {
+  "Org Admin": ["Full platform access", "User management", "Workspace creation", "Settings configuration", "All audit trails"],
+  "Workspace Admin": ["Workspace configuration", "Member management", "Module settings", "Report generation", "Workflow creation"],
+  "Executive": ["Dashboard access", "Executive reports", "Approval authority", "Read-only modules", "Board reporting"],
+  "Manager": ["Team oversight", "Task assignment", "Workflow management", "Report access", "Control review"],
+  "Auditor": ["Audit execution", "Evidence collection", "Finding documentation", "Control testing", "Report creation"],
+  "Analyst": ["Data analysis", "Risk assessment", "Control monitoring", "Report drafting", "Issue tracking"],
+  "Viewer": ["Read-only access", "Dashboard viewing", "Report viewing", "Limited navigation"],
+};
+
+function MembersSummary({ members }: { members: WorkspaceMember[] }) {
+  const [expandedMembers, setExpandedMembers] = useState<Set<string>>(
+    new Set(members.map(m => m.id))
+  );
+  
+  // Keep expanded state in sync with members list (all expanded by default)
+  useEffect(() => {
+    setExpandedMembers(new Set(members.map(m => m.id)));
+  }, [members.map(m => m.id).join(",")]);
+  
+  const toggleMember = (memberId: string) => {
+    setExpandedMembers(prev => {
+      const next = new Set(prev);
+      if (next.has(memberId)) {
+        next.delete(memberId);
+      } else {
+        next.add(memberId);
+      }
+      return next;
+    });
+  };
+  
+  return (
+    <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-4 h-full flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3 shrink-0">
+        <div>
+          <p className="text-[10px] text-gray-400 dark:text-muted-foreground uppercase tracking-wide">Team</p>
+          <p className="font-semibold text-gray-900 dark:text-foreground">Workspace Members</p>
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <div className="text-center">
+            <span className="font-bold text-[#266C92]">{members.length}</span>
+            <span className="text-gray-400 ml-1">{members.length === 1 ? 'member' : 'members'}</span>
+          </div>
+        </div>
+      </div>
+      
+      {/* Member list - expandable cards */}
+      <div className="space-y-2 flex-1 overflow-y-auto">
+        {members.map(member => {
+          const isExpanded = expandedMembers.has(member.id);
+          const capabilities = ROLE_CAPABILITIES[member.role] || ["Custom access"];
+          
+          return (
+            <div 
+              key={member.id} 
+              className="rounded-lg bg-gray-50 dark:bg-muted/30"
+            >
+              <div 
+                className="flex items-center gap-2 p-2 cursor-pointer rounded-lg hover-elevate"
+                onClick={() => toggleMember(member.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleMember(member.id);
+                  }
+                }}
+                data-testid={`toggle-member-${member.id}`}
+              >
+                <div className="w-6 h-6 rounded-full bg-[#266C92]/10 flex items-center justify-center shrink-0">
+                  <Users className="w-3 h-3 text-[#266C92]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-medium text-gray-800 dark:text-foreground truncate">
+                      {member.email || "Unnamed member"}
+                    </span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-[10px] text-[#266C92] font-medium bg-[#266C92]/10 px-1.5 py-0.5 rounded">
+                        {member.role}
+                      </span>
+                      <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isExpanded ? "" : "-rotate-90"}`} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {isExpanded && (
+                <div className="px-2 pb-2 pt-0">
+                  <div className="pl-8 space-y-1">
+                    <p className="text-[9px] text-gray-400 dark:text-muted-foreground uppercase tracking-wide mb-1">Capabilities</p>
+                    {capabilities.map((capability, idx) => (
+                      <div 
+                        key={idx} 
+                        className="flex items-start gap-2 p-1 rounded"
+                      >
+                        <CheckCircle className="w-2.5 h-2.5 text-[#266C92] shrink-0 mt-0.5" />
+                        <p className="text-[10px] text-gray-600 dark:text-muted-foreground">{capability}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {members.length === 0 && (
+          <div className="text-center py-8 text-gray-400 dark:text-muted-foreground">
+            <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <p className="text-xs">No members added yet</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function WorkspaceCreationWizard({
   open,
@@ -776,8 +901,8 @@ export function WorkspaceCreationWizard({
         onClick={handleClose}
       />
       
-      {/* Full-screen Modal */}
-      <div className="relative w-full h-full max-w-[1400px] max-h-[900px] m-4 bg-white dark:bg-background rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      {/* Full-screen Modal - True fullscreen, no rounded corners */}
+      <div className="relative w-full h-full bg-white dark:bg-background shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-gray-200 dark:border-border">
           <div>
@@ -827,10 +952,10 @@ export function WorkspaceCreationWizard({
                   />
                 </div>
                 
-                {/* Initial Users */}
+                {/* Workspace Members */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <Label className="text-sm font-medium">Initial Users</Label>
+                    <Label className="text-sm font-medium">Workspace Members</Label>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -839,7 +964,7 @@ export function WorkspaceCreationWizard({
                       data-testid="button-add-member"
                     >
                       <UserPlus className="w-3.5 h-3.5" />
-                      Add User
+                      Add Member
                     </Button>
                   </div>
                   
@@ -1062,19 +1187,19 @@ export function WorkspaceCreationWizard({
           {currentStep === "preview" && (
             <div className="h-full p-6 overflow-hidden flex flex-col">
               <div className="text-center mb-4 shrink-0">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 text-sm font-medium mb-3">
-                  <CheckCircle className="w-4 h-4" />
-                  Ready to Create
-                </div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-foreground">Review Your Workspace</h2>
-                <p className="text-gray-500 dark:text-muted-foreground mt-1 text-sm">
-                  Your workspace is configured and ready. The navigation panel preview shows exactly how it will appear.
-                </p>
               </div>
               
               <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
-                {/* Configuration Summary - wider section, same height as preview */}
+                {/* Configuration Summary - modules column */}
                 <div className="flex-1 flex flex-col min-h-0">
+                  <div className="flex items-center gap-2 mb-2 shrink-0">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
+                    <span className="text-[10px] font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
+                      Workspace Summary
+                    </span>
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
+                  </div>
                   <ConfigurationSummary
                     workspaceName={workspaceName}
                     selectedBuckets={selectedBuckets}
@@ -1083,12 +1208,24 @@ export function WorkspaceCreationWizard({
                   />
                 </div>
                 
+                {/* Members Summary - middle column */}
+                <div className="flex-1 flex flex-col min-h-0">
+                  <div className="flex items-center gap-2 mb-2 shrink-0">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
+                    <span className="text-[10px] font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
+                      Team Members
+                    </span>
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
+                  </div>
+                  <MembersSummary members={workspaceMembers} />
+                </div>
+                
                 {/* Navigation Preview - fixed width to match actual nav panel */}
                 <div className="w-[312px] shrink-0 flex flex-col min-h-0">
                   <div className="flex items-center gap-2 mb-2 shrink-0">
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
                     <span className="text-[10px] font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
-                      Live Preview
+                      Nav Preview
                     </span>
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
                   </div>
