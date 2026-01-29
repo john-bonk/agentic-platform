@@ -43,5 +43,6 @@ export const PROTOTYPE_EXPECTATIONS = {
   defaultWorkspaceCount: 4,
   moduleCount: 5,
   minSlideDecks: 3,
-  minQuickActions: 15, // 4+4+4+3 (Admin has 3 quick actions)
+  minQuickActions: 16, // 4+4+4+4 (Admin now has 4 quick actions including Data)
+  adminPageCount: 3, // Workspaces, Permissions, Data
 } as const;

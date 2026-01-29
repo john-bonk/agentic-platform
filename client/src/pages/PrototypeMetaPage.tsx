@@ -431,6 +431,14 @@ function LivePublishReadiness() {
       location: "client/src/lib/workspaceStore.ts currentWorkspace",
       loading: false,
     },
+    { 
+      id: "admin-pages", 
+      label: `${PROTOTYPE_EXPECTATIONS.adminPageCount} Admin Management Pages`, 
+      status: workspaceHomeNav["Admin"]?.sections[0]?.items.length === PROTOTYPE_EXPECTATIONS.adminPageCount,
+      actual: `${workspaceHomeNav["Admin"]?.sections[0]?.items.length || 0} pages (Workspaces, Permissions, Data)`,
+      location: "client/src/config/navigation.ts workspaceHomeNav.Admin",
+      loading: false,
+    },
   ];
 
   const passingChecks = checks.filter(c => !c.loading && c.status);

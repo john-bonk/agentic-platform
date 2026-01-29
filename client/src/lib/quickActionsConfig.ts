@@ -73,13 +73,22 @@ export const workspaceQuickActions: Record<string, QuickActionConfig[]> = {
       color: "#f59e0b",
     },
     {
+      id: "manage-data",
+      label: "Manage Data",
+      description: "Configure data tenancy, modeling, and connectivity across workspaces",
+      iconName: "Database",
+      type: "navigate",
+      route: "/admin/data",
+      color: "#10b981",
+    },
+    {
       id: "view-analytics",
       label: "View Platform Analytics",
       description: "Access platform-wide usage metrics and activity insights",
       iconName: "BarChart3",
       type: "navigate",
       route: "/admin",
-      color: "#10b981",
+      color: "#8b5cf6",
     },
   ],
   "enterprise-risk": [
