@@ -57,9 +57,9 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         defaultExpanded: true,
         collapsible: true,
         items: [
-          { id: "admin-overview", label: "Overview", path: "/admin" },
           { id: "admin-workspaces", label: "Workspaces", path: "/admin/workspaces" },
           { id: "admin-permissions", label: "Permissions", path: "/admin/permissions" },
+          { id: "admin-data", label: "Data", path: "/admin/data" },
         ],
       },
     ],

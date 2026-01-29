@@ -51,6 +51,7 @@ import {
   AdminOverviewPage,
   AdminWorkspacesPage,
   AdminPermissionsPage,
+  AdminDataPage,
   PrototypeMetaPage,
   GeneratedReportPage,
   CustomWorkspaceHome,
@@ -124,9 +125,10 @@ function Router() {
       <Route path="/ciso/global-residual-risk" component={CISOResidualRiskPage} />
       
       {/* Admin Workspace Routes */}
-      <Route path="/admin" component={AdminOverviewPage} />
+      <Route path="/admin" component={AdminWorkspacesPage} />
       <Route path="/admin/workspaces" component={AdminWorkspacesPage} />
       <Route path="/admin/permissions" component={AdminPermissionsPage} />
+      <Route path="/admin/data" component={AdminDataPage} />
       
       {/* Prototype Meta View */}
       <Route path="/prototype-meta" component={PrototypeMetaPage} />

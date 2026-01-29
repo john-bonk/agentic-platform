@@ -37,6 +37,7 @@ export { default as ComingSoonPage } from "./ComingSoonPage";
 export { default as AdminOverviewPage } from "./AdminOverviewPage";
 export { default as AdminWorkspacesPage } from "./AdminWorkspacesPage";
 export { default as AdminPermissionsPage } from "./AdminPermissionsPage";
+export { default as AdminDataPage } from "./AdminDataPage";
 export { default as PrototypeMetaPage } from "./PrototypeMetaPage";
 export { default as GeneratedReportPage } from "./GeneratedReportPage";
 export { default as CustomWorkspaceHome } from "./CustomWorkspaceHome";

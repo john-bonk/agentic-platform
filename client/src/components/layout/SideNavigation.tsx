@@ -35,6 +35,15 @@ import {
 import { type SideNavSection, getActiveModuleIndex } from "@/config/navigation";
 import { useSideNavStore } from "@/lib/sideNavStore";
 import { useWorkspaceStore, type Workspace } from "@/lib/workspaceStore";
+
+// Determine if quick access items (Home/Recent/Favorites) should be shown
+// Only show on Home module (index 0) and NOT for Admin workspace
+function shouldShowQuickAccess(location: string, workspace: Workspace): boolean {
+  const activeModuleIndex = getActiveModuleIndex(location);
+  const isHomeModule = activeModuleIndex === 0;
+  const isAdminWorkspace = workspace.persona === "Admin";
+  return isHomeModule && !isAdminWorkspace;
+}
 import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreationWizard";
 
 interface SideNavigationProps {
@@ -296,33 +305,35 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
             </button>
           </div>
 
-          {/* Quick access icons */}
-          <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
-            <Link href={currentWorkspace.isCustom ? "/custom-workspace" : "/"}>
+          {/* Quick access icons - Only show on Home module and not Admin */}
+          {shouldShowQuickAccess(location, currentWorkspace) && (
+            <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
+              <Link href={currentWorkspace.isCustom ? "/custom-workspace" : "/"}>
+                <button
+                  className="w-7 h-7 flex items-center justify-center rounded transition-colors"
+                  style={isHomeActive ? { backgroundColor: '#1d212b' } : undefined}
+                  data-testid="nav-collapsed-home"
+                  title="Home"
+                >
+                  <Home className={`w-3 h-3 ${isHomeActive ? "text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
+                </button>
+              </Link>
               <button
-                className="w-7 h-7 flex items-center justify-center rounded transition-colors"
-                style={isHomeActive ? { backgroundColor: '#1d212b' } : undefined}
-                data-testid="nav-collapsed-home"
-                title="Home"
+                className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
+                data-testid="nav-collapsed-recent"
+                title="Recent"
               >
-                <Home className={`w-3 h-3 ${isHomeActive ? "text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
+                <Clock className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
               </button>
-            </Link>
-            <button
-              className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
-              data-testid="nav-collapsed-recent"
-              title="Recent"
-            >
-              <Clock className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
-            </button>
-            <button
-              className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
-              data-testid="nav-collapsed-favorites"
-              title="Favorites"
-            >
-              <Star className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
-            </button>
-          </div>
+              <button
+                className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
+                data-testid="nav-collapsed-favorites"
+                title="Favorites"
+              >
+                <Star className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Main Content Area - Slides left when collapsed, slides right when expanding */}
@@ -387,25 +398,27 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
             </button>
           </div>
 
-          {/* Quick Access Items - Home, Recent, Favorites */}
-          <div className={`flex flex-col gap-0.5 px-3 pt-3 pb-2 border-b border-gray-100 dark:border-border transition-all duration-300 ease-in-out ${
-            isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
-          }`}>
-            <QuickAccessItem 
-              icon={Home} 
-              label="Home" 
-              path={currentWorkspace.isCustom ? "/custom-workspace" : "/"} 
-              isActive={isHomeActive}
-            />
-            <QuickAccessItem 
-              icon={Clock} 
-              label="Recent" 
-            />
-            <QuickAccessItem 
-              icon={Star} 
-              label="Favorites" 
-            />
-          </div>
+          {/* Quick Access Items - Home, Recent, Favorites - Only show on Home module and not Admin */}
+          {shouldShowQuickAccess(location, currentWorkspace) && (
+            <div className={`flex flex-col gap-0.5 px-3 pt-3 pb-2 border-b border-gray-100 dark:border-border transition-all duration-300 ease-in-out ${
+              isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+            }`}>
+              <QuickAccessItem 
+                icon={Home} 
+                label="Home" 
+                path={currentWorkspace.isCustom ? "/custom-workspace" : "/"} 
+                isActive={isHomeActive}
+              />
+              <QuickAccessItem 
+                icon={Clock} 
+                label="Recent" 
+              />
+              <QuickAccessItem 
+                icon={Star} 
+                label="Favorites" 
+              />
+            </div>
+          )}
 
           {/* Scrollable Navigation Sections */}
           <div className={`flex flex-col gap-4 pt-3 pb-6 px-3 flex-1 overflow-y-auto transition-all duration-300 ease-in-out ${
