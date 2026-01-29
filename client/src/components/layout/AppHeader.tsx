@@ -1,15 +1,14 @@
 /**
  * App Header Component
  * 
- * The top header bar with workspace switcher, global search, and utility icons.
- * Includes "Create new" workspace option.
+ * The top header bar with centered global search and utility icons.
+ * Workspace switcher has been moved to SideNavigation panel header.
  * 
  * Usage:
  * <AppHeader />
  */
 
-import { useState, useRef, useEffect, useMemo } from "react";
-import { useLocation } from "wouter";
+import { useState, useRef, useEffect } from "react";
 import {
   BellIcon,
   BotIcon,
@@ -22,19 +21,9 @@ import {
   FileText,
   AlertTriangle,
   ClipboardList,
-  Check,
-  Plus,
 } from "lucide-react";
 import { SettingsPanel } from "@/components/settings-panel";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
 import {
   Popover,
   PopoverContent,
@@ -42,9 +31,7 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { type Tab } from "@/lib/tabStore";
-import { useWorkspaceStore, type Workspace } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
-import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreationWizard";
 
 const ASSISTANT_PANEL_WIDTH = 420;
 
@@ -69,15 +56,10 @@ const utilityIcons = [
 ];
 
 export function AppHeader({ className = "" }: AppHeaderProps) {
-  const { currentWorkspace, setWorkspace, getAllWorkspaces, refreshKey } = useWorkspaceStore();
   const { toggleOpen: toggleAssistant, isOpen: isAssistantOpen } = useHomeAssistantStore();
-  const [, setLocation] = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-
-  const allWorkspaces = useMemo(() => getAllWorkspaces(), [refreshKey, getAllWorkspaces]);
 
   useEffect(() => {
     if (searchOpen && searchInputRef.current) {
@@ -121,77 +103,12 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
     setSearchQuery("");
   };
 
-  const handleWorkspaceChange = (workspace: Workspace) => {
-    setWorkspace(workspace);
-    // Navigate based on workspace type
-    if (workspace.isCustom) {
-      setLocation("/custom-workspace");
-    } else if (workspace.persona === "Admin") {
-      setLocation("/admin");
-    } else {
-      setLocation("/");
-    }
-  };
-
-  const handleWorkspaceCreated = (workspace: Workspace) => {
-    // Navigate to custom workspace home for custom workspaces
-    if (workspace.isCustom) {
-      setLocation("/custom-workspace");
-    } else {
-      setLocation("/");
-    }
-  };
-
   return (
     <>
       <header 
-        className={`relative flex h-12 items-center justify-between px-3 w-full bg-gray-900 flex-shrink-0 sticky top-0 z-40 ${className}`}
+        className={`relative flex h-12 items-center justify-center px-3 w-full bg-gray-900 flex-shrink-0 sticky top-0 z-40 ${className}`}
         data-testid="app-header"
       >
-        <div className="flex items-center z-10 ml-1">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="flex items-center gap-2 h-8 px-2 text-white"
-                data-testid="workspace-switcher"
-              >
-                <span className="text-sm font-medium" data-testid="current-workspace-name">{currentWorkspace.name}</span>
-                <ChevronDownIcon className="w-4 h-4 text-gray-400" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56" data-testid="workspace-dropdown">
-              <DropdownMenuLabel className="text-xs text-gray-500 font-normal">Your workspaces</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {allWorkspaces.map((workspace) => {
-                const isActive = workspace.id === currentWorkspace.id;
-                return (
-                  <DropdownMenuItem
-                    key={workspace.id}
-                    onClick={() => handleWorkspaceChange(workspace)}
-                    className="flex items-center gap-2 cursor-pointer"
-                    data-testid={`workspace-option-${workspace.id}`}
-                  >
-                    <span>{workspace.name}</span>
-                    {isActive && (
-                      <Check className="ml-auto w-4 h-4 text-[#266C92]" />
-                    )}
-                  </DropdownMenuItem>
-                );
-              })}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => setCreateDialogOpen(true)}
-                className="flex items-center gap-2 cursor-pointer text-[#266C92]"
-                data-testid="workspace-create-new"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Create new</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
         <div 
           className="absolute w-full max-w-md px-4 transition-all duration-300"
           style={{ 
@@ -279,7 +196,7 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
         </div>
 
         <div 
-          className="flex items-center gap-1 z-10 transition-all duration-300"
+          className="absolute right-3 flex items-center gap-1 z-10 transition-all duration-300"
           style={{ marginRight: isAssistantOpen ? `${ASSISTANT_PANEL_WIDTH}px` : 0 }}
         >
           {utilityIcons.map((item, index) => (
@@ -309,12 +226,6 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
           </Button>
         </div>
       </header>
-
-      <WorkspaceCreationWizard
-        open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-        onWorkspaceCreated={handleWorkspaceCreated}
-      />
     </>
   );
 }

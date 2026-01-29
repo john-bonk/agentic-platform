@@ -20,12 +20,10 @@
 import { useLocation } from "wouter";
 import { LeftIconNavbar } from "./LeftIconNavbar";
 import { SideNavigation } from "./SideNavigation";
-import { SideNavExpandButton } from "./SideNavExpandButton";
 import { AppHeader } from "./AppHeader";
 import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav } from "@/config/navigation";
 import { type Tab } from "@/lib/tabStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
-import { useSideNavStore } from "@/lib/sideNavStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 
 const ASSISTANT_PANEL_WIDTH = 420;
@@ -50,7 +48,6 @@ export function AppLayout({
   const [location] = useLocation();
   const currentModule = getModuleFromPath(location);
   const { currentWorkspace } = useWorkspaceStore();
-  const { isCollapsed } = useSideNavStore();
   const { isOpen: isAssistantOpen } = useHomeAssistantStore();
   
   const isHomeModule = currentModule.id === "home";
@@ -81,9 +78,6 @@ export function AppLayout({
               title={sideNavTitle}
             />
           )}
-          
-          {/* Universal expand button - always shows when side nav is collapsed */}
-          {isCollapsed && <SideNavExpandButton />}
           
           <main 
             className="flex flex-col flex-1 min-w-0 overflow-auto bg-white dark:bg-background transition-all duration-300 ease-in-out"

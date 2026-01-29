@@ -1,22 +1,47 @@
 /**
  * Side Navigation Component
  * 
- * A collapsible secondary navigation panel with grouped menu items.
- * Supports expandable/collapsible section groups driven by configuration.
+ * A sophisticated navigation panel with:
+ * - Full viewport height extending into header area
+ * - Workspace switcher as functional panel header
+ * - Home/Recent/Favorites quick access (non-collapsible)
+ * - Collapsible section groups for module navigation
+ * - Narrow collapsed state with quick-access icons
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useLocation } from "wouter";
-import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { 
+  ChevronDown, 
+  Home, 
+  Clock, 
+  Star, 
+  PanelLeftClose,
+  PanelLeft,
+  ChevronDownIcon,
+  Check,
+  Plus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 import { type SideNavSection, getActiveModuleIndex } from "@/config/navigation";
 import { useSideNavStore } from "@/lib/sideNavStore";
+import { useWorkspaceStore, type Workspace } from "@/lib/workspaceStore";
+import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreationWizard";
 
 interface SideNavigationProps {
   sections: SideNavSection[];
   title: string;
   className?: string;
+  onWorkspaceCreated?: (workspace: Workspace) => void;
 }
 
 interface CollapsibleSectionProps {
@@ -96,9 +121,65 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive }: Collaps
   );
 }
 
-export function SideNavigation({ sections, title, className = "" }: SideNavigationProps) {
-  const [location] = useLocation();
+// Quick access item component for Home/Recent/Favorites
+interface QuickAccessItemProps {
+  icon: typeof Home;
+  label: string;
+  path?: string;
+  isActive?: boolean;
+  onClick?: () => void;
+}
+
+function QuickAccessItem({ icon: Icon, label, path, isActive, onClick }: QuickAccessItemProps) {
+  const content = (
+    <Button
+      variant="ghost"
+      className={`h-[36px] w-full items-center gap-3 px-3 py-2 rounded flex justify-start ${
+        isActive
+          ? "bg-teal-50 dark:bg-primary/10 hover:bg-teal-50 dark:hover:bg-primary/10" 
+          : "hover:bg-gray-100 dark:hover:bg-accent"
+      }`}
+      onClick={onClick}
+      data-testid={`nav-quick-${label.toLowerCase()}`}
+    >
+      <Icon className={`w-4 h-4 ${isActive ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
+      <span
+        className={`text-sm ${
+          isActive
+            ? "font-semibold text-teal-600 dark:text-primary"
+            : "font-normal text-gray-600 dark:text-foreground"
+        }`}
+      >
+        {label}
+      </span>
+    </Button>
+  );
+
+  if (path) {
+    return <Link href={path}>{content}</Link>;
+  }
+  return content;
+}
+
+export function SideNavigation({ sections, title, className = "", onWorkspaceCreated }: SideNavigationProps) {
+  const [location, setLocation] = useLocation();
   const { isCollapsed, setCollapsed } = useSideNavStore();
+  const { currentWorkspace, setWorkspace, getAllWorkspaces, refreshKey } = useWorkspaceStore();
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  
+  const allWorkspaces = useMemo(() => getAllWorkspaces(), [refreshKey, getAllWorkspaces]);
+  
+  // Filter out "My Dashboard" items since we now have top-level Home quick access
+  const filteredSections = useMemo(() => {
+    return sections.map(section => ({
+      ...section,
+      items: section.items.filter(item => 
+        item.path !== "/" && 
+        item.label !== "My Dashboard" &&
+        item.id !== "my-dashboard"
+      )
+    })).filter(section => section.items.length > 0);
+  }, [sections]);
   
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
@@ -126,16 +207,13 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
   const activeModuleIndex = getActiveModuleIndex(location);
 
   const isActive = (path: string) => {
-    // Module indices: Home (0), Global Risk (1), Reporting (2), Intelligence (3), Workflows (4)
     if (activeModuleIndex === 0) {
-      // Home module
       if (path === "/") {
         return location === "/" || location === "/my-dashboard";
       }
       if (path === "/global-residual-risk") {
         return location === "/global-residual-risk";
       }
-      // Admin paths - exact match for overview
       if (path === "/admin") {
         return location === "/admin";
       }
@@ -143,17 +221,14 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
     }
     
     if (activeModuleIndex === 1) {
-      // Global Risk module (CRO, CAE, CISO)
       return location === path || location.startsWith(path + "/");
     }
 
     if (activeModuleIndex === 2) {
-      // Reporting module
       return location === path || location.startsWith(path + "/");
     }
 
     if (activeModuleIndex === 3) {
-      // Intelligence Hub module - exact match for Overview
       if (path === "/intelligence") {
         return location === "/intelligence";
       }
@@ -161,7 +236,6 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
     }
 
     if (activeModuleIndex === 4) {
-      // Workflows module
       if (path === "/workflows") {
         return location === "/workflows";
       }
@@ -174,44 +248,179 @@ export function SideNavigation({ sections, title, className = "" }: SideNavigati
     return false;
   };
 
-  return (
-    <nav 
-      className={`relative flex items-start bg-gray-100 dark:bg-muted flex-shrink-0 h-full z-30 transition-all duration-300 ease-in-out ${
-        isCollapsed ? "w-0 border-r-0" : "w-[272px] border-r-[3px] border-r-gray-100 dark:border-r-border"
-      } ${className}`}
-      data-testid="side-navigation"
-    >
-      <div className={`flex flex-col h-full bg-white dark:bg-card overflow-hidden transition-all duration-300 ease-in-out ${
-        isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
-      }`}>
-        <header className="flex items-center justify-between pl-6 pr-1 py-6 flex-shrink-0">
-          <h1 
-            className="font-semibold text-gray-900 dark:text-foreground text-lg leading-[1.2] whitespace-nowrap" 
-            data-testid="navigation-title"
-          >
-            {title}
-          </h1>
-          <button
-            onClick={() => setCollapsed(true)}
-            className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors cursor-pointer"
-            data-testid="nav-collapse-toggle-inline"
-          >
-            <ChevronLeft className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
-          </button>
-        </header>
+  const handleWorkspaceChange = (workspace: Workspace) => {
+    setWorkspace(workspace);
+    if (workspace.isCustom) {
+      setLocation("/custom-workspace");
+    } else if (workspace.persona === "Admin") {
+      setLocation("/admin");
+    } else {
+      setLocation("/");
+    }
+  };
 
-        <div className="flex flex-col gap-4 pt-0 pb-6 px-4 flex-1 overflow-y-auto">
-          {sections.map((section) => (
-            <CollapsibleSection
-              key={section.id}
-              section={section}
-              isExpanded={expandedSections[section.id] ?? true}
-              onToggle={() => toggleSection(section.id)}
-              isActive={isActive}
-            />
-          ))}
+  const handleWorkspaceCreatedInternal = (workspace: Workspace) => {
+    if (workspace.isCustom) {
+      setLocation("/custom-workspace");
+    } else {
+      setLocation("/");
+    }
+    onWorkspaceCreated?.(workspace);
+  };
+
+  const isHomeActive = location === "/" || location === "/my-dashboard" || location === "/custom-workspace";
+
+  return (
+    <>
+      <nav 
+        className={`relative flex flex-col bg-gray-50 dark:bg-muted/50 flex-shrink-0 z-30 transition-all duration-300 ease-in-out ${
+          isCollapsed ? "w-[52px]" : "w-[272px]"
+        } ${className}`}
+        style={{ height: 'calc(100vh - 48px)' }}
+        data-testid="side-navigation"
+      >
+        {/* Collapsed State - Narrow vertical panel */}
+        <div className={`absolute inset-0 flex flex-col bg-white dark:bg-card border-r border-gray-200 dark:border-border transition-all duration-300 ease-in-out ${
+          isCollapsed ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}>
+          {/* Expand button at top */}
+          <div className="flex items-center justify-center h-12 border-b border-gray-100 dark:border-border">
+            <button
+              onClick={() => setCollapsed(false)}
+              className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors cursor-pointer"
+              data-testid="nav-expand-button"
+            >
+              <PanelLeft className="w-4 h-4 text-gray-500 dark:text-muted-foreground" />
+            </button>
+          </div>
+
+          {/* Quick access icons - vertically aligned with expanded state */}
+          <div className="flex flex-col items-center gap-1 pt-3 px-2">
+            <Link href={currentWorkspace.isCustom ? "/custom-workspace" : "/"}>
+              <button
+                className={`w-9 h-9 flex items-center justify-center rounded transition-colors ${
+                  isHomeActive 
+                    ? "bg-teal-50 dark:bg-primary/10" 
+                    : "hover:bg-gray-100 dark:hover:bg-accent"
+                }`}
+                data-testid="nav-collapsed-home"
+                title="Home"
+              >
+                <Home className={`w-4 h-4 ${isHomeActive ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
+              </button>
+            </Link>
+            <button
+              className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
+              data-testid="nav-collapsed-recent"
+              title="Recent"
+            >
+              <Clock className="w-4 h-4 text-gray-500 dark:text-muted-foreground" />
+            </button>
+            <button
+              className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
+              data-testid="nav-collapsed-favorites"
+              title="Favorites"
+            >
+              <Star className="w-4 h-4 text-gray-500 dark:text-muted-foreground" />
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+
+        {/* Expanded State */}
+        <div className={`flex flex-col h-full bg-white dark:bg-card border-r border-gray-200 dark:border-border transition-all duration-300 ease-in-out ${
+          isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
+        }`}>
+          {/* Panel Header - Workspace Switcher + Collapse Button */}
+          <div className="flex items-center justify-between h-12 px-3 border-b border-gray-100 dark:border-border flex-shrink-0">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-1.5 h-8 px-2 text-gray-900 dark:text-foreground hover:bg-gray-100 dark:hover:bg-accent"
+                  data-testid="sidenav-workspace-switcher"
+                >
+                  <span className="text-sm font-semibold truncate max-w-[160px]">{currentWorkspace.name}</span>
+                  <ChevronDownIcon className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56" data-testid="sidenav-workspace-dropdown">
+                <DropdownMenuLabel className="text-xs text-gray-500 font-normal">Your workspaces</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {allWorkspaces.map((workspace) => {
+                  const isActiveWs = workspace.id === currentWorkspace.id;
+                  return (
+                    <DropdownMenuItem
+                      key={workspace.id}
+                      onClick={() => handleWorkspaceChange(workspace)}
+                      className="flex items-center gap-2 cursor-pointer"
+                      data-testid={`sidenav-workspace-option-${workspace.id}`}
+                    >
+                      <span>{workspace.name}</span>
+                      {isActiveWs && (
+                        <Check className="ml-auto w-4 h-4 text-[#266C92]" />
+                      )}
+                    </DropdownMenuItem>
+                  );
+                })}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => setCreateDialogOpen(true)}
+                  className="flex items-center gap-2 cursor-pointer text-[#266C92]"
+                  data-testid="sidenav-workspace-create-new"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Create new</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <button
+              onClick={() => setCollapsed(true)}
+              className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors cursor-pointer"
+              data-testid="nav-collapse-button"
+            >
+              <PanelLeftClose className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
+            </button>
+          </div>
+
+          {/* Quick Access Items - Home, Recent, Favorites */}
+          <div className="flex flex-col gap-0.5 px-3 pt-3 pb-2 border-b border-gray-100 dark:border-border">
+            <QuickAccessItem 
+              icon={Home} 
+              label="Home" 
+              path={currentWorkspace.isCustom ? "/custom-workspace" : "/"} 
+              isActive={isHomeActive}
+            />
+            <QuickAccessItem 
+              icon={Clock} 
+              label="Recent" 
+            />
+            <QuickAccessItem 
+              icon={Star} 
+              label="Favorites" 
+            />
+          </div>
+
+          {/* Scrollable Navigation Sections */}
+          <div className="flex flex-col gap-4 pt-3 pb-6 px-3 flex-1 overflow-y-auto">
+            {filteredSections.map((section) => (
+              <CollapsibleSection
+                key={section.id}
+                section={section}
+                isExpanded={expandedSections[section.id] ?? true}
+                onToggle={() => toggleSection(section.id)}
+                isActive={isActive}
+              />
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      <WorkspaceCreationWizard
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onWorkspaceCreated={handleWorkspaceCreatedInternal}
+      />
+    </>
   );
 }
