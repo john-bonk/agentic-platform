@@ -273,28 +273,30 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
   return (
     <>
       <nav 
-        className={`relative flex flex-col bg-gray-50 dark:bg-muted/50 flex-shrink-0 z-30 transition-all duration-300 ease-in-out ${
-          isCollapsed ? "w-[36px]" : "w-[272px]"
-        } ${className}`}
-        style={{ height: 'calc(100vh - 48px)' }}
+        className={`flex h-screen flex-shrink-0 z-30 transition-all duration-300 ease-in-out ${className}`}
         data-testid="side-navigation"
       >
-        {/* Collapsed State - Narrow vertical panel */}
-        <div className={`absolute inset-0 flex flex-col bg-white dark:bg-card border-r border-gray-200 dark:border-border transition-all duration-300 ease-in-out ${
-          isCollapsed ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}>
-          {/* Expand button at top */}
-          <div className="flex items-center justify-center h-10 border-b border-gray-100 dark:border-border">
+        {/* Collapsed Toolbar - Narrow vertical strip, full height */}
+        <div 
+          className={`flex flex-col bg-white dark:bg-card border-r border-gray-200 dark:border-border h-full transition-all duration-300 ease-in-out ${
+            isCollapsed ? "w-[36px] opacity-100" : "w-0 opacity-0 overflow-hidden"
+          }`}
+        >
+          {/* Dark header section matching top header */}
+          <div 
+            className="flex items-center justify-center h-12 flex-shrink-0"
+            style={{ backgroundColor: '#101827' }}
+          >
             <button
               onClick={() => setCollapsed(false)}
-              className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors cursor-pointer"
+              className="w-6 h-6 flex items-center justify-center hover:bg-gray-700 rounded transition-colors cursor-pointer"
               data-testid="nav-expand-button"
             >
-              <PanelLeft className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
+              <PanelLeft className="w-3 h-3 text-gray-400" />
             </button>
           </div>
 
-          {/* Quick access icons - smaller for collapsed state */}
+          {/* Quick access icons */}
           <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
             <Link href={currentWorkspace.isCustom ? "/custom-workspace" : "/"}>
               <button
@@ -326,17 +328,18 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
           </div>
         </div>
 
-        {/* Expanded State */}
-        <div className={`flex flex-col h-full bg-white dark:bg-card border-r border-gray-200 dark:border-border transition-all duration-300 ease-in-out ${
-          isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
-        }`}>
-          {/* Panel Header - Workspace Switcher + Collapse Button */}
-          <div className="flex items-center justify-between h-12 px-3 border-b border-gray-100 dark:border-border flex-shrink-0">
+        {/* Main Content Area */}
+        <div className="flex flex-col flex-1 h-full bg-white dark:bg-card border-r border-gray-200 dark:border-border">
+          {/* Panel Header - Dark background matching header, with Workspace Switcher */}
+          <div 
+            className="flex items-center justify-between h-12 px-3 flex-shrink-0 transition-all duration-300 ease-in-out"
+            style={{ backgroundColor: '#101827' }}
+          >
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="flex items-center gap-1.5 h-8 px-2 text-gray-900 dark:text-foreground hover:bg-gray-100 dark:hover:bg-accent"
+                  className="flex items-center gap-1.5 h-8 px-2 text-white hover:bg-gray-700"
                   data-testid="sidenav-workspace-switcher"
                 >
                   <span className="text-sm font-semibold truncate max-w-[160px]">{currentWorkspace.name}</span>
@@ -376,15 +379,19 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
 
             <button
               onClick={() => setCollapsed(true)}
-              className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors cursor-pointer"
+              className={`w-7 h-7 flex items-center justify-center hover:bg-gray-700 rounded transition-all duration-300 cursor-pointer ${
+                isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}
               data-testid="nav-collapse-button"
             >
-              <PanelLeftClose className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
+              <PanelLeftClose className="w-4 h-4 text-gray-400" />
             </button>
           </div>
 
           {/* Quick Access Items - Home, Recent, Favorites */}
-          <div className="flex flex-col gap-0.5 px-3 pt-3 pb-2 border-b border-gray-100 dark:border-border">
+          <div className={`flex flex-col gap-0.5 px-3 pt-3 pb-2 border-b border-gray-100 dark:border-border transition-all duration-300 ease-in-out ${
+            isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}>
             <QuickAccessItem 
               icon={Home} 
               label="Home" 
@@ -402,7 +409,9 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
           </div>
 
           {/* Scrollable Navigation Sections */}
-          <div className="flex flex-col gap-4 pt-3 pb-6 px-3 flex-1 overflow-y-auto">
+          <div className={`flex flex-col gap-4 pt-3 pb-6 px-3 flex-1 overflow-y-auto transition-all duration-300 ease-in-out ${
+            isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}>
             {filteredSections.map((section) => (
               <CollapsibleSection
                 key={section.id}

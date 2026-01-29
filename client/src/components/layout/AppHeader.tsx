@@ -9,21 +9,16 @@
  */
 
 import { useState, useRef, useEffect } from "react";
-import { useLocation } from "wouter";
 import {
   BellIcon,
   BotIcon,
   ChevronDownIcon,
-  // ClockIcon, // Temporarily hidden - will re-introduce later
-  // MailIcon,  // Temporarily hidden - will re-introduce later
   User,
   Search,
   Command,
   FileText,
   AlertTriangle,
   ClipboardList,
-  Check,
-  Plus,
 } from "lucide-react";
 import { SettingsPanel } from "@/components/settings-panel";
 import { Button } from "@/components/ui/button";
@@ -32,20 +27,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { type Tab } from "@/lib/tabStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
-import { useSideNavStore } from "@/lib/sideNavStore";
-import { useWorkspaceStore, type Workspace } from "@/lib/workspaceStore";
-import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreationWizard";
 
 const ASSISTANT_PANEL_WIDTH = 420;
 
@@ -70,27 +54,10 @@ const utilityIcons = [
 ];
 
 export function AppHeader({ className = "" }: AppHeaderProps) {
-  const [, setLocation] = useLocation();
   const { toggleOpen: toggleAssistant, isOpen: isAssistantOpen } = useHomeAssistantStore();
-  const { isCollapsed } = useSideNavStore();
-  const { currentWorkspace, setWorkspace, getAllWorkspaces, refreshKey } = useWorkspaceStore();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  
-  const allWorkspaces = getAllWorkspaces();
-
-  const handleWorkspaceChange = (workspace: Workspace) => {
-    setWorkspace(workspace);
-    if (workspace.isCustom) {
-      setLocation("/custom-workspace");
-    } else if (workspace.persona === "Admin") {
-      setLocation("/admin");
-    } else {
-      setLocation("/");
-    }
-  };
 
   useEffect(() => {
     if (searchOpen && searchInputRef.current) {
@@ -140,60 +107,6 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
         className={`relative flex h-12 items-center justify-center px-3 w-full bg-gray-900 flex-shrink-0 sticky top-0 z-40 ${className}`}
         data-testid="app-header"
       >
-        {/* Workspace Switcher - Animated slide-up/fade when collapsed */}
-        {/* Positioned to align with side panel: global nav (56px) + panel padding (12px) = 68px */}
-        <div 
-          className={`absolute flex items-center transition-all duration-300 ease-out ${
-            isCollapsed 
-              ? "opacity-100 translate-y-0 pointer-events-auto" 
-              : "opacity-0 translate-y-3 pointer-events-none"
-          }`}
-          style={{ left: '68px' }}
-          data-testid="header-workspace-switcher-container"
-        >
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="flex items-center gap-1.5 h-8 px-2 text-white hover:bg-gray-800"
-                data-testid="header-workspace-switcher"
-              >
-                <span className="text-sm font-medium truncate max-w-[160px]">{currentWorkspace.name}</span>
-                <ChevronDownIcon className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56" data-testid="header-workspace-dropdown">
-              <DropdownMenuLabel className="text-xs text-gray-500 font-normal">Your workspaces</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {allWorkspaces.map((workspace) => {
-                const isActiveWs = workspace.id === currentWorkspace.id;
-                return (
-                  <DropdownMenuItem
-                    key={workspace.id}
-                    onClick={() => handleWorkspaceChange(workspace)}
-                    className="flex items-center gap-2 cursor-pointer"
-                    data-testid={`header-workspace-option-${workspace.id}`}
-                  >
-                    <span>{workspace.name}</span>
-                    {isActiveWs && (
-                      <Check className="ml-auto w-4 h-4 text-[#266C92]" />
-                    )}
-                  </DropdownMenuItem>
-                );
-              })}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => setCreateDialogOpen(true)}
-                className="flex items-center gap-2 cursor-pointer text-[#266C92]"
-                data-testid="header-workspace-create-new"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Create new</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
         <div 
           className="absolute w-full max-w-md px-4 transition-all duration-300"
           style={{ 
@@ -312,19 +225,6 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
         </div>
       </header>
 
-      <WorkspaceCreationWizard
-        open={createDialogOpen}
-        onOpenChange={setCreateDialogOpen}
-        onWorkspaceCreated={(workspace) => {
-          if (workspace.isCustom) {
-            setLocation("/custom-workspace");
-          } else if (workspace.persona === "Admin") {
-            setLocation("/admin");
-          } else {
-            setLocation("/");
-          }
-        }}
-      />
     </>
   );
 }

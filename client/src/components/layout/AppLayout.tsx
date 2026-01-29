@@ -68,17 +68,18 @@ export function AppLayout({
         />
       )}
 
+      {/* Side Navigation - Full viewport height, adjacent to icon navbar */}
+      {showSideNav && (
+        <SideNavigation 
+          sections={sideNavSections} 
+          title={sideNavTitle}
+        />
+      )}
+
       <div className="flex flex-col flex-1 min-w-0 h-screen overflow-hidden">
         {showHeader && <AppHeader activeTab={activeTab} />}
         
         <div className="flex flex-1 overflow-hidden relative">
-          {showSideNav && (
-            <SideNavigation 
-              sections={sideNavSections} 
-              title={sideNavTitle}
-            />
-          )}
-          
           <main 
             className="flex flex-col flex-1 min-w-0 overflow-auto bg-white dark:bg-background transition-all duration-300 ease-in-out"
             style={{ marginRight: isAssistantOpen ? `${ASSISTANT_PANEL_WIDTH}px` : 0 }}
