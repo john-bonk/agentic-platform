@@ -276,12 +276,11 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
         className={`flex h-screen flex-shrink-0 z-30 transition-all duration-300 ease-in-out ${className}`}
         data-testid="side-navigation"
       >
-        {/* Collapsed Toolbar - Narrow vertical strip, full height, 1px border */}
+        {/* Collapsed Toolbar - Narrow vertical strip, full height */}
         <div 
-          className={`flex flex-col bg-white dark:bg-card h-full transition-all duration-300 ease-in-out ${
-            isCollapsed ? "w-[36px] opacity-100" : "w-0 opacity-0 overflow-hidden"
+          className={`flex flex-col bg-white dark:bg-card h-full transition-all duration-300 ease-in-out border-r border-gray-200 dark:border-border ${
+            isCollapsed ? "w-[36px] opacity-100" : "w-0 opacity-0 overflow-hidden border-r-0"
           }`}
-          style={{ borderRight: isCollapsed ? '1px solid #e5e7eb' : 'none' }}
         >
           {/* Dark header section matching top header */}
           <div 
@@ -326,9 +325,9 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
           </div>
         </div>
 
-        {/* Main Content Area - Slides left when collapsed */}
+        {/* Main Content Area - Slides left when collapsed, slides right when expanding */}
         <div className={`flex flex-col h-full bg-white dark:bg-card border-r border-gray-200 dark:border-border transition-all duration-300 ease-in-out ${
-          isCollapsed ? "w-0 overflow-hidden" : "w-[236px]"
+          isCollapsed ? "w-0 overflow-hidden border-r-0" : "w-[236px]"
         }`}>
           {/* Panel Header - Dark background matching header, with Workspace Switcher */}
           <div 

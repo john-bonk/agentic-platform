@@ -136,10 +136,13 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
         className={`relative flex h-12 items-center justify-center px-3 w-full bg-gray-900 flex-shrink-0 sticky top-0 z-40 ${className}`}
         data-testid="app-header"
       >
-        {/* Workspace Switcher - Shows when nav panel is collapsed */}
-        {isCollapsed && (
-          <div className="absolute left-3 flex items-center gap-2">
-            <DropdownMenu>
+        {/* Workspace Switcher - Shows when nav panel is collapsed with fade-in animation */}
+        <div 
+          className={`absolute left-3 flex items-center gap-2 transition-all duration-300 ease-in-out ${
+            isCollapsed ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 pointer-events-none"
+          }`}
+        >
+          <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -180,8 +183,7 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-        )}
+        </div>
 
         <div 
           className="absolute w-full max-w-md px-4 transition-all duration-300"
