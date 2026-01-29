@@ -276,11 +276,12 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
         className={`flex h-screen flex-shrink-0 z-30 transition-all duration-300 ease-in-out ${className}`}
         data-testid="side-navigation"
       >
-        {/* Collapsed Toolbar - Narrow vertical strip, full height */}
+        {/* Collapsed Toolbar - Narrow vertical strip, full height, 1px border */}
         <div 
-          className={`flex flex-col bg-white dark:bg-card border-r border-gray-200 dark:border-border h-full transition-all duration-300 ease-in-out ${
+          className={`flex flex-col bg-white dark:bg-card h-full transition-all duration-300 ease-in-out ${
             isCollapsed ? "w-[36px] opacity-100" : "w-0 opacity-0 overflow-hidden"
           }`}
+          style={{ borderRight: isCollapsed ? '1px solid #e5e7eb' : 'none' }}
         >
           {/* Dark header section matching top header */}
           <div 
@@ -300,15 +301,12 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
           <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
             <Link href={currentWorkspace.isCustom ? "/custom-workspace" : "/"}>
               <button
-                className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${
-                  isHomeActive 
-                    ? "bg-teal-50 dark:bg-primary/10" 
-                    : "hover:bg-gray-100 dark:hover:bg-accent"
-                }`}
+                className="w-7 h-7 flex items-center justify-center rounded transition-colors"
+                style={isHomeActive ? { backgroundColor: '#1d212b' } : undefined}
                 data-testid="nav-collapsed-home"
                 title="Home"
               >
-                <Home className={`w-3 h-3 ${isHomeActive ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
+                <Home className={`w-3 h-3 ${isHomeActive ? "text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
               </button>
             </Link>
             <button
