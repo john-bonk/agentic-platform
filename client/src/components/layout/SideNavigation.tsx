@@ -274,7 +274,7 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
     <>
       <nav 
         className={`relative flex flex-col bg-gray-50 dark:bg-muted/50 flex-shrink-0 z-30 transition-all duration-300 ease-in-out ${
-          isCollapsed ? "w-[52px]" : "w-[272px]"
+          isCollapsed ? "w-[36px]" : "w-[272px]"
         } ${className}`}
         style={{ height: 'calc(100vh - 48px)' }}
         data-testid="side-navigation"
@@ -284,21 +284,21 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
           isCollapsed ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}>
           {/* Expand button at top */}
-          <div className="flex items-center justify-center h-12 border-b border-gray-100 dark:border-border">
+          <div className="flex items-center justify-center h-10 border-b border-gray-100 dark:border-border">
             <button
               onClick={() => setCollapsed(false)}
-              className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors cursor-pointer"
+              className="w-6 h-6 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors cursor-pointer"
               data-testid="nav-expand-button"
             >
-              <PanelLeft className="w-4 h-4 text-gray-500 dark:text-muted-foreground" />
+              <PanelLeft className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
             </button>
           </div>
 
-          {/* Quick access icons - vertically aligned with expanded state */}
-          <div className="flex flex-col items-center gap-1 pt-3 px-2">
+          {/* Quick access icons - smaller for collapsed state */}
+          <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
             <Link href={currentWorkspace.isCustom ? "/custom-workspace" : "/"}>
               <button
-                className={`w-9 h-9 flex items-center justify-center rounded transition-colors ${
+                className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${
                   isHomeActive 
                     ? "bg-teal-50 dark:bg-primary/10" 
                     : "hover:bg-gray-100 dark:hover:bg-accent"
@@ -306,22 +306,22 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
                 data-testid="nav-collapsed-home"
                 title="Home"
               >
-                <Home className={`w-4 h-4 ${isHomeActive ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
+                <Home className={`w-3 h-3 ${isHomeActive ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
               </button>
             </Link>
             <button
-              className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
+              className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
               data-testid="nav-collapsed-recent"
               title="Recent"
             >
-              <Clock className="w-4 h-4 text-gray-500 dark:text-muted-foreground" />
+              <Clock className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
             </button>
             <button
-              className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
+              className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
               data-testid="nav-collapsed-favorites"
               title="Favorites"
             >
-              <Star className="w-4 h-4 text-gray-500 dark:text-muted-foreground" />
+              <Star className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
             </button>
           </div>
         </div>

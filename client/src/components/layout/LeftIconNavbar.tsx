@@ -10,7 +10,7 @@
  */
 
 import { Link, useLocation } from "wouter";
-import { Home, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish, Workflow, Activity, BarChart3, Shield, Cog } from "lucide-react";
+import { LayoutGrid, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish, Workflow, Activity, BarChart3, Shield, Cog } from "lucide-react";
 import { type IconNavItem, getActiveModuleIndex } from "@/config/navigation";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 
@@ -36,7 +36,7 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
     
     switch (icon) {
       case "home":
-        return <Home className={`w-4 h-4 ${colorClass}`} />;
+        return <LayoutGrid className={`w-4 h-4 ${colorClass}`} />;
       case "settings":
         return <Settings className={`w-4 h-4 ${colorClass}`} />;
       case "folder":
