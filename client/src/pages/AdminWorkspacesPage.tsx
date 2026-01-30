@@ -12,7 +12,8 @@ import {
   Lock,
   Plus,
   MoreVertical,
-  Settings
+  Settings,
+  LayoutDashboard,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -20,15 +21,26 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useState, useMemo } from "react";
+import { useWorkspaceStore } from "@/lib/workspaceStore";
+import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreationWizard";
 
-const summaryMetrics = [
-  { label: "Total Workspaces", value: "3", icon: Building2, color: "text-primary" },
-  { label: "Active Users", value: "105", icon: Users, color: "text-green-600" },
-  { label: "Active Items", value: "56", icon: CheckCircle, color: "text-purple-600" },
-  { label: "Avg Completion", value: "86%", icon: BarChart3, color: "text-amber-600" },
-];
+interface WorkspaceCard {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+  metrics: {
+    users: number;
+    items: number;
+    completion: number;
+  };
+  status: "active" | "inactive";
+  isCustom?: boolean;
+}
 
-const workspaces = [
+const defaultWorkspaceCards: WorkspaceCard[] = [
   {
     id: "it-security",
     name: "IT Security",
@@ -41,6 +53,7 @@ const workspaces = [
       completion: 78,
     },
     status: "active",
+    isCustom: false,
   },
   {
     id: "enterprise-risk",
@@ -54,6 +67,7 @@ const workspaces = [
       completion: 92,
     },
     status: "active",
+    isCustom: false,
   },
   {
     id: "enterprise-audit",
@@ -67,10 +81,47 @@ const workspaces = [
       completion: 88,
     },
     status: "active",
+    isCustom: false,
   },
 ];
 
 export function AdminWorkspacesPage() {
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const { customWorkspaces } = useWorkspaceStore();
+  
+  // Combine default workspaces with custom ones
+  const allWorkspaces = useMemo((): WorkspaceCard[] => {
+    const customCards: WorkspaceCard[] = customWorkspaces.map((ws) => ({
+      id: ws.id,
+      name: ws.name,
+      description: `Custom workspace with ${ws.moduleConfig?.selectedBuckets.length || 0} modules configured.`,
+      icon: LayoutDashboard,
+      color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
+      metrics: {
+        users: 1,
+        items: ws.moduleConfig?.selectedBuckets.reduce((acc, bucketId) => 
+          acc + (ws.moduleConfig?.enabledModules[bucketId]?.length || 0), 0) || 0,
+        completion: 0,
+      },
+      status: "active",
+      isCustom: true,
+    }));
+    return [...defaultWorkspaceCards, ...customCards];
+  }, [customWorkspaces]);
+  
+  // Dynamic metrics based on all workspaces
+  const dynamicMetrics = useMemo(() => {
+    const avgCompletion = allWorkspaces.length > 0
+      ? Math.round(allWorkspaces.reduce((acc, w) => acc + w.metrics.completion, 0) / allWorkspaces.length)
+      : 0;
+    return [
+      { label: "Total Workspaces", value: String(allWorkspaces.length), icon: Building2, color: "text-primary" },
+      { label: "Active Users", value: String(105 + customWorkspaces.length), icon: Users, color: "text-green-600" },
+      { label: "Active Items", value: String(56 + allWorkspaces.filter(w => w.isCustom).reduce((acc, w) => acc + w.metrics.items, 0)), icon: CheckCircle, color: "text-purple-600" },
+      { label: "Avg Completion", value: `${avgCompletion}%`, icon: BarChart3, color: "text-amber-600" },
+    ];
+  }, [allWorkspaces, customWorkspaces.length]);
+
   return (
     <AppLayout>
       <div className="flex flex-col gap-6 p-6">
@@ -78,7 +129,7 @@ export function AdminWorkspacesPage() {
           title="Workspace Administration" 
           description="Configure and manage MegaCorp's GRC workspaces"
           actions={
-            <Button data-testid="button-create-workspace">
+            <Button onClick={() => setWizardOpen(true)} data-testid="button-create-workspace">
               <Plus className="w-4 h-4 mr-2" />
               Create New Workspace
             </Button>
@@ -86,7 +137,7 @@ export function AdminWorkspacesPage() {
         />
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {summaryMetrics.map((metric) => (
+          {dynamicMetrics.map((metric) => (
             <Card key={metric.label} data-testid={`summary-card-${metric.label.toLowerCase().replace(/\s+/g, '-')}`}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
@@ -104,7 +155,7 @@ export function AdminWorkspacesPage() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {workspaces.map((workspace) => (
+          {allWorkspaces.map((workspace) => (
             <Card 
               key={workspace.id} 
               className="hover-elevate"
@@ -185,6 +236,11 @@ export function AdminWorkspacesPage() {
           ))}
         </div>
       </div>
+      
+      <WorkspaceCreationWizard 
+        open={wizardOpen} 
+        onOpenChange={setWizardOpen} 
+      />
     </AppLayout>
   );
 }

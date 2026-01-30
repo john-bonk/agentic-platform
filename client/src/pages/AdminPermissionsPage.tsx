@@ -50,7 +50,8 @@ import {
   Scale,
   Gavel
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useWorkspaceStore } from "@/lib/workspaceStore";
 import {
   Table,
   TableBody,
@@ -1100,7 +1101,9 @@ function ByModuleView() {
 }
 
 function ByWorkspaceView() {
-  const workspaces = [
+  const { customWorkspaces } = useWorkspaceStore();
+  
+  const defaultWorkspaces = [
     {
       id: "enterprise-risk",
       name: "Enterprise Risk",
@@ -1138,6 +1141,20 @@ function ByWorkspaceView() {
       ]
     },
   ];
+  
+  // Combine default workspaces with custom ones
+  const workspaces = useMemo(() => {
+    const customWsCards = customWorkspaces.map((ws) => ({
+      id: ws.id,
+      name: ws.name,
+      persona: "Custom",
+      userCount: 1,
+      color: "bg-emerald-500",
+      modules: ws.moduleConfig?.selectedBuckets.map(b => b.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())) || [],
+      delegations: [] as { from: string; to: string; scope: string; expires: string }[],
+    }));
+    return [...defaultWorkspaces, ...customWsCards];
+  }, [customWorkspaces]);
 
   const crossWorkspaceRules = [
     { source: "Enterprise Risk", target: "Enterprise Audit", permission: "Read Findings", status: "active" },
