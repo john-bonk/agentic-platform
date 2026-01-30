@@ -54,11 +54,15 @@ export const defaultWorkspaces: Workspace[] = [
 
 export const workspaces: Workspace[] = defaultWorkspaces;
 
+export type UserPersona = "Executive" | "Manager" | "Auditor" | "Analyst";
+
 interface WorkspaceStore {
   currentWorkspace: Workspace;
   customWorkspaces: Workspace[];
+  userPersona: UserPersona;
   setWorkspace: (workspace: Workspace) => void;
   addWorkspace: (workspace: Workspace) => void;
+  setUserPersona: (persona: UserPersona) => void;
   getAllWorkspaces: () => Workspace[];
   refreshKey: number;
   refreshWorkspace: () => void;
@@ -70,12 +74,14 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   // Default to Enterprise Risk (index 1) instead of Admin for the prototype landing view
   currentWorkspace: defaultWorkspaces[1],
   customWorkspaces: [],
+  userPersona: "Executive" as UserPersona,
   setWorkspace: (workspace: Workspace) => set({ currentWorkspace: workspace, refreshKey: Date.now() }),
   addWorkspace: (workspace: Workspace) => {
     const current = get().customWorkspaces;
     const updated = [...current, workspace];
     set({ customWorkspaces: updated, currentWorkspace: workspace, refreshKey: Date.now() });
   },
+  setUserPersona: (persona: UserPersona) => set({ userPersona: persona, refreshKey: Date.now() }),
   getAllWorkspaces: () => {
     const state = get();
     return [...defaultWorkspaces, ...state.customWorkspaces];

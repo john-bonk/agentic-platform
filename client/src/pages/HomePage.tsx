@@ -27,7 +27,7 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
-import { useWorkspaceStore, workspaces as storeWorkspaces, solutionCapabilities } from "@/lib/workspaceStore";
+import { useWorkspaceStore, workspaces as storeWorkspaces, solutionCapabilities, type UserPersona } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 import headerBgImage from "@/assets/header-background.png";
 
@@ -539,7 +539,7 @@ function getStatusBadge(status: Task["status"]) {
 }
 
 export default function HomePage() {
-  const { currentWorkspace, refreshKey, setWorkspace } = useWorkspaceStore();
+  const { currentWorkspace, refreshKey, setWorkspace, userPersona } = useWorkspaceStore();
   const [, setLocation] = useLocation();
   
   // Redirect custom workspaces to their dedicated page
@@ -573,9 +573,15 @@ export default function HomePage() {
     total: content.tasks.length,
   };
 
-  const welcomeMessage = currentWorkspace.isCustom 
-    ? "Welcome back!"
-    : `Welcome back, ${currentWorkspace.persona}`;
+  const getWelcomeMessage = () => {
+    if (currentWorkspace.isCustom) {
+      return userPersona === "Executive" ? "Welcome back!" : `Welcome back, ${userPersona}`;
+    }
+    return userPersona === "Executive" 
+      ? `Welcome back, ${currentWorkspace.persona}` 
+      : `Welcome back, ${userPersona}`;
+  };
+  const welcomeMessage = getWelcomeMessage();
 
   return (
     <AppLayout showHeader={true} showSideNav={true}>

@@ -42,7 +42,7 @@ import { Input } from "@/components/ui/input";
 import { type Tab } from "@/lib/tabStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 import { useSideNavStore } from "@/lib/sideNavStore";
-import { useWorkspaceStore, type Workspace } from "@/lib/workspaceStore";
+import { useWorkspaceStore, type Workspace, type UserPersona } from "@/lib/workspaceStore";
 import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreationWizard";
 
 const ASSISTANT_PANEL_WIDTH = 420;
@@ -70,7 +70,7 @@ const utilityIcons = [
 export function AppHeader({ className = "" }: AppHeaderProps) {
   const { toggleOpen: toggleAssistant, isOpen: isAssistantOpen } = useHomeAssistantStore();
   const { isCollapsed } = useSideNavStore();
-  const { currentWorkspace, workspaces: allWorkspaces, setWorkspace } = useWorkspaceStore();
+  const { currentWorkspace, workspaces: allWorkspaces, setWorkspace, userPersona, setUserPersona } = useWorkspaceStore();
   const [, setLocation] = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -290,16 +290,35 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
 
           <SettingsPanel />
 
-          <Button
-            variant="ghost"
-            className="flex h-9 items-center gap-1 rounded px-2 ml-1"
-            data-testid="header-avatar-menu"
-          >
-            <div className="relative w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
-              <User className="w-4 h-4 text-gray-300" />
-            </div>
-            <ChevronDownIcon className="w-4 h-4 text-gray-400" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex h-9 items-center gap-1 rounded px-2 ml-1"
+                data-testid="header-avatar-menu"
+              >
+                <div className="relative w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-gray-300" />
+                </div>
+                <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>View As</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {(["Executive", "Manager", "Auditor", "Analyst"] as UserPersona[]).map((persona) => (
+                <DropdownMenuItem
+                  key={persona}
+                  onClick={() => setUserPersona(persona)}
+                  className="flex items-center justify-between"
+                  data-testid={`persona-option-${persona.toLowerCase()}`}
+                >
+                  <span>{persona}</span>
+                  {userPersona === persona && <Check className="w-4 h-4 text-primary" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 

@@ -951,7 +951,7 @@ export function WorkspaceCreationWizard({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-[60] flex items-center justify-center"
       data-testid="workspace-wizard"
     >
       {/* Backdrop */}

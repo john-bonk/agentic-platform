@@ -439,6 +439,7 @@ export default function CustomWorkspaceHome() {
   // Use currentWorkspace directly - the reactive state field, not the getter
   const currentWorkspace = useWorkspaceStore(state => state.currentWorkspace);
   const refreshKey = useWorkspaceStore(state => state.refreshKey);
+  const userPersona = useWorkspaceStore(state => state.userPersona);
   
   // Extract module config from current workspace
   const selectedBuckets = useMemo(() => {
@@ -487,7 +488,7 @@ export default function CustomWorkspaceHome() {
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="text-2xl font-bold mb-1">
-                  Welcome back!
+                  {userPersona === "Executive" ? "Welcome back!" : `Welcome back, ${userPersona}`}
                 </h1>
                 <p className="text-white/70 text-sm max-w-lg">
                   {currentWorkspace?.name} • {selectedBuckets.length} capabilities • {totalModules} active modules
