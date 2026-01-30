@@ -21,6 +21,7 @@ import {
   ChevronDownIcon,
   Check,
   Plus,
+  Circle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +33,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { type SideNavSection, getActiveModuleIndex } from "@/config/navigation";
+import { type SideNavSection, type ModuleNavGroup, getActiveModuleIndex } from "@/config/navigation";
 import { useSideNavStore } from "@/lib/sideNavStore";
 import { useWorkspaceStore, type Workspace } from "@/lib/workspaceStore";
 
@@ -48,6 +49,7 @@ import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreatio
 
 interface SideNavigationProps {
   sections: SideNavSection[];
+  moduleGroups?: ModuleNavGroup[];
   title: string;
   className?: string;
   onWorkspaceCreated?: (workspace: Workspace) => void;
@@ -130,6 +132,136 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive }: Collaps
   );
 }
 
+interface ModuleGroupSectionProps {
+  group: ModuleNavGroup;
+  isModuleExpanded: boolean;
+  expandedSections: Record<string, boolean>;
+  onModuleToggle: () => void;
+  onSectionToggle: (sectionId: string) => void;
+  isActive: (path: string) => boolean;
+}
+
+function ModuleGroupSection({ 
+  group, 
+  isModuleExpanded, 
+  expandedSections,
+  onModuleToggle, 
+  onSectionToggle,
+  isActive 
+}: ModuleGroupSectionProps) {
+  return (
+    <div className="border border-gray-200 dark:border-border rounded-lg overflow-visible" data-testid={`nav-module-group-${group.moduleId}`}>
+      <Button
+        variant="ghost"
+        onClick={onModuleToggle}
+        className="flex items-center gap-2 w-full px-3 justify-start hover-elevate rounded-lg rounded-b-none"
+        data-testid={`nav-module-toggle-${group.moduleId}`}
+      >
+        <ChevronDown 
+          className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
+            isModuleExpanded ? "" : "-rotate-90"
+          }`}
+        />
+        <div 
+          className="w-5 h-5 rounded flex items-center justify-center shrink-0"
+          style={{ backgroundColor: `${group.moduleColor}20` }}
+        >
+          <Circle 
+            className="w-2.5 h-2.5" 
+            style={{ color: group.moduleColor, fill: group.moduleColor }} 
+            data-testid={`nav-module-icon-${group.moduleId}`}
+          />
+        </div>
+        <span 
+          className="text-sm font-semibold truncate"
+          style={{ color: group.moduleColor }}
+        >
+          {group.moduleName}
+        </span>
+        <span className="ml-auto text-[10px] text-gray-400 dark:text-muted-foreground">
+          {group.sections.length}
+        </span>
+      </Button>
+      
+      {isModuleExpanded && (
+        <div className="border-t border-gray-200 dark:border-border bg-gray-50/50 dark:bg-accent/30 rounded-b-lg">
+          <div className="py-1 space-y-1">
+            {group.sections.map(section => {
+              const isSectionExpanded = expandedSections[section.id] ?? section.defaultExpanded !== false;
+              return (
+                <div key={section.id} className="px-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onSectionToggle(section.id)}
+                    className="flex items-center justify-between w-full px-2 justify-start hover-elevate"
+                    data-testid={`nav-section-${section.id}`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <ChevronDown 
+                        className={`w-3 h-3 text-gray-400 transition-transform duration-200 ${
+                          isSectionExpanded ? "" : "-rotate-90"
+                        }`}
+                      />
+                      <span className="text-[10px] font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wider">
+                        {section.title}
+                      </span>
+                    </div>
+                  </Button>
+                  
+                  <div 
+                    className={`overflow-hidden transition-all duration-200 ease-in-out ${
+                      isSectionExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <ul className="flex flex-col gap-0.5 pt-0.5 ml-3">
+                      {section.items.map((item) => (
+                        <li key={item.id}>
+                          <Link href={item.path}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className={`w-full items-center gap-2 px-2 rounded flex justify-start ${
+                                isActive(item.path)
+                                  ? "bg-teal-50 dark:bg-primary/10" 
+                                  : ""
+                              }`}
+                              data-testid={`nav-item-${item.id}`}
+                            >
+                              <span
+                                className={`flex-1 text-left text-xs whitespace-nowrap ${
+                                  isActive(item.path)
+                                    ? "font-semibold text-teal-600 dark:text-primary"
+                                    : "font-normal text-gray-600 dark:text-foreground"
+                                }`}
+                              >
+                                {item.label}
+                              </span>
+                              {item.badge && (
+                                <Badge 
+                                  variant="secondary" 
+                                  className="bg-[#266C92] text-white text-[10px]"
+                                  data-testid={`nav-badge-${item.id}`}
+                                >
+                                  {item.badge}
+                                </Badge>
+                              )}
+                            </Button>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Quick access item component for Home/Recent/Favorites
 interface QuickAccessItemProps {
   icon: typeof Home;
@@ -170,7 +302,7 @@ function QuickAccessItem({ icon: Icon, label, path, isActive, onClick }: QuickAc
   return content;
 }
 
-export function SideNavigation({ sections, title, className = "", onWorkspaceCreated }: SideNavigationProps) {
+export function SideNavigation({ sections, moduleGroups, title, className = "", onWorkspaceCreated }: SideNavigationProps) {
   const [location, setLocation] = useLocation();
   const { isCollapsed, setCollapsed } = useSideNavStore();
   const { currentWorkspace, setWorkspace, getAllWorkspaces, refreshKey } = useWorkspaceStore();
@@ -195,6 +327,23 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
     sections.forEach(section => {
       initial[section.id] = section.defaultExpanded !== false;
     });
+    if (moduleGroups) {
+      moduleGroups.forEach(group => {
+        group.sections.forEach(section => {
+          initial[section.id] = section.defaultExpanded !== false;
+        });
+      });
+    }
+    return initial;
+  });
+  
+  const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    if (moduleGroups) {
+      moduleGroups.forEach(group => {
+        initial[group.moduleId] = group.defaultExpanded !== false;
+      });
+    }
     return initial;
   });
 
@@ -203,13 +352,37 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
     sections.forEach(section => {
       newExpanded[section.id] = expandedSections[section.id] ?? section.defaultExpanded !== false;
     });
+    if (moduleGroups) {
+      moduleGroups.forEach(group => {
+        group.sections.forEach(section => {
+          newExpanded[section.id] = expandedSections[section.id] ?? section.defaultExpanded !== false;
+        });
+      });
+    }
     setExpandedSections(newExpanded);
-  }, [sections]);
+  }, [sections, moduleGroups]);
+  
+  useEffect(() => {
+    if (moduleGroups) {
+      const newExpanded: Record<string, boolean> = {};
+      moduleGroups.forEach(group => {
+        newExpanded[group.moduleId] = expandedModules[group.moduleId] ?? group.defaultExpanded !== false;
+      });
+      setExpandedModules(newExpanded);
+    }
+  }, [moduleGroups]);
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => ({
       ...prev,
       [sectionId]: !prev[sectionId]
+    }));
+  };
+  
+  const toggleModule = (moduleId: string) => {
+    setExpandedModules(prev => ({
+      ...prev,
+      [moduleId]: !prev[moduleId]
     }));
   };
 
@@ -421,18 +594,32 @@ export function SideNavigation({ sections, title, className = "", onWorkspaceCre
           )}
 
           {/* Scrollable Navigation Sections */}
-          <div className={`flex flex-col gap-4 pt-3 pb-6 px-3 flex-1 overflow-y-auto transition-all duration-300 ease-in-out ${
+          <div className={`flex flex-col gap-3 pt-3 pb-6 px-3 flex-1 overflow-y-auto transition-all duration-300 ease-in-out ${
             isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
           }`}>
-            {filteredSections.map((section) => (
-              <CollapsibleSection
-                key={section.id}
-                section={section}
-                isExpanded={expandedSections[section.id] ?? true}
-                onToggle={() => toggleSection(section.id)}
-                isActive={isActive}
-              />
-            ))}
+            {moduleGroups && moduleGroups.length > 0 ? (
+              moduleGroups.map((group) => (
+                <ModuleGroupSection
+                  key={group.moduleId}
+                  group={group}
+                  isModuleExpanded={expandedModules[group.moduleId] ?? true}
+                  expandedSections={expandedSections}
+                  onModuleToggle={() => toggleModule(group.moduleId)}
+                  onSectionToggle={toggleSection}
+                  isActive={isActive}
+                />
+              ))
+            ) : (
+              filteredSections.map((section) => (
+                <CollapsibleSection
+                  key={section.id}
+                  section={section}
+                  isExpanded={expandedSections[section.id] ?? true}
+                  onToggle={() => toggleSection(section.id)}
+                  isActive={isActive}
+                />
+              ))
+            )}
           </div>
         </div>
       </nav>

@@ -12,6 +12,7 @@
 
 import { 
   generateNavSections as generateWizardNavSections,
+  generateModuleNavGroups as generateWizardModuleNavGroups,
   productCapabilityBuckets,
 } from "./workspaceWizardConfig";
 
@@ -33,6 +34,15 @@ export interface SideNavSection {
   items: SideNavItem[];
   defaultExpanded?: boolean;
   collapsible?: boolean;
+}
+
+export interface ModuleNavGroup {
+  moduleId: string;
+  moduleName: string;
+  moduleColor: string;
+  moduleIcon: string;
+  defaultExpanded?: boolean;
+  sections: SideNavSection[];
 }
 
 export interface ModuleConfig {
@@ -226,14 +236,16 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
 export function getWorkspaceHomeNav(
   persona: string, 
   moduleConfig?: { selectedBuckets: string[]; enabledModules: Record<string, string[]> }
-): { title: string; sections: SideNavSection[] } {
+): { title: string; sections: SideNavSection[]; moduleGroups?: ModuleNavGroup[] } {
   if (moduleConfig && moduleConfig.selectedBuckets.length > 0) {
     return {
       title: "Custom Workspace",
       sections: generateWizardNavSections(moduleConfig.selectedBuckets, moduleConfig.enabledModules),
+      moduleGroups: generateWizardModuleNavGroups(moduleConfig.selectedBuckets, moduleConfig.enabledModules),
     };
   }
-  return workspaceHomeNav[persona] || workspaceHomeNav["CRO"];
+  const nav = workspaceHomeNav[persona] || workspaceHomeNav["CRO"];
+  return { ...nav, moduleGroups: undefined };
 }
 
 /**

@@ -100,12 +100,13 @@ import {
 import {
   productCapabilityBuckets,
   generateNavSections,
+  generateModuleNavGroups,
   initializeEnabledModules,
   getCapabilityStats,
   type ProductCapabilityBucket,
   type ModuleCapability,
 } from "@/config/workspaceWizardConfig";
-import type { SideNavSection } from "@/config/navigation";
+import type { SideNavSection, ModuleNavGroup } from "@/config/navigation";
 import { type Workspace, useWorkspaceStore } from "@/lib/workspaceStore";
 
 interface WorkspaceCreationWizardProps {
@@ -348,14 +349,36 @@ function ModuleCard({
   );
 }
 
-function NavigationPreview({ sections, workspaceName }: { sections: SideNavSection[]; workspaceName: string }) {
+function NavigationPreview({ 
+  moduleGroups, 
+  workspaceName 
+}: { 
+  moduleGroups: ModuleNavGroup[]; 
+  workspaceName: string;
+}) {
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(
+    new Set(moduleGroups.filter(g => g.defaultExpanded).map(g => g.moduleId))
+  );
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(sections.filter(s => s.defaultExpanded).map(s => s.id))
+    new Set(moduleGroups.flatMap(g => g.sections.filter(s => s.defaultExpanded).map(s => s.id)))
   );
 
   useEffect(() => {
-    setExpandedSections(new Set(sections.filter(s => s.defaultExpanded).map(s => s.id)));
-  }, [sections.length, sections.map(s => s.id).join(",")]);
+    setExpandedModules(new Set(moduleGroups.filter(g => g.defaultExpanded).map(g => g.moduleId)));
+    setExpandedSections(new Set(moduleGroups.flatMap(g => g.sections.filter(s => s.defaultExpanded).map(s => s.id))));
+  }, [moduleGroups.length, moduleGroups.map(g => g.moduleId).join(",")]);
+
+  const toggleModule = (moduleId: string) => {
+    setExpandedModules(prev => {
+      const next = new Set(prev);
+      if (next.has(moduleId)) {
+        next.delete(moduleId);
+      } else {
+        next.add(moduleId);
+      }
+      return next;
+    });
+  };
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections(prev => {
@@ -369,74 +392,112 @@ function NavigationPreview({ sections, workspaceName }: { sections: SideNavSecti
     });
   };
 
+  const totalSections = moduleGroups.reduce((acc, g) => acc + g.sections.length, 0);
+
   return (
     <div
       className="relative bg-sidebar dark:bg-sidebar rounded-xl border border-border overflow-hidden h-full flex flex-col"
       data-testid="nav-preview"
     >
-      {/* Panel header - matches actual SideNavigation header */}
+      {/* Panel header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-sidebar-accent/50 shrink-0">
         <div className="w-8 h-8 rounded-lg bg-[#266C92] flex items-center justify-center">
           <LayoutDashboard className="w-4 h-4 text-white" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-semibold text-sidebar-foreground truncate">{workspaceName || "Custom Workspace"}</div>
-          <div className="text-[10px] text-sidebar-foreground/60">{sections.length} sections</div>
+          <div className="text-[10px] text-sidebar-foreground/60">{moduleGroups.length} modules, {totalSections} sections</div>
         </div>
       </div>
       
-      {/* Navigation sections - matches actual SideNavigation */}
+      {/* Navigation with module-level grouping */}
       <div className="flex-1 overflow-y-auto">
-        <div className="p-3 space-y-1">
-            {sections.map(section => {
-              const isExpanded = section.collapsible ? expandedSections.has(section.id) : true;
-              return (
-                <div key={section.id} data-testid={`preview-section-${section.id}`}>
-                  <div
-                    className={`flex items-center gap-2 w-full px-3 py-1.5 text-left rounded-md ${section.collapsible ? "hover-elevate" : ""}`}
-                    onClick={section.collapsible ? () => toggleSection(section.id) : undefined}
-                    onKeyDown={section.collapsible ? (e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        toggleSection(section.id);
-                      }
-                    } : undefined}
-                    role={section.collapsible ? "button" : undefined}
-                    tabIndex={section.collapsible ? 0 : undefined}
-                    style={{ cursor: section.collapsible ? "pointer" : "default" }}
-                    data-testid={section.collapsible ? `preview-toggle-${section.id}` : undefined}
+        <div className="p-3 space-y-2">
+          {moduleGroups.map(group => {
+            const isModuleExpanded = expandedModules.has(group.moduleId);
+            return (
+              <div key={group.moduleId} className="border border-border rounded-lg overflow-hidden" data-testid={`preview-module-${group.moduleId}`}>
+                {/* Module header */}
+                <button
+                  className="flex items-center gap-2 w-full px-3 py-2 text-left hover-elevate"
+                  onClick={() => toggleModule(group.moduleId)}
+                  data-testid={`preview-toggle-module-${group.moduleId}`}
+                >
+                  <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isModuleExpanded ? "" : "-rotate-90"}`} />
+                  <div 
+                    className="w-5 h-5 rounded flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: `${group.moduleColor}20` }}
                   >
-                    {section.collapsible && (
-                      <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isExpanded ? "" : "-rotate-90"}`} />
-                    )}
-                    <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {section.title}
-                    </span>
+                    {getBucketIcon(group.moduleIcon, `w-3 h-3`)}
                   </div>
-                  {isExpanded && (
-                    <div className="ml-5 space-y-0.5">
-                      {section.items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between px-3 py-1.5 rounded-md text-xs text-gray-600 dark:text-gray-300"
-                          data-testid={`preview-item-${item.id}`}
-                        >
-                          <span className="truncate">{item.label}</span>
-                          {item.badge && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                              {item.badge}
-                            </span>
-                          )}
-                        </div>
-                      ))}
+                  <span 
+                    className="text-xs font-semibold truncate"
+                    style={{ color: group.moduleColor }}
+                  >
+                    {group.moduleName}
+                  </span>
+                  <span className="ml-auto text-[9px] text-gray-400 dark:text-muted-foreground">
+                    {group.sections.length}
+                  </span>
+                </button>
+                
+                {/* Module sections */}
+                {isModuleExpanded && (
+                  <div className="border-t border-border bg-sidebar-accent/30">
+                    <div className="p-2 space-y-1">
+                      {group.sections.map(section => {
+                        const isSectionExpanded = section.collapsible ? expandedSections.has(section.id) : true;
+                        return (
+                          <div key={section.id} data-testid={`preview-section-${section.id}`}>
+                            <div
+                              className={`flex items-center gap-2 w-full px-2 py-1 text-left rounded-md ${section.collapsible ? "hover-elevate cursor-pointer" : ""}`}
+                              onClick={section.collapsible ? () => toggleSection(section.id) : undefined}
+                              onKeyDown={section.collapsible ? (e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  toggleSection(section.id);
+                                }
+                              } : undefined}
+                              role={section.collapsible ? "button" : undefined}
+                              tabIndex={section.collapsible ? 0 : undefined}
+                              data-testid={section.collapsible ? `preview-toggle-${section.id}` : undefined}
+                            >
+                              {section.collapsible && (
+                                <ChevronDown className={`w-2.5 h-2.5 text-gray-400 transition-transform ${isSectionExpanded ? "" : "-rotate-90"}`} />
+                              )}
+                              <span className="text-[9px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                {section.title}
+                              </span>
+                            </div>
+                            {isSectionExpanded && (
+                              <div className="ml-4 space-y-0.5">
+                                {section.items.map((item) => (
+                                  <div
+                                    key={item.id}
+                                    className="flex items-center justify-between px-2 py-1 rounded-md text-[10px] text-gray-600 dark:text-gray-300"
+                                    data-testid={`preview-item-${item.id}`}
+                                  >
+                                    <span className="truncate">{item.label}</span>
+                                    {item.badge && (
+                                      <span className="text-[8px] px-1 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                                        {item.badge}
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
-      
+      </div>
     </div>
   );
 }
@@ -779,6 +840,11 @@ export function WorkspaceCreationWizard({
 
   const navSections = useMemo(() => 
     generateNavSections(selectedBuckets, enabledModules),
+    [selectedBuckets, enabledModules]
+  );
+  
+  const moduleNavGroups = useMemo(() => 
+    generateModuleNavGroups(selectedBuckets, enabledModules),
     [selectedBuckets, enabledModules]
   );
 
@@ -1230,7 +1296,7 @@ export function WorkspaceCreationWizard({
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
                   </div>
                   <div className="flex-1 min-h-0 overflow-hidden">
-                    <NavigationPreview sections={navSections} workspaceName={workspaceName} />
+                    <NavigationPreview moduleGroups={moduleNavGroups} workspaceName={workspaceName} />
                   </div>
                 </div>
               </div>

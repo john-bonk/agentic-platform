@@ -7,7 +7,7 @@
  * - Navigation structure generation from capability combinations
  */
 
-import type { SideNavSection } from "./navigation";
+import type { SideNavSection, ModuleNavGroup } from "./navigation";
 
 export interface ProductCapabilityBucket {
   id: string;
@@ -1587,6 +1587,56 @@ export function generateNavSections(
   sections.push(viewsSection);
   
   return sections;
+}
+
+export function generateModuleNavGroups(
+  selectedBuckets: string[],
+  enabledModules: Record<string, string[]>
+): ModuleNavGroup[] {
+  const groups: ModuleNavGroup[] = [];
+  
+  for (const bucketId of selectedBuckets) {
+    const bucket = productCapabilityBuckets.find(b => b.id === bucketId);
+    if (!bucket) continue;
+    
+    const enabledForBucket = enabledModules[bucketId] || [];
+    if (enabledForBucket.length === 0) continue;
+    
+    const sections: SideNavSection[] = [];
+    
+    for (const moduleId of enabledForBucket) {
+      const module = bucket.moduleCapabilities.find(m => m.id === moduleId);
+      if (module) {
+        const section: SideNavSection = {
+          id: module.navContribution.sectionId,
+          title: module.navContribution.sectionTitle,
+          defaultExpanded: true,
+          collapsible: true,
+          items: module.navContribution.items.map(item => ({
+            id: item.id,
+            label: item.label,
+            path: item.pathSuffix,
+            badge: item.badge,
+            icon: item.icon,
+          })),
+        };
+        sections.push(section);
+      }
+    }
+    
+    if (sections.length > 0) {
+      groups.push({
+        moduleId: bucket.id,
+        moduleName: bucket.name,
+        moduleColor: bucket.color,
+        moduleIcon: bucket.icon,
+        defaultExpanded: true,
+        sections,
+      });
+    }
+  }
+  
+  return groups;
 }
 
 export function getDefaultEnabledModules(bucketId: string): string[] {

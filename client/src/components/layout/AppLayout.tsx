@@ -56,6 +56,7 @@ export function AppLayout({
     : null;
   
   const sideNavSections = workspaceNav ? workspaceNav.sections : currentModule.sideNavSections;
+  const sideNavModuleGroups = workspaceNav?.moduleGroups;
   // Use the actual workspace name for the title - especially important for custom workspaces
   const sideNavTitle = isHomeModule ? currentWorkspace.name : currentModule.name;
   
@@ -72,6 +73,7 @@ export function AppLayout({
       {showSideNav && (
         <SideNavigation 
           sections={sideNavSections} 
+          moduleGroups={sideNavModuleGroups}
           title={sideNavTitle}
         />
       )}

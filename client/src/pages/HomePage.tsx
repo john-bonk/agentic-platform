@@ -747,7 +747,7 @@ export default function HomePage() {
                               {badge.label}
                             </span>
                             <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium text-[#266C92] hover:underline cursor-pointer" data-testid={`task-title-${task.id}`}>
+                              <div className="text-sm font-medium text-[#266C92] dark:text-[#7BC4E0] hover:underline cursor-pointer" data-testid={`task-title-${task.id}`}>
                                 {task.title}
                               </div>
                               <div className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{task.context}</div>
