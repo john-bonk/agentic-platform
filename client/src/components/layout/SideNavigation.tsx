@@ -21,7 +21,16 @@ import {
   ChevronDownIcon,
   Check,
   Plus,
-  Circle,
+  TrendingUp,
+  ClipboardList,
+  Scale,
+  Lock,
+  Users,
+  Leaf,
+  ShieldCheck,
+  Database,
+  Brain,
+  LayoutDashboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -132,6 +141,22 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive }: Collaps
   );
 }
 
+// Helper to get bucket icon by name
+const getBucketIcon = (iconName: string, className: string = "w-6 h-6") => {
+  const icons: Record<string, JSX.Element> = {
+    "trending-up": <TrendingUp className={className} />,
+    "clipboard-list": <ClipboardList className={className} />,
+    "scale": <Scale className={className} />,
+    "lock": <Lock className={className} />,
+    "users": <Users className={className} />,
+    "leaf": <Leaf className={className} />,
+    "shield-check": <ShieldCheck className={className} />,
+    "database": <Database className={className} />,
+    "brain": <Brain className={className} />,
+  };
+  return icons[iconName] || <LayoutDashboard className={className} />;
+};
+
 interface ModuleGroupSectionProps {
   group: ModuleNavGroup;
   isModuleExpanded: boolean;
@@ -163,23 +188,13 @@ function ModuleGroupSection({
           }`}
         />
         <div 
-          className="w-5 h-5 rounded flex items-center justify-center shrink-0"
-          style={{ backgroundColor: `${group.moduleColor}20` }}
+          className="w-5 h-5 rounded flex items-center justify-center shrink-0 bg-gray-100 dark:bg-accent text-gray-600 dark:text-gray-300"
+          data-testid={`nav-module-icon-${group.moduleId}`}
         >
-          <Circle 
-            className="w-2.5 h-2.5" 
-            style={{ color: group.moduleColor, fill: group.moduleColor }} 
-            data-testid={`nav-module-icon-${group.moduleId}`}
-          />
+          {getBucketIcon(group.moduleIcon, "w-3 h-3")}
         </div>
-        <span 
-          className="text-sm font-semibold truncate"
-          style={{ color: group.moduleColor }}
-        >
+        <span className="text-sm font-normal truncate text-gray-700 dark:text-foreground">
           {group.moduleName}
-        </span>
-        <span className="ml-auto text-[10px] text-gray-400 dark:text-muted-foreground">
-          {group.sections.length}
         </span>
       </Button>
       

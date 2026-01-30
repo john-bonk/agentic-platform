@@ -425,19 +425,12 @@ function NavigationPreview({
                 >
                   <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isModuleExpanded ? "" : "-rotate-90"}`} />
                   <div 
-                    className="w-5 h-5 rounded flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: `${group.moduleColor}20` }}
+                    className="w-5 h-5 rounded flex items-center justify-center shrink-0 bg-gray-100 dark:bg-accent text-gray-600 dark:text-gray-300"
                   >
                     {getBucketIcon(group.moduleIcon, `w-3 h-3`)}
                   </div>
-                  <span 
-                    className="text-xs font-semibold truncate"
-                    style={{ color: group.moduleColor }}
-                  >
+                  <span className="text-xs font-normal truncate text-gray-700 dark:text-foreground">
                     {group.moduleName}
-                  </span>
-                  <span className="ml-auto text-[9px] text-gray-400 dark:text-muted-foreground">
-                    {group.sections.length}
                   </span>
                 </button>
                 
