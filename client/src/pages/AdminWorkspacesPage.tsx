@@ -22,7 +22,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState, useMemo } from "react";
-import { useWorkspaceStore } from "@/lib/workspaceStore";
+import { useLocation } from "wouter";
+import { useWorkspaceStore, Workspace } from "@/lib/workspaceStore";
 import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreationWizard";
 
 interface WorkspaceCard {
@@ -87,7 +88,13 @@ const defaultWorkspaceCards: WorkspaceCard[] = [
 
 export function AdminWorkspacesPage() {
   const [wizardOpen, setWizardOpen] = useState(false);
-  const { customWorkspaces } = useWorkspaceStore();
+  const [, setLocation] = useLocation();
+  const { customWorkspaces, setWorkspace } = useWorkspaceStore();
+  
+  const handleWorkspaceCreated = (workspace: Workspace) => {
+    setWorkspace(workspace);
+    setLocation(workspace.isCustom ? "/custom-workspace" : "/");
+  };
   
   // Combine default workspaces with custom ones
   const allWorkspaces = useMemo((): WorkspaceCard[] => {
@@ -239,7 +246,8 @@ export function AdminWorkspacesPage() {
       
       <WorkspaceCreationWizard 
         open={wizardOpen} 
-        onOpenChange={setWizardOpen} 
+        onOpenChange={setWizardOpen}
+        onWorkspaceCreated={handleWorkspaceCreated}
       />
     </AppLayout>
   );

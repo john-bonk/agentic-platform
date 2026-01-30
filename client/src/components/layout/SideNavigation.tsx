@@ -411,8 +411,8 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
       if (path === "/global-residual-risk") {
         return location === "/global-residual-risk";
       }
-      if (path === "/admin") {
-        return location === "/admin";
+      if (path === "/admin/workspaces") {
+        return location === "/admin" || location === "/admin/workspaces";
       }
       return location === path || location.startsWith(path + "/");
     }
