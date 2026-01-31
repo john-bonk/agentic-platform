@@ -57,6 +57,7 @@ import {
 } from "lucide-react";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { productCapabilityBuckets, getQuickActionsForWorkspace, generateNavSections } from "@/config/workspaceWizardConfig";
+import { archetypeTemplates, generateHomeContent, type ArchetypeTemplate, type HomeContent } from "@/config/homeViewConfig";
 
 interface DynamicTask {
   id: string;
@@ -450,6 +451,19 @@ export default function CustomWorkspaceHome() {
     return currentWorkspace?.moduleConfig?.enabledModules || {};
   }, [currentWorkspace?.moduleConfig?.enabledModules, refreshKey]);
   
+  // Get archetype configuration
+  const selectedArchetype = useMemo<ArchetypeTemplate | null>(() => {
+    const archetypeId = currentWorkspace?.homeViewConfig?.archetypeId;
+    if (!archetypeId) return null;
+    return archetypeTemplates.find(a => a.id === archetypeId) || null;
+  }, [currentWorkspace?.homeViewConfig?.archetypeId, refreshKey]);
+  
+  // Generate dynamic content based on archetype and modules
+  const archetypeContent = useMemo<HomeContent | null>(() => {
+    if (!selectedArchetype) return null;
+    return generateHomeContent(selectedArchetype.id, selectedBuckets);
+  }, [selectedArchetype, selectedBuckets]);
+  
   const tasks = useMemo(() => {
     const generatedTasks = generateTasksFromModules(selectedBuckets, enabledModules);
     return generatedTasks;
@@ -492,6 +506,11 @@ export default function CustomWorkspaceHome() {
                 </h1>
                 <p className="text-white/70 text-sm max-w-lg">
                   {currentWorkspace?.name} • {selectedBuckets.length} capabilities • {totalModules} active modules
+                  {selectedArchetype && (
+                    <span className="ml-2 px-2 py-0.5 rounded bg-white/10 text-[10px] uppercase tracking-wide">
+                      {selectedArchetype.name}
+                    </span>
+                  )}
                 </p>
               </div>
               

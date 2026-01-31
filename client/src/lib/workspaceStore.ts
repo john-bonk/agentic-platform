@@ -13,6 +13,10 @@ export interface WorkspaceModuleConfig {
   enabledModules: Record<string, string[]>;
 }
 
+export interface WorkspaceHomeViewConfig {
+  archetypeId: string;
+}
+
 export interface Workspace {
   id: string;
   name: string;
@@ -22,6 +26,7 @@ export interface Workspace {
   icon?: string;
   selectedCapabilities?: string[];
   moduleConfig?: WorkspaceModuleConfig;
+  homeViewConfig?: WorkspaceHomeViewConfig;
   isCustom?: boolean;
 }
 

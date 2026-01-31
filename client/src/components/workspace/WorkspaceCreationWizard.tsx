@@ -106,6 +106,11 @@ import {
   type ProductCapabilityBucket,
   type ModuleCapability,
 } from "@/config/workspaceWizardConfig";
+import {
+  archetypeTemplates,
+  getRecommendedArchetype,
+} from "@/config/homeViewConfig";
+import { HomeViewStep } from "./HomeViewStep";
 import type { SideNavSection, ModuleNavGroup } from "@/config/navigation";
 import { type Workspace, useWorkspaceStore } from "@/lib/workspaceStore";
 
@@ -115,13 +120,14 @@ interface WorkspaceCreationWizardProps {
   onWorkspaceCreated?: (workspace: Workspace) => void;
 }
 
-type WizardStep = "name" | "buckets" | "modules" | "preview";
+type WizardStep = "name" | "buckets" | "modules" | "homeView" | "preview";
 
-const stepOrder: WizardStep[] = ["name", "buckets", "modules", "preview"];
+const stepOrder: WizardStep[] = ["name", "buckets", "modules", "homeView", "preview"];
 const stepLabels: Record<WizardStep, string> = {
   name: "Name",
   buckets: "Modules",
   modules: "Capabilities",
+  homeView: "Home View",
   preview: "Preview",
 };
 
@@ -674,6 +680,88 @@ const ROLE_CAPABILITIES: Record<string, string[]> = {
   "Viewer": ["Read-only access", "Dashboard viewing", "Report viewing", "Limited navigation"],
 };
 
+function HomeViewSummary({ selectedArchetype }: { selectedArchetype: string }) {
+  const archetype = archetypeTemplates.find(t => t.id === selectedArchetype);
+  
+  if (!archetype) {
+    return (
+      <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-4 h-full flex items-center justify-center">
+        <p className="text-sm text-gray-500 dark:text-muted-foreground">No home view selected</p>
+      </div>
+    );
+  }
+
+  const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: `repeat(${archetype.layout.columns}, 1fr)`,
+    gridTemplateRows: `repeat(${archetype.layout.rows}, minmax(20px, 1fr))`,
+    gridTemplateAreas: archetype.layout.areas,
+    gap: "2px",
+    height: "100%",
+  };
+
+  const getWidgetColor = (widgetType: string): string => {
+    const colors: Record<string, string> = {
+      "welcome-header": "bg-[#266C92]/20",
+      "metrics-bar": "bg-emerald-500/20",
+      "kpi-cards": "bg-emerald-500/20",
+      "task-list": "bg-amber-500/20",
+      "activity-feed": "bg-blue-500/20",
+      "chart-area": "bg-purple-500/20",
+      "trend-chart": "bg-purple-500/20",
+      "quick-actions": "bg-cyan-500/20",
+      "ai-command": "bg-pink-500/20",
+      "timeline": "bg-orange-500/20",
+      "status-grid": "bg-teal-500/20",
+      "heat-map": "bg-red-500/20",
+      "data-table": "bg-gray-500/20",
+      "alerts-panel": "bg-rose-500/20",
+      "progress-tracker": "bg-indigo-500/20",
+      "calendar-view": "bg-sky-500/20",
+      "workflow-queue": "bg-violet-500/20",
+      "coverage-map": "bg-lime-500/20",
+      "summary-card": "bg-[#266C92]/20",
+      "navigation-shortcuts": "bg-slate-500/20",
+    };
+    return colors[widgetType] || "bg-gray-500/20";
+  };
+
+  return (
+    <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-4 h-full flex flex-col">
+      <div className="flex items-center gap-2 mb-3 shrink-0">
+        <div 
+          className="w-7 h-7 rounded-lg flex items-center justify-center"
+          style={{ backgroundColor: `${archetype.colorAccent}15`, color: archetype.colorAccent }}
+        >
+          <LayoutDashboard className="w-4 h-4" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold text-gray-900 dark:text-foreground truncate">{archetype.name}</p>
+          <p className="text-[10px] text-gray-500 dark:text-muted-foreground">{archetype.persona} View</p>
+        </div>
+      </div>
+      
+      <div className="flex-1 min-h-0 bg-muted/30 dark:bg-muted/20 rounded-lg border border-border p-1.5">
+        <div style={gridStyle}>
+          {archetype.slots.map((slot) => (
+            <div
+              key={slot.id}
+              style={{ gridArea: slot.gridArea }}
+              className={`rounded ${getWidgetColor(slot.widgetType)}`}
+            />
+          ))}
+        </div>
+      </div>
+      
+      <div className="mt-2 shrink-0">
+        <p className="text-[9px] text-gray-500 dark:text-muted-foreground text-center">
+          {archetype.slots.length} widgets &middot; {archetype.layout.columns}x{archetype.layout.rows} grid
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function MembersSummary({ members }: { members: WorkspaceMember[] }) {
   const [expandedMembers, setExpandedMembers] = useState<Set<string>>(
     new Set(members.map(m => m.id))
@@ -797,6 +885,7 @@ export function WorkspaceCreationWizard({
   const [workspaceMembers, setWorkspaceMembers] = useState<WorkspaceMember[]>([
     { id: "1", email: "admin@company.org", role: "Org Admin" }
   ]);
+  const [selectedArchetype, setSelectedArchetype] = useState<string>("operations-hub");
   
   const addWorkspace = useWorkspaceStore(state => state.addWorkspace);
   
@@ -823,8 +912,17 @@ export function WorkspaceCreationWizard({
     if (selectedBuckets.length > 0) completed.add("buckets");
     const totalModules = Object.values(enabledModules).reduce((sum, arr) => sum + arr.length, 0);
     if (totalModules > 0) completed.add("modules");
+    if (selectedArchetype) completed.add("homeView");
     return completed;
-  }, [workspaceName, selectedBuckets, enabledModules]);
+  }, [workspaceName, selectedBuckets, enabledModules, selectedArchetype]);
+  
+  // Auto-update recommended archetype when modules change
+  useEffect(() => {
+    if (selectedBuckets.length > 0) {
+      const recommended = getRecommendedArchetype(selectedBuckets);
+      setSelectedArchetype(recommended);
+    }
+  }, [selectedBuckets.join(",")]);
 
   const stats = useMemo(() => 
     getCapabilityStats(selectedBuckets, enabledModules),
@@ -884,10 +982,11 @@ export function WorkspaceCreationWizard({
       case "name": return workspaceName.trim().length > 0;
       case "buckets": return selectedBuckets.length > 0;
       case "modules": return Object.values(enabledModules).some(arr => arr.length > 0);
+      case "homeView": return !!selectedArchetype;
       case "preview": return true;
       default: return false;
     }
-  }, [currentStep, workspaceName, selectedBuckets, enabledModules]);
+  }, [currentStep, workspaceName, selectedBuckets, enabledModules, selectedArchetype]);
 
   const goNext = () => {
     const currentIndex = stepOrder.indexOf(currentStep);
@@ -921,6 +1020,9 @@ export function WorkspaceCreationWizard({
         selectedBuckets,
         enabledModules,
       },
+      homeViewConfig: {
+        archetypeId: selectedArchetype,
+      },
     };
     
     addWorkspace(newWorkspace);
@@ -932,6 +1034,7 @@ export function WorkspaceCreationWizard({
     setSelectedBuckets([]);
     setEnabledModules({});
     setActiveBucketTab(null);
+    setSelectedArchetype("operations-hub");
   };
 
   const handleClose = () => {
@@ -941,6 +1044,7 @@ export function WorkspaceCreationWizard({
     setSelectedBuckets([]);
     setEnabledModules({});
     setActiveBucketTab(null);
+    setSelectedArchetype("operations-hub");
   };
 
   if (!open) return null;
@@ -1243,13 +1347,23 @@ export function WorkspaceCreationWizard({
             </div>
           )}
           
+          {currentStep === "homeView" && (
+            <div className="h-full p-6 overflow-hidden">
+              <HomeViewStep
+                selectedArchetype={selectedArchetype}
+                onArchetypeChange={setSelectedArchetype}
+                selectedModules={selectedBuckets}
+              />
+            </div>
+          )}
+          
           {currentStep === "preview" && (
             <div className="h-full p-6 overflow-hidden flex flex-col">
               <div className="text-center mb-4 shrink-0">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-foreground">Review Your Workspace</h2>
               </div>
               
-              <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
+              <div className="flex-1 flex gap-4 min-h-0 overflow-hidden">
                 {/* Configuration Summary - modules column */}
                 <div className="flex-1 flex flex-col min-h-0">
                   <div className="flex items-center gap-2 mb-2 shrink-0">
@@ -1267,6 +1381,18 @@ export function WorkspaceCreationWizard({
                   />
                 </div>
                 
+                {/* Home View Summary - new column */}
+                <div className="w-[220px] shrink-0 flex flex-col min-h-0">
+                  <div className="flex items-center gap-2 mb-2 shrink-0">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
+                    <span className="text-[10px] font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
+                      Home View
+                    </span>
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
+                  </div>
+                  <HomeViewSummary selectedArchetype={selectedArchetype} />
+                </div>
+                
                 {/* Members Summary - middle column */}
                 <div className="flex-1 flex flex-col min-h-0">
                   <div className="flex items-center gap-2 mb-2 shrink-0">
@@ -1280,7 +1406,7 @@ export function WorkspaceCreationWizard({
                 </div>
                 
                 {/* Navigation Preview - fixed width to match actual nav panel */}
-                <div className="w-[312px] shrink-0 flex flex-col min-h-0">
+                <div className="w-[280px] shrink-0 flex flex-col min-h-0">
                   <div className="flex items-center gap-2 mb-2 shrink-0">
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
                     <span className="text-[10px] font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
