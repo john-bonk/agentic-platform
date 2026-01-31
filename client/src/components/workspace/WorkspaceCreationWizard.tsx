@@ -1363,7 +1363,7 @@ export function WorkspaceCreationWizard({
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-foreground">Review Your Workspace</h2>
               </div>
               
-              <div className="flex-1 flex gap-4 min-h-0 overflow-hidden">
+              <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
                 {/* Configuration Summary - modules column */}
                 <div className="flex-1 flex flex-col min-h-0">
                   <div className="flex items-center gap-2 mb-2 shrink-0">
@@ -1381,18 +1381,6 @@ export function WorkspaceCreationWizard({
                   />
                 </div>
                 
-                {/* Home View Summary - new column */}
-                <div className="w-[220px] shrink-0 flex flex-col min-h-0">
-                  <div className="flex items-center gap-2 mb-2 shrink-0">
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
-                    <span className="text-[10px] font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
-                      Home View
-                    </span>
-                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
-                  </div>
-                  <HomeViewSummary selectedArchetype={selectedArchetype} />
-                </div>
-                
                 {/* Members Summary - middle column */}
                 <div className="flex-1 flex flex-col min-h-0">
                   <div className="flex items-center gap-2 mb-2 shrink-0">
@@ -1406,7 +1394,7 @@ export function WorkspaceCreationWizard({
                 </div>
                 
                 {/* Navigation Preview - fixed width to match actual nav panel */}
-                <div className="w-[280px] shrink-0 flex flex-col min-h-0">
+                <div className="w-[312px] shrink-0 flex flex-col min-h-0">
                   <div className="flex items-center gap-2 mb-2 shrink-0">
                     <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-200 dark:via-border to-transparent" />
                     <span className="text-[10px] font-medium text-gray-500 dark:text-muted-foreground uppercase tracking-wide">
