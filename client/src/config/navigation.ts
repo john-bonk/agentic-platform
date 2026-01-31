@@ -85,7 +85,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
           { id: "global-residual-risk-cro", label: "Global Residual Risk", path: "/global-residual-risk" },
-          { id: "vendor-exposure", label: "Vendor Exposure", path: "/vendor-exposure" },
+          { id: "vendor-exposure", label: "Vendor Exposure", path: "/intelligence/vendor-exposure" },
         ],
       },
       {
@@ -136,7 +136,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
           { id: "global-residual-risk-cae", label: "Global Residual Risk", path: "/global-residual-risk" },
-          { id: "org-impact", label: "Org Impact Analysis", path: "/org-impact" },
+          { id: "org-impact", label: "Org Impact Analysis", path: "/intelligence/org-impact" },
         ],
       },
       {
@@ -188,8 +188,8 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
           { id: "global-residual-risk-ciso", label: "Global Residual Risk", path: "/global-residual-risk" },
-          { id: "threat-detection", label: "Threat Detection", path: "/threat-detection" },
-          { id: "vulnerability-scan", label: "Vulnerability Scan", path: "/vulnerability-scan" },
+          { id: "threat-detection", label: "Threat Detection", path: "/intelligence/threat-detection" },
+          { id: "vulnerability-scan", label: "Vulnerability Scan", path: "/intelligence/vulnerability-scan" },
         ],
       },
       {
