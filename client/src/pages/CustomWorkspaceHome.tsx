@@ -57,7 +57,8 @@ import {
 } from "lucide-react";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { productCapabilityBuckets, getQuickActionsForWorkspace, generateNavSections } from "@/config/workspaceWizardConfig";
-import { archetypeTemplates, generateHomeContent, type ArchetypeTemplate, type HomeContent } from "@/config/homeViewConfig";
+import { archetypeTemplates, generateHomeContent, type ArchetypeTemplate, type InjectedHomeContent } from "@/config/homeViewConfig";
+import { ArchetypeDashboard } from "@/components/workspace/ArchetypeDashboard";
 
 interface DynamicTask {
   id: string;
@@ -459,10 +460,10 @@ export default function CustomWorkspaceHome() {
   }, [currentWorkspace?.homeViewConfig?.archetypeId, refreshKey]);
   
   // Generate dynamic content based on archetype and modules
-  const archetypeContent = useMemo<HomeContent | null>(() => {
+  const archetypeContent = useMemo<InjectedHomeContent | null>(() => {
     if (!selectedArchetype) return null;
-    return generateHomeContent(selectedArchetype.id, selectedBuckets);
-  }, [selectedArchetype, selectedBuckets]);
+    return generateHomeContent(selectedBuckets, selectedArchetype.id, currentWorkspace?.name || "Workspace");
+  }, [selectedArchetype, selectedBuckets, currentWorkspace?.name]);
   
   const tasks = useMemo(() => {
     const generatedTasks = generateTasksFromModules(selectedBuckets, enabledModules);
@@ -490,6 +491,32 @@ export default function CustomWorkspaceHome() {
     return { highPriority, inProgress, dueToday };
   }, [tasks]);
   
+  // If archetype is selected, render the archetype-based dashboard
+  if (selectedArchetype && archetypeContent) {
+    return (
+      <AppLayout>
+        <div data-testid="page-custom-workspace-home">
+          <ArchetypeDashboard
+            archetype={selectedArchetype}
+            content={{
+              metrics: archetypeContent.metrics,
+              tasks: archetypeContent.tasks,
+              activities: archetypeContent.activities,
+              charts: archetypeContent.charts,
+              quickActions: archetypeContent.quickActions,
+              alerts: archetypeContent.alerts,
+              statusItems: archetypeContent.statusItems,
+              greeting: archetypeContent.greeting,
+            }}
+            workspaceName={currentWorkspace?.name || "Custom Workspace"}
+            userPersona={userPersona}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Fallback to legacy layout if no archetype selected
   return (
     <AppLayout>
       <div className="p-6 space-y-6" data-testid="page-custom-workspace-home">
