@@ -37,11 +37,11 @@ const vendors: VendorRisk[] = [
 const getRiskBadge = (level: string) => {
   switch (level) {
     case "high":
-      return <Badge className="bg-red-100 text-red-800">High Risk</Badge>;
+      return <Badge className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300">High Risk</Badge>;
     case "medium":
-      return <Badge className="bg-amber-100 text-amber-800">Medium</Badge>;
+      return <Badge className="bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300">Medium</Badge>;
     case "low":
-      return <Badge className="bg-green-100 text-green-800">Low</Badge>;
+      return <Badge className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">Low</Badge>;
     default:
       return null;
   }
@@ -62,7 +62,7 @@ export default function VendorExposurePage() {
 
   return (
     <AppLayout>
-      <div className="flex-1 bg-slate-50 min-h-screen">
+      <div className="flex-1 bg-slate-50 dark:bg-background min-h-screen">
         <PageHeader
           title="Vendor Exposure Analysis"
           description="Comprehensive tariff risk assessment across your supplier network"
@@ -88,12 +88,12 @@ export default function VendorExposurePage() {
             <Card data-testid="metric-total-exposure">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                    <DollarSign className="w-5 h-5 text-red-600" />
+                  <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                    <DollarSign className="w-5 h-5 text-red-600 dark:text-red-400" />
                   </div>
                   <div>
-                    <p className="text-xl font-bold text-gray-900">{formatCurrency(totalExposure)}</p>
-                    <p className="text-sm text-gray-500">Total Exposure</p>
+                    <p className="text-xl font-bold text-gray-900 dark:text-foreground">{formatCurrency(totalExposure)}</p>
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Total Exposure</p>
                   </div>
                 </div>
               </CardContent>
@@ -105,8 +105,8 @@ export default function VendorExposurePage() {
                     <Building2 className="w-5 h-5 text-[#266C92]" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">127</p>
-                    <p className="text-sm text-gray-500">Vendors Analyzed</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-foreground">127</p>
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Vendors Analyzed</p>
                   </div>
                 </div>
               </CardContent>
@@ -114,12 +114,12 @@ export default function VendorExposurePage() {
             <Card data-testid="metric-high-risk">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                    <AlertTriangle className="w-5 h-5 text-amber-600" />
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">{highRiskCount}</p>
-                    <p className="text-sm text-gray-500">High Risk</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-foreground">{highRiskCount}</p>
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">High Risk</p>
                   </div>
                 </div>
               </CardContent>
@@ -127,12 +127,12 @@ export default function VendorExposurePage() {
             <Card data-testid="metric-alternatives">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                    <Globe className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">14</p>
-                    <p className="text-sm text-gray-500">Alternatives Found</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-foreground">14</p>
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Alternatives Found</p>
                   </div>
                 </div>
               </CardContent>
@@ -147,20 +147,20 @@ export default function VendorExposurePage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="p-4 rounded-lg bg-red-100 border border-red-200">
-                    <p className="font-medium text-red-800">China</p>
-                    <p className="text-2xl font-bold text-red-900">$12.0M</p>
-                    <p className="text-sm text-red-700">69 vendors</p>
+                  <div className="p-4 rounded-lg bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800">
+                    <p className="font-medium text-red-800 dark:text-red-300">China</p>
+                    <p className="text-2xl font-bold text-red-900 dark:text-red-200">$12.0M</p>
+                    <p className="text-sm text-red-700 dark:text-red-400">69 vendors</p>
                   </div>
-                  <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
-                    <p className="font-medium text-amber-800">Vietnam</p>
-                    <p className="text-2xl font-bold text-amber-900">$3.2M</p>
-                    <p className="text-sm text-amber-700">28 vendors</p>
+                  <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                    <p className="font-medium text-amber-800 dark:text-amber-300">Vietnam</p>
+                    <p className="text-2xl font-bold text-amber-900 dark:text-amber-200">$3.2M</p>
+                    <p className="text-sm text-amber-700 dark:text-amber-400">28 vendors</p>
                   </div>
-                  <div className="p-4 rounded-lg bg-green-50 border border-green-200">
-                    <p className="font-medium text-green-800">Thailand</p>
-                    <p className="text-2xl font-bold text-green-900">$1.8M</p>
-                    <p className="text-sm text-green-700">18 vendors</p>
+                  <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                    <p className="font-medium text-green-800 dark:text-green-300">Thailand</p>
+                    <p className="text-2xl font-bold text-green-900 dark:text-green-200">$1.8M</p>
+                    <p className="text-sm text-green-700 dark:text-green-400">18 vendors</p>
                   </div>
                 </div>
               </CardContent>
@@ -174,22 +174,22 @@ export default function VendorExposurePage() {
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600">Supplier Diversification</span>
-                      <span className="font-medium">68%</span>
+                      <span className="text-gray-600 dark:text-muted-foreground">Supplier Diversification</span>
+                      <span className="font-medium text-foreground">68%</span>
                     </div>
                     <Progress value={68} className="h-2" />
                   </div>
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600">Contract Negotiations</span>
-                      <span className="font-medium">45%</span>
+                      <span className="text-gray-600 dark:text-muted-foreground">Contract Negotiations</span>
+                      <span className="font-medium text-foreground">45%</span>
                     </div>
                     <Progress value={45} className="h-2" />
                   </div>
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600">Tariff Engineering</span>
-                      <span className="font-medium">32%</span>
+                      <span className="text-gray-600 dark:text-muted-foreground">Tariff Engineering</span>
+                      <span className="font-medium text-foreground">32%</span>
                     </div>
                     <Progress value={32} className="h-2" />
                   </div>
@@ -208,30 +208,30 @@ export default function VendorExposurePage() {
                 {vendors.map((vendor) => (
                   <div 
                     key={vendor.id}
-                    className="flex items-center justify-between p-4 rounded-lg border border-slate-200 hover-elevate cursor-pointer"
+                    className="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card hover-elevate cursor-pointer"
                     data-testid={`vendor-${vendor.id}`}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                        <Building2 className="w-5 h-5 text-gray-600" />
+                      <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-muted flex items-center justify-center">
+                        <Building2 className="w-5 h-5 text-gray-600 dark:text-muted-foreground" />
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900">{vendor.name}</h4>
+                        <h4 className="font-medium text-gray-900 dark:text-foreground">{vendor.name}</h4>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-gray-500">{vendor.country}</span>
-                          <span className="text-xs text-gray-300">|</span>
-                          <span className="text-xs text-gray-500">{vendor.products} products</span>
-                          <span className="text-xs text-gray-300">|</span>
-                          <span className="text-xs text-green-600">{vendor.alternativesCount} alternatives</span>
+                          <span className="text-xs text-gray-500 dark:text-muted-foreground">{vendor.country}</span>
+                          <span className="text-xs text-gray-300 dark:text-muted-foreground/50">|</span>
+                          <span className="text-xs text-gray-500 dark:text-muted-foreground">{vendor.products} products</span>
+                          <span className="text-xs text-gray-300 dark:text-muted-foreground/50">|</span>
+                          <span className="text-xs text-green-600 dark:text-green-400">{vendor.alternativesCount} alternatives</span>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <p className="font-semibold text-gray-900">{formatCurrency(vendor.exposure)}</p>
+                        <p className="font-semibold text-gray-900 dark:text-foreground">{formatCurrency(vendor.exposure)}</p>
                         {getRiskBadge(vendor.riskLevel)}
                       </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                      <ChevronRight className="w-5 h-5 text-gray-400 dark:text-muted-foreground" />
                     </div>
                   </div>
                 ))}

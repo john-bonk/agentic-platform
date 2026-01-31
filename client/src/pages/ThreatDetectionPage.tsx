@@ -104,13 +104,13 @@ const getSeverityBadge = (severity: string) => {
 const getStatusBadge = (status: string) => {
   switch (status) {
     case "active":
-      return <Badge variant="outline" className="border-red-500 text-red-600 bg-red-50"><Radio className="w-3 h-3 mr-1 animate-pulse" />Active</Badge>;
+      return <Badge variant="outline" className="border-red-500 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20"><Radio className="w-3 h-3 mr-1 animate-pulse" />Active</Badge>;
     case "investigating":
-      return <Badge variant="outline" className="border-amber-500 text-amber-600 bg-amber-50"><Eye className="w-3 h-3 mr-1" />Investigating</Badge>;
+      return <Badge variant="outline" className="border-amber-500 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20"><Eye className="w-3 h-3 mr-1" />Investigating</Badge>;
     case "contained":
-      return <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50"><Lock className="w-3 h-3 mr-1" />Contained</Badge>;
+      return <Badge variant="outline" className="border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"><Lock className="w-3 h-3 mr-1" />Contained</Badge>;
     case "resolved":
-      return <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50"><CheckCircle2 className="w-3 h-3 mr-1" />Resolved</Badge>;
+      return <Badge variant="outline" className="border-green-500 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"><CheckCircle2 className="w-3 h-3 mr-1" />Resolved</Badge>;
     default:
       return null;
   }
@@ -148,7 +148,7 @@ export default function ThreatDetectionPage() {
 
   return (
     <AppLayout>
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden bg-background">
         <PageHeader 
           title="Threat Detection" 
           description="AI-powered Zero Day threat analysis and intrusion detection"
@@ -191,12 +191,12 @@ export default function ThreatDetectionPage() {
                 <Card data-testid="metric-active-threats">
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                        <AlertCircle className="w-5 h-5 text-red-600" />
+                      <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                        <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-gray-900">{activeThreats}</p>
-                        <p className="text-sm text-gray-500">Active Threats</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-foreground">{activeThreats}</p>
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground">Active Threats</p>
                       </div>
                     </div>
                   </CardContent>
@@ -207,12 +207,12 @@ export default function ThreatDetectionPage() {
                 <Card data-testid="metric-critical-threats">
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                        <Skull className="w-5 h-5 text-orange-600" />
+                      <div className="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                        <Skull className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-gray-900">{criticalThreats}</p>
-                        <p className="text-sm text-gray-500">Zero-Day Threats</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-foreground">{criticalThreats}</p>
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground">Zero-Day Threats</p>
                       </div>
                     </div>
                   </CardContent>
@@ -223,12 +223,12 @@ export default function ThreatDetectionPage() {
                 <Card data-testid="metric-blocked-attacks">
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                        <Shield className="w-5 h-5 text-emerald-600" />
+                      <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                        <Shield className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-gray-900">487</p>
-                        <p className="text-sm text-gray-500">Attacks Blocked</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-foreground">487</p>
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground">Attacks Blocked</p>
                       </div>
                     </div>
                   </CardContent>
@@ -239,12 +239,12 @@ export default function ThreatDetectionPage() {
                 <Card data-testid="metric-contained-today">
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <Lock className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                        <Lock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-gray-900">{containedToday}</p>
-                        <p className="text-sm text-gray-500">Contained Today</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-foreground">{containedToday}</p>
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground">Contained Today</p>
                       </div>
                     </div>
                   </CardContent>
@@ -259,8 +259,8 @@ export default function ThreatDetectionPage() {
                         <Zap className="w-5 h-5 text-[#266C92]" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-gray-900">99.2%</p>
-                        <p className="text-sm text-gray-500">Detection Rate</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-foreground">99.2%</p>
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground">Detection Rate</p>
                       </div>
                     </div>
                   </CardContent>
@@ -270,15 +270,15 @@ export default function ThreatDetectionPage() {
 
             {scanStatus === "complete" && (
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-                <Card className="border-green-200 bg-green-50" data-testid="scan-complete-alert">
+                <Card className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20" data-testid="scan-complete-alert">
                   <CardContent className="py-4">
                     <div className="flex items-center gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-green-600" />
+                      <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
                       <div className="flex-1">
-                        <p className="font-medium text-green-800">Threat scan complete</p>
-                        <p className="text-sm text-green-600">Scanned 1,247 endpoints, 89 applications, 34 network segments. 2 new indicators detected.</p>
+                        <p className="font-medium text-green-800 dark:text-green-300">Threat scan complete</p>
+                        <p className="text-sm text-green-600 dark:text-green-400">Scanned 1,247 endpoints, 89 applications, 34 network segments. 2 new indicators detected.</p>
                       </div>
-                      <Button size="sm" variant="outline" className="border-green-300" onClick={() => setScanStatus("idle")} data-testid="button-dismiss-scan-alert">
+                      <Button size="sm" variant="outline" className="border-green-300 dark:border-green-700" onClick={() => setScanStatus("idle")} data-testid="button-dismiss-scan-alert">
                         Dismiss
                       </Button>
                     </div>
@@ -317,11 +317,12 @@ export default function ThreatDetectionPage() {
                                 <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                               </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                            <XAxis dataKey="time" tick={{ fontSize: 12 }} stroke="#9ca3af" />
-                            <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" />
+                            <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                            <XAxis dataKey="time" tick={{ fontSize: 12 }} className="fill-muted-foreground" />
+                            <YAxis tick={{ fontSize: 12 }} className="fill-muted-foreground" />
                             <Tooltip
-                              contentStyle={{ backgroundColor: "white", borderRadius: "8px", border: "1px solid #e5e7eb" }}
+                              contentStyle={{ backgroundColor: "hsl(var(--card))", borderRadius: "8px", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }}
+                              labelStyle={{ color: "hsl(var(--foreground))" }}
                             />
                             <Area type="monotone" dataKey="blocked" stroke="#10b981" fill="url(#blockedGradient)" strokeWidth={2} name="Blocked" />
                             <Area type="monotone" dataKey="threats" stroke="#ef4444" fill="url(#threatGradient)" strokeWidth={2} name="Active Threats" />
@@ -334,15 +335,15 @@ export default function ThreatDetectionPage() {
                       <div className="space-y-4">
                         {attackVectors.map((vector, idx) => (
                           <div key={idx} className="flex items-center gap-4">
-                            <div className="w-32 text-sm font-medium text-gray-700">{vector.vector}</div>
+                            <div className="w-32 text-sm font-medium text-gray-700 dark:text-foreground">{vector.vector}</div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 <Progress value={(vector.blocked / vector.attempts) * 100} className="h-2 flex-1" />
-                                <span className="text-xs text-gray-500 w-16">{vector.blocked}/{vector.attempts}</span>
+                                <span className="text-xs text-gray-500 dark:text-muted-foreground w-16">{vector.blocked}/{vector.attempts}</span>
                               </div>
                             </div>
                             <div className="w-20">
-                              <Badge className={vector.severity > 80 ? "bg-red-100 text-red-700" : vector.severity > 60 ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"}>
+                              <Badge className={vector.severity > 80 ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300" : vector.severity > 60 ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300" : "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"}>
                                 {vector.severity}% Risk
                               </Badge>
                             </div>
@@ -355,11 +356,12 @@ export default function ThreatDetectionPage() {
                       <div className="h-[280px]">
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={threatTimeline}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                            <XAxis dataKey="time" tick={{ fontSize: 12 }} stroke="#9ca3af" />
-                            <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" />
+                            <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                            <XAxis dataKey="time" tick={{ fontSize: 12 }} className="fill-muted-foreground" />
+                            <YAxis tick={{ fontSize: 12 }} className="fill-muted-foreground" />
                             <Tooltip
-                              contentStyle={{ backgroundColor: "white", borderRadius: "8px", border: "1px solid #e5e7eb" }}
+                              contentStyle={{ backgroundColor: "hsl(var(--card))", borderRadius: "8px", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }}
+                              labelStyle={{ color: "hsl(var(--foreground))" }}
                             />
                             <Bar dataKey="alerts" fill="#266C92" radius={[4, 4, 0, 0]} name="Security Alerts" />
                           </BarChart>
@@ -379,8 +381,8 @@ export default function ThreatDetectionPage() {
                     <div className="h-[180px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <RadarChart data={radarData}>
-                          <PolarGrid stroke="#e5e7eb" />
-                          <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
+                          <PolarGrid className="stroke-border" />
+                          <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} className="fill-muted-foreground" />
                           <Radar name="Coverage" dataKey="A" stroke="#266C92" fill="#266C92" fillOpacity={0.3} />
                         </RadarChart>
                       </ResponsiveContainer>
@@ -404,13 +406,15 @@ export default function ThreatDetectionPage() {
                             outerRadius={50}
                             dataKey="value"
                             strokeWidth={2}
-                            stroke="#fff"
+                            stroke="hsl(var(--card))"
                           >
                             {threatTypeDistribution.map((entry, idx) => (
                               <Cell key={idx} fill={entry.color} />
                             ))}
                           </Pie>
-                          <Tooltip />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: "hsl(var(--card))", borderRadius: "8px", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }}
+                          />
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
@@ -418,7 +422,7 @@ export default function ThreatDetectionPage() {
                       {threatTypeDistribution.map((item, idx) => (
                         <div key={idx} className="flex items-center gap-1 text-xs">
                           <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                          <span className="text-gray-600">{item.name}</span>
+                          <span className="text-gray-600 dark:text-muted-foreground">{item.name}</span>
                         </div>
                       ))}
                     </div>
@@ -431,7 +435,7 @@ export default function ThreatDetectionPage() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base font-semibold">Active Threat Indicators</CardTitle>
-                  <Badge variant="outline" className="text-gray-600">
+                  <Badge variant="outline" className="text-gray-600 dark:text-muted-foreground">
                     {threatIndicators.length} Indicators
                   </Badge>
                 </div>
@@ -445,22 +449,22 @@ export default function ThreatDetectionPage() {
                       animate={{ opacity: 1, x: 0 }}
                       className={`flex items-center gap-4 p-3 rounded-lg border ${
                         threat.status === "active" 
-                          ? "border-red-200 bg-red-50/50" 
+                          ? "border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/20" 
                           : threat.status === "investigating"
-                            ? "border-amber-200 bg-amber-50/30"
-                            : "border-gray-100 bg-gray-50/50"
+                            ? "border-amber-200 dark:border-amber-800 bg-amber-50/30 dark:bg-amber-900/10"
+                            : "border-gray-100 dark:border-border bg-gray-50/50 dark:bg-muted/30"
                       }`}
                       data-testid={`threat-indicator-${threat.id}`}
                     >
-                      <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-white dark:bg-card border border-gray-200 dark:border-border flex items-center justify-center">
                         {getTypeIcon(threat.type)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-gray-900 text-sm truncate">{threat.name}</p>
+                          <p className="font-medium text-gray-900 dark:text-foreground text-sm truncate">{threat.name}</p>
                           {getSeverityBadge(threat.severity)}
                         </div>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Wifi className="w-3 h-3" />
                             {threat.source}
@@ -477,8 +481,8 @@ export default function ThreatDetectionPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="text-right">
-                          <p className="text-xs text-gray-500">Confidence</p>
-                          <p className="font-semibold text-sm text-gray-900">{threat.confidence}%</p>
+                          <p className="text-xs text-gray-500 dark:text-muted-foreground">Confidence</p>
+                          <p className="font-semibold text-sm text-gray-900 dark:text-foreground">{threat.confidence}%</p>
                         </div>
                         {getStatusBadge(threat.status)}
                         <Button size="sm" variant="ghost" data-testid={`button-investigate-${threat.id}`}>
