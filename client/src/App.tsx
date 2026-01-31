@@ -72,6 +72,10 @@ function Router() {
       <Route path="/recent" component={RecentPage} />
       <Route path="/favorites" component={FavoritesPage} />
       <Route path="/global-residual-risk" component={GlobalResidualRiskRouter} />
+      <Route path="/vendor-exposure" component={VendorExposurePage} />
+      <Route path="/org-impact" component={OrgImpactPage} />
+      <Route path="/threat-detection" component={ThreatDetectionPage} />
+      <Route path="/vulnerability-scan" component={VulnerabilityScanPage} />
       <Route path="/inventory" component={AllInventoryPage} />
       <Route path="/coverage-mapping" component={CoverageMappingPage} />
       <Route path="/controls" component={ComingSoonPage} />
