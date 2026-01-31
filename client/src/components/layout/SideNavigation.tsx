@@ -506,20 +506,26 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
                   <Home className={`w-3 h-3 ${isHomeActive ? "text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
                 </button>
               </Link>
-              <button
-                className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
-                data-testid="nav-collapsed-recent"
-                title="Recent"
-              >
-                <Clock className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
-              </button>
-              <button
-                className="w-7 h-7 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-accent rounded transition-colors"
-                data-testid="nav-collapsed-favorites"
-                title="Favorites"
-              >
-                <Star className="w-3 h-3 text-gray-500 dark:text-muted-foreground" />
-              </button>
+              <Link href="/recent">
+                <button
+                  className="w-7 h-7 flex items-center justify-center rounded transition-colors"
+                  style={location === "/recent" ? { backgroundColor: '#1d212b' } : undefined}
+                  data-testid="nav-collapsed-recent"
+                  title="Recent"
+                >
+                  <Clock className={`w-3 h-3 ${location === "/recent" ? "text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
+                </button>
+              </Link>
+              <Link href="/favorites">
+                <button
+                  className="w-7 h-7 flex items-center justify-center rounded transition-colors"
+                  style={location === "/favorites" ? { backgroundColor: '#1d212b' } : undefined}
+                  data-testid="nav-collapsed-favorites"
+                  title="Favorites"
+                >
+                  <Star className={`w-3 h-3 ${location === "/favorites" ? "text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
+                </button>
+              </Link>
             </div>
           )}
         </div>
@@ -600,10 +606,14 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
               <QuickAccessItem 
                 icon={Clock} 
                 label="Recent" 
+                path="/recent"
+                isActive={location === "/recent"}
               />
               <QuickAccessItem 
                 icon={Star} 
                 label="Favorites" 
+                path="/favorites"
+                isActive={location === "/favorites"}
               />
             </div>
           )}

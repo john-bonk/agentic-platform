@@ -62,16 +62,6 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
     title: "Admin",
     sections: [
       {
-        id: "admin-quick-access",
-        title: "Quick Access",
-        defaultExpanded: true,
-        collapsible: true,
-        items: [
-          { id: "admin-recent", label: "Recent", path: "/recent", icon: "clock" },
-          { id: "admin-favorites", label: "Favorites", path: "/favorites", icon: "star" },
-        ],
-      },
-      {
         id: "admin-management",
         title: "Management",
         defaultExpanded: true,
@@ -87,16 +77,6 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
   "CRO": {
     title: "Enterprise Risk",
     sections: [
-      {
-        id: "cro-quick-access",
-        title: "Quick Access",
-        defaultExpanded: true,
-        collapsible: true,
-        items: [
-          { id: "cro-recent", label: "Recent", path: "/recent", icon: "clock" },
-          { id: "cro-favorites", label: "Favorites", path: "/favorites", icon: "star" },
-        ],
-      },
       {
         id: "cro-dashboards",
         title: "Dashboards",
@@ -148,16 +128,6 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
     title: "Enterprise Audit",
     sections: [
       {
-        id: "cae-quick-access",
-        title: "Quick Access",
-        defaultExpanded: true,
-        collapsible: true,
-        items: [
-          { id: "cae-recent", label: "Recent", path: "/recent", icon: "clock" },
-          { id: "cae-favorites", label: "Favorites", path: "/favorites", icon: "star" },
-        ],
-      },
-      {
         id: "cae-dashboards",
         title: "Dashboards",
         defaultExpanded: true,
@@ -208,16 +178,6 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
   "CISO": {
     title: "IT Security",
     sections: [
-      {
-        id: "ciso-quick-access",
-        title: "Quick Access",
-        defaultExpanded: true,
-        collapsible: true,
-        items: [
-          { id: "ciso-recent", label: "Recent", path: "/recent", icon: "clock" },
-          { id: "ciso-favorites", label: "Favorites", path: "/favorites", icon: "star" },
-        ],
-      },
       {
         id: "ciso-dashboards",
         title: "Dashboards",
