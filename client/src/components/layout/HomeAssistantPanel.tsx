@@ -243,7 +243,11 @@ function MessageBubble({ message, onResourceNavigate }: MessageBubbleProps) {
             <span className="text-xs font-medium text-[#266C92]">AuditBoard Assistant</span>
           </div>
         )}
-        <div className="text-sm prose prose-sm dark:prose-invert max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&_strong]:font-semibold">
+        <div className={`text-sm max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&_strong]:font-semibold ${
+          isUser 
+            ? "text-white [&_p]:text-white [&_li]:text-white [&_strong]:text-white [&_em]:text-white [&_a]:text-white/80 [&_a]:underline [&_code]:text-white/90" 
+            : "prose prose-sm dark:prose-invert text-gray-900 dark:text-foreground"
+        }`}>
           <ReactMarkdown>{message.content}</ReactMarkdown>
         </div>
         
@@ -411,6 +415,9 @@ interface BuildingReportState {
   active: boolean;
   deckKey: string;
   step: number;
+  isCustomQuery?: boolean;
+  reportResult?: { title: string; reportId: string; sections: any[] } | null;
+  error?: boolean;
 }
 
 const reportBuildSteps = [
@@ -454,6 +461,32 @@ export function HomeAssistantPanel() {
       }, reportBuildSteps[buildingReport.step].duration);
       return () => clearTimeout(timer);
     }
+    if (buildingReport?.active && buildingReport.step >= reportBuildSteps.length && buildingReport.reportResult) {
+      const report = buildingReport.reportResult;
+      addMessage({
+        id: `msg-${Date.now()}-report`,
+        role: "assistant",
+        content: `I've generated a comprehensive report: **${report.title}**\n\nThe report includes ${report.sections.length} sections with detailed analysis and visualizations. Click the report card below to view the full report.`,
+        timestamp: new Date().toISOString(),
+        resources: [{
+          type: "Report",
+          title: report.title,
+          id: report.reportId,
+          status: "Generated",
+          route: `/reporting/generated/${report.reportId}`,
+        }],
+      });
+      setBuildingReport(null);
+    }
+    if (buildingReport?.active && buildingReport.step >= reportBuildSteps.length && buildingReport.error) {
+      addMessage({
+        id: `msg-${Date.now()}-err`,
+        role: "assistant",
+        content: "I encountered an error generating the report. Please try again.",
+        timestamp: new Date().toISOString(),
+      });
+      setBuildingReport(null);
+    }
   }, [buildingReport]);
 
   const quickActions = currentWorkspace.isCustom 
@@ -470,36 +503,16 @@ export function HomeAssistantPanel() {
   };
 
   const handleGenerateReport = async (prompt: string) => {
-    setBuildingReport({ active: true, deckKey: "generated", step: 0 });
+    setBuildingReport({ active: true, deckKey: "generated", step: 0, isCustomQuery: true });
     
     try {
       const res = await apiRequest("POST", "/api/generate-report", { prompt });
       const report = await res.json();
       
-      addMessage({
-        id: `msg-${Date.now()}-report`,
-        role: "assistant",
-        content: `I've generated a comprehensive report: **${report.title}**\n\nThe report includes ${report.sections.length} sections with detailed analysis and visualizations. Click the report card below to view the full report.`,
-        timestamp: new Date().toISOString(),
-        resources: [{
-          type: "Report",
-          title: report.title,
-          id: report.reportId,
-          status: "Generated",
-          route: `/reporting/generated/${report.reportId}`,
-        }],
-      });
-      
-      setBuildingReport(null);
+      setBuildingReport(prev => prev ? { ...prev, reportResult: report } : null);
     } catch (error) {
       console.error("Report generation error:", error);
-      setBuildingReport(null);
-      addMessage({
-        id: `msg-${Date.now()}-err`,
-        role: "assistant",
-        content: "I encountered an error generating the report. Please try again.",
-        timestamp: new Date().toISOString(),
-      });
+      setBuildingReport(prev => prev ? { ...prev, error: true } : null);
     }
   };
 
@@ -723,7 +736,14 @@ export function HomeAssistantPanel() {
                 ))}
               </div>
 
-              {buildingReport.step >= reportBuildSteps.length && (
+              {buildingReport.step >= reportBuildSteps.length && buildingReport.isCustomQuery && !buildingReport.reportResult && !buildingReport.error && (
+                <div className="flex items-center gap-2 text-sm text-[#266C92]">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Finalizing report data...</span>
+                </div>
+              )}
+
+              {buildingReport.step >= reportBuildSteps.length && !buildingReport.isCustomQuery && (
                 <div className="bg-white dark:bg-card p-3 rounded-lg border border-green-200 dark:border-green-800">
                   <div className="flex items-start gap-2">
                     <CheckCircle2 className="w-5 h-5 text-green-500 dark:text-green-400 flex-shrink-0 mt-0.5" />
