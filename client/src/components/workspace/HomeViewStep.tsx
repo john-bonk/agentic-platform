@@ -1,17 +1,4 @@
-/**
- * Home View Step Component
- * 
- * Step 4 of the workspace creation wizard - allows users to select
- * a home dashboard archetype and preview the wireframe layout.
- * 
- * Features:
- * - Archetype template selection grid
- * - Wireframe preview of selected layout
- * - Recommended archetype based on module selection
- * - Persona filtering
- */
-
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -82,47 +69,185 @@ const getWidgetLabel = (widgetType: string): string => {
   return labels[widgetType] || widgetType;
 };
 
-const getWidgetColor = (widgetType: string): string => {
-  const colors: Record<string, string> = {
-    "welcome-header": "bg-[#266C92]/20 border-[#266C92]/40",
-    "metrics-bar": "bg-emerald-500/20 border-emerald-500/40",
-    "kpi-cards": "bg-emerald-500/20 border-emerald-500/40",
-    "task-list": "bg-amber-500/20 border-amber-500/40",
-    "activity-feed": "bg-blue-500/20 border-blue-500/40",
-    "chart-area": "bg-purple-500/20 border-purple-500/40",
-    "trend-chart": "bg-purple-500/20 border-purple-500/40",
-    "quick-actions": "bg-cyan-500/20 border-cyan-500/40",
-    "ai-command": "bg-pink-500/20 border-pink-500/40",
-    "timeline": "bg-orange-500/20 border-orange-500/40",
-    "status-grid": "bg-teal-500/20 border-teal-500/40",
-    "heat-map": "bg-red-500/20 border-red-500/40",
-    "data-table": "bg-gray-500/20 border-gray-500/40",
-    "alerts-panel": "bg-rose-500/20 border-rose-500/40",
-    "progress-tracker": "bg-indigo-500/20 border-indigo-500/40",
-    "calendar-view": "bg-sky-500/20 border-sky-500/40",
-    "workflow-queue": "bg-violet-500/20 border-violet-500/40",
-    "coverage-map": "bg-lime-500/20 border-lime-500/40",
-    "summary-card": "bg-[#266C92]/20 border-[#266C92]/40",
-    "navigation-shortcuts": "bg-slate-500/20 border-slate-500/40",
-  };
-  return colors[widgetType] || "bg-gray-500/20 border-gray-500/40";
-};
+function MiniWidgetIcon({ widgetType, large = false }: { widgetType: string; large?: boolean }) {
+  const s = large ? 1.6 : 1;
+  const color = "stroke-foreground/30";
+  const fill = "fill-foreground/10";
+
+  switch (widgetType) {
+    case "chart-area":
+    case "trend-chart":
+      return (
+        <svg width={Math.round(24 * s)} height={Math.round(16 * s)} viewBox="0 0 24 16" className="opacity-60">
+          <rect x="2" y="10" width="3" height="6" rx="0.5" className={fill} />
+          <rect x="7" y="6" width="3" height="10" rx="0.5" className={fill} />
+          <rect x="12" y="3" width="3" height="13" rx="0.5" className={fill} />
+          <rect x="17" y="8" width="3" height="8" rx="0.5" className={fill} />
+          {large && <line x1="1" y1="1" x2="22" y2="1" className={color} strokeWidth="0.5" strokeDasharray="2 2" />}
+        </svg>
+      );
+    case "task-list":
+    case "workflow-queue":
+      return (
+        <svg width={Math.round(22 * s)} height={Math.round(14 * s)} viewBox="0 0 22 14" className="opacity-60">
+          <rect x="1" y="1" width="2" height="2" rx="0.5" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <line x1="5" y1="2" x2="20" y2="2" className={color} strokeWidth="1" />
+          <rect x="1" y="6" width="2" height="2" rx="0.5" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <line x1="5" y1="7" x2="17" y2="7" className={color} strokeWidth="1" />
+          <rect x="1" y="11" width="2" height="2" rx="0.5" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <line x1="5" y1="12" x2="19" y2="12" className={color} strokeWidth="1" />
+        </svg>
+      );
+    case "heat-map":
+    case "coverage-map":
+      return (
+        <svg width={Math.round(22 * s)} height={Math.round(14 * s)} viewBox="0 0 22 14" className="opacity-60">
+          {[0, 1, 2, 3].map(r =>
+            [0, 1, 2, 3, 4].map(c => (
+              <rect
+                key={`${r}-${c}`}
+                x={1 + c * 4.2}
+                y={1 + r * 3.2}
+                width="3.5"
+                height="2.5"
+                rx="0.3"
+                className={fill}
+                style={{ opacity: 0.3 + Math.random() * 0.5 }}
+              />
+            ))
+          )}
+        </svg>
+      );
+    case "kpi-cards":
+    case "metrics-bar":
+      return (
+        <svg width={Math.round(24 * s)} height={Math.round(10 * s)} viewBox="0 0 24 10" className="opacity-60">
+          <rect x="1" y="1" width="6" height="8" rx="1" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <rect x="9" y="1" width="6" height="8" rx="1" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <rect x="17" y="1" width="6" height="8" rx="1" className={fill} stroke="currentColor" strokeWidth="0.3" />
+        </svg>
+      );
+    case "welcome-header":
+    case "summary-card":
+      return (
+        <svg width={Math.round(22 * s)} height={Math.round(10 * s)} viewBox="0 0 22 10" className="opacity-60">
+          <line x1="1" y1="3" x2="14" y2="3" className={color} strokeWidth="1.5" />
+          <line x1="1" y1="7" x2="10" y2="7" className={color} strokeWidth="0.8" />
+        </svg>
+      );
+    case "activity-feed":
+      return (
+        <svg width={Math.round(22 * s)} height={Math.round(14 * s)} viewBox="0 0 22 14" className="opacity-60">
+          <circle cx="3" cy="2.5" r="1.5" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <line x1="6" y1="2.5" x2="20" y2="2.5" className={color} strokeWidth="0.8" />
+          <circle cx="3" cy="7" r="1.5" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <line x1="6" y1="7" x2="16" y2="7" className={color} strokeWidth="0.8" />
+          <circle cx="3" cy="11.5" r="1.5" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <line x1="6" y1="11.5" x2="18" y2="11.5" className={color} strokeWidth="0.8" />
+        </svg>
+      );
+    case "ai-command":
+      return (
+        <svg width={Math.round(22 * s)} height={Math.round(10 * s)} viewBox="0 0 22 10" className="opacity-60">
+          <rect x="1" y="2" width="20" height="6" rx="3" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <circle cx="5" cy="5" r="1.2" className={color} strokeWidth="0.5" fill="none" />
+          <line x1="9" y1="5" x2="18" y2="5" className={color} strokeWidth="0.6" />
+        </svg>
+      );
+    case "quick-actions":
+    case "navigation-shortcuts":
+      return (
+        <svg width={Math.round(20 * s)} height={Math.round(14 * s)} viewBox="0 0 20 14" className="opacity-60">
+          <rect x="1" y="1" width="8" height="5" rx="1" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <rect x="11" y="1" width="8" height="5" rx="1" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <rect x="1" y="8" width="8" height="5" rx="1" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <rect x="11" y="8" width="8" height="5" rx="1" className={fill} stroke="currentColor" strokeWidth="0.3" />
+        </svg>
+      );
+    case "data-table":
+      return (
+        <svg width={Math.round(24 * s)} height={Math.round(14 * s)} viewBox="0 0 24 14" className="opacity-60">
+          <line x1="1" y1="2" x2="23" y2="2" className={color} strokeWidth="0.8" />
+          <line x1="1" y1="5.5" x2="23" y2="5.5" className={color} strokeWidth="0.4" />
+          <line x1="1" y1="8.5" x2="23" y2="8.5" className={color} strokeWidth="0.4" />
+          <line x1="1" y1="11.5" x2="23" y2="11.5" className={color} strokeWidth="0.4" />
+          <line x1="8" y1="1" x2="8" y2="13" className={color} strokeWidth="0.3" />
+          <line x1="16" y1="1" x2="16" y2="13" className={color} strokeWidth="0.3" />
+        </svg>
+      );
+    case "alerts-panel":
+      return (
+        <svg width={Math.round(20 * s)} height={Math.round(14 * s)} viewBox="0 0 20 14" className="opacity-60">
+          <rect x="1" y="1" width="18" height="3.5" rx="0.5" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <rect x="1" y="5.5" width="18" height="3.5" rx="0.5" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <rect x="1" y="10" width="18" height="3.5" rx="0.5" className={fill} stroke="currentColor" strokeWidth="0.3" />
+        </svg>
+      );
+    case "progress-tracker":
+      return (
+        <svg width={Math.round(22 * s)} height={Math.round(10 * s)} viewBox="0 0 22 10" className="opacity-60">
+          <rect x="1" y="2" width="20" height="2.5" rx="1" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <rect x="1" y="2" width="14" height="2.5" rx="1" className="fill-foreground/15" />
+          <rect x="1" y="6.5" width="20" height="2.5" rx="1" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <rect x="1" y="6.5" width="9" height="2.5" rx="1" className="fill-foreground/15" />
+        </svg>
+      );
+    case "calendar-view":
+      return (
+        <svg width={Math.round(20 * s)} height={Math.round(14 * s)} viewBox="0 0 20 14" className="opacity-60">
+          <rect x="1" y="1" width="18" height="12" rx="1" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <line x1="1" y1="4" x2="19" y2="4" className={color} strokeWidth="0.4" />
+          {[0, 1, 2, 3, 4].map(c => (
+            <line key={c} x1={4.6 + c * 3} y1="4" x2={4.6 + c * 3} y2="13" className={color} strokeWidth="0.3" />
+          ))}
+        </svg>
+      );
+    case "timeline":
+      return (
+        <svg width={Math.round(22 * s)} height={Math.round(14 * s)} viewBox="0 0 22 14" className="opacity-60">
+          <line x1="3" y1="1" x2="3" y2="13" className={color} strokeWidth="0.5" />
+          <circle cx="3" cy="3" r="1.2" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <line x1="6" y1="3" x2="18" y2="3" className={color} strokeWidth="0.6" />
+          <circle cx="3" cy="7.5" r="1.2" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <line x1="6" y1="7.5" x2="15" y2="7.5" className={color} strokeWidth="0.6" />
+          <circle cx="3" cy="12" r="1.2" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <line x1="6" y1="12" x2="20" y2="12" className={color} strokeWidth="0.6" />
+        </svg>
+      );
+    case "status-grid":
+      return (
+        <svg width={Math.round(20 * s)} height={Math.round(14 * s)} viewBox="0 0 20 14" className="opacity-60">
+          <circle cx="4" cy="4" r="2" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <circle cx="10" cy="4" r="2" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <circle cx="16" cy="4" r="2" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <circle cx="4" cy="10" r="2" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <circle cx="10" cy="10" r="2" className={fill} stroke="currentColor" strokeWidth="0.3" />
+          <circle cx="16" cy="10" r="2" className={fill} stroke="currentColor" strokeWidth="0.3" />
+        </svg>
+      );
+    default:
+      return (
+        <svg width={Math.round(20 * s)} height={Math.round(10 * s)} viewBox="0 0 20 10" className="opacity-60">
+          <rect x="1" y="1" width="18" height="8" rx="1" className={fill} stroke="currentColor" strokeWidth="0.3" />
+        </svg>
+      );
+  }
+}
 
 function WireframePreview({ archetype }: { archetype: ArchetypeTemplate }) {
-  // Create a simplified grid representation for wireframe
   const gridStyle = {
     display: "grid",
     gridTemplateColumns: `repeat(${archetype.layout.columns}, 1fr)`,
-    gridTemplateRows: `repeat(${archetype.layout.rows}, minmax(40px, 1fr))`,
+    gridTemplateRows: `repeat(${archetype.layout.rows}, minmax(28px, 1fr))`,
     gridTemplateAreas: archetype.layout.areas,
-    gap: "4px",
+    gap: "3px",
     height: "100%",
-    padding: "8px",
+    padding: "6px",
   };
 
   return (
-    <div 
-      className="bg-muted/30 dark:bg-muted/20 rounded-lg border border-border h-full"
+    <div
+      className="bg-background dark:bg-muted/10 rounded-md border border-border/60 h-full"
       data-testid={`wireframe-${archetype.id}`}
     >
       <div style={gridStyle}>
@@ -130,11 +255,9 @@ function WireframePreview({ archetype }: { archetype: ArchetypeTemplate }) {
           <div
             key={slot.id}
             style={{ gridArea: slot.gridArea }}
-            className={`rounded border ${getWidgetColor(slot.widgetType)} flex items-center justify-center p-1`}
+            className="rounded-sm border border-border/40 bg-muted/20 dark:bg-muted/10 flex items-center justify-center"
           >
-            <span className="text-[8px] font-medium text-foreground/60 text-center leading-tight">
-              {getWidgetLabel(slot.widgetType)}
-            </span>
+            <MiniWidgetIcon widgetType={slot.widgetType} />
           </div>
         ))}
       </div>
@@ -156,68 +279,50 @@ function ArchetypeCard({
   return (
     <button
       onClick={onSelect}
-      className={`relative flex flex-col rounded-xl border transition-all hover-elevate active-elevate-2 overflow-hidden ${
+      className={`relative flex flex-col rounded-md border transition-all hover-elevate active-elevate-2 text-left ${
         isSelected
-          ? "border-[#266C92] ring-2 ring-[#266C92]/20 bg-[#266C92]/5 dark:bg-[#266C92]/10"
+          ? "border-[#266C92] ring-1 ring-[#266C92]/30 bg-card"
           : "border-border bg-card"
       }`}
       data-testid={`archetype-${archetype.id}`}
     >
-      {/* Wireframe preview area */}
-      <div className="h-32 p-2">
+      {isSelected && (
+        <div className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r bg-[#266C92]" />
+      )}
+
+      <div className="h-28 p-2">
         <WireframePreview archetype={archetype} />
       </div>
 
-      {/* Info section */}
-      <div className="p-3 border-t border-border bg-background/50">
-        <div className="flex items-start gap-2">
-          <div
-            className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-              isSelected
-                ? "bg-[#266C92]/10 text-[#266C92]"
-                : "bg-muted text-muted-foreground"
-            }`}
-            style={isSelected ? { backgroundColor: `${archetype.colorAccent}15`, color: archetype.colorAccent } : {}}
-          >
-            {getArchetypeIcon(archetype.icon, "w-4 h-4")}
+      <div className="px-3 pb-3 pt-2">
+        <div className="flex items-center gap-2">
+          <div className={`w-6 h-6 rounded flex items-center justify-center shrink-0 ${
+            isSelected ? "text-[#266C92]" : "text-muted-foreground"
+          }`}>
+            {getArchetypeIcon(archetype.icon, "w-3.5 h-3.5")}
           </div>
-          <div className="flex-1 min-w-0 text-left">
-            <div className={`font-medium text-sm truncate ${isSelected ? "text-[#266C92]" : "text-foreground"}`}>
+          <div className="flex-1 min-w-0">
+            <div className={`text-xs font-medium truncate ${isSelected ? "text-[#266C92]" : "text-foreground"}`}>
               {archetype.name}
             </div>
-            <div className="text-[10px] text-muted-foreground line-clamp-2">
-              {archetype.description}
+            <div className="text-[10px] text-muted-foreground truncate">
+              {archetype.persona}
             </div>
           </div>
-        </div>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1 mt-2">
-          <Badge variant="outline" className="text-[9px] px-1.5 py-0">
-            {archetype.persona}
-          </Badge>
-          <Badge variant="outline" className="text-[9px] px-1.5 py-0">
-            {archetype.slots.length} widgets
-          </Badge>
         </div>
       </div>
 
-      {/* Selection indicator */}
       {isSelected && (
-        <div className="absolute top-2 right-2">
-          <div className="w-5 h-5 rounded-full bg-[#266C92] flex items-center justify-center shadow-sm">
-            <Check className="w-3 h-3 text-white" />
+        <div className="absolute top-1.5 right-1.5">
+          <div className="w-4 h-4 rounded-full bg-[#266C92] flex items-center justify-center">
+            <Check className="w-2.5 h-2.5 text-white" />
           </div>
         </div>
       )}
 
-      {/* Recommended badge */}
-      {isRecommended && (
-        <div className="absolute top-2 left-2">
-          <Badge className="bg-amber-500 text-white text-[9px] px-1.5 py-0 gap-0.5">
-            <Sparkles className="w-2.5 h-2.5" />
-            Recommended
-          </Badge>
+      {isRecommended && !isSelected && (
+        <div className="absolute top-1.5 right-1.5">
+          <Sparkles className="w-3 h-3 text-[#266C92]/60" />
         </div>
       )}
     </button>
@@ -228,62 +333,50 @@ function LargeWireframePreview({ archetype }: { archetype: ArchetypeTemplate }) 
   const gridStyle = {
     display: "grid",
     gridTemplateColumns: `repeat(${archetype.layout.columns}, 1fr)`,
-    gridTemplateRows: `repeat(${archetype.layout.rows}, minmax(60px, 1fr))`,
+    gridTemplateRows: `repeat(${archetype.layout.rows}, minmax(56px, 1fr))`,
     gridTemplateAreas: archetype.layout.areas,
-    gap: "8px",
+    gap: "6px",
     height: "100%",
   };
 
   return (
-    <div 
-      className="bg-background rounded-xl border border-border h-full p-4"
+    <div
+      className="bg-card rounded-md border border-border h-full p-4 flex flex-col"
       data-testid="large-wireframe-preview"
     >
-      {/* Header simulation */}
-      <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border">
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#266C92]/10">
-          {getArchetypeIcon(archetype.icon, "w-4 h-4 text-[#266C92]")}
+      <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border/60">
+        <div className="w-7 h-7 rounded flex items-center justify-center bg-muted/60">
+          {getArchetypeIcon(archetype.icon, "w-4 h-4 text-foreground/60")}
         </div>
         <div>
-          <div className="font-semibold text-foreground">{archetype.name}</div>
-          <div className="text-xs text-muted-foreground">{archetype.persona} View</div>
+          <div className="text-sm font-medium text-foreground">{archetype.name}</div>
+          <div className="text-[11px] text-muted-foreground">{archetype.persona}</div>
         </div>
         <div className="flex-1" />
-        <Badge style={{ backgroundColor: `${archetype.colorAccent}20`, color: archetype.colorAccent }}>
-          {archetype.slots.length} widgets
-        </Badge>
+        <span className="text-[11px] text-muted-foreground">
+          {archetype.slots.length} zones
+        </span>
       </div>
 
-      {/* Grid preview */}
-      <div style={gridStyle} className="flex-1">
+      <div style={gridStyle} className="flex-1 min-h-0">
         {archetype.slots.map((slot) => (
           <div
             key={slot.id}
             style={{ gridArea: slot.gridArea }}
-            className={`rounded-lg border-2 border-dashed ${getWidgetColor(slot.widgetType)} flex flex-col items-center justify-center p-2 transition-all hover:scale-[1.02]`}
+            className="rounded border border-border/40 bg-muted/15 dark:bg-muted/10 flex flex-col items-center justify-center gap-1 p-2"
           >
-            <div className="text-[10px] font-semibold text-foreground/70 text-center">
+            <MiniWidgetIcon widgetType={slot.widgetType} large />
+            <span className="text-[9px] font-medium text-muted-foreground/70 leading-none">
               {getWidgetLabel(slot.widgetType)}
-            </div>
-            <div className="text-[8px] text-muted-foreground mt-0.5 capitalize">
-              {slot.size}
-            </div>
+            </span>
           </div>
         ))}
       </div>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
-        <div className="flex gap-1">
-          {archetype.tags.map((tag) => (
-            <Badge key={tag} variant="outline" className="text-[9px] px-1.5 py-0">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-        <div className="text-[10px] text-muted-foreground">
-          Layout: {archetype.layout.columns}x{archetype.layout.rows} grid
-        </div>
+      <div className="flex items-center mt-3 pt-3 border-t border-border/40">
+        <span className="text-[10px] text-muted-foreground">
+          {archetype.layout.columns}-col grid
+        </span>
       </div>
     </div>
   );
@@ -304,7 +397,6 @@ export function HomeViewStep({
     [selectedArchetype]
   );
 
-  // Sort archetypes: recommended first, then alphabetically
   const sortedArchetypes = useMemo(() => {
     return [...archetypeTemplates].sort((a, b) => {
       if (a.id === recommendedArchetype) return -1;
@@ -315,13 +407,11 @@ export function HomeViewStep({
 
   return (
     <div className="flex h-full gap-6" data-testid="home-view-step">
-      {/* Left panel: Archetype selection */}
       <div className="w-[420px] shrink-0 flex flex-col">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-foreground">Choose Home Layout</h3>
           <p className="text-sm text-muted-foreground">
-            Select a dashboard archetype that matches your workflow. Content will be dynamically 
-            populated based on your selected modules.
+            Select a dashboard template that matches your workflow.
           </p>
         </div>
 
@@ -340,13 +430,11 @@ export function HomeViewStep({
         </ScrollArea>
       </div>
 
-      {/* Right panel: Large wireframe preview */}
       <div className="flex-1 flex flex-col min-w-0">
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-foreground">Layout Preview</h3>
           <p className="text-sm text-muted-foreground">
-            Wireframe view of the selected dashboard layout. Widgets will be populated with 
-            content from your {selectedModules.length} selected module{selectedModules.length !== 1 ? "s" : ""}.
+            {currentArchetype.description}
           </p>
         </div>
 
@@ -354,24 +442,19 @@ export function HomeViewStep({
           <LargeWireframePreview archetype={currentArchetype} />
         </div>
 
-        {/* Module summary */}
-        <div className="mt-4 p-3 rounded-lg bg-muted/50 border border-border">
-          <div className="flex items-center gap-2 mb-2">
-            <Star className="w-4 h-4 text-amber-500" />
-            <span className="text-sm font-medium text-foreground">Content Sources</span>
+        {selectedModules.length > 0 && (
+          <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+            <span>{selectedModules.length} module{selectedModules.length !== 1 ? "s" : ""} connected</span>
+            <span className="text-border">|</span>
+            <span className="truncate">
+              {selectedModules
+                .slice(0, 4)
+                .map((m) => m.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" "))
+                .join(", ")}
+              {selectedModules.length > 4 && ` +${selectedModules.length - 4} more`}
+            </span>
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {selectedModules.length > 0 ? (
-              selectedModules.map((moduleId) => (
-                <Badge key={moduleId} variant="secondary" className="text-xs">
-                  {moduleId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
-                </Badge>
-              ))
-            ) : (
-              <span className="text-xs text-muted-foreground">No modules selected</span>
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

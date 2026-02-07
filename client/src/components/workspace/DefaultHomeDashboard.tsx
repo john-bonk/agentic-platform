@@ -264,9 +264,15 @@ export function DefaultHomeDashboard({ workspaceName, userPersona, selectedModul
     total: content.tasks.length,
   }), [content.tasks]);
 
-  const welcomeMessage = userPersona === "Executive"
-    ? "Welcome back!"
-    : `Welcome back, ${userPersona}`;
+  const welcomeMessage = (() => {
+    switch (userPersona) {
+      case "CRO": return "Chief Risk Officer Dashboard";
+      case "CAE": return "Chief Audit Executive Dashboard";
+      case "CISO": return "Security Operations Dashboard";
+      case "Executive": return "Welcome back!";
+      default: return `Welcome back, ${userPersona}`;
+    }
+  })();
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">

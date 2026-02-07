@@ -545,7 +545,10 @@ export default function CustomWorkspaceHome() {
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="text-2xl font-bold mb-1">
-                  {userPersona === "Executive" ? "Welcome back!" : `Welcome back, ${userPersona}`}
+                  {userPersona === "CRO" ? "Chief Risk Officer Dashboard" :
+                   userPersona === "CAE" ? "Chief Audit Executive Dashboard" :
+                   userPersona === "CISO" ? "Security Operations Dashboard" :
+                   userPersona === "Executive" ? "Welcome back!" : `Welcome back, ${userPersona}`}
                 </h1>
                 <p className="text-white/70 text-sm max-w-lg">
                   {currentWorkspace?.name} • {selectedBuckets.length} capabilities • {totalModules} active modules
