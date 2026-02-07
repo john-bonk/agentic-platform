@@ -59,6 +59,7 @@ import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { productCapabilityBuckets, getQuickActionsForWorkspace, generateNavSections } from "@/config/workspaceWizardConfig";
 import { archetypeTemplates, generateHomeContent, type ArchetypeTemplate, type InjectedHomeContent } from "@/config/homeViewConfig";
 import { ArchetypeDashboard } from "@/components/workspace/ArchetypeDashboard";
+import { DefaultDashboardContent, type DashboardItem } from "@/components/workspace/DefaultDashboardContent";
 
 interface DynamicTask {
   id: string;
@@ -491,7 +492,31 @@ export default function CustomWorkspaceHome() {
     return { highPriority, inProgress, dueToday };
   }, [tasks]);
   
-  // If an archetype is selected, render the archetype-based dashboard
+  const dashboardItems = useMemo<DashboardItem[]>(() => {
+    return tasks.map((t) => ({
+      id: t.id,
+      name: t.title,
+      category: t.category,
+      priority: t.priority === "high" ? "High" : t.priority === "medium" ? "Medium" : "Low",
+      status: t.status === "in-progress" ? "In Progress" : t.status === "completed" ? "Complete" : "Not Started",
+      metric: t.dueDate,
+      owner: t.moduleId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
+    }));
+  }, [tasks]);
+
+  if (selectedArchetype && selectedArchetype.id === "auditboard-default") {
+    return (
+      <AppLayout>
+        <div data-testid="page-custom-workspace-home">
+          <DefaultDashboardContent
+            title={currentWorkspace?.name || "Dashboard"}
+            items={dashboardItems.length > 0 ? dashboardItems : undefined}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
   if (selectedArchetype && archetypeContent) {
     return (
       <AppLayout>

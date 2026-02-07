@@ -21,6 +21,7 @@ import {
   type ArchetypeTemplate,
 } from "@/config/homeViewConfig";
 import { ArchetypeDashboard } from "@/components/workspace/ArchetypeDashboard";
+import { DefaultDashboardContent } from "@/components/workspace/DefaultDashboardContent";
 
 interface HomeViewStepProps {
   selectedArchetype: string;
@@ -157,6 +158,8 @@ function LiveDashboardPreview({ archetype, selectedModules, enabledModules }: { 
     return () => observer.disconnect();
   }, [updateScale]);
 
+  const isDefault = archetype.id === "auditboard-default";
+
   return (
     <div
       className="bg-background rounded-lg border border-border overflow-hidden h-full flex flex-col"
@@ -184,22 +187,26 @@ function LiveDashboardPreview({ archetype, selectedModules, enabledModules }: { 
             transformOrigin: "top left",
           }}
         >
-          <ArchetypeDashboard
-            archetype={archetype}
-            content={{
-              metrics: content.metrics,
-              tasks: content.tasks,
-              activities: content.activities,
-              charts: content.charts,
-              quickActions: content.quickActions,
-              alerts: content.alerts,
-              statusItems: content.statusItems,
-              greeting: content.greeting,
-            }}
-            workspaceName="My Workspace"
-            userPersona="Executive"
-            compact
-          />
+          {isDefault ? (
+            <DefaultDashboardContent title="Dashboard Template" compact />
+          ) : (
+            <ArchetypeDashboard
+              archetype={archetype}
+              content={{
+                metrics: content.metrics,
+                tasks: content.tasks,
+                activities: content.activities,
+                charts: content.charts,
+                quickActions: content.quickActions,
+                alerts: content.alerts,
+                statusItems: content.statusItems,
+                greeting: content.greeting,
+              }}
+              workspaceName="My Workspace"
+              userPersona="Executive"
+              compact
+            />
+          )}
         </div>
       </div>
     </div>
