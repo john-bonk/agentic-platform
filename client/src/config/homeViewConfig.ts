@@ -201,6 +201,33 @@ export interface ModuleContentContribution {
 
 export const archetypeTemplates: ArchetypeTemplate[] = [
   {
+    id: "auditboard-default",
+    name: "AuditBoard Default",
+    description: "The standard AuditBoard home experience with hero header, assistant bar, inbox tabs, task overview donut, and scenario planning",
+    icon: "layout-dashboard",
+    persona: "Any",
+    colorAccent: "#266C92",
+    tags: ["default", "standard", "auditboard", "classic"],
+    layout: {
+      columns: 12,
+      rows: 4,
+      areas: `
+        "hero hero hero hero hero hero hero hero hero hero hero hero"
+        "assistant assistant assistant assistant assistant assistant assistant assistant assistant assistant assistant assistant"
+        "inbox inbox inbox inbox inbox inbox inbox inbox inbox inbox inbox inbox"
+        "donut donut donut donut tasks tasks tasks tasks tasks tasks tasks tasks"
+      `,
+      gap: "0",
+    },
+    slots: [
+      { id: "hero", widgetType: "welcome-header", size: "full", gridArea: "hero", priority: 1 },
+      { id: "assistant", widgetType: "ai-command", size: "full", gridArea: "assistant", priority: 2 },
+      { id: "inbox", widgetType: "data-table", size: "full", gridArea: "inbox", priority: 3, contentKey: "data" },
+      { id: "donut", widgetType: "chart-area", size: "medium", gridArea: "donut", priority: 4, contentKey: "chart-1" },
+      { id: "tasks", widgetType: "task-list", size: "large", gridArea: "tasks", priority: 5, contentKey: "tasks" },
+    ],
+  },
+  {
     id: "command-center",
     name: "Executive Command Center",
     description: "High-level strategic overview with prominent AI assistance and key metrics",
