@@ -59,7 +59,6 @@ import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { productCapabilityBuckets, getQuickActionsForWorkspace, generateNavSections } from "@/config/workspaceWizardConfig";
 import { archetypeTemplates, generateHomeContent, type ArchetypeTemplate, type InjectedHomeContent } from "@/config/homeViewConfig";
 import { ArchetypeDashboard } from "@/components/workspace/ArchetypeDashboard";
-import { DefaultHomeDashboard } from "@/components/workspace/DefaultHomeDashboard";
 
 interface DynamicTask {
   id: string;
@@ -463,8 +462,8 @@ export default function CustomWorkspaceHome() {
   // Generate dynamic content based on archetype and modules
   const archetypeContent = useMemo<InjectedHomeContent | null>(() => {
     if (!selectedArchetype) return null;
-    return generateHomeContent(selectedBuckets, selectedArchetype.id, currentWorkspace?.name || "Workspace");
-  }, [selectedArchetype, selectedBuckets, currentWorkspace?.name]);
+    return generateHomeContent(selectedBuckets, selectedArchetype.id, currentWorkspace?.name || "Workspace", enabledModules);
+  }, [selectedArchetype, selectedBuckets, currentWorkspace?.name, enabledModules]);
   
   const tasks = useMemo(() => {
     const generatedTasks = generateTasksFromModules(selectedBuckets, enabledModules);
@@ -492,22 +491,7 @@ export default function CustomWorkspaceHome() {
     return { highPriority, inProgress, dueToday };
   }, [tasks]);
   
-  // If "AuditBoard Default" archetype is selected, render the standard home layout
-  if (selectedArchetype?.id === "auditboard-default") {
-    return (
-      <AppLayout>
-        <div data-testid="page-custom-workspace-home">
-          <DefaultHomeDashboard
-            workspaceName={currentWorkspace?.name || "Custom Workspace"}
-            userPersona={userPersona}
-            selectedModules={selectedBuckets}
-          />
-        </div>
-      </AppLayout>
-    );
-  }
-
-  // If another archetype is selected, render the archetype-based dashboard
+  // If an archetype is selected, render the archetype-based dashboard
   if (selectedArchetype && archetypeContent) {
     return (
       <AppLayout>

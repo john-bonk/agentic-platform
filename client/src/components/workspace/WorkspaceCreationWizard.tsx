@@ -885,7 +885,7 @@ export function WorkspaceCreationWizard({
   const [workspaceMembers, setWorkspaceMembers] = useState<WorkspaceMember[]>([
     { id: "1", email: "admin@company.org", role: "Org Admin" }
   ]);
-  const [selectedArchetype, setSelectedArchetype] = useState<string>("operations-hub");
+  const [selectedArchetype, setSelectedArchetype] = useState<string>("auditboard-default");
   
   const addWorkspace = useWorkspaceStore(state => state.addWorkspace);
   
@@ -916,9 +916,9 @@ export function WorkspaceCreationWizard({
     return completed;
   }, [workspaceName, selectedBuckets, enabledModules, selectedArchetype]);
   
-  // Auto-update recommended archetype when modules change
+  // Auto-update recommended archetype when modules change (only if not already set to auditboard-default)
   useEffect(() => {
-    if (selectedBuckets.length > 0) {
+    if (selectedBuckets.length > 0 && selectedArchetype !== "auditboard-default") {
       const recommended = getRecommendedArchetype(selectedBuckets);
       setSelectedArchetype(recommended);
     }
@@ -1034,7 +1034,7 @@ export function WorkspaceCreationWizard({
     setSelectedBuckets([]);
     setEnabledModules({});
     setActiveBucketTab(null);
-    setSelectedArchetype("operations-hub");
+    setSelectedArchetype("auditboard-default");
   };
 
   const handleClose = () => {
@@ -1044,7 +1044,7 @@ export function WorkspaceCreationWizard({
     setSelectedBuckets([]);
     setEnabledModules({});
     setActiveBucketTab(null);
-    setSelectedArchetype("operations-hub");
+    setSelectedArchetype("auditboard-default");
   };
 
   if (!open) return null;
@@ -1353,6 +1353,7 @@ export function WorkspaceCreationWizard({
                 selectedArchetype={selectedArchetype}
                 onArchetypeChange={setSelectedArchetype}
                 selectedModules={selectedBuckets}
+                enabledModules={enabledModules}
               />
             </div>
           )}

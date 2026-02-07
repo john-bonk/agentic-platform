@@ -26,6 +26,7 @@ interface HomeViewStepProps {
   selectedArchetype: string;
   onArchetypeChange: (archetypeId: string) => void;
   selectedModules: string[];
+  enabledModules?: Record<string, string[]>;
 }
 
 const getArchetypeIcon = (iconName: string, className: string = "w-5 h-5") => {
@@ -133,10 +134,10 @@ function ArchetypeCard({
   );
 }
 
-function LiveDashboardPreview({ archetype, selectedModules }: { archetype: ArchetypeTemplate; selectedModules: string[] }) {
+function LiveDashboardPreview({ archetype, selectedModules, enabledModules }: { archetype: ArchetypeTemplate; selectedModules: string[]; enabledModules?: Record<string, string[]> }) {
   const content = useMemo(() => {
-    return generateHomeContent(selectedModules, archetype.id, "My Workspace");
-  }, [archetype.id, selectedModules]);
+    return generateHomeContent(selectedModules, archetype.id, "My Workspace", enabledModules);
+  }, [archetype.id, selectedModules, enabledModules]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5);
@@ -209,6 +210,7 @@ export function HomeViewStep({
   selectedArchetype,
   onArchetypeChange,
   selectedModules,
+  enabledModules,
 }: HomeViewStepProps) {
   const recommendedArchetype = useMemo(
     () => getRecommendedArchetype(selectedModules),
@@ -269,7 +271,7 @@ export function HomeViewStep({
         </div>
 
         <div className="flex-1 min-h-0">
-          <LiveDashboardPreview archetype={currentArchetype} selectedModules={selectedModules} />
+          <LiveDashboardPreview archetype={currentArchetype} selectedModules={selectedModules} enabledModules={enabledModules} />
         </div>
 
         {selectedModules.length > 0 && (

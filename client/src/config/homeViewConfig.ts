@@ -927,24 +927,170 @@ export interface InjectedHomeContent {
   moduleSummary: string[];
 }
 
+const taskActionVerbs: Record<string, string[]> = {
+  "control-library": ["Review control definitions in", "Update documentation for", "Validate framework alignment in"],
+  "control-testing": ["Execute test plan for", "Complete operating effectiveness test for", "Schedule design testing for"],
+  "control-gaps": ["Remediate gap identified in", "Track deficiency for", "Close open finding in"],
+  "control-attestation": ["Complete attestation cycle for", "Follow up on pending attestation in", "Launch attestation campaign for"],
+  "control-monitoring": ["Review monitoring alerts for", "Configure automated checks in", "Analyze monitoring trends in"],
+  "control-mapping": ["Update framework mapping for", "Verify risk-control linkage in", "Complete coverage matrix for"],
+  "control-evidence": ["Collect evidence for", "Review evidence submissions in", "Upload supporting documents for"],
+  "control-analytics": ["Run performance analysis for", "Generate trend report for", "Review benchmarking data in"],
+  "control-reporting": ["Prepare executive summary for", "Generate board report for", "Compile status report on"],
+  "risk-register": ["Update risk assessments in", "Review emerging risks in", "Validate risk ratings for"],
+  "risk-assessment": ["Complete quarterly assessment for", "Score inherent risk in", "Evaluate residual risk for"],
+  "risk-mitigation": ["Track mitigation progress for", "Implement response plan for", "Evaluate treatment options in"],
+  "risk-appetite": ["Review appetite statements for", "Align tolerance levels in", "Update risk limits for"],
+  "risk-indicators": ["Review KRI thresholds in", "Update leading indicators for", "Calibrate trigger points in"],
+  "risk-scenarios": ["Model scenario outcomes for", "Update stress test parameters in", "Run Monte Carlo simulation for"],
+  "risk-governance": ["Review governance framework for", "Update committee charter for", "Prepare governance report on"],
+  "risk-reporting": ["Compile risk report for", "Prepare committee briefing on", "Generate dashboard for"],
+  "risk-integration": ["Integrate risk data across", "Consolidate risk information for", "Synchronize risk feeds in"],
+  "audit-universe": ["Update audit universe for", "Prioritize audit entities in", "Review coverage map for"],
+  "audit-planning": ["Finalize audit plan for", "Allocate resources for", "Define scope for"],
+  "audit-execution": ["Complete fieldwork testing for", "Document observations in", "Gather evidence for"],
+  "audit-findings": ["Draft finding for", "Validate remediation for", "Track management response in"],
+  "audit-reporting": ["Prepare audit report for", "Review draft report for", "Distribute findings from"],
+  "audit-analytics": ["Run data analytics for", "Identify anomalies in", "Generate insights for"],
+  "audit-qa": ["Complete quality review for", "Validate workpaper standards in", "Perform peer review for"],
+  "audit-resources": ["Allocate team resources for", "Manage staff assignments in", "Track utilization for"],
+  "audit-time": ["Log time entries for", "Review time budgets for", "Analyze time variance in"],
+  "it-controls": ["Test IT general controls for", "Review access provisioning in", "Validate segregation of duties for"],
+  "vulnerability-mgmt": ["Scan for vulnerabilities in", "Prioritize remediation for", "Patch critical systems in"],
+  "security-incidents": ["Update incident playbook for", "Conduct tabletop exercise for", "Review incident logs in"],
+  "threat-intel": ["Analyze threat landscape for", "Update threat feeds in", "Brief stakeholders on"],
+  "security-assessments": ["Complete security review for", "Evaluate threat posture in", "Assess control maturity for"],
+  "access-reviews": ["Certify access rights for", "Review privileged accounts in", "Validate entitlements for"],
+  "security-frameworks": ["Map framework requirements for", "Assess maturity level in", "Update crosswalk for"],
+  "security-metrics": ["Collect security KPIs for", "Generate metrics dashboard for", "Analyze trend data in"],
+  "security-awareness": ["Launch awareness campaign for", "Track training completion for", "Update training materials for"],
+  "asset-inventory": ["Catalog IT assets for", "Update asset registry in", "Validate lifecycle data for"],
+  "system-inventory": ["Inventory systems for", "Update system registry in", "Validate system dependencies for"],
+  "change-management": ["Review change request for", "Approve deployment for", "Document change impact in"],
+  "service-catalog": ["Update service offerings for", "Review catalog entries in", "Publish new services for"],
+  "bcdr-planning": ["Test disaster recovery plan for", "Validate backup procedures in", "Review RTO/RPO targets for"],
+  "vendor-tech": ["Assess technology vendor for", "Review vendor SLAs for", "Evaluate vendor performance in"],
+  "it-policies": ["Update IT policies for", "Review policy compliance in", "Distribute policy changes for"],
+  "it-projects": ["Track project milestones for", "Review budget variance in", "Assess delivery risk for"],
+  "it-metrics": ["Collect IT performance data for", "Analyze availability metrics for", "Report on SLA compliance for"],
+  "regulation-library": ["Catalog regulations for", "Update regulatory library in", "Index requirements for"],
+  "obligations-mgmt": ["Track obligations for", "Review compliance status for", "Map requirements for"],
+  "compliance-calendar": ["Review upcoming deadlines for", "Prepare filing for", "Track regulatory submissions in"],
+  "sox-compliance": ["Complete SOX testing for", "Review key controls for", "Prepare 302/404 materials for"],
+  "gdpr-privacy": ["Review privacy controls for", "Update data processing records in", "Conduct DPIA for"],
+  "policy-mgmt": ["Review policy effectiveness for", "Update procedures in", "Distribute policy changes for"],
+  "regulatory-exams": ["Prepare for examination in", "Compile exam materials for", "Respond to findings in"],
+  "regulatory-reporting": ["Generate compliance report for", "Compile regulatory filings for", "Prepare disclosure for"],
+  "compliance-training": ["Complete compliance training for", "Track certifications in", "Update training requirements for"],
+  "vendor-inventory": ["Update vendor registry for", "Catalog active vendors in", "Classify vendors by risk in"],
+  "vendor-onboarding": ["Complete onboarding for", "Verify vendor credentials for", "Set up monitoring for"],
+  "vendor-assessments": ["Complete risk assessment for", "Score vendor criticality in", "Evaluate compliance of"],
+  "vendor-monitoring": ["Monitor vendor performance for", "Track SLA compliance for", "Review vendor alerts in"],
+  "contract-mgmt": ["Review contract terms for", "Track renewal dates for", "Negotiate terms for"],
+  "vendor-performance": ["Evaluate performance of", "Collect scorecard data for", "Review KPIs for"],
+  "vendor-issues": ["Track vendor issue for", "Escalate findings for", "Resolve remediation for"],
+  "fourth-party": ["Identify subcontractors for", "Assess concentration risk in", "Map supply chain for"],
+  "vendor-offboarding": ["Plan offboarding for", "Transfer services from", "Archive records for"],
+  "ai-inventory": ["Catalog AI models for", "Update model registry in", "Verify model documentation for"],
+  "ai-risk-assessment": ["Assess AI model risk for", "Evaluate bias potential in", "Review ethical compliance of"],
+  "ai-validation": ["Validate model accuracy for", "Run backtesting for", "Verify model outputs in"],
+  "ai-ethics": ["Review ethical guidelines for", "Assess societal impact of", "Evaluate fairness in"],
+  "ai-explainability": ["Document model decisions for", "Generate interpretability report for", "Review transparency of"],
+  "ai-monitoring": ["Monitor model performance for", "Track drift metrics in", "Review prediction accuracy for"],
+  "ai-lifecycle": ["Track model lifecycle for", "Review deployment status of", "Plan retirement of"],
+  "ai-compliance": ["Verify AI regulatory compliance for", "Map AI requirements for", "Prepare AI disclosure for"],
+  "ai-documentation": ["Document model architecture for", "Update lineage records for", "Archive training data for"],
+  "esg-metrics": ["Collect ESG metrics for", "Update sustainability KPIs in", "Benchmark ESG performance for"],
+  "carbon-tracking": ["Log carbon data for", "Validate emissions measurement for", "Reconcile scope data for"],
+  "net-zero": ["Track net-zero progress for", "Update reduction targets for", "Report on pathway in"],
+  "sustainability-reporting": ["Prepare sustainability disclosure for", "Compile ESG data for", "Generate impact report for"],
+  "climate-risk": ["Assess climate risk exposure for", "Model physical risk for", "Evaluate transition risk in"],
+  "supply-chain-esg": ["Assess supply chain ESG for", "Monitor supplier compliance in", "Track scope 3 emissions for"],
+  "biodiversity": ["Monitor biodiversity impact for", "Assess ecological footprint of", "Report on habitat metrics for"],
+  "water-waste": ["Track water usage for", "Monitor waste metrics for", "Optimize resource efficiency in"],
+  "dei-social": ["Review DEI metrics for", "Assess community impact of", "Track social initiatives in"],
+};
+
+const taskAssignees = [
+  "Sarah Chen", "Michael Torres", "James Wilson", "Amanda Liu", "David Kim",
+  "Rachel Green", "Tom Anderson", "Lisa Park", "Steven Yeun", "Michelle Tu",
+  "Alex Park", "Jennifer Lee", "Robert Nguyen", "Emily Zhang", "Kevin Wu",
+];
+
+const taskStatuses: Array<"pending" | "in-progress" | "completed"> = ["pending", "in-progress", "pending", "in-progress", "pending"];
+const taskPriorities: Array<"low" | "medium" | "high" | "critical"> = ["high", "medium", "high", "medium", "low", "critical", "medium"];
+
+function generateDynamicTasks(
+  selectedModules: string[],
+  enabledModules?: Record<string, string[]>
+): TaskItem[] {
+  const tasks: TaskItem[] = [];
+  let idx = 0;
+
+  const today = new Date();
+  const generateDueDate = (offset: number) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + offset);
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  };
+
+  const dueDateOffsets = [3, 7, 10, 14, 5, 21, 2, 8, 12, 6, 15, 4, 9, 18, 1];
+
+  for (const bucketId of selectedModules) {
+    const capabilityIds = enabledModules?.[bucketId] || [];
+
+    if (capabilityIds.length === 0) {
+      const contribution = moduleContentContributions[bucketId];
+      if (contribution) {
+        tasks.push(...contribution.tasks);
+      }
+      continue;
+    }
+
+    for (const capId of capabilityIds) {
+      const verbs = taskActionVerbs[capId] || [`Review and update`, `Complete assessment for`, `Prepare documentation for`];
+
+      const verb = verbs[idx % verbs.length];
+      const moduleName = moduleContentContributions[bucketId]?.moduleName || bucketId;
+      const status = taskStatuses[idx % taskStatuses.length];
+      const priority = taskPriorities[idx % taskPriorities.length];
+      const assignee = taskAssignees[idx % taskAssignees.length];
+      const dueOffset = dueDateOffsets[idx % dueDateOffsets.length];
+
+      tasks.push({
+        id: `dyn-${bucketId}-${capId}-${idx}`,
+        title: `${verb} ${moduleName}`,
+        status,
+        priority,
+        dueDate: generateDueDate(dueOffset),
+        assignee,
+        module: bucketId,
+      });
+      idx++;
+    }
+  }
+
+  return tasks;
+}
+
 /**
  * Generates dynamic home content based on selected modules and archetype
  * 
  * @param selectedModules - Array of module IDs selected by user
  * @param archetypeId - Selected archetype template ID
  * @param workspaceName - Custom workspace name
+ * @param enabledModules - Optional map of bucket ID to enabled capability IDs for dynamic task generation
  * @returns Fully populated content for the home view
  */
 export function generateHomeContent(
   selectedModules: string[],
   archetypeId: string,
-  workspaceName: string
+  workspaceName: string,
+  enabledModules?: Record<string, string[]>
 ): InjectedHomeContent {
   const archetype = archetypeTemplates.find(t => t.id === archetypeId) || archetypeTemplates[0];
   
-  // Aggregate content from all selected modules
   const allMetrics: MetricItem[] = [];
-  const allTasks: TaskItem[] = [];
   const allActivities: ActivityItem[] = [];
   const allCharts: ChartData[] = [];
   const allQuickActions: QuickAction[] = [];
@@ -956,7 +1102,6 @@ export function generateHomeContent(
     const contribution = moduleContentContributions[moduleId];
     if (contribution) {
       allMetrics.push(...contribution.metrics);
-      allTasks.push(...contribution.tasks);
       allActivities.push(...contribution.activities);
       allCharts.push(...contribution.charts);
       allQuickActions.push(...contribution.quickActions);
@@ -966,7 +1111,8 @@ export function generateHomeContent(
     }
   }
 
-  // Apply archetype-specific content limits based on slots
+  const allTasks = generateDynamicTasks(selectedModules, enabledModules);
+
   const slotCounts = {
     metrics: archetype.slots.filter(s => s.widgetType === "metrics-bar" || s.widgetType === "kpi-cards").length,
     tasks: archetype.slots.filter(s => s.widgetType === "task-list").length,
@@ -975,13 +1121,11 @@ export function generateHomeContent(
     alerts: archetype.slots.filter(s => s.widgetType === "alerts-panel").length,
   };
 
-  // Select content based on archetype capacity (randomize within bounds for variety)
   const shuffleAndLimit = <T>(arr: T[], limit: number): T[] => {
     const shuffled = [...arr].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, limit);
   };
 
-  // Calculate content limits based on archetype complexity
   const metricsLimit = Math.max(4, slotCounts.metrics * 4);
   const tasksLimit = Math.max(4, slotCounts.tasks * 5);
   const chartsLimit = Math.max(2, slotCounts.charts * 2);
@@ -993,16 +1137,16 @@ export function generateHomeContent(
     workspaceName,
     greeting: `Welcome to ${workspaceName}`,
     metrics: shuffleAndLimit(allMetrics, metricsLimit),
-    tasks: shuffleAndLimit(allTasks, tasksLimit).sort((a, b) => {
-      const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-      return priorityOrder[a.priority] - priorityOrder[b.priority];
-    }),
+    tasks: allTasks.sort((a, b) => {
+      const priorityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+      return (priorityOrder[a.priority] || 3) - (priorityOrder[b.priority] || 3);
+    }).slice(0, tasksLimit),
     activities: shuffleAndLimit(allActivities, activitiesLimit),
     charts: shuffleAndLimit(allCharts, chartsLimit),
-    quickActions: shuffleAndLimit(allQuickActions, 6), // Always limit quick actions
+    quickActions: shuffleAndLimit(allQuickActions, 6),
     alerts: allAlerts.sort((a, b) => {
-      const severityOrder = { critical: 0, error: 1, warning: 2, info: 3 };
-      return severityOrder[a.severity] - severityOrder[b.severity];
+      const severityOrder: Record<string, number> = { critical: 0, error: 1, warning: 2, info: 3 };
+      return (severityOrder[a.severity] || 3) - (severityOrder[b.severity] || 3);
     }).slice(0, alertsLimit),
     statusItems: shuffleAndLimit(allStatusItems, 6),
     moduleSummary,
