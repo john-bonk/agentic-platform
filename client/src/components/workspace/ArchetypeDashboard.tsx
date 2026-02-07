@@ -140,27 +140,27 @@ function MetricsBarWidget({ metrics }: { metrics: MetricItem[] }) {
   return (
     <div className="grid grid-cols-4 gap-2 h-full">
       {metrics.slice(0, 4).map((metric, idx) => (
-        <Card key={idx} className="h-full">
-          <CardContent className="p-3 flex flex-col justify-between h-full">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider truncate pr-1">{metric.label}</p>
+        <Card key={idx} className="h-full overflow-hidden min-w-0">
+          <CardContent className="p-3 flex flex-col justify-between h-full overflow-hidden">
+            <div className="flex items-center justify-between gap-1 mb-1">
+              <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-wide leading-tight line-clamp-1 min-w-0">{metric.label}</p>
               <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                 metric.status === "positive" ? "bg-emerald-500" : 
                 metric.status === "negative" ? "bg-red-500" : 
                 metric.status === "warning" ? "bg-amber-500" : "bg-gray-300 dark:bg-gray-600"
               }`} />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xl font-bold tracking-tight">{metric.value}</p>
               {(metric.changeLabel || metric.change) && (
                 <div className={`flex items-center gap-1 mt-0.5 text-[11px] ${
                   metric.status === "positive" ? "text-emerald-600 dark:text-emerald-400" : 
                   metric.status === "negative" ? "text-red-600 dark:text-red-400" : "text-muted-foreground"
                 }`}>
-                  {metric.status === "positive" && <TrendingUp className="w-3 h-3" />}
-                  {metric.status === "negative" && <TrendingDown className="w-3 h-3" />}
-                  {metric.status === "warning" && <AlertTriangle className="w-3 h-3" />}
-                  <span>{metric.changeLabel || `${metric.change! > 0 ? '+' : ''}${metric.change}%`}</span>
+                  {metric.status === "positive" && <TrendingUp className="w-3 h-3 shrink-0" />}
+                  {metric.status === "negative" && <TrendingDown className="w-3 h-3 shrink-0" />}
+                  {metric.status === "warning" && <AlertTriangle className="w-3 h-3 shrink-0" />}
+                  <span className="truncate">{metric.changeLabel || `${metric.change! > 0 ? '+' : ''}${metric.change}%`}</span>
                 </div>
               )}
             </div>
@@ -175,10 +175,10 @@ function KPICardsWidget({ metrics }: { metrics: MetricItem[] }) {
   return (
     <div className="grid grid-cols-2 gap-2 h-full">
       {metrics.slice(0, 4).map((metric, idx) => (
-        <Card key={idx} className="h-full">
-          <CardContent className="p-3 flex flex-col justify-between h-full">
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider truncate pr-1">{metric.label}</p>
+        <Card key={idx} className="h-full overflow-hidden min-w-0">
+          <CardContent className="p-3 flex flex-col justify-between h-full overflow-hidden">
+            <div className="flex items-center justify-between gap-1">
+              <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-wide leading-tight line-clamp-1 min-w-0">{metric.label}</p>
               <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${
                 metric.status === "positive" ? "bg-emerald-100 dark:bg-emerald-900/30" : 
                 metric.status === "negative" ? "bg-red-100 dark:bg-red-900/30" :

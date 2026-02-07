@@ -12,6 +12,7 @@ import type { SideNavSection, ModuleNavGroup } from "./navigation";
 export interface ProductCapabilityBucket {
   id: string;
   name: string;
+  navShortName: string;
   description: string;
   icon: string;
   color: string;
@@ -57,6 +58,7 @@ export const productCapabilityBuckets: ProductCapabilityBucket[] = [
   {
     id: "controls-management",
     name: "Controls Management",
+    navShortName: "Controls",
     description: "Internal control framework and testing",
     icon: "shield-check",
     color: "#266C92",
@@ -217,6 +219,7 @@ export const productCapabilityBuckets: ProductCapabilityBucket[] = [
   {
     id: "enterprise-risk",
     name: "Enterprise Risk Management",
+    navShortName: "Risk",
     description: "Enterprise-wide risk identification and assessment",
     icon: "trending-up",
     color: "#4CAF50",
@@ -378,6 +381,7 @@ export const productCapabilityBuckets: ProductCapabilityBucket[] = [
   {
     id: "audit-management",
     name: "Audit Management",
+    navShortName: "Audit",
     description: "Internal audit planning and execution",
     icon: "clipboard-list",
     color: "#9C27B0",
@@ -540,6 +544,7 @@ export const productCapabilityBuckets: ProductCapabilityBucket[] = [
   {
     id: "cyber-it-compliance",
     name: "Cyber and IT Compliance",
+    navShortName: "Cyber & IT",
     description: "IT security and compliance management",
     icon: "lock",
     color: "#F44336",
@@ -702,6 +707,7 @@ export const productCapabilityBuckets: ProductCapabilityBucket[] = [
   {
     id: "information-technology",
     name: "Information Technology",
+    navShortName: "IT",
     description: "IT asset and service management",
     icon: "database",
     color: "#607D8B",
@@ -864,6 +870,7 @@ export const productCapabilityBuckets: ProductCapabilityBucket[] = [
   {
     id: "regulatory-compliance",
     name: "Regulatory Compliance",
+    navShortName: "Regulatory",
     description: "Regulatory tracking and obligations",
     icon: "scale",
     color: "#795548",
@@ -1028,6 +1035,7 @@ export const productCapabilityBuckets: ProductCapabilityBucket[] = [
   {
     id: "third-party",
     name: "Third Party",
+    navShortName: "3rd Party",
     description: "Vendor and third-party risk management",
     icon: "users",
     color: "#FF9800",
@@ -1190,6 +1198,7 @@ export const productCapabilityBuckets: ProductCapabilityBucket[] = [
   {
     id: "ai-governance",
     name: "AI Governance",
+    navShortName: "AI Gov",
     description: "AI/ML model risk and governance",
     icon: "brain",
     color: "#E91E63",
@@ -1352,6 +1361,7 @@ export const productCapabilityBuckets: ProductCapabilityBucket[] = [
   {
     id: "environmental-compliance",
     name: "Environmental Compliance",
+    navShortName: "ESG",
     description: "ESG and sustainability management",
     icon: "leaf",
     color: "#4CAF50",
@@ -1628,6 +1638,7 @@ export function generateModuleNavGroups(
       groups.push({
         moduleId: bucket.id,
         moduleName: bucket.name,
+        moduleNavShortName: bucket.navShortName,
         moduleColor: bucket.color,
         moduleIcon: bucket.icon,
         defaultExpanded: true,

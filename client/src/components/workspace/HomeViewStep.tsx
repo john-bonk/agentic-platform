@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -138,12 +138,30 @@ function LiveDashboardPreview({ archetype, selectedModules }: { archetype: Arche
     return generateHomeContent(selectedModules, archetype.id, "My Workspace");
   }, [archetype.id, selectedModules]);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0.5);
+  const SOURCE_WIDTH = 1400;
+
+  const updateScale = useCallback(() => {
+    if (containerRef.current) {
+      const containerWidth = containerRef.current.offsetWidth;
+      setScale(Math.min(1, containerWidth / SOURCE_WIDTH));
+    }
+  }, []);
+
+  useEffect(() => {
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [updateScale]);
+
   return (
     <div
       className="bg-background rounded-lg border border-border overflow-hidden h-full flex flex-col"
       data-testid="live-dashboard-preview"
     >
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-border/60 bg-muted/20 shrink-0">
+      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border/60 bg-muted/20 shrink-0">
         <div className="flex gap-1">
           <div className="w-2 h-2 rounded-full bg-red-400/60" />
           <div className="w-2 h-2 rounded-full bg-amber-400/60" />
@@ -156,12 +174,12 @@ function LiveDashboardPreview({ archetype, selectedModules }: { archetype: Arche
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-hidden relative">
+      <div ref={containerRef} className="flex-1 min-h-0 overflow-hidden relative">
         <div
-          className="origin-top-left absolute top-0 left-0"
+          className="absolute top-0 left-0"
           style={{
-            width: "1200px",
-            transform: "scale(var(--preview-scale))",
+            width: `${SOURCE_WIDTH}px`,
+            transform: `scale(${scale})`,
             transformOrigin: "top left",
           }}
         >
@@ -182,29 +200,8 @@ function LiveDashboardPreview({ archetype, selectedModules }: { archetype: Arche
             compact
           />
         </div>
-        <ScaleCalculator />
       </div>
     </div>
-  );
-}
-
-function ScaleCalculator() {
-  return (
-    <style>{`
-      [data-testid="live-dashboard-preview"] .overflow-hidden.relative {
-        --preview-scale: 0.48;
-      }
-      @media (min-width: 1400px) {
-        [data-testid="live-dashboard-preview"] .overflow-hidden.relative {
-          --preview-scale: 0.55;
-        }
-      }
-      @media (min-width: 1600px) {
-        [data-testid="live-dashboard-preview"] .overflow-hidden.relative {
-          --preview-scale: 0.6;
-        }
-      }
-    `}</style>
   );
 }
 

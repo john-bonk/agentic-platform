@@ -39,6 +39,7 @@ export interface SideNavSection {
 export interface ModuleNavGroup {
   moduleId: string;
   moduleName: string;
+  moduleNavShortName: string;
   moduleColor: string;
   moduleIcon: string;
   defaultExpanded?: boolean;

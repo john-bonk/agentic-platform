@@ -179,22 +179,16 @@ function ModuleGroupSection({
       <Button
         variant="ghost"
         onClick={onModuleToggle}
-        className="flex items-center gap-2 w-full px-3 justify-start hover-elevate rounded-lg rounded-b-none"
+        className="flex items-center gap-1.5 w-full px-2.5 justify-start hover-elevate rounded-lg rounded-b-none"
         data-testid={`nav-module-toggle-${group.moduleId}`}
       >
         <ChevronDown 
-          className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
+          className={`w-3 h-3 text-gray-400 transition-transform duration-200 shrink-0 ${
             isModuleExpanded ? "" : "-rotate-90"
           }`}
         />
-        <div 
-          className="w-5 h-5 rounded flex items-center justify-center shrink-0 bg-gray-100 dark:bg-accent text-gray-600 dark:text-gray-300"
-          data-testid={`nav-module-icon-${group.moduleId}`}
-        >
-          {getBucketIcon(group.moduleIcon, "w-3 h-3")}
-        </div>
-        <span className="text-sm font-normal truncate text-gray-700 dark:text-foreground">
-          {group.moduleName}
+        <span className="text-[13px] font-medium truncate text-gray-700 dark:text-foreground">
+          {group.moduleNavShortName || group.moduleName}
         </span>
       </Button>
       
