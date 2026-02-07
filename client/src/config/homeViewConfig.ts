@@ -487,6 +487,37 @@ export const archetypeTemplates: ArchetypeTemplate[] = [
       { id: "actions", widgetType: "quick-actions", size: "medium", gridArea: "actions", priority: 7 },
     ],
   },
+  {
+    id: "analytics-dashboard",
+    name: "Analytics Dashboard",
+    description: "Filter bar, KPI metric cards, multi-chart analytics, and a filterable items overview table",
+    icon: "bar-chart-2",
+    persona: "Analyst",
+    colorAccent: "#266C92",
+    tags: ["analytics", "filters", "table", "kpi", "charts"],
+    layout: {
+      columns: 12,
+      rows: 4,
+      areas: `
+        "filters filters filters filters filters filters filters filters filters filters filters filters"
+        "kpi1 kpi1 kpi1 kpi2 kpi2 kpi2 kpi3 kpi3 kpi3 kpi4 kpi4 kpi4"
+        "chartA chartA chartA chartA chartB chartB chartB chartB chartC chartC chartC chartC"
+        "table table table table table table table table table table table table"
+      `,
+      gap: "1rem",
+    },
+    slots: [
+      { id: "filters", widgetType: "data-table", size: "full", gridArea: "filters", priority: 1 },
+      { id: "kpi1", widgetType: "kpi-cards", size: "small", gridArea: "kpi1", priority: 2, contentKey: "kpi" },
+      { id: "kpi2", widgetType: "kpi-cards", size: "small", gridArea: "kpi2", priority: 3, contentKey: "kpi" },
+      { id: "kpi3", widgetType: "kpi-cards", size: "small", gridArea: "kpi3", priority: 4, contentKey: "kpi" },
+      { id: "kpi4", widgetType: "kpi-cards", size: "small", gridArea: "kpi4", priority: 5, contentKey: "kpi" },
+      { id: "chartA", widgetType: "chart-area", size: "medium", gridArea: "chartA", priority: 6, contentKey: "chart-1" },
+      { id: "chartB", widgetType: "chart-area", size: "medium", gridArea: "chartB", priority: 7, contentKey: "chart-2" },
+      { id: "chartC", widgetType: "chart-area", size: "medium", gridArea: "chartC", priority: 8, contentKey: "chart-3" },
+      { id: "table", widgetType: "data-table", size: "full", gridArea: "table", priority: 9, contentKey: "table" },
+    ],
+  },
 ];
 
 // =============================================================================

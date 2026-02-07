@@ -158,8 +158,6 @@ function LiveDashboardPreview({ archetype, selectedModules, enabledModules }: { 
     return () => observer.disconnect();
   }, [updateScale]);
 
-  const isDefault = archetype.id === "auditboard-default";
-
   return (
     <div
       className="bg-background rounded-lg border border-border overflow-hidden h-full flex flex-col"
@@ -187,8 +185,8 @@ function LiveDashboardPreview({ archetype, selectedModules, enabledModules }: { 
             transformOrigin: "top left",
           }}
         >
-          {isDefault ? (
-            <DefaultDashboardContent title="Dashboard Template" compact />
+          {archetype.id === "analytics-dashboard" ? (
+            <DefaultDashboardContent title="Analytics Dashboard" compact />
           ) : (
             <ArchetypeDashboard
               archetype={archetype}
