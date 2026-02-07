@@ -60,6 +60,7 @@ interface ArchetypeDashboardProps {
   content: WidgetContent;
   workspaceName: string;
   userPersona?: string;
+  compact?: boolean;
 }
 
 const getPriorityColor = (priority: string) => {
@@ -111,22 +112,22 @@ function WelcomeHeaderWidget({ workspaceName, userPersona, metrics }: { workspac
   })();
 
   return (
-    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#266C92] via-[#1e5a7a] to-[#164557] p-6 text-white h-full flex flex-col justify-between">
+    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#266C92] via-[#1e5a7a] to-[#164557] px-5 py-4 text-white h-full flex flex-col justify-between">
       <div className="absolute top-0 right-0 w-80 h-80 bg-white/[0.03] rounded-full -translate-y-1/3 translate-x-1/3" />
       <div className="absolute bottom-0 left-0 w-56 h-56 bg-white/[0.03] rounded-full translate-y-1/3 -translate-x-1/3" />
       <div className="relative z-10">
-        <p className="text-white/60 text-xs font-medium uppercase tracking-wider mb-1">{workspaceName}</p>
-        <h1 className="text-2xl font-bold mb-0.5" data-testid="welcome-heading">
+        <p className="text-white/60 text-[10px] font-medium uppercase tracking-wider mb-0.5">{workspaceName}</p>
+        <h1 className="text-xl font-bold leading-tight" data-testid="welcome-heading">
           {personaGreeting.title}
         </h1>
-        <p className="text-white/60 text-sm">{personaGreeting.subtitle}</p>
+        <p className="text-white/60 text-xs mt-0.5">{personaGreeting.subtitle}</p>
       </div>
       {topMetrics.length > 0 && (
-        <div className="relative z-10 flex items-center gap-3 mt-4">
+        <div className="relative z-10 flex items-center gap-2 mt-3 flex-wrap">
           {topMetrics.map((m, idx) => (
-            <div key={idx} className="flex items-center gap-2 px-3 py-2 bg-white/[0.08] rounded-lg border border-white/[0.08]">
-              <span className="text-white/60 text-xs">{m.label}</span>
-              <span className="text-sm font-semibold">{m.value}</span>
+            <div key={idx} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/[0.08] rounded-md border border-white/[0.08]">
+              <span className="text-white/60 text-[11px]">{m.label}</span>
+              <span className="text-xs font-semibold">{m.value}</span>
             </div>
           ))}
         </div>
@@ -137,22 +138,22 @@ function WelcomeHeaderWidget({ workspaceName, userPersona, metrics }: { workspac
 
 function MetricsBarWidget({ metrics }: { metrics: MetricItem[] }) {
   return (
-    <div className="grid grid-cols-4 gap-3 h-full">
+    <div className="grid grid-cols-4 gap-2 h-full">
       {metrics.slice(0, 4).map((metric, idx) => (
         <Card key={idx} className="h-full">
-          <CardContent className="p-4 flex flex-col justify-between h-full">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">{metric.label}</p>
-              <div className={`w-2 h-2 rounded-full ${
+          <CardContent className="p-3 flex flex-col justify-between h-full">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider truncate pr-1">{metric.label}</p>
+              <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                 metric.status === "positive" ? "bg-emerald-500" : 
                 metric.status === "negative" ? "bg-red-500" : 
                 metric.status === "warning" ? "bg-amber-500" : "bg-gray-300 dark:bg-gray-600"
               }`} />
             </div>
             <div>
-              <p className="text-2xl font-bold tracking-tight">{metric.value}</p>
+              <p className="text-xl font-bold tracking-tight">{metric.value}</p>
               {(metric.changeLabel || metric.change) && (
-                <div className={`flex items-center gap-1 mt-1 text-xs ${
+                <div className={`flex items-center gap-1 mt-0.5 text-[11px] ${
                   metric.status === "positive" ? "text-emerald-600 dark:text-emerald-400" : 
                   metric.status === "negative" ? "text-red-600 dark:text-red-400" : "text-muted-foreground"
                 }`}>
@@ -172,27 +173,27 @@ function MetricsBarWidget({ metrics }: { metrics: MetricItem[] }) {
 
 function KPICardsWidget({ metrics }: { metrics: MetricItem[] }) {
   return (
-    <div className="grid grid-cols-2 gap-3 h-full">
+    <div className="grid grid-cols-2 gap-2 h-full">
       {metrics.slice(0, 4).map((metric, idx) => (
         <Card key={idx} className="h-full">
-          <CardContent className="p-4 flex flex-col justify-between h-full">
+          <CardContent className="p-3 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
-              <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">{metric.label}</p>
-              <div className={`w-7 h-7 rounded-md flex items-center justify-center ${
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider truncate pr-1">{metric.label}</p>
+              <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${
                 metric.status === "positive" ? "bg-emerald-100 dark:bg-emerald-900/30" : 
                 metric.status === "negative" ? "bg-red-100 dark:bg-red-900/30" :
                 metric.status === "warning" ? "bg-amber-100 dark:bg-amber-900/30" : "bg-muted"
               }`}>
-                {metric.status === "positive" && <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />}
-                {metric.status === "negative" && <TrendingDown className="w-3.5 h-3.5 text-red-600" />}
-                {metric.status === "warning" && <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />}
-                {(metric.status === "neutral" || !metric.status) && <Minus className="w-3.5 h-3.5 text-muted-foreground" />}
+                {metric.status === "positive" && <TrendingUp className="w-3 h-3 text-emerald-600" />}
+                {metric.status === "negative" && <TrendingDown className="w-3 h-3 text-red-600" />}
+                {metric.status === "warning" && <AlertTriangle className="w-3 h-3 text-amber-600" />}
+                {(metric.status === "neutral" || !metric.status) && <Minus className="w-3 h-3 text-muted-foreground" />}
               </div>
             </div>
-            <div className="mt-3">
-              <p className="text-3xl font-bold tracking-tight">{metric.value}</p>
+            <div className="mt-2">
+              <p className="text-2xl font-bold tracking-tight">{metric.value}</p>
               {(metric.changeLabel || metric.change) && (
-                <p className={`text-xs mt-1 ${
+                <p className={`text-[11px] mt-0.5 ${
                   metric.status === "positive" ? "text-emerald-600 dark:text-emerald-400" : 
                   metric.status === "negative" ? "text-red-600 dark:text-red-400" : "text-muted-foreground"
                 }`}>{metric.changeLabel || `${metric.change! > 0 ? '+' : ''}${metric.change}%`}</p>
@@ -207,62 +208,53 @@ function KPICardsWidget({ metrics }: { metrics: MetricItem[] }) {
 
 function TaskListWidget({ tasks }: { tasks: TaskItem[] }) {
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <CheckSquare className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <CheckSquare className="w-3.5 h-3.5 text-[#266C92]" />
             <span>Tasks</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-[10px]">{tasks.length} items</Badge>
-            <Button variant="ghost" size="icon" className="h-6 w-6"><MoreHorizontal className="w-3.5 h-3.5" /></Button>
+          <div className="flex items-center gap-1.5">
+            <Badge variant="secondary" className="text-[10px]">{tasks.length}</Badge>
+            <Button variant="ghost" size="icon" className="h-5 w-5"><MoreHorizontal className="w-3 h-3" /></Button>
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0">
-        <ScrollArea className="h-full">
-          <div className="space-y-1 pr-2">
-            {tasks.map((task) => (
-              <div 
-                key={task.id}
-                className="px-3 py-2.5 rounded-md border border-transparent hover:border-border hover:bg-muted/40 transition-colors cursor-pointer group"
-                data-testid={`task-${task.id}`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
-                    task.priority === "critical" ? "bg-red-500" :
-                    task.priority === "high" ? "bg-orange-500" :
-                    task.priority === "medium" ? "bg-amber-500" : "bg-emerald-500"
-                  }`} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground leading-tight">{task.title}</p>
-                    {task.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{task.description}</p>}
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <Badge className={`text-[10px] px-1.5 py-0 h-4 ${getStatusColor(task.status)}`}>
-                        {task.status === "completed" && <CheckCircle className="w-2.5 h-2.5 mr-0.5" />}
-                        {task.status === "in-progress" && <Activity className="w-2.5 h-2.5 mr-0.5" />}
-                        {task.status === "blocked" && <AlertCircle className="w-2.5 h-2.5 mr-0.5" />}
-                        {task.status.replace("-", " ")}
-                      </Badge>
-                      {task.dueDate && (
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                          <Clock className="w-2.5 h-2.5" />{task.dueDate}
-                        </span>
-                      )}
-                      {task.assignee && (
-                        <span className="text-[10px] text-muted-foreground">{task.assignee}</span>
-                      )}
-                    </div>
+      <CardContent className="flex-1 min-h-0 overflow-auto pt-0 px-2 pb-2">
+        <div className="space-y-0.5">
+          {tasks.slice(0, 8).map((task) => (
+            <div 
+              key={task.id}
+              className="px-2 py-2 rounded-md hover:bg-muted/40 transition-colors cursor-pointer"
+              data-testid={`task-${task.id}`}
+            >
+              <div className="flex items-start gap-2">
+                <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${
+                  task.priority === "critical" ? "bg-red-500" :
+                  task.priority === "high" ? "bg-orange-500" :
+                  task.priority === "medium" ? "bg-amber-500" : "bg-emerald-500"
+                }`} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-foreground leading-tight truncate">{task.title}</p>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <Badge className={`text-[9px] px-1 py-0 h-[14px] ${getStatusColor(task.status)}`}>
+                      {task.status.replace("-", " ")}
+                    </Badge>
+                    {task.dueDate && (
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                        <Clock className="w-2.5 h-2.5" />{task.dueDate}
+                      </span>
+                    )}
                   </div>
-                  <Badge className={`shrink-0 text-[9px] px-1.5 py-0 h-4 ${getPriorityColor(task.priority)}`}>
-                    {task.priority}
-                  </Badge>
                 </div>
+                <Badge className={`shrink-0 text-[9px] px-1 py-0 h-[14px] ${getPriorityColor(task.priority)}`}>
+                  {task.priority}
+                </Badge>
               </div>
-            ))}
-          </div>
-        </ScrollArea>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
@@ -271,47 +263,42 @@ function TaskListWidget({ tasks }: { tasks: TaskItem[] }) {
 function ActivityFeedWidget({ activities }: { activities: ActivityItem[] }) {
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "alert": return <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />;
-      case "milestone": return <Target className="w-3.5 h-3.5 text-emerald-600" />;
-      case "comment": return <FileText className="w-3.5 h-3.5 text-blue-600" />;
-      case "action": return <CheckCircle className="w-3.5 h-3.5 text-[#266C92]" />;
-      default: return <Activity className="w-3.5 h-3.5 text-muted-foreground" />;
+      case "alert": return <AlertTriangle className="w-3 h-3 text-amber-600" />;
+      case "milestone": return <Target className="w-3 h-3 text-emerald-600" />;
+      case "comment": return <FileText className="w-3 h-3 text-blue-600" />;
+      case "action": return <CheckCircle className="w-3 h-3 text-[#266C92]" />;
+      default: return <Activity className="w-3 h-3 text-muted-foreground" />;
     }
   };
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <Activity className="w-3.5 h-3.5 text-[#266C92]" />
             <span>Recent Activity</span>
           </div>
-          <Button variant="ghost" size="icon" className="h-6 w-6"><MoreHorizontal className="w-3.5 h-3.5" /></Button>
+          <Button variant="ghost" size="icon" className="h-5 w-5"><MoreHorizontal className="w-3 h-3" /></Button>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0">
-        <ScrollArea className="h-full">
-          <div className="space-y-0.5 pr-2">
-            {activities.map((activity) => (
-              <div key={activity.id} className="flex items-start gap-3 px-2 py-2.5 rounded-md hover:bg-muted/40 transition-colors cursor-pointer">
-                <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
-                  {getTypeIcon(activity.type)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm leading-tight">
-                    {activity.actor && <span className="font-medium">{activity.actor} </span>}
-                    <span className="text-muted-foreground">{activity.title}</span>
-                  </p>
-                  {activity.description && (
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{activity.description}</p>
-                  )}
-                  <p className="text-[10px] text-muted-foreground/70 mt-1">{activity.timestamp}</p>
-                </div>
+      <CardContent className="flex-1 min-h-0 overflow-auto pt-0 px-2 pb-2">
+        <div className="space-y-0.5">
+          {activities.slice(0, 6).map((activity) => (
+            <div key={activity.id} className="flex items-start gap-2 px-2 py-1.5 rounded-md hover:bg-muted/40 transition-colors cursor-pointer">
+              <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                {getTypeIcon(activity.type)}
               </div>
-            ))}
-          </div>
-        </ScrollArea>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs leading-tight">
+                  {activity.actor && <span className="font-medium">{activity.actor} </span>}
+                  <span className="text-muted-foreground">{activity.title}</span>
+                </p>
+                <p className="text-[10px] text-muted-foreground/70 mt-0.5">{activity.timestamp}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
@@ -404,7 +391,7 @@ function LineChartSVG({ data, height = 140, color = "#266C92" }: { data: Array<{
   );
 }
 
-function DonutChartSVG({ data, size = 120 }: { data: Array<{ label: string; value: number; color?: string }>; size?: number }) {
+function DonutChartSVG({ data, size = 100 }: { data: Array<{ label: string; value: number; color?: string }>; size?: number }) {
   const total = data.reduce((s, d) => s + d.value, 0) || 1;
   const r = 40;
   const circumference = 2 * Math.PI * r;
@@ -461,23 +448,23 @@ function ChartAreaWidget({ charts }: { charts: ChartData[] }) {
   );
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-2 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            {(chart.type === "bar") && <BarChart2 className="w-4 h-4 text-[#266C92]" />}
-            {(chart.type === "pie" || chart.type === "donut") && <PieChart className="w-4 h-4 text-[#266C92]" />}
-            {(chart.type === "line" || chart.type === "area") && <LineChart className="w-4 h-4 text-[#266C92]" />}
-            {chart.type === "gauge" && <Gauge className="w-4 h-4 text-[#266C92]" />}
-            <span>{chart.title}</span>
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            {(chart.type === "bar") && <BarChart2 className="w-3.5 h-3.5 text-[#266C92]" />}
+            {(chart.type === "pie" || chart.type === "donut") && <PieChart className="w-3.5 h-3.5 text-[#266C92]" />}
+            {(chart.type === "line" || chart.type === "area") && <LineChart className="w-3.5 h-3.5 text-[#266C92]" />}
+            {chart.type === "gauge" && <Gauge className="w-3.5 h-3.5 text-[#266C92]" />}
+            <span className="truncate">{chart.title}</span>
           </div>
-          <Button variant="ghost" size="icon" className="h-6 w-6"><MoreHorizontal className="w-3.5 h-3.5" /></Button>
+          <Button variant="ghost" size="icon" className="h-5 w-5"><MoreHorizontal className="w-3 h-3" /></Button>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 flex items-center justify-center p-4">
-        {chart.type === "bar" && <BarChartSVG data={chart.data} />}
+      <CardContent className="flex-1 min-h-0 flex items-center justify-center p-3 pt-0">
+        {chart.type === "bar" && <BarChartSVG data={chart.data} height={120} />}
         {(chart.type === "pie" || chart.type === "donut") && <DonutChartSVG data={chart.data} />}
-        {(chart.type === "line" || chart.type === "area") && <LineChartSVG data={chart.data} />}
+        {(chart.type === "line" || chart.type === "area") && <LineChartSVG data={chart.data} height={120} />}
         {chart.type === "gauge" && <GaugeChartSVG value={typeof chart.data[0]?.value === "number" ? chart.data[0].value : 72} label={chart.data[0]?.label || "Score"} />}
       </CardContent>
     </Card>
@@ -509,20 +496,20 @@ function TrendChartWidget({ charts }: { charts: ChartData[] }) {
   if (!chart) return <ChartAreaWidget charts={charts} />;
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-2 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-[#266C92]" />
-            <span>{chart.title}</span>
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <TrendingUp className="w-3.5 h-3.5 text-[#266C92]" />
+            <span className="truncate">{chart.title}</span>
           </div>
           <Badge variant="secondary" className="text-[10px]">
             {chart.data.length} periods
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 flex items-center justify-center p-4">
-        <LineChartSVG data={chart.data} color="#266C92" />
+      <CardContent className="flex-1 min-h-0 flex items-center justify-center p-3 pt-0">
+        <LineChartSVG data={chart.data} color="#266C92" height={120} />
       </CardContent>
     </Card>
   );
@@ -550,28 +537,25 @@ function QuickActionsWidget({ actions }: { actions: QuickAction[] }) {
   };
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <Zap className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center gap-1.5">
+          <Zap className="w-3.5 h-3.5 text-[#266C92]" />
           <span>Quick Actions</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0">
-        <div className="grid grid-cols-2 gap-2">
+      <CardContent className="flex-1 min-h-0 pt-0 px-3 pb-3">
+        <div className="grid grid-cols-2 gap-1.5">
           {actions.slice(0, 6).map((action) => (
             <Button
               key={action.id}
               variant="outline"
               size="sm"
-              className="justify-start gap-2 h-auto py-2.5 px-3"
+              className="justify-start gap-1.5 h-auto py-2 px-2.5"
               data-testid={`action-${action.id}`}
             >
               {getIcon(action.icon)}
-              <div className="text-left min-w-0">
-                <span className="text-xs truncate block">{action.label}</span>
-                {action.description && <span className="text-[10px] text-muted-foreground truncate block">{action.description}</span>}
-              </div>
+              <span className="text-[11px] truncate">{action.label}</span>
             </Button>
           ))}
         </div>
@@ -582,19 +566,19 @@ function QuickActionsWidget({ actions }: { actions: QuickAction[] }) {
 
 function AICommandWidget({ actions }: { actions: QuickAction[] }) {
   return (
-    <Card className="h-full flex flex-col bg-gradient-to-br from-background to-muted/30">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#266C92]/10 flex items-center justify-center">
-            <Sparkles className="w-3.5 h-3.5 text-[#266C92]" />
+    <Card className="h-full flex flex-col bg-gradient-to-br from-background to-muted/30 overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center gap-1.5">
+          <div className="w-5 h-5 rounded-md bg-[#266C92]/10 flex items-center justify-center">
+            <Sparkles className="w-3 h-3 text-[#266C92]" />
           </div>
           AI Assistant
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 flex flex-col pt-0">
-        <div className="rounded-lg border border-border bg-background p-3 mb-3">
-          <p className="text-xs text-muted-foreground mb-2">Suggested queries:</p>
-          <div className="space-y-1.5">
+      <CardContent className="flex-1 min-h-0 flex flex-col pt-0 px-3 pb-3">
+        <div className="rounded-md border border-border bg-background p-2.5 mb-2">
+          <p className="text-[10px] text-muted-foreground mb-1.5">Suggested:</p>
+          <div className="space-y-1">
             {(actions.length > 0 ? actions.slice(0, 3) : [
               { id: "1", label: "Summarize my open tasks" },
               { id: "2", label: "Show compliance status" },
@@ -602,20 +586,20 @@ function AICommandWidget({ actions }: { actions: QuickAction[] }) {
             ]).map((action) => (
               <div
                 key={action.id}
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs text-muted-foreground hover:bg-muted/50 cursor-pointer transition-colors"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] text-muted-foreground hover:bg-muted/50 cursor-pointer transition-colors"
               >
-                <ChevronRight className="w-3 h-3 shrink-0" />
+                <ChevronRight className="w-2.5 h-2.5 shrink-0" />
                 <span className="truncate">{action.label}</span>
               </div>
             ))}
           </div>
         </div>
-        <div className="mt-auto flex gap-2">
-          <div className="flex-1 h-9 rounded-md border border-border bg-background px-3 flex items-center">
-            <span className="text-xs text-muted-foreground">Ask anything...</span>
+        <div className="mt-auto flex gap-1.5">
+          <div className="flex-1 h-8 rounded-md border border-border bg-background px-2.5 flex items-center">
+            <span className="text-[11px] text-muted-foreground">Ask anything...</span>
           </div>
-          <Button size="icon" className="bg-[#266C92] shrink-0">
-            <Send className="w-4 h-4" />
+          <Button size="icon" className="bg-[#266C92] shrink-0 h-8 w-8">
+            <Send className="w-3.5 h-3.5" />
           </Button>
         </div>
       </CardContent>
@@ -634,34 +618,26 @@ function TimelineWidget({ activities }: { activities: ActivityItem[] }) {
   };
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <Timer className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center gap-1.5">
+          <Timer className="w-3.5 h-3.5 text-[#266C92]" />
           <span>Timeline</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0">
-        <ScrollArea className="h-full">
-          <div className="relative pl-5 pr-2">
-            <div className="absolute left-[7px] top-1 bottom-1 w-px bg-border" />
-            {activities.slice(0, 10).map((activity, idx) => (
-              <div key={activity.id} className="relative pb-4 last:pb-0">
-                <div className={`absolute left-[-14px] top-1 w-2.5 h-2.5 rounded-full ${getTimelineColor(activity.type)} ring-2 ring-background`} />
-                <div className="ml-2">
-                  <p className="text-xs font-medium leading-tight">{activity.title}</p>
-                  {activity.description && (
-                    <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{activity.description}</p>
-                  )}
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[10px] text-muted-foreground/60">{activity.timestamp}</span>
-                    {activity.actor && <span className="text-[10px] text-muted-foreground/60">by {activity.actor}</span>}
-                  </div>
-                </div>
+      <CardContent className="flex-1 min-h-0 overflow-auto pt-0 px-3 pb-2">
+        <div className="relative pl-4">
+          <div className="absolute left-[5px] top-1 bottom-1 w-px bg-border" />
+          {activities.slice(0, 6).map((activity) => (
+            <div key={activity.id} className="relative pb-3 last:pb-0">
+              <div className={`absolute left-[-12px] top-1 w-2 h-2 rounded-full ${getTimelineColor(activity.type)} ring-2 ring-background`} />
+              <div className="ml-1">
+                <p className="text-[11px] font-medium leading-tight truncate">{activity.title}</p>
+                <span className="text-[10px] text-muted-foreground/60">{activity.timestamp}</span>
               </div>
-            ))}
-          </div>
-        </ScrollArea>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
@@ -669,34 +645,34 @@ function TimelineWidget({ activities }: { activities: ActivityItem[] }) {
 
 function StatusGridWidget({ statuses }: { statuses: StatusItem[] }) {
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <Grid3X3 className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center gap-1.5">
+          <Grid3X3 className="w-3.5 h-3.5 text-[#266C92]" />
           <span>Status Overview</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0">
-        <div className="grid grid-cols-2 gap-2">
+      <CardContent className="flex-1 min-h-0 pt-0 px-3 pb-3">
+        <div className="grid grid-cols-2 gap-1.5">
           {statuses.slice(0, 6).map((status) => (
             <div 
               key={status.id}
-              className={`p-3 rounded-lg border transition-colors ${
+              className={`p-2.5 rounded-md border transition-colors ${
                 status.status === "healthy" ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/60 dark:border-emerald-800/40" :
                 status.status === "warning" ? "bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/60 dark:border-amber-800/40" :
                 status.status === "critical" ? "bg-red-50/50 dark:bg-red-950/20 border-red-200/60 dark:border-red-800/40" :
                 "bg-muted/20 border-border"
               }`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{status.category}</span>
-                {status.status === "healthy" && <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />}
-                {status.status === "warning" && <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />}
-                {status.status === "critical" && <AlertCircle className="w-3.5 h-3.5 text-red-600" />}
-                {status.status === "unknown" && <Clock className="w-3.5 h-3.5 text-gray-500" />}
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[9px] text-muted-foreground font-medium uppercase tracking-wider truncate">{status.category}</span>
+                {status.status === "healthy" && <CheckCircle className="w-3 h-3 text-emerald-600 shrink-0" />}
+                {status.status === "warning" && <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0" />}
+                {status.status === "critical" && <AlertCircle className="w-3 h-3 text-red-600 shrink-0" />}
+                {status.status === "unknown" && <Clock className="w-3 h-3 text-gray-500 shrink-0" />}
               </div>
-              <p className="text-lg font-bold leading-none">{status.value}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{status.label}</p>
+              <p className="text-base font-bold leading-none">{status.value}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{status.label}</p>
             </div>
           ))}
         </div>
@@ -717,14 +693,14 @@ function HeatMapWidget({ metrics }: { metrics: MetricItem[] }) {
   );
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <Layers className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center gap-1.5">
+          <Layers className="w-3.5 h-3.5 text-[#266C92]" />
           <span>Risk Heat Map</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0 flex items-center justify-center">
+      <CardContent className="flex-1 min-h-0 pt-0 px-3 pb-3 flex items-center justify-center">
         <div className="w-full">
           <div className="flex mb-1">
             <div className="w-20" />
@@ -761,60 +737,47 @@ function HeatMapWidget({ metrics }: { metrics: MetricItem[] }) {
 
 function DataTableWidget({ tasks }: { tasks: TaskItem[] }) {
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <FileText className="w-3.5 h-3.5 text-[#266C92]" />
             <span>Data Table</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Badge variant="secondary" className="text-[10px]">{tasks.length} records</Badge>
-            <Button variant="ghost" size="icon" className="h-6 w-6"><Search className="w-3 h-3" /></Button>
-          </div>
+          <Badge variant="secondary" className="text-[10px]">{tasks.length}</Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0">
-        <ScrollArea className="h-full">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left py-2 px-2 font-medium text-muted-foreground uppercase text-[10px] tracking-wider">Item</th>
-                <th className="text-left py-2 px-2 font-medium text-muted-foreground uppercase text-[10px] tracking-wider">Status</th>
-                <th className="text-left py-2 px-2 font-medium text-muted-foreground uppercase text-[10px] tracking-wider">Priority</th>
-                <th className="text-left py-2 px-2 font-medium text-muted-foreground uppercase text-[10px] tracking-wider">Due</th>
-                <th className="text-left py-2 px-2 font-medium text-muted-foreground uppercase text-[10px] tracking-wider">Assignee</th>
+      <CardContent className="flex-1 min-h-0 overflow-auto pt-0 px-2 pb-2">
+        <table className="w-full text-[11px]">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="text-left py-1.5 px-2 font-medium text-muted-foreground uppercase text-[9px] tracking-wider">Item</th>
+              <th className="text-left py-1.5 px-2 font-medium text-muted-foreground uppercase text-[9px] tracking-wider">Status</th>
+              <th className="text-left py-1.5 px-2 font-medium text-muted-foreground uppercase text-[9px] tracking-wider">Priority</th>
+              <th className="text-left py-1.5 px-2 font-medium text-muted-foreground uppercase text-[9px] tracking-wider">Due</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tasks.slice(0, 8).map((task) => (
+              <tr key={task.id} className="border-b border-border/40 hover:bg-muted/30 transition-colors cursor-pointer">
+                <td className="py-1.5 px-2">
+                  <span className="truncate font-medium block max-w-[180px]">{task.title}</span>
+                </td>
+                <td className="py-1.5 px-2">
+                  <Badge className={`text-[9px] px-1 py-0 h-[14px] ${getStatusColor(task.status)}`}>
+                    {task.status.replace("-", " ")}
+                  </Badge>
+                </td>
+                <td className="py-1.5 px-2">
+                  <Badge className={`text-[9px] px-1 py-0 h-[14px] ${getPriorityColor(task.priority)}`}>
+                    {task.priority}
+                  </Badge>
+                </td>
+                <td className="py-1.5 px-2 text-muted-foreground text-[10px]">{task.dueDate || "-"}</td>
               </tr>
-            </thead>
-            <tbody>
-              {tasks.slice(0, 10).map((task) => (
-                <tr key={task.id} className="border-b border-border/40 hover:bg-muted/30 transition-colors cursor-pointer">
-                  <td className="py-2 px-2">
-                    <div className="flex items-center gap-2 max-w-[200px]">
-                      <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                        task.priority === "critical" ? "bg-red-500" : task.priority === "high" ? "bg-orange-500" :
-                        task.priority === "medium" ? "bg-amber-500" : "bg-emerald-500"
-                      }`} />
-                      <span className="truncate font-medium">{task.title}</span>
-                    </div>
-                  </td>
-                  <td className="py-2 px-2">
-                    <Badge className={`text-[9px] px-1.5 py-0 h-4 ${getStatusColor(task.status)}`}>
-                      {task.status.replace("-", " ")}
-                    </Badge>
-                  </td>
-                  <td className="py-2 px-2">
-                    <Badge className={`text-[9px] px-1.5 py-0 h-4 ${getPriorityColor(task.priority)}`}>
-                      {task.priority}
-                    </Badge>
-                  </td>
-                  <td className="py-2 px-2 text-muted-foreground">{task.dueDate || "-"}</td>
-                  <td className="py-2 px-2 text-muted-foreground">{task.assignee || "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollArea>
+            ))}
+          </tbody>
+        </table>
       </CardContent>
     </Card>
   );
@@ -822,47 +785,37 @@ function DataTableWidget({ tasks }: { tasks: TaskItem[] }) {
 
 function AlertsPanelWidget({ alerts }: { alerts: AlertItem[] }) {
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Bell className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <Bell className="w-3.5 h-3.5 text-[#266C92]" />
             <span>Alerts</span>
           </div>
           <Badge variant="destructive" className="text-[10px]">{alerts.length}</Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0">
-        <ScrollArea className="h-full">
-          <div className="space-y-2 pr-2">
-            {alerts.map((alert) => (
-              <div 
-                key={alert.id}
-                className={`p-3 rounded-lg border ${getSeverityColor(alert.severity)}`}
-              >
-                <div className="flex items-start gap-2.5">
-                  <div className="mt-0.5 shrink-0">
-                    {(alert.severity === "critical" || alert.severity === "error") && <AlertCircle className="w-4 h-4" />}
-                    {(alert.severity === "warning" || alert.severity === "high" || alert.severity === "medium") && <AlertTriangle className="w-4 h-4" />}
-                    {(alert.severity === "info" || alert.severity === "low") && <Bell className="w-4 h-4" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium leading-tight">{alert.title}</p>
-                    <p className="text-xs opacity-70 mt-0.5 line-clamp-2">{alert.message}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-[10px] opacity-50">{alert.timestamp}</span>
-                      {alert.actionLabel && (
-                        <Button variant="ghost" size="sm" className="h-5 px-2 text-[10px]">
-                          {alert.actionLabel} <ArrowUpRight className="w-2.5 h-2.5 ml-0.5" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
+      <CardContent className="flex-1 min-h-0 overflow-auto pt-0 px-2 pb-2">
+        <div className="space-y-1.5">
+          {alerts.slice(0, 5).map((alert) => (
+            <div 
+              key={alert.id}
+              className={`p-2 rounded-md border ${getSeverityColor(alert.severity)}`}
+            >
+              <div className="flex items-start gap-2">
+                <div className="mt-0.5 shrink-0">
+                  {(alert.severity === "critical" || alert.severity === "error") && <AlertCircle className="w-3.5 h-3.5" />}
+                  {alert.severity === "warning" && <AlertTriangle className="w-3.5 h-3.5" />}
+                  {alert.severity === "info" && <Bell className="w-3.5 h-3.5" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-medium leading-tight truncate">{alert.title}</p>
+                  <p className="text-[10px] opacity-70 mt-0.5 line-clamp-1">{alert.message}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </ScrollArea>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
@@ -876,24 +829,24 @@ function ProgressTrackerWidget({ metrics }: { metrics: MetricItem[] }) {
   }));
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <Target className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center gap-1.5">
+          <Target className="w-3.5 h-3.5 text-[#266C92]" />
           <span>Progress</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 flex flex-col justify-center pt-0">
-        <div className="space-y-4">
+      <CardContent className="flex-1 min-h-0 flex flex-col justify-center pt-0 px-3 pb-3">
+        <div className="space-y-3">
           {progressItems.map((item, idx) => {
             const color = item.value >= 80 ? "bg-emerald-500" : item.value >= 50 ? "bg-[#266C92]" : "bg-amber-500";
             return (
               <div key={idx}>
-                <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-foreground font-medium">{item.label}</span>
-                  <span className="text-muted-foreground">{item.value}%</span>
+                <div className="flex justify-between text-[11px] mb-1">
+                  <span className="text-foreground font-medium truncate pr-2">{item.label}</span>
+                  <span className="text-muted-foreground shrink-0">{item.value}%</span>
                 </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                   <div className={`h-full ${color} rounded-full transition-all duration-700`} style={{ width: `${item.value}%` }} />
                 </div>
               </div>
@@ -915,41 +868,40 @@ function CalendarViewWidget({ tasks }: { tasks: TaskItem[] }) {
   const taskDays = [0, 1, 3, 5];
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-[#266C92]" />
             <span>Upcoming</span>
           </div>
-          <span className="text-xs text-muted-foreground font-normal">
+          <span className="text-[10px] text-muted-foreground font-normal">
             {today.toLocaleDateString("en", { month: "short", year: "numeric" })}
           </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0">
-        <div className="grid grid-cols-7 gap-1.5">
+      <CardContent className="flex-1 min-h-0 pt-0 px-3 pb-3">
+        <div className="grid grid-cols-7 gap-1">
           {days.map((day, idx) => (
             <div 
               key={idx}
-              className={`p-2 text-center rounded-lg transition-colors ${
+              className={`p-1.5 text-center rounded-md transition-colors ${
                 idx === 0 ? "bg-[#266C92] text-white" : "bg-muted/30 hover:bg-muted/50"
               }`}
             >
-              <p className="text-[9px] uppercase font-medium opacity-70">{day.toLocaleDateString("en", { weekday: "short" })}</p>
-              <p className="text-lg font-bold leading-tight">{day.getDate()}</p>
+              <p className="text-[8px] uppercase font-medium opacity-70">{day.toLocaleDateString("en", { weekday: "short" })}</p>
+              <p className="text-sm font-bold leading-tight">{day.getDate()}</p>
               {taskDays.includes(idx) && (
-                <div className="flex justify-center gap-0.5 mt-1">
+                <div className="flex justify-center gap-0.5 mt-0.5">
                   <div className={`w-1 h-1 rounded-full ${idx === 0 ? "bg-white/70" : "bg-amber-500"}`} />
-                  {idx < 2 && <div className={`w-1 h-1 rounded-full ${idx === 0 ? "bg-white/50" : "bg-[#266C92]"}`} />}
                 </div>
               )}
             </div>
           ))}
         </div>
-        <div className="mt-3 space-y-1.5">
+        <div className="mt-2 space-y-1">
           {tasks.slice(0, 3).map((task) => (
-            <div key={task.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md text-xs hover:bg-muted/40 transition-colors cursor-pointer">
+            <div key={task.id} className="flex items-center gap-1.5 px-1.5 py-1 rounded-md text-[11px] hover:bg-muted/40 transition-colors cursor-pointer">
               <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
                 task.priority === "critical" || task.priority === "high" ? "bg-red-500" : "bg-amber-500"
               }`} />
@@ -967,39 +919,35 @@ function WorkflowQueueWidget({ tasks }: { tasks: TaskItem[] }) {
   const pendingTasks = tasks.filter(t => t.status === "pending" || t.status === "in-progress").slice(0, 6);
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <RefreshCw className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <RefreshCw className="w-3.5 h-3.5 text-[#266C92]" />
             <span>Workflow Queue</span>
           </div>
-          <Badge variant="secondary" className="text-[10px]">{pendingTasks.length} pending</Badge>
+          <Badge variant="secondary" className="text-[10px]">{pendingTasks.length}</Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0">
-        <ScrollArea className="h-full">
-          <div className="space-y-1 pr-2">
-            {pendingTasks.map((task, idx) => (
-              <div 
-                key={task.id}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-muted/40 transition-colors cursor-pointer"
-              >
-                <div className="w-5 h-5 rounded-full border-2 border-[#266C92]/30 flex items-center justify-center text-[9px] font-bold text-[#266C92]">
-                  {idx + 1}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm truncate font-medium">{task.title}</p>
-                  {task.assignee && <p className="text-[10px] text-muted-foreground">{task.assignee}</p>}
-                </div>
-                <Badge className={`text-[9px] px-1.5 py-0 h-4 ${getStatusColor(task.status)}`}>
-                  {task.status.replace("-", " ")}
-                </Badge>
-                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+      <CardContent className="flex-1 min-h-0 overflow-auto pt-0 px-2 pb-2">
+        <div className="space-y-0.5">
+          {pendingTasks.map((task, idx) => (
+            <div 
+              key={task.id}
+              className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/40 transition-colors cursor-pointer"
+            >
+              <div className="w-4 h-4 rounded-full border-2 border-[#266C92]/30 flex items-center justify-center text-[8px] font-bold text-[#266C92] shrink-0">
+                {idx + 1}
               </div>
-            ))}
-          </div>
-        </ScrollArea>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] truncate font-medium">{task.title}</p>
+              </div>
+              <Badge className={`text-[9px] px-1 py-0 h-[14px] ${getStatusColor(task.status)}`}>
+                {task.status.replace("-", " ")}
+              </Badge>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
@@ -1018,23 +966,23 @@ function CoverageMapWidget({ metrics }: { metrics: MetricItem[] }) {
   ];
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <Gauge className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center gap-1.5">
+          <Gauge className="w-3.5 h-3.5 text-[#266C92]" />
           <span>Coverage Map</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0 flex flex-col items-center justify-center gap-4">
+      <CardContent className="flex-1 min-h-0 pt-0 px-3 pb-3 flex flex-col items-center justify-center gap-3">
         <GaugeChartSVG value={coverageValue} label="Overall Coverage" />
         <div className="w-full space-y-2">
           {segments.map((seg, idx) => (
             <div key={idx}>
               <div className="flex justify-between text-[10px] mb-0.5">
-                <span className="text-muted-foreground">{seg.label}</span>
-                <span className="font-medium">{seg.pct}%</span>
+                <span className="text-muted-foreground truncate pr-1">{seg.label}</span>
+                <span className="font-medium shrink-0">{seg.pct}%</span>
               </div>
-              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className="h-1 bg-muted rounded-full overflow-hidden">
                 <div className="h-full rounded-full" style={{ width: `${seg.pct}%`, backgroundColor: seg.color }} />
               </div>
             </div>
@@ -1051,34 +999,30 @@ function SummaryCardWidget({ content, workspaceName }: { content: WidgetContent;
   const completedCount = content.tasks?.filter(t => t.status === "completed").length || 0;
 
   return (
-    <Card className="h-full bg-gradient-to-r from-[#266C92]/5 to-transparent">
-      <CardContent className="p-5 h-full flex items-center gap-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#266C92]/10 flex items-center justify-center">
-            <LayoutDashboard className="w-5 h-5 text-[#266C92]" />
+    <Card className="h-full bg-gradient-to-r from-[#266C92]/5 to-transparent overflow-hidden">
+      <CardContent className="p-3 h-full flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-[#266C92]/10 flex items-center justify-center">
+            <LayoutDashboard className="w-4 h-4 text-[#266C92]" />
           </div>
           <div>
-            <p className="font-semibold text-foreground">{workspaceName}</p>
-            <p className="text-xs text-muted-foreground">Workspace Summary</p>
+            <p className="text-xs font-semibold text-foreground">{workspaceName}</p>
+            <p className="text-[10px] text-muted-foreground">Summary</p>
           </div>
         </div>
-        <div className="h-8 w-px bg-border" />
-        <div className="flex items-center gap-6">
+        <div className="h-6 w-px bg-border" />
+        <div className="flex items-center gap-4">
           <div className="text-center">
-            <p className="text-2xl font-bold">{taskCount}</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Tasks</p>
+            <p className="text-lg font-bold">{taskCount}</p>
+            <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Tasks</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-emerald-600">{completedCount}</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Done</p>
+            <p className="text-lg font-bold text-emerald-600">{completedCount}</p>
+            <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Done</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-amber-600">{alertCount}</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Alerts</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold">{content.metrics?.length || 0}</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Metrics</p>
+            <p className="text-lg font-bold text-amber-600">{alertCount}</p>
+            <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Alerts</p>
           </div>
         </div>
       </CardContent>
@@ -1098,19 +1042,19 @@ function NavigationShortcutsWidget({ actions }: { actions: QuickAction[] }) {
   };
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 shrink-0">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <Layers className="w-4 h-4 text-[#266C92]" />
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="py-2.5 px-3 shrink-0">
+        <CardTitle className="text-xs font-semibold flex items-center gap-1.5">
+          <Layers className="w-3.5 h-3.5 text-[#266C92]" />
           <span>Navigation</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 pt-0">
-        <div className="grid grid-cols-2 gap-1.5">
+      <CardContent className="flex-1 min-h-0 pt-0 px-3 pb-3">
+        <div className="grid grid-cols-2 gap-1">
           {actions.slice(0, 8).map((action) => (
             <div
               key={action.id}
-              className="flex items-center gap-2 px-3 py-2 rounded-md text-xs hover:bg-muted/50 cursor-pointer transition-colors border border-transparent hover:border-border"
+              className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-[11px] hover:bg-muted/50 cursor-pointer transition-colors"
             >
               <span className="text-muted-foreground">{getIcon(action.icon)}</span>
               <span className="truncate">{action.label}</span>
@@ -1175,23 +1119,25 @@ function renderWidget(slot: WidgetSlot, content: WidgetContent, workspaceName: s
   }
 }
 
-export function ArchetypeDashboard({ archetype, content, workspaceName, userPersona }: ArchetypeDashboardProps) {
-  const gridStyle = useMemo(() => ({
-    display: "grid",
-    gridTemplateColumns: `repeat(${archetype.layout.columns}, 1fr)`,
-    gridTemplateRows: `repeat(${archetype.layout.rows}, minmax(160px, 1fr))`,
-    gridTemplateAreas: archetype.layout.areas,
-    gap: archetype.layout.gap || "16px",
-    minHeight: "700px",
-  }), [archetype.layout]);
+export function ArchetypeDashboard({ archetype, content, workspaceName, userPersona, compact }: ArchetypeDashboardProps) {
+  const gridStyle = useMemo(() => {
+    const gap = compact ? "8px" : (archetype.layout.gap || "12px");
+    return {
+      display: "grid",
+      gridTemplateColumns: `repeat(${archetype.layout.columns}, 1fr)`,
+      gridTemplateRows: `repeat(${archetype.layout.rows}, minmax(0, auto))`,
+      gridTemplateAreas: archetype.layout.areas,
+      gap,
+    };
+  }, [archetype.layout, compact]);
 
   return (
-    <div className="p-6 pb-12" data-testid="archetype-dashboard">
+    <div className={compact ? "p-3" : "p-4"} data-testid="archetype-dashboard">
       <div style={gridStyle}>
         {archetype.slots.map((slot) => (
           <div 
             key={slot.id} 
-            style={{ gridArea: slot.gridArea }}
+            style={{ gridArea: slot.gridArea, minHeight: 0 }}
             data-testid={`widget-${slot.widgetType}`}
           >
             {renderWidget(slot, content, workspaceName, userPersona)}

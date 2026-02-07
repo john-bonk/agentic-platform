@@ -59,7 +59,7 @@ export const defaultWorkspaces: Workspace[] = [
 
 export const workspaces: Workspace[] = defaultWorkspaces;
 
-export type UserPersona = "Executive" | "Manager" | "Auditor" | "Analyst";
+export type UserPersona = "Executive" | "Manager" | "Auditor" | "Analyst" | "CRO" | "CAE" | "CISO";
 
 interface WorkspaceStore {
   currentWorkspace: Workspace;
