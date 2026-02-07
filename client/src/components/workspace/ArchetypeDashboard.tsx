@@ -1066,8 +1066,10 @@ function NavigationShortcutsWidget({ actions }: { actions: QuickAction[] }) {
   );
 }
 
-function renderWidget(slot: WidgetSlot, content: WidgetContent, workspaceName: string, userPersona?: string) {
+function renderWidget(slot: WidgetSlot, content: WidgetContent, workspaceName: string, userPersona?: string, chartIndex?: number) {
   const props = { workspaceName, userPersona };
+  const charts = content.charts || [];
+  const chartForSlot = chartIndex !== undefined && charts[chartIndex] ? [charts[chartIndex]] : charts;
   
   switch (slot.widgetType) {
     case "welcome-header":
@@ -1081,9 +1083,9 @@ function renderWidget(slot: WidgetSlot, content: WidgetContent, workspaceName: s
     case "activity-feed":
       return <ActivityFeedWidget activities={content.activities || []} />;
     case "chart-area":
-      return <ChartAreaWidget charts={content.charts || []} />;
+      return <ChartAreaWidget charts={chartForSlot} />;
     case "trend-chart":
-      return <TrendChartWidget charts={content.charts || []} />;
+      return <TrendChartWidget charts={chartForSlot} />;
     case "quick-actions":
       return <QuickActionsWidget actions={content.quickActions || []} />;
     case "ai-command":
@@ -1131,6 +1133,18 @@ export function ArchetypeDashboard({ archetype, content, workspaceName, userPers
     };
   }, [archetype.layout, compact]);
 
+  const chartSlotIndexMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    let idx = 0;
+    for (const slot of archetype.slots) {
+      if (slot.widgetType === "chart-area" || slot.widgetType === "trend-chart") {
+        map[slot.id] = idx;
+        idx++;
+      }
+    }
+    return map;
+  }, [archetype.slots]);
+
   return (
     <div className={compact ? "p-3" : "p-4"} data-testid="archetype-dashboard">
       <div style={gridStyle}>
@@ -1140,7 +1154,7 @@ export function ArchetypeDashboard({ archetype, content, workspaceName, userPers
             style={{ gridArea: slot.gridArea, minHeight: 0 }}
             data-testid={`widget-${slot.widgetType}`}
           >
-            {renderWidget(slot, content, workspaceName, userPersona)}
+            {renderWidget(slot, content, workspaceName, userPersona, chartSlotIndexMap[slot.id])}
           </div>
         ))}
       </div>

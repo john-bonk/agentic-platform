@@ -222,6 +222,8 @@ export function HomeViewStep({
 
   const sortedArchetypes = useMemo(() => {
     return [...archetypeTemplates].sort((a, b) => {
+      if (a.id === "auditboard-default") return -1;
+      if (b.id === "auditboard-default") return 1;
       if (a.id === recommendedArchetype) return -1;
       if (b.id === recommendedArchetype) return 1;
       return a.name.localeCompare(b.name);

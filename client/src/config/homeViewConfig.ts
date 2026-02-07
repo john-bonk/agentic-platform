@@ -203,7 +203,7 @@ export const archetypeTemplates: ArchetypeTemplate[] = [
   {
     id: "auditboard-default",
     name: "AuditBoard Default",
-    description: "The standard AuditBoard home experience with hero header, assistant bar, inbox tabs, task overview donut, and scenario planning",
+    description: "The standard AuditBoard dashboard with metrics, tasks, charts, and activity feed driven by your selected modules",
     icon: "layout-dashboard",
     persona: "Any",
     colorAccent: "#266C92",
@@ -212,19 +212,21 @@ export const archetypeTemplates: ArchetypeTemplate[] = [
       columns: 12,
       rows: 4,
       areas: `
-        "hero hero hero hero hero hero hero hero hero hero hero hero"
-        "assistant assistant assistant assistant assistant assistant assistant assistant assistant assistant assistant assistant"
-        "inbox inbox inbox inbox inbox inbox inbox inbox inbox inbox inbox inbox"
-        "donut donut donut donut tasks tasks tasks tasks tasks tasks tasks tasks"
+        "welcome welcome welcome welcome welcome welcome metrics metrics metrics metrics metrics metrics"
+        "tasks tasks tasks tasks tasks tasks chart1 chart1 chart1 chart1 chart1 chart1"
+        "tasks tasks tasks tasks tasks tasks chart2 chart2 chart2 chart2 chart2 chart2"
+        "activity activity activity activity activity activity actions actions actions actions actions actions"
       `,
-      gap: "0",
+      gap: "1rem",
     },
     slots: [
-      { id: "hero", widgetType: "welcome-header", size: "full", gridArea: "hero", priority: 1 },
-      { id: "assistant", widgetType: "ai-command", size: "full", gridArea: "assistant", priority: 2 },
-      { id: "inbox", widgetType: "data-table", size: "full", gridArea: "inbox", priority: 3, contentKey: "data" },
-      { id: "donut", widgetType: "chart-area", size: "medium", gridArea: "donut", priority: 4, contentKey: "chart-1" },
-      { id: "tasks", widgetType: "task-list", size: "large", gridArea: "tasks", priority: 5, contentKey: "tasks" },
+      { id: "welcome", widgetType: "welcome-header", size: "large", gridArea: "welcome", priority: 1 },
+      { id: "metrics", widgetType: "metrics-bar", size: "medium", gridArea: "metrics", priority: 2, contentKey: "kpi" },
+      { id: "tasks", widgetType: "task-list", size: "large", gridArea: "tasks", priority: 3, contentKey: "tasks" },
+      { id: "chart1", widgetType: "chart-area", size: "medium", gridArea: "chart1", priority: 4, contentKey: "chart-1" },
+      { id: "chart2", widgetType: "chart-area", size: "medium", gridArea: "chart2", priority: 5, contentKey: "chart-2" },
+      { id: "activity", widgetType: "activity-feed", size: "medium", gridArea: "activity", priority: 6, contentKey: "activity" },
+      { id: "actions", widgetType: "quick-actions", size: "medium", gridArea: "actions", priority: 7 },
     ],
   },
   {
@@ -710,6 +712,13 @@ export const moduleContentContributions: Record<string, ModuleContentContributio
         { label: "Network", value: 456 },
         { label: "Cloud", value: 312 },
       ]},
+      { id: "itm-c2", type: "area", title: "Incident Response Time", module: "it-management", data: [
+        { label: "Jan", value: 4.2 },
+        { label: "Feb", value: 3.8 },
+        { label: "Mar", value: 3.5 },
+        { label: "Apr", value: 3.1 },
+        { label: "May", value: 2.9 },
+      ]},
     ],
     quickActions: [
       { id: "itm-qa1", label: "New Change Request", icon: "git-pull-request", path: "/changes/new", module: "it-management" },
@@ -748,6 +757,9 @@ export const moduleContentContributions: Record<string, ModuleContentContributio
         { label: "GDPR", value: 94, color: "#2196F3" },
         { label: "CCPA", value: 97, color: "#9C27B0" },
         { label: "HIPAA", value: 96, color: "#FF9800" },
+      ]},
+      { id: "rc-c2", type: "gauge", title: "Overall Compliance Score", module: "regulatory-compliance", data: [
+        { label: "Compliance", value: 96 },
       ]},
     ],
     quickActions: [
@@ -788,6 +800,12 @@ export const moduleContentContributions: Record<string, ModuleContentContributio
         { label: "Medium", value: 156, color: "#FFC107" },
         { label: "Low", value: 146, color: "#4CAF50" },
       ]},
+      { id: "tp-c2", type: "bar", title: "Assessments by Quarter", module: "third-party", data: [
+        { label: "Q1", value: 45, color: "#2196F3" },
+        { label: "Q2", value: 52, color: "#2196F3" },
+        { label: "Q3", value: 38, color: "#2196F3" },
+        { label: "Q4", value: 61, color: "#2196F3" },
+      ]},
     ],
     quickActions: [
       { id: "tp-qa1", label: "Add Vendor", icon: "user-plus", path: "/vendors/new", module: "third-party" },
@@ -825,6 +843,11 @@ export const moduleContentContributions: Record<string, ModuleContentContributio
         { label: "High", value: 5, color: "#F44336" },
         { label: "Medium", value: 12, color: "#FF9800" },
         { label: "Low", value: 6, color: "#4CAF50" },
+      ]},
+      { id: "aig-c2", type: "donut", title: "Model Usage Distribution", module: "ai-governance", data: [
+        { label: "Production", value: 14, color: "#266C92" },
+        { label: "Staging", value: 5, color: "#9C27B0" },
+        { label: "Development", value: 4, color: "#607D8B" },
       ]},
     ],
     quickActions: [
@@ -864,6 +887,11 @@ export const moduleContentContributions: Record<string, ModuleContentContributio
         { label: "2023", value: 15.6 },
         { label: "2024", value: 13.8 },
         { label: "2025", value: 12.4 },
+      ]},
+      { id: "ec-c2", type: "pie", title: "Energy Sources", module: "environmental-compliance", data: [
+        { label: "Renewable", value: 62, color: "#4CAF50" },
+        { label: "Natural Gas", value: 24, color: "#FF9800" },
+        { label: "Grid", value: 14, color: "#607D8B" },
       ]},
     ],
     quickActions: [
