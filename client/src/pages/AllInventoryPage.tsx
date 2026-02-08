@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo, useEffect } from "react";
 import {
   ReactFlow,
   Background,
@@ -10,7 +10,6 @@ import {
   ConnectionLineType,
   Handle,
   Position,
-  NodeMouseHandler,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { AppLayout } from "@/components/layout";
@@ -18,6 +17,12 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Filter, MoreHorizontal } from "lucide-react";
 import { EntityDetailPanel, EntityDetails, generateEntityDetails } from "@/components/inventory/EntityDetailPanel";
+import { useWorkspaceStore } from "@/lib/workspaceStore";
+import {
+  getWorkspaceViewConfig,
+  buildInventoryNodes,
+  buildInventoryEdges,
+} from "@/config/inventoryMappingConfig";
 
 interface ColumnNodeData {
   label: string;
@@ -79,187 +84,45 @@ const nodeTypes = {
   columnNode: ColumnNode,
 };
 
-const TEAL = "#266C92";
-const PURPLE = "#7c3aed";
-const MAGENTA = "#a855f7";
-
 export default function AllInventoryPage() {
   const [selectedEntity, setSelectedEntity] = useState<EntityDetails | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const { currentWorkspace } = useWorkspaceStore();
 
   const handleItemClick = useCallback((itemId: string, itemLabel: string, groupType: string) => {
     const details = generateEntityDetails(itemId, itemLabel, groupType);
     setSelectedEntity(details);
   }, []);
 
-  const inventoryNodes: Node[] = [
-    {
-      id: "locations",
-      type: "columnNode",
-      position: { x: 0, y: 0 },
-      data: {
-        label: "Locations",
-        headerColor: TEAL,
-        onItemClick: handleItemClick,
-        items: [
-          { id: "north-america", label: "North America" },
-          { id: "united-states", label: "United States" },
-          { id: "mexico", label: "Mexico" },
-          { id: "canada", label: "Canada" },
-          { id: "europe", label: "Europe" },
-          { id: "germany", label: "Germany" },
-          { id: "france", label: "France" },
-          { id: "united-kingdom", label: "United Kingdom" },
-          { id: "asia-pacific", label: "Asia-Pacific", highlighted: true },
-          { id: "singapore", label: "Singapore", highlighted: true },
-        ],
-      },
-    },
-    {
-      id: "legal-entities",
-      type: "columnNode",
-      position: { x: 200, y: 0 },
-      data: {
-        label: "Legal Entities",
-        headerColor: TEAL,
-        onItemClick: handleItemClick,
-        items: [
-          { id: "evergrow-logistics", label: "Evergrow Logistics" },
-          { id: "climatecare-ventures", label: "ClimateCare Ventures" },
-          { id: "nuharvest-innovations", label: "NuHarvest Innovations" },
-          { id: "suncoast-foods", label: "SunCoast Foods" },
-          { id: "greenfoods-holdings", label: "GreenFoods Holdings" },
-          { id: "agri-hub", label: "Agri-Hub Distributors" },
-          { id: "sea-foodsource", label: "SEA FoodSource", highlighted: true },
-        ],
-      },
-    },
-    {
-      id: "facilities",
-      type: "columnNode",
-      position: { x: 400, y: 0 },
-      data: {
-        label: "Facilities",
-        headerColor: TEAL,
-        onItemClick: handleItemClick,
-        items: [
-          { id: "us-west-agri", label: "US-West Agri" },
-          { id: "us-mid-pro", label: "US-Mid Pro" },
-          { id: "us-south-pack", label: "US-South Pack" },
-          { id: "us-east-dist", label: "US-East Dist" },
-          { id: "ca-se-propack", label: "CA-SE Pro/Pack" },
-          { id: "mx-central-farm", label: "MX-Central Farm" },
-          { id: "mx-south-hub", label: "MX-South Hub" },
-          { id: "de-north-euro", label: "DE-North Euro" },
-          { id: "fr-south-green", label: "FR-South Green" },
-          { id: "uk-central-hub", label: "UK-Central Hub" },
-          { id: "uk-innovation", label: "UK-Innovation" },
-          { id: "se-east-bio", label: "SE-East Bio", highlighted: true },
-          { id: "se-west-hq", label: "SE-West HQ", highlighted: true },
-        ],
-      },
-    },
-    {
-      id: "product-lines",
-      type: "columnNode",
-      position: { x: 600, y: 0 },
-      data: {
-        label: "Product Lines",
-        headerColor: TEAL,
-        onItemClick: handleItemClick,
-        items: [
-          { id: "beverages", label: "Beverages" },
-          { id: "frozen-foods", label: "Frozen Foods" },
-          { id: "plant-based-proteins", label: "Plant-Based Proteins" },
-          { id: "dairy-products", label: "Dairy Products" },
-          { id: "meat-processing", label: "Meat Processing" },
-          { id: "packaged-goods", label: "Packaged Goods" },
-          { id: "cereals-grains", label: "Cereals & Grains" },
-          { id: "organic-vegetables", label: "Organic Vegetables" },
-          { id: "algae-proteins", label: "Algae-Based Proteins", highlighted: true },
-          { id: "hydro-microgreens", label: "Hydro Microgreens", highlighted: true },
-          { id: "seafood-alternatives", label: "Seafood Alternatives", highlighted: true },
-        ],
-      },
-    },
-    {
-      id: "teams",
-      type: "columnNode",
-      position: { x: 800, y: 0 },
-      data: {
-        label: "Teams",
-        headerColor: TEAL,
-        onItemClick: handleItemClick,
-        items: [
-          { id: "sourcing-supply", label: "Sourcing & Supply", highlighted: true },
-          { id: "sustainability", label: "Sustainability", highlighted: true },
-          { id: "food-safety", label: "Food Safety", highlighted: true },
-          { id: "distribution", label: "Distribution", highlighted: true },
-          { id: "operations", label: "Operations", highlighted: true },
-          { id: "corporate", label: "Corporate", highlighted: true },
-        ],
-      },
-    },
-    {
-      id: "it-systems",
-      type: "columnNode",
-      position: { x: 1000, y: 0 },
-      data: {
-        label: "IT Systems",
-        headerColor: TEAL,
-        onItemClick: handleItemClick,
-        items: [
-          { id: "sap", label: "SAP" },
-          { id: "oracle-fusion", label: "Oracle Fusion", highlighted: true },
-          { id: "salesforce", label: "Salesforce" },
-          { id: "azure-sql", label: "Azure SQL Database..." },
-          { id: "bpc", label: "BPC" },
-          { id: "firebase", label: "Firebase Realtime Da...", highlighted: true },
-          { id: "jd-tableau", label: "JD Tableau" },
-          { id: "zapier", label: "Zapier Automations" },
-        ],
-      },
-    },
-  ];
+  const config = useMemo(
+    () => getWorkspaceViewConfig(currentWorkspace.id, currentWorkspace.isCustom),
+    [currentWorkspace.id, currentWorkspace.isCustom]
+  );
 
-  // Clean bidirectional edges: Product Lines ↔ Teams ↔ IT Systems
-  // Each team maps to specific product lines and IT systems in a clear distribution
-  const inventoryEdges: Edge[] = [
-    // Singapore acquisition path (highlighted)
-    { id: "e-ap-sea", source: "locations", sourceHandle: "source-asia-pacific", target: "legal-entities", targetHandle: "target-sea-foodsource", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-sg-sea", source: "locations", sourceHandle: "source-singapore", target: "legal-entities", targetHandle: "target-sea-foodsource", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-sea-se1", source: "legal-entities", sourceHandle: "source-sea-foodsource", target: "facilities", targetHandle: "target-se-east-bio", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-sea-se2", source: "legal-entities", sourceHandle: "source-sea-foodsource", target: "facilities", targetHandle: "target-se-west-hq", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-se1-algae", source: "facilities", sourceHandle: "source-se-east-bio", target: "product-lines", targetHandle: "target-algae-proteins", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-se1-hydro", source: "facilities", sourceHandle: "source-se-east-bio", target: "product-lines", targetHandle: "target-hydro-microgreens", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-se2-seafood", source: "facilities", sourceHandle: "source-se-west-hq", target: "product-lines", targetHandle: "target-seafood-alternatives", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    
-    // Product Lines → Teams (forward: each product line maps to 1-2 teams)
-    { id: "e-bev-sourcing", source: "product-lines", sourceHandle: "source-beverages", target: "teams", targetHandle: "target-sourcing-supply", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-frozen-dist", source: "product-lines", sourceHandle: "source-frozen-foods", target: "teams", targetHandle: "target-distribution", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-plant-sustain", source: "product-lines", sourceHandle: "source-plant-based-proteins", target: "teams", targetHandle: "target-sustainability", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-dairy-safety", source: "product-lines", sourceHandle: "source-dairy-products", target: "teams", targetHandle: "target-food-safety", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-meat-ops", source: "product-lines", sourceHandle: "source-meat-processing", target: "teams", targetHandle: "target-operations", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-pack-corp", source: "product-lines", sourceHandle: "source-packaged-goods", target: "teams", targetHandle: "target-corporate", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-cereal-sourcing", source: "product-lines", sourceHandle: "source-cereals-grains", target: "teams", targetHandle: "target-sourcing-supply", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-organic-sustain", source: "product-lines", sourceHandle: "source-organic-vegetables", target: "teams", targetHandle: "target-sustainability", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-algae-sustain", source: "product-lines", sourceHandle: "source-algae-proteins", target: "teams", targetHandle: "target-sustainability", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-hydro-safety", source: "product-lines", sourceHandle: "source-hydro-microgreens", target: "teams", targetHandle: "target-food-safety", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-seafood-ops", source: "product-lines", sourceHandle: "source-seafood-alternatives", target: "teams", targetHandle: "target-operations", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    
-    // Teams → IT Systems (forward only - no reverse edges)
-    { id: "e-sourcing-sap", source: "teams", sourceHandle: "source-sourcing-supply", target: "it-systems", targetHandle: "target-sap", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-sustain-oracle", source: "teams", sourceHandle: "source-sustainability", target: "it-systems", targetHandle: "target-oracle-fusion", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-safety-firebase", source: "teams", sourceHandle: "source-food-safety", target: "it-systems", targetHandle: "target-firebase", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 2 }, animated: false },
-    { id: "e-dist-salesforce", source: "teams", sourceHandle: "source-distribution", target: "it-systems", targetHandle: "target-salesforce", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-ops-azure", source: "teams", sourceHandle: "source-operations", target: "it-systems", targetHandle: "target-azure-sql", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-corp-bpc", source: "teams", sourceHandle: "source-corporate", target: "it-systems", targetHandle: "target-bpc", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-sustain-tableau", source: "teams", sourceHandle: "source-sustainability", target: "it-systems", targetHandle: "target-jd-tableau", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-    { id: "e-ops-zapier", source: "teams", sourceHandle: "source-operations", target: "it-systems", targetHandle: "target-zapier", type: "smoothstep", style: { stroke: TEAL, strokeWidth: 1.5 }, animated: false },
-  ];
+  const initialNodes = useMemo(
+    () => buildInventoryNodes(config.inventory, handleItemClick),
+    [config, handleItemClick]
+  );
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(inventoryNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(inventoryEdges);
+  const initialEdges = useMemo(
+    () => buildInventoryEdges(config.inventory),
+    [config]
+  );
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  useEffect(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, [config]);
+
+  const tabLabels = useMemo(() => {
+    return config.inventory.columns.map((col) => ({
+      value: col.id,
+      label: col.data.label,
+    }));
+  }, [config]);
 
   return (
     <AppLayout>
@@ -283,48 +146,16 @@ export default function AllInventoryPage() {
               >
                 Overview
               </TabsTrigger>
-              <TabsTrigger 
-                value="locations" 
-                className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-slate-500"
-                data-testid="tab-locations"
-              >
-                Locations
-              </TabsTrigger>
-              <TabsTrigger 
-                value="legal-entities" 
-                className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-slate-500"
-                data-testid="tab-legal-entities"
-              >
-                Legal Entities
-              </TabsTrigger>
-              <TabsTrigger 
-                value="facilities" 
-                className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-slate-500"
-                data-testid="tab-facilities"
-              >
-                Facilities
-              </TabsTrigger>
-              <TabsTrigger 
-                value="product-lines" 
-                className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-slate-500"
-                data-testid="tab-product-lines"
-              >
-                Product Lines
-              </TabsTrigger>
-              <TabsTrigger 
-                value="teams" 
-                className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-slate-500"
-                data-testid="tab-teams"
-              >
-                Teams
-              </TabsTrigger>
-              <TabsTrigger 
-                value="it-systems" 
-                className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-slate-500"
-                data-testid="tab-it-systems"
-              >
-                IT Systems
-              </TabsTrigger>
+              {tabLabels.map((tab) => (
+                <TabsTrigger 
+                  key={tab.value}
+                  value={tab.value}
+                  className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-slate-500"
+                  data-testid={`tab-${tab.value}`}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
           </Tabs>
         </div>
