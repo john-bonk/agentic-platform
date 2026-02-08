@@ -96,9 +96,17 @@ function ColumnNode({ data, id }: { data: ColumnNodeData; id: string }) {
                   : "bg-slate-50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300"
               }`}
               style={{ 
-                transition: 'background-color 0.4s ease, color 0.4s ease, opacity 0.6s ease, box-shadow 0.4s ease',
+                transition: 'background-color 0.4s ease, color 0.4s ease, opacity 0.6s ease, box-shadow 0.4s ease, border-color 0.4s ease',
                 animation: isMaItem ? 'fadeInItem 0.6s ease-out' : undefined,
-                ...(isSelected ? { backgroundColor: 'rgba(124, 58, 237, 0.15)', color: '#7c3aed', boxShadow: '0 0 0 2px rgba(124, 58, 237, 0.3)' } : {}),
+                ...(isSelected ? { 
+                  backgroundColor: 'rgba(124, 58, 237, 0.18)', 
+                  color: '#7c3aed', 
+                  boxShadow: '0 0 0 2px rgba(124, 58, 237, 0.5), 0 0 8px rgba(124, 58, 237, 0.15)',
+                  borderColor: 'rgba(124, 58, 237, 0.5)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  fontWeight: 600,
+                } : {}),
               }}
               onMouseEnter={(e) => {
                 if (isConnected && !isSelected) {
@@ -299,7 +307,7 @@ function AllInventoryFlow() {
   const { toast } = useToast();
 
   const { currentWorkspace } = useWorkspaceStore();
-  const { isCollapsed, setCollapsed } = useSideNavStore();
+  const { isCollapsed } = useSideNavStore();
 
   const isEnterpriseAudit = currentWorkspace.id === "enterprise-audit";
   const maActive = isEnterpriseAudit ? showMaItems : true;
@@ -350,18 +358,11 @@ function AllInventoryFlow() {
         description: "New items and mappings have been added to the inventory.",
         duration: 3000,
       });
-      setCollapsed(true);
       setTimeout(() => {
         fitView({ padding: 0.15, duration: 500 });
       }, 200);
-      setTimeout(() => {
-        const details = generateEntityDetails("sea-foodsource", "SEA FoodSource", "legal-entities");
-        setSelectedEntity(details);
-        setSelectedItemId("sea-foodsource");
-        setHoveredItemId(null);
-      }, 1000);
     }, 2000);
-  }, [isUploading, showMaItems, toast, fitView, setCollapsed]);
+  }, [isUploading, showMaItems, toast, fitView]);
 
   const config = useMemo(
     () => getWorkspaceViewConfig(currentWorkspace.id, currentWorkspace.isCustom),
