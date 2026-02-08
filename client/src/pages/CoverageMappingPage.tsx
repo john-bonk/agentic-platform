@@ -46,7 +46,7 @@ function GroupNode({ data, id }: { data: GroupNodeData; id: string }) {
     >
       <div 
         className="flex items-center justify-between px-3 py-2 rounded-t-lg"
-        style={{ backgroundColor: data.headerColor }}
+        style={{ backgroundColor: data.headerColor, opacity: 0.82 }}
       >
         <span className="text-white text-xs font-medium">{data.label}</span>
         <button className="w-4 h-4 rounded bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">

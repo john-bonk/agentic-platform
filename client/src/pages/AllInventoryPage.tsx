@@ -60,10 +60,10 @@ function ColumnNode({ data, id }: { data: ColumnNodeData; id: string }) {
     >
       <div 
         className="flex items-center justify-between px-3 py-2 rounded-t-lg"
-        style={{ backgroundColor: data.headerColor }}
+        style={{ backgroundColor: data.headerColor, opacity: 0.82 }}
       >
         <div className="flex items-center gap-1.5">
-          <Icon className="w-3 h-3 text-white/80" />
+          <Icon className="w-3 h-3 text-white/90" />
           <span className="text-white text-xs font-medium">{data.label}</span>
         </div>
         <button className="w-4 h-4 rounded bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
