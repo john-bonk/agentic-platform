@@ -82,6 +82,7 @@ Preferred communication style: Simple, everyday language.
 - React Hook Form with Zod resolvers for form validation
 - ThemeProvider context for dark/light mode (localStorage: "app-theme")
 - SettingsPanel with localStorage persistence ("dashboard-settings") and CustomEvent sync
+- BrowserChrome wrapper (`client/src/components/layout/BrowserChrome.tsx`) — toggled via Settings > Appearance > "Show Browser". Uses `--browser-chrome-height` CSS variable to adjust layout heights. Extensible `tabs` prop for future multi-tab support.
 
 **Routing**: Wouter library for lightweight client-side routing.
 
