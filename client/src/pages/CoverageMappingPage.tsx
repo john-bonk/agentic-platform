@@ -163,7 +163,7 @@ function CoverageMappingFlow() {
   useEffect(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
-  }, [config, initialNodes]);
+  }, [config]);
 
   useEffect(() => {
     if (hoveredItemId) {
@@ -194,8 +194,8 @@ function CoverageMappingFlow() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fitView({ padding: 0.2, duration: 200 });
-    }, 50);
+      fitView({ padding: 0.2, duration: 300 });
+    }, 350);
     return () => clearTimeout(timer);
   }, [isCollapsed, selectedEntity, fitView]);
 
