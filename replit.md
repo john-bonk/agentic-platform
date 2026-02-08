@@ -101,6 +101,11 @@ Preferred communication style: Simple, everyday language.
 ### Navigation Configuration
 - `client/src/config/navigation.ts` - Central navigation config for icon navbar and side navigation
 
+### Workspace-Specific View Configs
+- `client/src/config/inventoryMappingConfig.ts` - Workspace-specific data for All Inventory and Coverage Mapping pages (3 scenarios: enterprise-audit, enterprise-risk, it-security; custom workspaces use hash-based deterministic selection)
+- `client/src/pages/AllInventoryPage.tsx` - ReactFlow inventory view with dynamic tabs per workspace
+- `client/src/pages/CoverageMappingPage.tsx` - ReactFlow coverage mapping with left→right source/target handles, single TEAL edges
+
 ### Layout Components
 - `client/src/components/layout/AppLayout.tsx` - Main page wrapper
 - `client/src/components/layout/PageHeader.tsx` - Reusable page header
