@@ -498,7 +498,7 @@ export default function CustomWorkspaceHome() {
   }, [tasks]);
   
   if (selectedArchetype && selectedArchetype.id === "auditboard-default") {
-    const selectedCaps = currentWorkspace?.selectedCapabilities || [];
+    const selectedCaps = currentWorkspace?.moduleConfig?.selectedBuckets || currentWorkspace?.selectedCapabilities || [];
     const homeContent = selectedCaps.length > 0
       ? generateCustomWorkspaceContent(selectedCaps)
       : workspaceContent["enterprise-risk"];

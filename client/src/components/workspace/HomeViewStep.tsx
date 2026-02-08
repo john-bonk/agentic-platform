@@ -25,6 +25,7 @@ import { DefaultDashboardContent } from "@/components/workspace/DefaultDashboard
 import {
   HomePageContent,
   workspaceContent,
+  generateCustomWorkspaceContent,
 } from "@/components/workspace/HomePageContent";
 
 interface HomeViewStepProps {
@@ -191,8 +192,10 @@ function LiveDashboardPreview({ archetype, selectedModules, enabledModules }: { 
         >
           {archetype.id === "auditboard-default" ? (
             <HomePageContent
-              content={workspaceContent["enterprise-risk"]}
-              welcomeMessage="Welcome back, CRO"
+              content={selectedModules.length > 0
+                ? generateCustomWorkspaceContent(selectedModules)
+                : workspaceContent["enterprise-risk"]}
+              welcomeMessage="Welcome back!"
               showWorkspaces={true}
               compact
             />

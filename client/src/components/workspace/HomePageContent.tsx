@@ -166,43 +166,132 @@ export const workspaceContent: Record<string, WorkspaceContentData> = {
   },
 };
 
-const capabilityTaskTemplates: Record<string, Task[]> = {
+const bucketDisplayNames: Record<string, string> = {
+  "controls-management": "Controls Management",
+  "enterprise-risk": "Enterprise Risk Management",
+  "audit-management": "Audit Management",
+  "cyber-compliance": "Cyber and IT Compliance",
+  "cyber-it-compliance": "Cyber and IT Compliance",
+  "information-technology": "Information Technology",
+  "regulatory-compliance": "Regulatory Compliance",
+  "third-party": "Third Party Risk",
+  "ai-governance": "AI Governance",
+  "environmental-compliance": "Environmental Compliance",
+};
+
+const capabilityTaskPool: Record<string, string[]> = {
   "controls-management": [
-    { id: "ctrl-1", title: "Review SOX Control Documentation", context: "Controls: Q4 Review", preparers: ["Control Team"], dueDate: "11-15-2025", status: "incomplete" },
-    { id: "ctrl-2", title: "Update Control Testing Schedule", context: "Planning: Control Testing", preparers: ["Audit Lead"], dueDate: "11-20-2025", status: "in-progress" },
+    "Review SOX Control Documentation for Q4",
+    "Complete Control Testing Cycle for Key Processes",
+    "Remediate Open Control Gaps from Last Assessment",
+    "Update Control Owner Attestation Records",
+    "Validate Automated Monitoring Alert Thresholds",
+    "Map Controls to Updated Regulatory Framework",
+    "Gather Evidence for Annual Control Certification",
+    "Analyze Control Effectiveness Trend Data",
+    "Prepare Control Environment Board Summary",
+    "Reconcile Control Library Against Process Changes",
   ],
   "enterprise-risk": [
-    { id: "erm-1", title: "Complete Risk Assessment", context: "Risk: Enterprise Review", preparers: ["Risk Team"], dueDate: "11-10-2025", status: "incomplete" },
-    { id: "erm-2", title: "Update Risk Register", context: "Risk: Quarterly Update", preparers: ["Risk Analyst"], dueDate: "11-25-2025", status: "in-progress" },
+    "Update Strategic Risk Register with Q4 Findings",
+    "Complete Quarterly Enterprise Risk Assessment",
+    "Review Risk Appetite Statement with Stakeholders",
+    "Investigate KRI Threshold Breach on Credit Exposure",
+    "Evaluate Emerging Geopolitical Risk Scenarios",
+    "Finalize Risk Treatment Plans for Top 5 Risks",
+    "Collect Risk Owner Attestations Across Business Units",
+    "Refresh Risk Heat Map for Executive Committee",
+    "Assess Concentration Risk in Key Supply Chains",
+    "Prepare Board-Level Risk Briefing Materials",
   ],
   "audit-management": [
-    { id: "aud-1", title: "Finalize Audit Workpapers", context: "Audit: Q4 Engagement", preparers: ["Audit Team"], dueDate: "11-12-2025", status: "incomplete" },
-    { id: "aud-2", title: "Review Audit Findings", context: "Report: Findings Summary", preparers: ["CAE"], dueDate: "11-30-2025", status: "incomplete" },
+    "Finalize Q1 Annual Audit Plan for Approval",
+    "Complete IT Audit Fieldwork on General Controls",
+    "Escalate Overdue Audit Findings Past Remediation Date",
+    "Draft Exit Meeting Summary for Operational Audit",
+    "Optimize Auditor Resource Allocation for Next Quarter",
+    "Upload Workpapers for Current Engagement",
+    "Refresh Audit Universe Entity Risk Ratings",
+    "Review Audit Committee Presentation Materials",
+    "Track Corrective Action Plan Implementation Status",
+    "Validate Sampling Methodology for Financial Audit",
   ],
   "cyber-compliance": [
-    { id: "cyber-1", title: "Complete Cyber Risk Assessment", context: "Security: Annual Review", preparers: ["Security Team"], dueDate: "11-08-2025", status: "in-progress" },
-    { id: "cyber-2", title: "Update Security Policies", context: "Compliance: Policy Review", preparers: ["CISO"], dueDate: "11-22-2025", status: "incomplete" },
+    "Patch Critical Vulnerabilities from Latest Security Scan",
+    "Complete Privileged Access Review Certification Campaign",
+    "Investigate Root Cause of Recent Phishing Incident",
+    "Update Ransomware Incident Response Playbook",
+    "Validate ITGC Test Results for SOC 2 Readiness",
+    "Review Application Control Configuration in ERP",
+    "Conduct Penetration Test on External-Facing Systems",
+    "Assess Third-Party Application Security Posture",
+    "Generate Monthly Vulnerability Trend Analysis Report",
+    "Revise Data Loss Prevention Policy and Procedures",
   ],
   "information-technology": [
-    { id: "it-1", title: "Review IT General Controls", context: "IT: Control Assessment", preparers: ["IT Team"], dueDate: "11-18-2025", status: "incomplete" },
-    { id: "it-2", title: "Update System Inventory", context: "IT: Asset Management", preparers: ["IT Admin"], dueDate: "12-01-2025", status: "incomplete" },
+    "Reconcile Physical Assets Against CMDB Records",
+    "Update Application Portfolio Criticality Ratings",
+    "Approve Emergency Change Requests in Queue",
+    "Prepare Agenda for Weekly Change Advisory Board",
+    "Review Disaster Recovery Test Results and Gaps",
+    "Assess Cloud Service Provider SLA Compliance",
+    "Update System Inventory with New Deployments",
+    "Validate Backup and Restoration Procedures",
+    "Review IT Service Desk Ticket Escalation Trends",
+    "Conduct Capacity Planning Review for Core Systems",
   ],
   "regulatory-compliance": [
-    { id: "reg-1", title: "ESG Disclosure Review", context: "Compliance: ESG Reporting", preparers: ["Compliance Team"], dueDate: "11-14-2025", status: "in-progress" },
-    { id: "reg-2", title: "Regulatory Filing Preparation", context: "Compliance: Q4 Filing", preparers: ["Legal Team"], dueDate: "12-05-2025", status: "incomplete" },
+    "Assess Impact of New SEC Climate Disclosure Rules",
+    "Prepare Quarterly Regulatory Filing Documents",
+    "Update SOX Process Narratives for Key Workflows",
+    "Review Materials for CFO/CEO Section 302 Certification",
+    "Track Regulatory Obligation Deadlines This Month",
+    "Analyze Cross-Border Data Privacy Requirements",
+    "Conduct Gap Analysis Against Updated GDPR Guidance",
+    "Compile Regulatory Change Impact Assessment Report",
+    "Verify Compliance Training Completion Rates",
+    "Review Anti-Money Laundering Program Effectiveness",
   ],
   "third-party": [
-    { id: "tp-1", title: "Vendor Risk Assessment", context: "Vendor: Annual Review", preparers: ["Vendor Team"], dueDate: "11-16-2025", status: "incomplete" },
-    { id: "tp-2", title: "Update Vendor Contracts", context: "Vendor: Contract Review", preparers: ["Procurement"], dueDate: "11-28-2025", status: "in-progress" },
+    "Complete Due Diligence for New Cloud Provider Vendor",
+    "Process Pending Vendor Intake and Onboarding Requests",
+    "Conduct Annual Reassessment of Tier 1 Payment Processor",
+    "Validate Security Questionnaire Responses from Vendors",
+    "Update Vendor Risk Tiering Based on Latest Assessments",
+    "Review Vendor Contract Renewal Terms and SLAs",
+    "Monitor Fourth-Party Concentration Risk Exposure",
+    "Escalate Vendor Non-Compliance Findings to Procurement",
+    "Refresh Vendor Inventory Contact and Contract Data",
+    "Assess Business Continuity Plans for Critical Vendors",
   ],
   "ai-governance": [
-    { id: "ai-1", title: "AI Model Risk Assessment", context: "AI: Governance Review", preparers: ["AI Team"], dueDate: "11-20-2025", status: "incomplete" },
-    { id: "ai-2", title: "Update AI Use Policies", context: "AI: Policy Development", preparers: ["Data Science"], dueDate: "12-10-2025", status: "incomplete" },
+    "Document New ML Models Deployed This Quarter",
+    "Complete Risk Assessment for Credit Scoring AI Model",
+    "Review Fairness and Bias Metrics for HR Screening Model",
+    "Execute Quarterly Validation for Fraud Detection System",
+    "Update Responsible AI Use Policy Documentation",
+    "Assess Explainability Requirements for Customer-Facing AI",
+    "Review Model Drift Monitoring Dashboard Alerts",
+    "Conduct Data Quality Audit for Training Pipelines",
+    "Prepare AI Governance Board Briefing Materials",
+    "Evaluate Regulatory Compliance of Generative AI Tools",
   ],
   "environmental-compliance": [
-    { id: "env-1", title: "Environmental Impact Assessment", context: "ESG: Environmental Review", preparers: ["ESG Team"], dueDate: "11-22-2025", status: "in-progress" },
-    { id: "env-2", title: "Carbon Emissions Reporting", context: "ESG: Emissions Tracking", preparers: ["Sustainability"], dueDate: "12-15-2025", status: "incomplete" },
+    "Gather Q4 Sustainability Metrics from All Facilities",
+    "Calculate and Verify Scope 1 and 2 Emissions Data",
+    "Distribute Scope 3 Emissions Survey to Key Suppliers",
+    "Compile Quarterly Progress Report Toward Net Zero Targets",
+    "Review CSRD Reporting Requirements and Readiness",
+    "Validate Water Usage and Waste Diversion Data",
+    "Assess Climate Risk Scenarios for Physical Assets",
+    "Update Environmental Permit Compliance Status",
+    "Prepare ESG Disclosure Materials for Annual Report",
+    "Benchmark Carbon Intensity Against Industry Peers",
   ],
+};
+
+const bucketIdAliases: Record<string, string> = {
+  "cyber-it-compliance": "cyber-compliance",
 };
 
 const capabilityQuickActions: Record<string, { label: string; id: string }[]> = {
@@ -217,46 +306,133 @@ const capabilityQuickActions: Record<string, { label: string; id: string }[]> = 
   "environmental-compliance": [{ label: "Log Emission", id: "new-emission" }, { label: "ESG Report", id: "esg-report" }],
 };
 
+function resolveBucketId(id: string): string {
+  return bucketIdAliases[id] || id;
+}
+
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const result = [...arr];
+  let s = seed;
+  for (let i = result.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0x7fffffff;
+    const j = s % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+const preparerPool = [
+  "Sarah Chen", "Michael Torres", "James Wilson", "Amanda Liu",
+  "Steven Yeun", "Michelle Tu", "Alex Park", "Jennifer Liu",
+  "David Kim", "Rachel Green", "Tom Anderson", "Sarah Lin",
+];
+
+const statusOptions: Task["status"][] = ["incomplete", "incomplete", "in-progress", "incomplete", "in-progress"];
+
+function buildTaskFromPool(bucketId: string, titleIndex: number, taskIdCounter: number, seed: number): Task {
+  const resolvedId = resolveBucketId(bucketId);
+  const pool = capabilityTaskPool[resolvedId] || capabilityTaskPool["controls-management"];
+  const title = pool[titleIndex % pool.length];
+  const displayName = bucketDisplayNames[resolvedId] || resolvedId;
+
+  const s = (seed * 1664525 + 1013904223) & 0x7fffffff;
+  const prepCount = (s % 2) + 1;
+  const shuffledPreparers = seededShuffle(preparerPool, seed + taskIdCounter);
+  const preparers = shuffledPreparers.slice(0, prepCount);
+
+  const baseDays = 10 + (taskIdCounter * 3) % 60;
+  const dueMonth = 10 + Math.floor(baseDays / 30);
+  const dueDay = (baseDays % 28) + 1;
+  const dueDate = `${dueMonth}-${String(dueDay).padStart(2, "0")}-2025`;
+
+  const status = statusOptions[taskIdCounter % statusOptions.length];
+
+  return {
+    id: `dyn-${taskIdCounter}`,
+    title,
+    context: `${displayName}: Workspace Initiative`,
+    preparers,
+    dueDate,
+    status,
+  };
+}
+
 export function generateCustomWorkspaceContent(capabilities: string[]): WorkspaceContentData {
+  const resolvedCaps = capabilities.map(resolveBucketId);
+  const uniqueCaps = Array.from(new Set(resolvedCaps));
+
+  const isSingleModule = uniqueCaps.length === 1;
+
+  const seed = uniqueCaps.sort().join(",").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  const taskCount = isSingleModule
+    ? 10
+    : Math.min(4 + (seed % 9), 12);
+
   const tasks: Task[] = [];
+  let taskIdCounter = 0;
+
+  if (isSingleModule) {
+    const bucketId = uniqueCaps[0];
+    const pool = capabilityTaskPool[bucketId] || [];
+    const shuffled = seededShuffle(pool, seed);
+    for (let i = 0; i < Math.min(taskCount, shuffled.length); i++) {
+      tasks.push(buildTaskFromPool(bucketId, i, taskIdCounter++, seed));
+    }
+  } else {
+    for (const bucketId of uniqueCaps) {
+      tasks.push(buildTaskFromPool(bucketId, 0, taskIdCounter++, seed));
+    }
+
+    const remaining = taskCount - tasks.length;
+    if (remaining > 0) {
+      const extraPool: { bucketId: string; titleIndex: number }[] = [];
+      for (const bucketId of uniqueCaps) {
+        const pool = capabilityTaskPool[bucketId] || [];
+        for (let i = 1; i < pool.length; i++) {
+          extraPool.push({ bucketId, titleIndex: i });
+        }
+      }
+      const shuffledExtra = seededShuffle(extraPool, seed + 99);
+      for (let i = 0; i < Math.min(remaining, shuffledExtra.length); i++) {
+        const { bucketId, titleIndex } = shuffledExtra[i];
+        tasks.push(buildTaskFromPool(bucketId, titleIndex, taskIdCounter++, seed));
+      }
+    }
+  }
+
+  const singleBucketName = isSingleModule
+    ? (bucketDisplayNames[uniqueCaps[0]] || uniqueCaps[0])
+    : "";
+  const headerTitle = isSingleModule
+    ? `${singleBucketName} Tasks`
+    : "Workspace Tasks";
+
+  const complete = tasks.filter(t => t.status === "complete").length;
+
   const quickActionsMap: { [key: string]: { label: string; id: string } } = {};
-
-  capabilities.forEach(capId => {
-    const capTasks = capabilityTaskTemplates[capId] || [];
-    tasks.push(...capTasks);
-
+  uniqueCaps.forEach(capId => {
     const capActions = capabilityQuickActions[capId] || [];
     capActions.forEach(action => {
       quickActionsMap[action.id] = action;
     });
   });
-
-  const uniqueTasks = tasks.slice(0, 8);
   const quickActions = Object.values(quickActionsMap).slice(0, 4);
-
-  const incomplete = uniqueTasks.filter(t => t.status === "incomplete").length;
-  const inProgress = uniqueTasks.filter(t => t.status === "in-progress").length;
-  const complete = uniqueTasks.filter(t => t.status === "complete").length;
-
-  const capabilityNames = capabilities.map(id =>
-    solutionCapabilities.find(c => c.id === id)?.name || id
-  ).slice(0, 2).join(" & ");
 
   return {
     scenarioPlanning: {
-      title: `${capabilityNames} Initiative`,
-      progress: `${complete}/${uniqueTasks.length} Completed`,
+      title: headerTitle,
+      progress: `${complete}/${tasks.length} Completed`,
       completed: complete,
-      total: uniqueTasks.length,
+      total: tasks.length,
     },
-    tasks: uniqueTasks,
+    tasks,
     inboxStats: [
-      { label: "My Tasks", value: uniqueTasks.length },
-      { label: "My Issues", value: Math.floor(Math.random() * 5) },
-      { label: "My Controls", value: capabilities.includes("controls-management") ? 8 : 2 },
-      { label: "My Narratives", value: capabilities.includes("audit-management") ? 3 : 0 },
-      { label: "My Risks", value: capabilities.includes("enterprise-risk") ? 6 : 1 },
-      { label: "My Comments", value: Math.floor(Math.random() * 8) },
+      { label: "My Tasks", value: tasks.length },
+      { label: "My Issues", value: 2 + (seed % 4) },
+      { label: "My Controls", value: uniqueCaps.includes("controls-management") ? 8 : 2 },
+      { label: "My Narratives", value: uniqueCaps.includes("audit-management") ? 3 : 0 },
+      { label: "My Risks", value: uniqueCaps.includes("enterprise-risk") ? 6 : 1 },
+      { label: "My Comments", value: 1 + (seed % 7) },
     ],
     quickActions: quickActions.length > 0 ? quickActions : [
       { label: "Create New Item", id: "new-item" },
