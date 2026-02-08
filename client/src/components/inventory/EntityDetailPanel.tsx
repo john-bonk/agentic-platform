@@ -106,7 +106,7 @@ export function EntityDetailPanel({ entity, onClose, onNavigate }: EntityDetailP
         </div>
       </div>
 
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex-wrap">
         {entity.status && (
           <Badge variant="secondary" className={`${statusColors[entity.status]} text-xs`}>
             {entity.status.charAt(0).toUpperCase() + entity.status.slice(1)}
@@ -117,7 +117,7 @@ export function EntityDetailPanel({ entity, onClose, onNavigate }: EntityDetailP
             {entity.riskLevel.charAt(0).toUpperCase() + entity.riskLevel.slice(1)} Risk
           </Badge>
         )}
-        {entity.tags?.map((tag) => (
+        {entity.tags?.slice(0, 1).map((tag) => (
           <Badge key={tag} variant="outline" className="text-xs">
             {tag}
           </Badge>
@@ -395,6 +395,31 @@ export function generateEntityDetails(nodeId: string, nodeLabel: string, nodeTyp
     { id: "risk-3", name: "Operational Disruption", severity: "low" },
   ];
 
+  if (nodeId === "sea-foodsource") {
+    return {
+      id: nodeId,
+      name: nodeLabel,
+      type: entityType,
+      description: `${nodeLabel} is a recently acquired legal entity specializing in sustainable seafood and plant-based marine protein alternatives across Southeast Asia.`,
+      status: "new",
+      riskLevel: "medium",
+      complianceScore: 72,
+      owner: "Sarah Chen",
+      lastReviewed: "Jan 3, 2026",
+      createdDate: "Dec 15, 2025",
+      relatedEntities,
+      recentActivity,
+      metrics: [
+        { label: "Controls Mapped", value: 4, trend: "up" },
+        { label: "Open Issues", value: 3, trend: "down" },
+        { label: "Test Coverage", value: "72%", trend: "stable" },
+      ],
+      controls,
+      risks,
+      tags: ["M&A Integration"],
+    };
+  }
+
   const statuses: EntityDetails["status"][] = ["active", "pending", "review", "new"];
   const riskLevels: EntityDetails["riskLevel"][] = ["low", "medium", "high"];
 
@@ -415,7 +440,7 @@ export function generateEntityDetails(nodeId: string, nodeLabel: string, nodeTyp
     controls,
     risks,
     tags: nodeType.includes("sea") || nodeLabel.includes("Singapore") || nodeLabel.includes("SEA") 
-      ? ["M&A Integration", "Singapore Acquisition"] 
+      ? ["M&A Integration"] 
       : undefined,
   };
 }

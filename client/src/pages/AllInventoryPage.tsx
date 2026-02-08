@@ -50,6 +50,7 @@ interface ColumnNodeData {
   showMaItems?: boolean;
   isFirstColumn?: boolean;
   isLastColumn?: boolean;
+  selectedItemId?: string | null;
   onItemClick?: (itemId: string, itemLabel: string, groupType: string) => void;
   onItemHover?: (itemId: string) => void;
   onItemLeave?: () => void;
@@ -85,6 +86,7 @@ function ColumnNode({ data, id }: { data: ColumnNodeData; id: string }) {
         {visibleItems.map((item) => {
           const isConnected = data.connectedItemIds?.has(item.id);
           const isMaItem = item.highlighted && showMa;
+          const isSelected = data.selectedItemId === item.id;
           return (
             <div 
               key={item.id}
@@ -94,18 +96,19 @@ function ColumnNode({ data, id }: { data: ColumnNodeData; id: string }) {
                   : "bg-slate-50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300"
               }`}
               style={{ 
-                transition: 'background-color 0.2s ease, color 0.2s ease, opacity 0.6s ease',
+                transition: 'background-color 0.4s ease, color 0.4s ease, opacity 0.6s ease, box-shadow 0.4s ease',
                 animation: isMaItem ? 'fadeInItem 0.6s ease-out' : undefined,
+                ...(isSelected ? { backgroundColor: 'rgba(124, 58, 237, 0.15)', color: '#7c3aed', boxShadow: '0 0 0 2px rgba(124, 58, 237, 0.3)' } : {}),
               }}
               onMouseEnter={(e) => {
-                if (isConnected) {
+                if (isConnected && !isSelected) {
                   e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.15)';
                   e.currentTarget.style.color = '#7c3aed';
                   data.onItemHover?.(item.id);
                 }
               }}
               onMouseLeave={(e) => {
-                if (isConnected) {
+                if (isConnected && !isSelected) {
                   e.currentTarget.style.backgroundColor = '';
                   e.currentTarget.style.color = '';
                   data.onItemLeave?.();
@@ -289,13 +292,14 @@ function AllInventoryFlow() {
   const [selectedEntity, setSelectedEntity] = useState<EntityDetails | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [showMaItems, setShowMaItems] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const { fitView } = useReactFlow();
   const { toast } = useToast();
 
   const { currentWorkspace } = useWorkspaceStore();
-  const { isCollapsed } = useSideNavStore();
+  const { isCollapsed, setCollapsed } = useSideNavStore();
 
   const isEnterpriseAudit = currentWorkspace.id === "enterprise-audit";
   const maActive = isEnterpriseAudit ? showMaItems : true;
@@ -303,6 +307,14 @@ function AllInventoryFlow() {
   const handleItemClick = useCallback((itemId: string, itemLabel: string, groupType: string) => {
     const details = generateEntityDetails(itemId, itemLabel, groupType);
     setSelectedEntity(details);
+    setSelectedItemId(itemId);
+    setHoveredItemId(null);
+  }, []);
+
+  const handleClosePanel = useCallback(() => {
+    setSelectedEntity(null);
+    setSelectedItemId(null);
+    setHoveredItemId(null);
   }, []);
 
   const onItemHover = useCallback((itemId: string) => setHoveredItemId(itemId), []);
@@ -312,7 +324,7 @@ function AllInventoryFlow() {
     if (isUploading || showMaItems) return;
     setIsUploading(true);
 
-    const toastResult = toast({
+    toast({
       title: "Processing M&A files...",
       description: (
         <div className="mt-2">
@@ -320,14 +332,14 @@ function AllInventoryFlow() {
             <div 
               className="h-full bg-[#266C92] rounded-full"
               style={{ 
-                animation: 'progressBar 3s ease-in-out forwards',
+                animation: 'progressBar 1.8s ease-in-out forwards',
               }}
             />
           </div>
           <p className="text-xs text-muted-foreground mt-2">Analyzing inventory data...</p>
         </div>
       ),
-      duration: 4000,
+      duration: 2500,
     });
 
     setTimeout(() => {
@@ -338,11 +350,18 @@ function AllInventoryFlow() {
         description: "New items and mappings have been added to the inventory.",
         duration: 3000,
       });
+      setCollapsed(true);
       setTimeout(() => {
         fitView({ padding: 0.15, duration: 500 });
       }, 200);
-    }, 3500);
-  }, [isUploading, showMaItems, toast, fitView]);
+      setTimeout(() => {
+        const details = generateEntityDetails("sea-foodsource", "SEA FoodSource", "legal-entities");
+        setSelectedEntity(details);
+        setSelectedItemId("sea-foodsource");
+        setHoveredItemId(null);
+      }, 1000);
+    }, 2000);
+  }, [isUploading, showMaItems, toast, fitView, setCollapsed]);
 
   const config = useMemo(
     () => getWorkspaceViewConfig(currentWorkspace.id, currentWorkspace.isCustom),
@@ -362,6 +381,8 @@ function AllInventoryFlow() {
 
   const columnCount = config.inventory.columns.length;
 
+  const activeHighlightId = selectedItemId || hoveredItemId;
+
   const initialNodes = useMemo(
     () => buildInventoryNodes(config.inventory, handleItemClick).map((n, idx) => ({
       ...n,
@@ -373,9 +394,10 @@ function AllInventoryFlow() {
         showMaItems: maActive,
         isFirstColumn: isEnterpriseAudit && idx === 0,
         isLastColumn: isEnterpriseAudit && idx === columnCount - 1,
+        selectedItemId,
       },
     })),
-    [config, handleItemClick, connectedItemIds, onItemHover, onItemLeave, maActive, columnCount, isEnterpriseAudit]
+    [config, handleItemClick, connectedItemIds, onItemHover, onItemLeave, maActive, columnCount, isEnterpriseAudit, selectedItemId]
   );
 
   const initialEdges = useMemo(
@@ -418,18 +440,19 @@ function AllInventoryFlow() {
   }, [showMaItems, setEdges]);
 
   useEffect(() => {
-    if (hoveredItemId) {
+    if (activeHighlightId) {
       setEdges((eds) =>
         eds.map((e) => {
           const srcId = e.sourceHandle?.replace("source-", "");
           const tgtId = e.targetHandle?.replace("target-", "");
-          const isRelated = srcId === hoveredItemId || tgtId === hoveredItemId;
+          const isRelated = srcId === activeHighlightId || tgtId === activeHighlightId;
           return {
             ...e,
             style: {
               ...e.style,
               stroke: isRelated ? '#7c3aed' : '#266C92',
               strokeWidth: isRelated ? 2.5 : 2,
+              transition: 'stroke 0.4s ease, stroke-width 0.3s ease',
             },
           };
         })
@@ -438,11 +461,11 @@ function AllInventoryFlow() {
       setEdges((eds) =>
         eds.map((e) => ({
           ...e,
-          style: { ...e.style, stroke: '#266C92', strokeWidth: 2 },
+          style: { ...e.style, stroke: '#266C92', strokeWidth: 2, transition: 'stroke 0.4s ease, stroke-width 0.3s ease' },
         }))
       );
     }
-  }, [hoveredItemId, setEdges]);
+  }, [activeHighlightId, setEdges]);
 
   useEffect(() => {
     if (activeTab === "overview") {
@@ -566,7 +589,7 @@ function AllInventoryFlow() {
 
       <EntityDetailPanel 
         entity={selectedEntity} 
-        onClose={() => setSelectedEntity(null)}
+        onClose={handleClosePanel}
         onNavigate={(id) => {
           console.log("Navigate to:", id);
         }}

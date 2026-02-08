@@ -336,8 +336,8 @@
 
 @keyframes progressBar {
   0% { width: 0%; }
-  20% { width: 15%; }
-  50% { width: 45%; }
-  80% { width: 75%; }
+  30% { width: 25%; }
+  60% { width: 60%; }
+  85% { width: 85%; }
   100% { width: 100%; }
 }
