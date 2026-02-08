@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo, useEffect } from "react";
+import { useCallback, useState, useMemo, useEffect, useRef } from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -21,10 +21,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MapPin, Building2, Package, Users, Server, Plus, Filter, MoreHorizontal, Search, ChevronRight, Circle } from "lucide-react";
+import { MapPin, Building2, Package, Users, Server, Plus, Filter, MoreHorizontal, Search, ChevronRight, Circle, Upload } from "lucide-react";
 import { EntityDetailPanel, EntityDetails, generateEntityDetails } from "@/components/inventory/EntityDetailPanel";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { useSideNavStore } from "@/lib/sideNavStore";
+import { useToast } from "@/hooks/use-toast";
 import {
   getWorkspaceViewConfig,
   buildInventoryNodes,
@@ -46,6 +47,9 @@ interface ColumnNodeData {
   items: { id: string; label: string; highlighted?: boolean }[];
   headerColor: string;
   connectedItemIds?: Set<string>;
+  showMaItems?: boolean;
+  isFirstColumn?: boolean;
+  isLastColumn?: boolean;
   onItemClick?: (itemId: string, itemLabel: string, groupType: string) => void;
   onItemHover?: (itemId: string) => void;
   onItemLeave?: () => void;
@@ -53,6 +57,13 @@ interface ColumnNodeData {
 
 function ColumnNode({ data, id }: { data: ColumnNodeData; id: string }) {
   const Icon = columnIcons[id] || Building2;
+  const showMa = data.showMaItems ?? true;
+
+  const visibleItems = useMemo(() => {
+    if (showMa) return data.items;
+    return data.items.filter((item) => !item.highlighted);
+  }, [data.items, showMa]);
+
   return (
     <div 
       className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-visible"
@@ -71,17 +82,21 @@ function ColumnNode({ data, id }: { data: ColumnNodeData; id: string }) {
         </button>
       </div>
       <div className="p-1.5 space-y-0.5">
-        {data.items.map((item) => {
+        {visibleItems.map((item) => {
           const isConnected = data.connectedItemIds?.has(item.id);
+          const isMaItem = item.highlighted && showMa;
           return (
             <div 
               key={item.id}
               className={`relative px-2.5 py-1.5 text-xs rounded cursor-pointer ${
-                item.highlighted 
+                isMaItem 
                   ? "bg-[#266C92]/15 text-[#266C92] dark:bg-[#266C92]/25 dark:text-[#4a9bc7] font-medium border border-[#266C92]/30" 
                   : "bg-slate-50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300"
               }`}
-              style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
+              style={{ 
+                transition: 'background-color 0.2s ease, color 0.2s ease, opacity 0.6s ease',
+                animation: isMaItem ? 'fadeInItem 0.6s ease-out' : undefined,
+              }}
               onMouseEnter={(e) => {
                 if (isConnected) {
                   e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.15)';
@@ -100,20 +115,24 @@ function ColumnNode({ data, id }: { data: ColumnNodeData; id: string }) {
               data-testid={`item-${item.id}`}
             >
               <span className="line-clamp-1">{item.label}</span>
-              <Handle
-                type="source"
-                position={Position.Right}
-                id={`source-${item.id}`}
-                className="!w-1.5 !h-1.5 !bg-[#266C92] !border-0 !right-[-3px]"
-                style={{ top: '50%', transform: 'translateY(-50%)' }}
-              />
-              <Handle
-                type="target"
-                position={Position.Left}
-                id={`target-${item.id}`}
-                className="!w-1.5 !h-1.5 !bg-[#266C92] !border-0 !left-[-3px]"
-                style={{ top: '50%', transform: 'translateY(-50%)' }}
-              />
+              {!data.isLastColumn && (
+                <Handle
+                  type="source"
+                  position={Position.Right}
+                  id={`source-${item.id}`}
+                  className="!w-1.5 !h-1.5 !bg-[#266C92] !border-0 !right-[-3px]"
+                  style={{ top: '50%', transform: 'translateY(-50%)' }}
+                />
+              )}
+              {!data.isFirstColumn && (
+                <Handle
+                  type="target"
+                  position={Position.Left}
+                  id={`target-${item.id}`}
+                  className="!w-1.5 !h-1.5 !bg-[#266C92] !border-0 !left-[-3px]"
+                  style={{ top: '50%', transform: 'translateY(-50%)' }}
+                />
+              )}
             </div>
           );
         })}
@@ -270,7 +289,10 @@ function AllInventoryFlow() {
   const [selectedEntity, setSelectedEntity] = useState<EntityDetails | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  const [showMaItems, setShowMaItems] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { fitView } = useReactFlow();
+  const { toast } = useToast();
 
   const { currentWorkspace } = useWorkspaceStore();
   const { isCollapsed } = useSideNavStore();
@@ -282,6 +304,42 @@ function AllInventoryFlow() {
 
   const onItemHover = useCallback((itemId: string) => setHoveredItemId(itemId), []);
   const onItemLeave = useCallback(() => setHoveredItemId(null), []);
+
+  const handleUpload = useCallback(() => {
+    if (isUploading || showMaItems) return;
+    setIsUploading(true);
+
+    const toastResult = toast({
+      title: "Processing M&A files...",
+      description: (
+        <div className="mt-2">
+          <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-[#266C92] rounded-full"
+              style={{ 
+                animation: 'progressBar 3s ease-in-out forwards',
+              }}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">Analyzing inventory data...</p>
+        </div>
+      ),
+      duration: 4000,
+    });
+
+    setTimeout(() => {
+      setShowMaItems(true);
+      setIsUploading(false);
+      toast({
+        title: "M&A inventory imported",
+        description: "New items and mappings have been added to the inventory.",
+        duration: 3000,
+      });
+      setTimeout(() => {
+        fitView({ padding: 0.15, duration: 500 });
+      }, 200);
+    }, 3500);
+  }, [isUploading, showMaItems, toast, fitView]);
 
   const config = useMemo(
     () => getWorkspaceViewConfig(currentWorkspace.id, currentWorkspace.isCustom),
@@ -299,17 +357,31 @@ function AllInventoryFlow() {
     return ids;
   }, [config]);
 
+  const columnCount = config.inventory.columns.length;
+
   const initialNodes = useMemo(
-    () => buildInventoryNodes(config.inventory, handleItemClick).map((n) => ({
+    () => buildInventoryNodes(config.inventory, handleItemClick).map((n, idx) => ({
       ...n,
-      data: { ...n.data, connectedItemIds, onItemHover, onItemLeave },
+      data: { 
+        ...n.data, 
+        connectedItemIds, 
+        onItemHover, 
+        onItemLeave,
+        showMaItems,
+        isFirstColumn: idx === 0,
+        isLastColumn: idx === columnCount - 1,
+      },
     })),
-    [config, handleItemClick, connectedItemIds, onItemHover, onItemLeave]
+    [config, handleItemClick, connectedItemIds, onItemHover, onItemLeave, showMaItems, columnCount]
   );
 
   const initialEdges = useMemo(
-    () => buildInventoryEdges(config.inventory),
-    [config]
+    () => showMaItems ? buildInventoryEdges(config.inventory).map(e => ({
+      ...e,
+      animated: true,
+      style: { ...e.style, opacity: 0 },
+    })) : [],
+    [config, showMaItems]
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -318,7 +390,24 @@ function AllInventoryFlow() {
   useEffect(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
-  }, [config]);
+  }, [config, showMaItems]);
+
+  const edgesFadedIn = useRef(false);
+  useEffect(() => {
+    if (showMaItems && !edgesFadedIn.current) {
+      edgesFadedIn.current = true;
+      const timer = setTimeout(() => {
+        setEdges((eds) =>
+          eds.map((e) => ({
+            ...e,
+            animated: false,
+            style: { ...e.style, opacity: 1 },
+          }))
+        );
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [showMaItems, setEdges]);
 
   useEffect(() => {
     if (hoveredItemId) {
@@ -373,9 +462,22 @@ function AllInventoryFlow() {
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-slate-200 dark:border-slate-700">
           <h1 className="text-lg font-semibold" data-testid="text-page-title">All Inventory</h1>
-          <Button variant="ghost" size="icon" data-testid="button-inventory-more">
-            <MoreHorizontal className="w-5 h-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1.5"
+              onClick={handleUpload}
+              disabled={isUploading || showMaItems}
+              data-testid="button-upload-inventory"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              Upload
+            </Button>
+            <Button variant="ghost" size="icon" data-testid="button-inventory-more">
+              <MoreHorizontal className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
 
         <div className="px-6 pt-4">
@@ -443,7 +545,7 @@ function AllInventoryFlow() {
             <InventoryListView
               columnId={activeColumn.id}
               columnLabel={activeColumn.data.label}
-              items={activeColumn.data.items}
+              items={showMaItems ? activeColumn.data.items : activeColumn.data.items.filter(i => !i.highlighted)}
               connectedItemIds={connectedItemIds}
               onItemClick={handleItemClick}
               selectedEntityId={selectedEntity?.id}

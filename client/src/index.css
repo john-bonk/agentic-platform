@@ -328,3 +328,16 @@
 .toolbar-surface {
   @apply bg-[#f9fafb] dark:bg-muted/50;
 }
+
+@keyframes fadeInItem {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes progressBar {
+  0% { width: 0%; }
+  20% { width: 15%; }
+  50% { width: 45%; }
+  80% { width: 75%; }
+  100% { width: 100%; }
+}
