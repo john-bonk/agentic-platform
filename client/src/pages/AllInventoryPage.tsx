@@ -303,7 +303,7 @@ function AllInventoryFlow() {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [showMaItems, setShowMaItems] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const { fitView } = useReactFlow();
+  const { fitView, getViewport } = useReactFlow();
   const { toast } = useToast();
 
   const { currentWorkspace } = useWorkspaceStore();
@@ -484,28 +484,6 @@ function AllInventoryFlow() {
 
   const prevPanelOpen = useRef(false);
   const prevCollapsed = useRef(isCollapsed);
-  const fitAnimRef = useRef<number | null>(null);
-
-  const animateFitView = useCallback((durationMs = 300) => {
-    if (fitAnimRef.current) cancelAnimationFrame(fitAnimRef.current);
-    const start = performance.now();
-    const step = (now: number) => {
-      const elapsed = now - start;
-      fitView({ padding: 0.15, duration: 0 });
-      if (elapsed < durationMs) {
-        fitAnimRef.current = requestAnimationFrame(step);
-      } else {
-        fitAnimRef.current = null;
-      }
-    };
-    fitAnimRef.current = requestAnimationFrame(step);
-  }, [fitView]);
-
-  useEffect(() => {
-    return () => {
-      if (fitAnimRef.current) cancelAnimationFrame(fitAnimRef.current);
-    };
-  }, []);
 
   useEffect(() => {
     const panelOpen = !!selectedEntity;
@@ -520,9 +498,13 @@ function AllInventoryFlow() {
     }
 
     if (activeTab === "overview" && (panelJustClosed || (collapsedChanged && !panelOpen))) {
-      animateFitView(300);
+      const currentZoom = getViewport().zoom;
+      const timer = setTimeout(() => {
+        fitView({ padding: 0.15, duration: 400, maxZoom: currentZoom, minZoom: currentZoom });
+      }, 50);
+      return () => clearTimeout(timer);
     }
-  }, [isCollapsed, selectedEntity, activeTab, animateFitView]);
+  }, [isCollapsed, selectedEntity, activeTab, fitView, getViewport]);
 
   const tabLabels = useMemo(() => {
     return config.inventory.columns.map((col) => ({
