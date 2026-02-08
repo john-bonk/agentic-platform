@@ -76,7 +76,8 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
 
   return (
     <aside
-      className={`flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 bg-gray-900 sticky top-0 h-screen z-50 flex-shrink-0 ${className}`}
+      className={`flex flex-col w-14 items-center justify-between pt-2 pb-2.5 px-2 bg-gray-900 sticky top-0 z-50 flex-shrink-0 ${className}`}
+      style={{ height: 'calc(100vh - var(--browser-chrome-height, 0px))' }}
       data-testid="icon-navbar"
     >
       <nav className="flex flex-col items-center gap-1 relative flex-[0_0_auto]">

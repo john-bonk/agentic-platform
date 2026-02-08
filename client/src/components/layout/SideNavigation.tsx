@@ -470,7 +470,8 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
   return (
     <>
       <nav 
-        className={`flex h-screen flex-shrink-0 z-30 transition-all duration-300 ease-in-out ${className}`}
+        className={`flex flex-shrink-0 z-30 transition-all duration-300 ease-in-out ${className}`}
+        style={{ height: 'calc(100vh - var(--browser-chrome-height, 0px))' }}
         data-testid="side-navigation"
       >
         {/* Collapsed Toolbar - Narrow vertical strip, full height */}

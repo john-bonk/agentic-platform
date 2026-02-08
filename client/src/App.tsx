@@ -59,6 +59,8 @@ import {
   FavoritesPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
+import { BrowserChrome } from "@/components/layout/BrowserChrome";
+import { useSettings } from "@/components/settings-panel";
 
 function Router() {
   return (
@@ -147,14 +149,30 @@ function Router() {
   );
 }
 
+function AppContent() {
+  const settings = useSettings();
+
+  const content = (
+    <>
+      <Toaster />
+      <Router />
+      <HomeAssistantPanel />
+    </>
+  );
+
+  if (settings.showBrowser) {
+    return <BrowserChrome>{content}</BrowserChrome>;
+  }
+
+  return content;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="app-theme">
         <TooltipProvider>
-          <Toaster />
-          <Router />
-          <HomeAssistantPanel />
+          <AppContent />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
-import { Wrench, Moon, Sun, Layout, RefreshCw, Bot, Filter } from "lucide-react";
+import { Wrench, Moon, Sun, Layout, RefreshCw, Bot, Filter, Globe } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 
 interface SettingsState {
@@ -27,6 +27,7 @@ interface SettingsState {
   includedStatuses: string[];
   agentEnabled: boolean;
   agentTone: string;
+  showBrowser: boolean;
 }
 
 const defaultSettings: SettingsState = {
@@ -35,6 +36,7 @@ const defaultSettings: SettingsState = {
   includedStatuses: ["Not Started", "In Progress", "Pending", "Blocked"],
   agentEnabled: true,
   agentTone: "professional",
+  showBrowser: false,
 };
 
 const STORAGE_KEY = "dashboard-settings";
@@ -140,6 +142,17 @@ export function SettingsPanel() {
                 checked={theme === "dark"}
                 onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
                 data-testid="switch-dark-mode"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="show-browser" className="text-sm text-muted-foreground">
+                Show Browser
+              </Label>
+              <Switch
+                id="show-browser"
+                checked={settings.showBrowser}
+                onCheckedChange={(checked) => updateSetting("showBrowser", checked)}
+                data-testid="switch-show-browser"
               />
             </div>
           </div>

@@ -8,6 +8,7 @@
 }
 
 :root {
+  --browser-chrome-height: 0px;
   --blob-green: rgba(100, 252, 217, 1);
   --blue-600: rgba(31, 93, 216, 1);
   --font-100-12px-regular-font-family: "SF Pro Display", Helvetica;

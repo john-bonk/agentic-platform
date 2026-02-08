@@ -61,7 +61,10 @@ export function AppLayout({
   const sideNavTitle = isHomeModule ? currentWorkspace.name : currentModule.name;
   
   return (
-    <div className={`flex items-start relative h-screen overflow-hidden bg-background ${className}`}>
+    <div 
+      className={`flex items-start relative overflow-hidden bg-background ${className}`}
+      style={{ height: 'calc(100vh - var(--browser-chrome-height, 0px))' }}
+    >
       {showIconNav && (
         <LeftIconNavbar 
           items={iconNavItems} 
@@ -78,7 +81,10 @@ export function AppLayout({
         />
       )}
 
-      <div className="flex flex-col flex-1 min-w-0 h-screen overflow-hidden">
+      <div 
+        className="flex flex-col flex-1 min-w-0 overflow-hidden"
+        style={{ height: 'calc(100vh - var(--browser-chrome-height, 0px))' }}
+      >
         {showHeader && <AppHeader activeTab={activeTab} />}
         
         <div className="flex flex-1 overflow-hidden relative">
