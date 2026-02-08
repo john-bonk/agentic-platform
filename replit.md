@@ -110,7 +110,7 @@ Preferred communication style: Simple, everyday language.
 - Module ORDER: Home (0), Database (1), Global Risk (2), Reporting (3), Intelligence (4), Workflows (5)
 - Database module (icon: database) owns `/inventory` and `/coverage-mapping` paths
 - Inventory/Coverage Mapping nav items live ONLY in Database module side panel, NOT in workspace home nav panels (CRO/CAE/CISO/Home)
-- Both inventory pages have top-level TabsTrigger toggle to switch between All Inventory and Coverage Mapping
+- Both inventory pages display a simple page title header; navigation between them is via the Database module side panel
 
 ### Layout Components
 - `client/src/components/layout/AppLayout.tsx` - Main page wrapper
