@@ -423,6 +423,15 @@ function AllInventoryFlow() {
     setEdges(initialEdges);
   }, [config, maActive]);
 
+  useEffect(() => {
+    setNodes((nds) =>
+      nds.map((n) => ({
+        ...n,
+        data: { ...n.data, selectedItemId },
+      }))
+    );
+  }, [selectedItemId, setNodes]);
+
   const edgesFadedIn = useRef(false);
   useEffect(() => {
     if (isEnterpriseAudit && maActive && !edgesFadedIn.current) {
@@ -475,7 +484,7 @@ function AllInventoryFlow() {
       }, 350);
       return () => clearTimeout(timer);
     }
-  }, [isCollapsed, selectedEntity, fitView, activeTab]);
+  }, [isCollapsed, fitView, activeTab]);
 
   const tabLabels = useMemo(() => {
     return config.inventory.columns.map((col) => ({
