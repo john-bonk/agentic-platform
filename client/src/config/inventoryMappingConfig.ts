@@ -867,7 +867,7 @@ export function buildInventoryEdges(config: InventoryConfig): Edge[] {
     sourceHandle: e.sourceHandle,
     target: e.target,
     targetHandle: e.targetHandle,
-    type: "smoothstep" as const,
+    type: "default" as const,
     style: { stroke: TEAL, strokeWidth: e.strokeWidth ?? 2 },
     animated: false,
   }));
@@ -898,7 +898,7 @@ export function buildCoverageEdges(config: CoverageConfig): Edge[] {
     sourceHandle: e.sourceHandle,
     target: e.target,
     targetHandle: e.targetHandle,
-    type: "smoothstep" as const,
+    type: "default" as const,
     style: { stroke: TEAL, strokeWidth: e.strokeWidth ?? 2 },
     animated: false,
   }));

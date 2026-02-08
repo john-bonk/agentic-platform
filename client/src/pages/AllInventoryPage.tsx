@@ -173,9 +173,9 @@ export default function AllInventoryPage() {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             nodeTypes={nodeTypes}
-            connectionLineType={ConnectionLineType.SmoothStep}
+            connectionLineType={ConnectionLineType.Bezier}
             defaultEdgeOptions={{
-              type: "smoothstep",
+              type: "default",
               style: { strokeWidth: 2 },
             }}
             fitView

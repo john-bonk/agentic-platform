@@ -125,7 +125,7 @@ export function EntityDetailPanel({ entity, onClose, onNavigate }: EntityDetailP
       </div>
 
       <Tabs defaultValue="overview" className="flex-1 flex flex-col overflow-hidden">
-        <TabsList className="px-4 pt-2 bg-transparent p-0 h-auto gap-4 border-b border-slate-200 dark:border-slate-700 rounded-none">
+        <TabsList className="px-6 pt-2 bg-transparent p-0 h-auto gap-4 border-b border-slate-200 dark:border-slate-700 rounded-none">
           <TabsTrigger value="overview" className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs font-medium text-slate-500" data-testid="tab-entity-overview">
             Overview
           </TabsTrigger>
