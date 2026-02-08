@@ -60,6 +60,11 @@ import { productCapabilityBuckets, getQuickActionsForWorkspace, generateNavSecti
 import { archetypeTemplates, generateHomeContent, type ArchetypeTemplate, type InjectedHomeContent } from "@/config/homeViewConfig";
 import { ArchetypeDashboard } from "@/components/workspace/ArchetypeDashboard";
 import { DefaultDashboardContent } from "@/components/workspace/DefaultDashboardContent";
+import {
+  HomePageContent,
+  workspaceContent,
+  generateCustomWorkspaceContent,
+} from "@/components/workspace/HomePageContent";
 
 interface DynamicTask {
   id: string;
@@ -492,6 +497,28 @@ export default function CustomWorkspaceHome() {
     return { highPriority, inProgress, dueToday };
   }, [tasks]);
   
+  if (selectedArchetype && selectedArchetype.id === "auditboard-default") {
+    const selectedCaps = currentWorkspace?.selectedCapabilities || [];
+    const homeContent = selectedCaps.length > 0
+      ? generateCustomWorkspaceContent(selectedCaps)
+      : workspaceContent["enterprise-risk"];
+    const welcomeMsg = userPersona === "Executive"
+      ? "Welcome back!"
+      : `Welcome back, ${userPersona}`;
+
+    return (
+      <AppLayout>
+        <div data-testid="page-custom-workspace-home">
+          <HomePageContent
+            content={homeContent}
+            welcomeMessage={welcomeMsg}
+            showWorkspaces={false}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
   if (selectedArchetype && selectedArchetype.id === "analytics-dashboard") {
     return (
       <AppLayout>

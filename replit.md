@@ -210,3 +210,22 @@ The AuditBoard Assistant includes an integrated intelligence layer for context-a
 - Uses Drizzle ORM for type-safe database access
 - Implements shared types between client and server via `shared` directory
 - Intelligence uses keyword-based routing (no external APIs required)
+
+## CRITICAL: AuditBoard Default / Enterprise Risk Parity
+
+**HomePageContent is the SINGLE SOURCE OF TRUTH for the AuditBoard home dashboard.**
+
+The Enterprise Risk workspace home page (teal hero header, assistant card, inbox tabs, donut chart, tariff task list, workspace switcher) is rendered by `HomePageContent` component (`client/src/components/workspace/HomePageContent.tsx`).
+
+When users create a workspace via the wizard and select "AuditBoard Default" layout, the resulting workspace MUST render using this exact same `HomePageContent` component - NOT through `ArchetypeDashboard`.
+
+**Architecture:**
+- `HomePage.tsx` uses `HomePageContent` for default workspaces (Enterprise Risk, Enterprise Audit, IT Security)
+- `CustomWorkspaceHome.tsx` uses `HomePageContent` when archetype is `auditboard-default`
+- `HomeViewStep.tsx` uses `HomePageContent` for the wizard preview of `auditboard-default`
+- `ArchetypeDashboard` is used ONLY for other archetype layouts (Command Center, CISO, CAE, etc.)
+
+**DO NOT** route `auditboard-default` through `ArchetypeDashboard`. These are fundamentally different rendering systems.
+
+**Tests:** 35 parity tests in `client/src/components/workspace/__tests__/auditboard-default-parity.test.ts`
+Run with: `npx vitest run --config vitest.config.ts`

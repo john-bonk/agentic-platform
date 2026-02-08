@@ -22,6 +22,10 @@ import {
 } from "@/config/homeViewConfig";
 import { ArchetypeDashboard } from "@/components/workspace/ArchetypeDashboard";
 import { DefaultDashboardContent } from "@/components/workspace/DefaultDashboardContent";
+import {
+  HomePageContent,
+  workspaceContent,
+} from "@/components/workspace/HomePageContent";
 
 interface HomeViewStepProps {
   selectedArchetype: string;
@@ -185,7 +189,14 @@ function LiveDashboardPreview({ archetype, selectedModules, enabledModules }: { 
             transformOrigin: "top left",
           }}
         >
-          {archetype.id === "analytics-dashboard" ? (
+          {archetype.id === "auditboard-default" ? (
+            <HomePageContent
+              content={workspaceContent["enterprise-risk"]}
+              welcomeMessage="Welcome back, CRO"
+              showWorkspaces={true}
+              compact
+            />
+          ) : archetype.id === "analytics-dashboard" ? (
             <DefaultDashboardContent title="Analytics Dashboard" compact />
           ) : (
             <ArchetypeDashboard
