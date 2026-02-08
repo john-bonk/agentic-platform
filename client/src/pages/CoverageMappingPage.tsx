@@ -31,6 +31,7 @@ interface GroupNodeData {
   items: { id: string; label: string; highlighted?: boolean }[];
   headerColor: string;
   column: "left" | "right";
+  nodeWidth?: number;
   connectedItemIds?: Set<string>;
   onItemClick?: (itemId: string, itemLabel: string, groupType: string) => void;
   onItemHover?: (itemId: string) => void;
@@ -40,8 +41,8 @@ interface GroupNodeData {
 function GroupNode({ data, id }: { data: GroupNodeData; id: string }) {
   return (
     <div 
-      className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 min-w-[200px] overflow-visible"
-      style={{ minWidth: 200 }}
+      className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-visible"
+      style={{ width: data.nodeWidth ?? 200, minWidth: data.nodeWidth ?? 200 }}
     >
       <div 
         className="flex items-center justify-between px-3 py-2 rounded-t-lg"

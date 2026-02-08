@@ -292,6 +292,17 @@ const enterpriseAuditCoverage: CoverageConfig = {
     { id: "e11", source: "controls", sourceHandle: "source-climate-change-mitigation", target: "processes", targetHandle: "target-waste-treatment" },
     { id: "e12", source: "controls", sourceHandle: "source-supply-chain-traceability", target: "processes", targetHandle: "target-energy-consumption" },
     { id: "e13", source: "controls", sourceHandle: "source-regulatory-compliance-audits", target: "processes", targetHandle: "target-water-usage" },
+    { id: "e14", source: "compliance-frameworks", sourceHandle: "source-iso-22000", target: "facilities", targetHandle: "target-se-east-bio" },
+    { id: "e15", source: "compliance-frameworks", sourceHandle: "source-iso-14001", target: "processes", targetHandle: "target-waste-treatment" },
+    { id: "e16", source: "policies", sourceHandle: "source-sustainable-sourcing", target: "product-lines", targetHandle: "target-algae-based-proteins" },
+    { id: "e17", source: "policies", sourceHandle: "source-sustainable-sourcing", target: "processes", targetHandle: "target-raw-material-procurement" },
+    { id: "e18", source: "risks", sourceHandle: "source-climate-supply-disruption", target: "processes", targetHandle: "target-energy-consumption" },
+    { id: "e19", source: "risks", sourceHandle: "source-food-contamination", target: "product-lines", targetHandle: "target-seafood-alternatives" },
+    { id: "e20", source: "risks", sourceHandle: "source-cybersecurity-breach", target: "it-systems", targetHandle: "target-supply-chain-mgmt" },
+    { id: "e21", source: "controls", sourceHandle: "source-climate-change-mitigation", target: "it-systems", targetHandle: "target-environmental-monitoring" },
+    { id: "e22", source: "controls", sourceHandle: "source-regulatory-compliance-audits", target: "facilities", targetHandle: "target-se-west-hq" },
+    { id: "e23", source: "risks", sourceHandle: "source-market-volatility", target: "product-lines", targetHandle: "target-hydroponic-microgreens" },
+    { id: "e24", source: "controls", sourceHandle: "source-supply-chain-traceability", target: "product-lines", targetHandle: "target-algae-based-proteins" },
   ],
 };
 
@@ -882,12 +893,29 @@ export function buildCoverageNodes(
   const ITEM_PADDING = 12;
   const GAP = 24;
   const START_Y = 50;
+  const CHAR_WIDTH = 7.5;
+  const NODE_PADDING = 60;
+  const MIN_WIDTH = 200;
 
   const estimateHeight = (group: CoverageGroupData) =>
     HEADER_HEIGHT + ITEM_PADDING + group.items.length * ITEM_HEIGHT;
 
   const leftGroups = config.groups.filter((g) => g.column === "left");
   const rightGroups = config.groups.filter((g) => g.column === "right");
+
+  const computeColumnWidth = (groups: CoverageGroupData[]) => {
+    let maxLen = 0;
+    for (const g of groups) {
+      maxLen = Math.max(maxLen, g.label.length);
+      for (const item of g.items) {
+        maxLen = Math.max(maxLen, item.label.length);
+      }
+    }
+    return Math.max(MIN_WIDTH, maxLen * CHAR_WIDTH + NODE_PADDING);
+  };
+
+  const leftWidth = computeColumnWidth(leftGroups);
+  const rightWidth = computeColumnWidth(rightGroups);
 
   const computePositions = (groups: CoverageGroupData[]) => {
     const positions = new Map<string, number>();
@@ -914,6 +942,7 @@ export function buildCoverageNodes(
       headerColor: group.headerColor,
       items: group.items,
       column: group.column,
+      nodeWidth: group.column === "left" ? leftWidth : rightWidth,
       onItemClick,
     },
   }));
