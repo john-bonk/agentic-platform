@@ -85,7 +85,10 @@ export function EntityDetailPanel({ entity, onClose, onNavigate }: EntityDetailP
   const Icon = typeIcons[entity.type] || Building2;
 
   return (
-    <div className="fixed right-0 top-0 h-full w-[420px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-xl z-50 flex flex-col">
+    <div 
+      className="fixed right-0 top-0 h-full w-[420px] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-xl z-50 flex flex-col"
+      style={{ animation: 'slideInPanel 0.3s ease-in-out' }}
+    >
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-[#266C92]/10 flex items-center justify-center">

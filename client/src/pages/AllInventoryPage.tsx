@@ -484,6 +484,29 @@ function AllInventoryFlow() {
 
   const prevPanelOpen = useRef(false);
   const prevCollapsed = useRef(isCollapsed);
+  const fitAnimRef = useRef<number | null>(null);
+
+  const animateFitView = useCallback((durationMs = 300) => {
+    if (fitAnimRef.current) cancelAnimationFrame(fitAnimRef.current);
+    const start = performance.now();
+    const step = (now: number) => {
+      const elapsed = now - start;
+      fitView({ padding: 0.15, duration: 0 });
+      if (elapsed < durationMs) {
+        fitAnimRef.current = requestAnimationFrame(step);
+      } else {
+        fitAnimRef.current = null;
+      }
+    };
+    fitAnimRef.current = requestAnimationFrame(step);
+  }, [fitView]);
+
+  useEffect(() => {
+    return () => {
+      if (fitAnimRef.current) cancelAnimationFrame(fitAnimRef.current);
+    };
+  }, []);
+
   useEffect(() => {
     const panelOpen = !!selectedEntity;
     const panelJustClosed = prevPanelOpen.current && !panelOpen;
@@ -497,12 +520,9 @@ function AllInventoryFlow() {
     }
 
     if (activeTab === "overview" && (panelJustClosed || (collapsedChanged && !panelOpen))) {
-      const timer = setTimeout(() => {
-        fitView({ padding: 0.15, duration: 300 });
-      }, 350);
-      return () => clearTimeout(timer);
+      animateFitView(300);
     }
-  }, [isCollapsed, selectedEntity, fitView, activeTab]);
+  }, [isCollapsed, selectedEntity, activeTab, animateFitView]);
 
   const tabLabels = useMemo(() => {
     return config.inventory.columns.map((col) => ({
