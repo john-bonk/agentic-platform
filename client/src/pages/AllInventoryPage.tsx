@@ -297,6 +297,9 @@ function AllInventoryFlow() {
   const { currentWorkspace } = useWorkspaceStore();
   const { isCollapsed } = useSideNavStore();
 
+  const isEnterpriseAudit = currentWorkspace.id === "enterprise-audit";
+  const maActive = isEnterpriseAudit ? showMaItems : true;
+
   const handleItemClick = useCallback((itemId: string, itemLabel: string, groupType: string) => {
     const details = generateEntityDetails(itemId, itemLabel, groupType);
     setSelectedEntity(details);
@@ -367,21 +370,26 @@ function AllInventoryFlow() {
         connectedItemIds, 
         onItemHover, 
         onItemLeave,
-        showMaItems,
-        isFirstColumn: idx === 0,
-        isLastColumn: idx === columnCount - 1,
+        showMaItems: maActive,
+        isFirstColumn: isEnterpriseAudit && idx === 0,
+        isLastColumn: isEnterpriseAudit && idx === columnCount - 1,
       },
     })),
-    [config, handleItemClick, connectedItemIds, onItemHover, onItemLeave, showMaItems, columnCount]
+    [config, handleItemClick, connectedItemIds, onItemHover, onItemLeave, maActive, columnCount, isEnterpriseAudit]
   );
 
   const initialEdges = useMemo(
-    () => showMaItems ? buildInventoryEdges(config.inventory).map(e => ({
-      ...e,
-      animated: true,
-      style: { ...e.style, opacity: 0 },
-    })) : [],
-    [config, showMaItems]
+    () => {
+      const allEdges = buildInventoryEdges(config.inventory);
+      if (!isEnterpriseAudit) return allEdges;
+      if (!maActive) return [];
+      return allEdges.map(e => ({
+        ...e,
+        animated: true,
+        style: { ...e.style, opacity: 0 },
+      }));
+    },
+    [config, maActive, isEnterpriseAudit]
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -390,11 +398,11 @@ function AllInventoryFlow() {
   useEffect(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
-  }, [config, showMaItems]);
+  }, [config, maActive]);
 
   const edgesFadedIn = useRef(false);
   useEffect(() => {
-    if (showMaItems && !edgesFadedIn.current) {
+    if (isEnterpriseAudit && maActive && !edgesFadedIn.current) {
       edgesFadedIn.current = true;
       const timer = setTimeout(() => {
         setEdges((eds) =>
@@ -463,17 +471,19 @@ function AllInventoryFlow() {
         <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-slate-200 dark:border-slate-700">
           <h1 className="text-lg font-semibold" data-testid="text-page-title">All Inventory</h1>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-1.5"
-              onClick={handleUpload}
-              disabled={isUploading || showMaItems}
-              data-testid="button-upload-inventory"
-            >
-              <Upload className="w-3.5 h-3.5" />
-              Upload
-            </Button>
+            {isEnterpriseAudit && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-1.5"
+                onClick={handleUpload}
+                disabled={isUploading || showMaItems}
+                data-testid="button-upload-inventory"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                Upload
+              </Button>
+            )}
             <Button variant="ghost" size="icon" data-testid="button-inventory-more">
               <MoreHorizontal className="w-5 h-5" />
             </Button>
@@ -545,7 +555,7 @@ function AllInventoryFlow() {
             <InventoryListView
               columnId={activeColumn.id}
               columnLabel={activeColumn.data.label}
-              items={showMaItems ? activeColumn.data.items : activeColumn.data.items.filter(i => !i.highlighted)}
+              items={maActive ? activeColumn.data.items : activeColumn.data.items.filter(i => !i.highlighted)}
               connectedItemIds={connectedItemIds}
               onItemClick={handleItemClick}
               selectedEntityId={selectedEntity?.id}
