@@ -12,8 +12,10 @@ import {
   Position,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { useLocation } from "wouter";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Info, Filter, MoreHorizontal } from "lucide-react";
 import { EntityDetailPanel, EntityDetails, generateEntityDetails } from "@/components/inventory/EntityDetailPanel";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
@@ -90,6 +92,7 @@ const nodeTypes = {
 
 export default function CoverageMappingPage() {
   const [selectedEntity, setSelectedEntity] = useState<EntityDetails | null>(null);
+  const [, setLocation] = useLocation();
   const { currentWorkspace } = useWorkspaceStore();
 
   const handleItemClick = useCallback((itemId: string, itemLabel: string, groupType: string) => {
@@ -123,10 +126,26 @@ export default function CoverageMappingPage() {
   return (
     <AppLayout>
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Coverage Mapping</h1>
-          </div>
+        <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 dark:border-slate-700">
+          <Tabs value="coverage" className="w-auto">
+            <TabsList className="bg-transparent p-0 h-auto gap-6 border-b border-transparent">
+              <TabsTrigger 
+                value="inventory"
+                className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-slate-500"
+                onClick={() => setLocation("/inventory")}
+                data-testid="toggle-all-inventory"
+              >
+                All Inventory
+              </TabsTrigger>
+              <TabsTrigger 
+                value="coverage"
+                className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-slate-500"
+                data-testid="toggle-coverage-mapping"
+              >
+                Coverage Mapping
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
           <Button variant="ghost" size="icon" data-testid="button-coverage-more">
             <MoreHorizontal className="w-5 h-5" />
           </Button>

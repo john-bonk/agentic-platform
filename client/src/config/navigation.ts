@@ -18,7 +18,7 @@ import {
 
 export type IconNavItem = 
   | { type: "image"; src: string; alt: string; active: boolean; path?: string; modulePrefix?: string }
-  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity" | "bar-chart-3" | "shield"; alt: string; active: boolean; path?: string; modulePrefix?: string };
+  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity" | "bar-chart-3" | "shield" | "database"; alt: string; active: boolean; path?: string; modulePrefix?: string };
 
 export interface SideNavItem {
   id: string;
@@ -90,16 +90,6 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         ],
       },
       {
-        id: "cro-inventory",
-        title: "Inventory",
-        defaultExpanded: true,
-        collapsible: true,
-        items: [
-          { id: "all-inventory", label: "All Inventory", path: "/inventory" },
-          { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
-        ],
-      },
-      {
         id: "cro-environment",
         title: "Environment",
         defaultExpanded: true,
@@ -138,16 +128,6 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
           { id: "global-residual-risk-cae", label: "Global Residual Risk", path: "/global-residual-risk" },
           { id: "org-impact", label: "Org Impact Analysis", path: "/org-impact" },
-        ],
-      },
-      {
-        id: "cae-inventory",
-        title: "Inventory",
-        defaultExpanded: true,
-        collapsible: true,
-        items: [
-          { id: "all-inventory", label: "All Inventory", path: "/inventory" },
-          { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
         ],
       },
       {
@@ -191,16 +171,6 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
           { id: "global-residual-risk-ciso", label: "Global Residual Risk", path: "/global-residual-risk" },
           { id: "threat-detection", label: "Threat Detection", path: "/threat-detection" },
           { id: "vulnerability-scan", label: "Vulnerability Scan", path: "/vulnerability-scan" },
-        ],
-      },
-      {
-        id: "ciso-inventory",
-        title: "Inventory",
-        defaultExpanded: true,
-        collapsible: true,
-        items: [
-          { id: "all-inventory", label: "All Inventory", path: "/inventory" },
-          { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
         ],
       },
       {
@@ -275,16 +245,6 @@ export const modules: ModuleConfig[] = [
         ],
       },
       {
-        id: "home-inventory",
-        title: "Inventory",
-        defaultExpanded: true,
-        collapsible: true,
-        items: [
-          { id: "all-inventory", label: "All Inventory", path: "/inventory" },
-          { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
-        ],
-      },
-      {
         id: "home-environment",
         title: "Environment",
         defaultExpanded: true,
@@ -307,6 +267,23 @@ export const modules: ModuleConfig[] = [
           { id: "open-tasks", label: "Open Tasks", path: "/open-tasks", badge: "4" },
           { id: "financial-accounts-view", label: "Financial Accounts View", path: "/financial-accounts-view" },
           { id: "financial-applications-view", label: "Financial Applications View", path: "/financial-applications-view" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "database",
+    name: "Database",
+    icon: { type: "lucide", icon: "database", alt: "Database", active: false, path: "/inventory", modulePrefix: "/inventory" },
+    sideNavSections: [
+      {
+        id: "db-inventory",
+        title: "Inventory",
+        defaultExpanded: true,
+        collapsible: true,
+        items: [
+          { id: "all-inventory", label: "All Inventory", path: "/inventory" },
+          { id: "coverage-mapping", label: "Coverage Mapping", path: "/coverage-mapping" },
         ],
       },
     ],
@@ -448,24 +425,28 @@ export const sideNavSections: SideNavSection[] = modules[0].sideNavSections;
 /**
  * Get module configuration based on current path
  * Ensures exclusive active state - only one module active at a time
- * ORDER: Home (0), Global Risk (1), Reporting (2), Intelligence (3), Workflows (4)
+ * ORDER: Home (0), Database (1), Global Risk (2), Reporting (3), Intelligence (4), Workflows (5)
  */
 export function getModuleFromPath(path: string): ModuleConfig {
+  // Database module (Inventory & Coverage Mapping)
+  if (path.startsWith("/inventory") || path.startsWith("/coverage-mapping")) {
+    return modules[1]; // Database
+  }
   // Residual Risk module (CRO, CAE, CISO direct paths)
   if (path.startsWith("/cro") || path.startsWith("/cae") || path.startsWith("/ciso")) {
-    return modules[1]; // Global Risk
+    return modules[2]; // Global Risk
   }
   // Reporting module
   if (path.startsWith("/reporting")) {
-    return modules[2]; // Reporting
+    return modules[3]; // Reporting
   }
   // Intelligence Hub module
   if (path.startsWith("/intelligence")) {
-    return modules[3]; // Intelligence Hub
+    return modules[4]; // Intelligence Hub
   }
   // Workflow module: any path starting with /workflow (includes /workflows and /workflow/:id)
   if (path.startsWith("/workflow")) {
-    return modules[4]; // Workflows
+    return modules[5]; // Workflows
   }
   // Default to Home
   return modules[0];
@@ -475,7 +456,7 @@ export function getModuleFromPath(path: string): ModuleConfig {
  * Home paths - all paths that belong to the Home module
  */
 const homePaths = [
-  "/", "/my-dashboard", "/custom-workspace", "/inventory", "/coverage-mapping", "/controls", "/tests", 
+  "/", "/my-dashboard", "/custom-workspace", "/controls", "/tests", 
   "/issues", "/financial-accounts", "/risk-control-matrix", "/coso-framework", 
   "/open-tasks", "/financial-accounts-view", "/financial-applications-view", 
   "/profile", "/wizard", "/demo", "/items", "/global-residual-risk",
@@ -485,7 +466,7 @@ const homePaths = [
 /**
  * Determine which module is active based on path
  * Returns the index of the active module, or -1 for special pages (prototype-meta)
- * ORDER: Home (0), Global Risk (1), Reporting (2), Intelligence (3), Workflows (4)
+ * ORDER: Home (0), Database (1), Global Risk (2), Reporting (3), Intelligence (4), Workflows (5)
  */
 export function getActiveModuleIndex(path: string): number {
   // Special pages that don't belong to any module
@@ -493,24 +474,29 @@ export function getActiveModuleIndex(path: string): number {
     return -1; // No module active - the Cog icon handles its own active state
   }
   
+  // Database module (Inventory & Coverage Mapping)
+  if (path.startsWith("/inventory") || path.startsWith("/coverage-mapping")) {
+    return 1; // Database module
+  }
+  
   // Residual Risk module (CRO, CAE, CISO direct paths)
   if (path.startsWith("/cro") || path.startsWith("/cae") || path.startsWith("/ciso")) {
-    return 1; // Global Risk module
+    return 2; // Global Risk module
   }
   
   // Reporting module
   if (path.startsWith("/reporting")) {
-    return 2; // Reporting module
+    return 3; // Reporting module
   }
   
   // Intelligence Hub module
   if (path.startsWith("/intelligence")) {
-    return 3; // Intelligence Hub module
+    return 4; // Intelligence Hub module
   }
   
   // Workflow module: any path starting with /workflow
   if (path.startsWith("/workflow")) {
-    return 4; // Workflows module
+    return 5; // Workflows module
   }
   
   // Check if path matches Home module paths

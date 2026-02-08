@@ -106,6 +106,12 @@ Preferred communication style: Simple, everyday language.
 - `client/src/pages/AllInventoryPage.tsx` - ReactFlow inventory view with dynamic tabs per workspace
 - `client/src/pages/CoverageMappingPage.tsx` - ReactFlow coverage mapping with left→right source/target handles, single TEAL edges
 
+### Global Navigation (Left Icon Navbar)
+- Module ORDER: Home (0), Database (1), Global Risk (2), Reporting (3), Intelligence (4), Workflows (5)
+- Database module (icon: database) owns `/inventory` and `/coverage-mapping` paths
+- Inventory/Coverage Mapping nav items live ONLY in Database module side panel, NOT in workspace home nav panels (CRO/CAE/CISO/Home)
+- Both inventory pages have top-level TabsTrigger toggle to switch between All Inventory and Coverage Mapping
+
 ### Layout Components
 - `client/src/components/layout/AppLayout.tsx` - Main page wrapper
 - `client/src/components/layout/PageHeader.tsx` - Reusable page header

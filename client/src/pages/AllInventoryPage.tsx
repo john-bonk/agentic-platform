@@ -12,6 +12,7 @@ import {
   Position,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { useLocation } from "wouter";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -87,6 +88,7 @@ const nodeTypes = {
 export default function AllInventoryPage() {
   const [selectedEntity, setSelectedEntity] = useState<EntityDetails | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const [, setLocation] = useLocation();
   const { currentWorkspace } = useWorkspaceStore();
 
   const handleItemClick = useCallback((itemId: string, itemLabel: string, groupType: string) => {
@@ -127,10 +129,26 @@ export default function AllInventoryPage() {
   return (
     <AppLayout>
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">All Inventory</h1>
-          </div>
+        <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 dark:border-slate-700">
+          <Tabs value="inventory" className="w-auto">
+            <TabsList className="bg-transparent p-0 h-auto gap-6 border-b border-transparent">
+              <TabsTrigger 
+                value="inventory"
+                className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-slate-500"
+                data-testid="toggle-all-inventory"
+              >
+                All Inventory
+              </TabsTrigger>
+              <TabsTrigger 
+                value="coverage"
+                className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm font-medium text-slate-500"
+                onClick={() => setLocation("/coverage-mapping")}
+                data-testid="toggle-coverage-mapping"
+              >
+                Coverage Mapping
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
           <Button variant="ghost" size="icon" data-testid="button-inventory-more">
             <MoreHorizontal className="w-5 h-5" />
           </Button>

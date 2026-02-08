@@ -97,10 +97,10 @@ export function EntityDetailPanel({ entity, onClose, onNavigate }: EntityDetailP
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8" data-testid="button-entity-more">
+          <Button variant="ghost" size="icon" data-testid="button-entity-more">
             <MoreHorizontal className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose} data-testid="button-close-panel">
+          <Button variant="ghost" size="icon" onClick={onClose} data-testid="button-close-panel">
             <X className="w-4 h-4" />
           </Button>
         </div>
@@ -125,14 +125,14 @@ export function EntityDetailPanel({ entity, onClose, onNavigate }: EntityDetailP
       </div>
 
       <Tabs defaultValue="overview" className="flex-1 flex flex-col overflow-hidden">
-        <TabsList className="mx-4 mt-3 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
-          <TabsTrigger value="overview" className="text-xs px-3 py-1.5 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700" data-testid="tab-entity-overview">
+        <TabsList className="px-4 pt-2 bg-transparent p-0 h-auto gap-4 border-b border-slate-200 dark:border-slate-700 rounded-none">
+          <TabsTrigger value="overview" className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs font-medium text-slate-500" data-testid="tab-entity-overview">
             Overview
           </TabsTrigger>
-          <TabsTrigger value="relationships" className="text-xs px-3 py-1.5 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700" data-testid="tab-entity-relationships">
+          <TabsTrigger value="relationships" className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs font-medium text-slate-500" data-testid="tab-entity-relationships">
             Relationships
           </TabsTrigger>
-          <TabsTrigger value="activity" className="text-xs px-3 py-1.5 rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700" data-testid="tab-entity-activity">
+          <TabsTrigger value="activity" className="bg-transparent px-0 pb-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#266C92] data-[state=active]:text-[#266C92] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs font-medium text-slate-500" data-testid="tab-entity-activity">
             Activity
           </TabsTrigger>
         </TabsList>
