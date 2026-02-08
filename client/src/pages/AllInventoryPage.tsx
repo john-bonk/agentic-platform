@@ -307,7 +307,8 @@ function AllInventoryFlow() {
   const { toast } = useToast();
 
   const { currentWorkspace } = useWorkspaceStore();
-  const { isCollapsed } = useSideNavStore();
+  const { isCollapsed, setCollapsed } = useSideNavStore();
+  const autoCollapsedRef = useRef(false);
 
   const isEnterpriseAudit = currentWorkspace.id === "enterprise-audit";
   const maActive = isEnterpriseAudit ? showMaItems : true;
@@ -317,7 +318,11 @@ function AllInventoryFlow() {
     setSelectedEntity(details);
     setSelectedItemId(itemId);
     setHoveredItemId(null);
-  }, []);
+    if (!isCollapsed) {
+      autoCollapsedRef.current = true;
+      setCollapsed(true);
+    }
+  }, [isCollapsed, setCollapsed]);
 
   const handleClosePanel = useCallback(() => {
     setSelectedEntity(null);
@@ -478,12 +483,20 @@ function AllInventoryFlow() {
   }, [activeHighlightId, setEdges]);
 
   const prevPanelOpen = useRef(false);
+  const prevCollapsed = useRef(isCollapsed);
   useEffect(() => {
     const panelOpen = !!selectedEntity;
     const panelJustClosed = prevPanelOpen.current && !panelOpen;
+    const collapsedChanged = prevCollapsed.current !== isCollapsed;
     prevPanelOpen.current = panelOpen;
+    prevCollapsed.current = isCollapsed;
 
-    if (activeTab === "overview" && (panelJustClosed || !panelOpen)) {
+    if (collapsedChanged && autoCollapsedRef.current) {
+      autoCollapsedRef.current = false;
+      return;
+    }
+
+    if (activeTab === "overview" && (panelJustClosed || (collapsedChanged && !panelOpen))) {
       const timer = setTimeout(() => {
         fitView({ padding: 0.15, duration: 300 });
       }, 350);
