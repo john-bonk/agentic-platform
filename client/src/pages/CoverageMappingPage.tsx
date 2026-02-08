@@ -211,13 +211,13 @@ function CoverageMappingFlow() {
         </div>
 
         <div className="mx-6 mt-4 mb-2">
-          <div className="flex items-start gap-3 px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-            <Info className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 px-4 py-3 bg-[#266C92]/8 dark:bg-[#266C92]/15 border border-[#266C92]/20 dark:border-[#266C92]/30 rounded-lg">
+            <Info className="w-5 h-5 text-[#266C92] dark:text-[#4a9bc7] flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+              <p className="text-sm font-medium text-[#1a4f6e] dark:text-[#7ec0e0]">
                 {config.coverage.banner.title}
               </p>
-              <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">
+              <p className="text-xs text-[#266C92] dark:text-[#4a9bc7] mt-0.5">
                 {config.coverage.banner.subtitle}
               </p>
             </div>
