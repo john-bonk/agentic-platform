@@ -477,14 +477,19 @@ function AllInventoryFlow() {
     }
   }, [activeHighlightId, setEdges]);
 
+  const prevPanelOpen = useRef(false);
   useEffect(() => {
-    if (activeTab === "overview") {
+    const panelOpen = !!selectedEntity;
+    const panelJustClosed = prevPanelOpen.current && !panelOpen;
+    prevPanelOpen.current = panelOpen;
+
+    if (activeTab === "overview" && (panelJustClosed || !panelOpen)) {
       const timer = setTimeout(() => {
         fitView({ padding: 0.15, duration: 300 });
       }, 350);
       return () => clearTimeout(timer);
     }
-  }, [isCollapsed, fitView, activeTab]);
+  }, [isCollapsed, selectedEntity, fitView, activeTab]);
 
   const tabLabels = useMemo(() => {
     return config.inventory.columns.map((col) => ({
