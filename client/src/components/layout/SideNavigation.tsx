@@ -498,29 +498,29 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
             <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
               <Link href={currentWorkspace.isCustom ? "/custom-workspace" : "/"}>
                 <button
-                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${isHomeActive ? "dark:bg-[#1d212b]" : ""}`}
+                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${isHomeActive ? "bg-teal-50 dark:bg-primary/10" : ""}`}
                   data-testid="nav-collapsed-home"
                   title="Home"
                 >
-                  <Home className={`w-3 h-3 ${isHomeActive ? "text-[#266C92] dark:text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
+                  <Home className={`w-3 h-3 ${isHomeActive ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
                 </button>
               </Link>
               <Link href="/recent">
                 <button
-                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${location === "/recent" ? "dark:bg-[#1d212b]" : ""}`}
+                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${location === "/recent" ? "bg-teal-50 dark:bg-primary/10" : ""}`}
                   data-testid="nav-collapsed-recent"
                   title="Recent"
                 >
-                  <Clock className={`w-3 h-3 ${location === "/recent" ? "text-[#266C92] dark:text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
+                  <Clock className={`w-3 h-3 ${location === "/recent" ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
                 </button>
               </Link>
               <Link href="/favorites">
                 <button
-                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${location === "/favorites" ? "dark:bg-[#1d212b]" : ""}`}
+                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${location === "/favorites" ? "bg-teal-50 dark:bg-primary/10" : ""}`}
                   data-testid="nav-collapsed-favorites"
                   title="Favorites"
                 >
-                  <Star className={`w-3 h-3 ${location === "/favorites" ? "text-[#266C92] dark:text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
+                  <Star className={`w-3 h-3 ${location === "/favorites" ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
                 </button>
               </Link>
             </div>
@@ -530,20 +530,20 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
             <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
               <Link href="/inventory">
                 <button
-                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${location === "/inventory" ? "dark:bg-[#1d212b]" : ""}`}
+                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${location === "/inventory" ? "bg-teal-50 dark:bg-primary/10" : ""}`}
                   data-testid="nav-collapsed-inventory"
                   title="All Inventory"
                 >
-                  <Layers className={`w-3 h-3 ${location === "/inventory" ? "text-[#266C92] dark:text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
+                  <Layers className={`w-3 h-3 ${location === "/inventory" ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
                 </button>
               </Link>
               <Link href="/coverage-mapping">
                 <button
-                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${location === "/coverage-mapping" ? "dark:bg-[#1d212b]" : ""}`}
+                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${location === "/coverage-mapping" ? "bg-teal-50 dark:bg-primary/10" : ""}`}
                   data-testid="nav-collapsed-coverage"
                   title="Coverage Mapping"
                 >
-                  <GitBranch className={`w-3 h-3 ${location === "/coverage-mapping" ? "text-[#266C92] dark:text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
+                  <GitBranch className={`w-3 h-3 ${location === "/coverage-mapping" ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
                 </button>
               </Link>
             </div>
