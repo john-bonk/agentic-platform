@@ -33,6 +33,8 @@ interface GroupNodeData {
   column: "left" | "right";
   connectedItemIds?: Set<string>;
   onItemClick?: (itemId: string, itemLabel: string, groupType: string) => void;
+  onItemHover?: (itemId: string) => void;
+  onItemLeave?: () => void;
 }
 
 function GroupNode({ data, id }: { data: GroupNodeData; id: string }) {
@@ -66,12 +68,14 @@ function GroupNode({ data, id }: { data: GroupNodeData; id: string }) {
                 if (isConnected) {
                   e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.15)';
                   e.currentTarget.style.color = '#7c3aed';
+                  data.onItemHover?.(item.id);
                 }
               }}
               onMouseLeave={(e) => {
                 if (isConnected) {
                   e.currentTarget.style.backgroundColor = '';
                   e.currentTarget.style.color = '';
+                  data.onItemLeave?.();
                 }
               }}
               onClick={() => data.onItemClick?.(item.id, item.label, id)}
@@ -110,6 +114,7 @@ const nodeTypes = {
 
 function CoverageMappingFlow() {
   const [selectedEntity, setSelectedEntity] = useState<EntityDetails | null>(null);
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
   const { fitView } = useReactFlow();
 
   const { currentWorkspace } = useWorkspaceStore();
@@ -119,6 +124,9 @@ function CoverageMappingFlow() {
     const details = generateEntityDetails(itemId, itemLabel, groupType);
     setSelectedEntity(details);
   }, []);
+
+  const onItemHover = useCallback((itemId: string) => setHoveredItemId(itemId), []);
+  const onItemLeave = useCallback(() => setHoveredItemId(null), []);
 
   const config = useMemo(
     () => getWorkspaceViewConfig(currentWorkspace.id, currentWorkspace.isCustom),
@@ -139,9 +147,9 @@ function CoverageMappingFlow() {
   const initialNodes = useMemo(
     () => buildCoverageNodes(config.coverage, handleItemClick).map((n) => ({
       ...n,
-      data: { ...n.data, connectedItemIds },
+      data: { ...n.data, connectedItemIds, onItemHover, onItemLeave },
     })),
-    [config, handleItemClick, connectedItemIds]
+    [config, handleItemClick, connectedItemIds, onItemHover, onItemLeave]
   );
 
   const initialEdges = useMemo(
@@ -155,12 +163,39 @@ function CoverageMappingFlow() {
   useEffect(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
-  }, [config]);
+  }, [config, initialNodes]);
+
+  useEffect(() => {
+    if (hoveredItemId) {
+      setEdges((eds) =>
+        eds.map((e) => {
+          const srcId = e.sourceHandle?.replace("source-", "");
+          const tgtId = e.targetHandle?.replace("target-", "");
+          const isRelated = srcId === hoveredItemId || tgtId === hoveredItemId;
+          return {
+            ...e,
+            style: {
+              ...e.style,
+              stroke: isRelated ? '#7c3aed' : '#266C92',
+              strokeWidth: isRelated ? 2.5 : 2,
+            },
+          };
+        })
+      );
+    } else {
+      setEdges((eds) =>
+        eds.map((e) => ({
+          ...e,
+          style: { ...e.style, stroke: '#266C92', strokeWidth: 2 },
+        }))
+      );
+    }
+  }, [hoveredItemId, setEdges]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fitView({ padding: 0.2, duration: 300 });
-    }, 350);
+      fitView({ padding: 0.2, duration: 200 });
+    }, 50);
     return () => clearTimeout(timer);
   }, [isCollapsed, selectedEntity, fitView]);
 
