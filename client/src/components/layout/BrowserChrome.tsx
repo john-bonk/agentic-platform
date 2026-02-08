@@ -48,7 +48,7 @@ export function BrowserChrome({ children, visible, tabs: externalTabs }: Browser
           data-testid="browser-chrome-bar"
         >
           <div className="flex items-end h-[38px] pl-[76px] pr-2 pt-[8px] gap-0 relative">
-            <div className="flex items-center gap-[6px] absolute left-3 top-[8px]">
+            <div className="flex items-center gap-[6px] absolute left-3 top-[13px]">
               <div className="w-[12px] h-[12px] rounded-full" style={{ backgroundColor: '#ed6a5e' }} />
               <div className="w-[12px] h-[12px] rounded-full" style={{ backgroundColor: '#f5bf4f' }} />
               <div className="w-[12px] h-[12px] rounded-full" style={{ backgroundColor: '#62c554' }} />
