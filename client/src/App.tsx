@@ -152,19 +152,13 @@ function Router() {
 function AppContent() {
   const settings = useSettings();
 
-  const content = (
-    <>
+  return (
+    <BrowserChrome visible={settings.showBrowser}>
       <Toaster />
       <Router />
       <HomeAssistantPanel />
-    </>
+    </BrowserChrome>
   );
-
-  if (settings.showBrowser) {
-    return <BrowserChrome>{content}</BrowserChrome>;
-  }
-
-  return content;
 }
 
 function App() {
