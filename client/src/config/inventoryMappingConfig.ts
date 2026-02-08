@@ -877,10 +877,38 @@ export function buildCoverageNodes(
   config: CoverageConfig,
   onItemClick: (itemId: string, itemLabel: string, groupType: string) => void
 ): Node[] {
+  const HEADER_HEIGHT = 32;
+  const ITEM_HEIGHT = 26;
+  const ITEM_PADDING = 12;
+  const GAP = 24;
+  const START_Y = 50;
+
+  const estimateHeight = (group: CoverageGroupData) =>
+    HEADER_HEIGHT + ITEM_PADDING + group.items.length * ITEM_HEIGHT;
+
+  const leftGroups = config.groups.filter((g) => g.column === "left");
+  const rightGroups = config.groups.filter((g) => g.column === "right");
+
+  const computePositions = (groups: CoverageGroupData[]) => {
+    const positions = new Map<string, number>();
+    let y = START_Y;
+    for (const group of groups) {
+      positions.set(group.id, y);
+      y += estimateHeight(group) + GAP;
+    }
+    return positions;
+  };
+
+  const leftPositions = computePositions(leftGroups);
+  const rightPositions = computePositions(rightGroups);
+
   return config.groups.map((group) => ({
     id: group.id,
     type: "groupNode",
-    position: group.position,
+    position: {
+      x: group.position.x,
+      y: (group.column === "left" ? leftPositions.get(group.id) : rightPositions.get(group.id)) ?? group.position.y,
+    },
     data: {
       label: group.label,
       headerColor: group.headerColor,

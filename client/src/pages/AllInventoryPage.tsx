@@ -1,10 +1,12 @@
-import { useCallback, useState, useMemo, useEffect } from "react";
+import { useCallback, useState, useMemo, useEffect, useRef } from "react";
 import {
   ReactFlow,
+  ReactFlowProvider,
   Background,
   Controls,
   useNodesState,
   useEdgesState,
+  useReactFlow,
   Node,
   Edge,
   ConnectionLineType,
@@ -15,23 +17,35 @@ import "@xyflow/react/dist/style.css";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Filter, MoreHorizontal } from "lucide-react";
+import { MapPin, Building2, Package, Users, Server, Plus, Filter, MoreHorizontal } from "lucide-react";
 import { EntityDetailPanel, EntityDetails, generateEntityDetails } from "@/components/inventory/EntityDetailPanel";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
+import { useSideNavStore } from "@/lib/sideNavStore";
 import {
   getWorkspaceViewConfig,
   buildInventoryNodes,
   buildInventoryEdges,
 } from "@/config/inventoryMappingConfig";
 
+const columnIcons: Record<string, typeof Building2> = {
+  "locations": MapPin,
+  "legal-entities": Building2,
+  "facilities": Building2,
+  "product-lines": Package,
+  "teams": Users,
+  "it-systems": Server,
+};
+
 interface ColumnNodeData {
   label: string;
   items: { id: string; label: string; highlighted?: boolean }[];
   headerColor: string;
+  connectedItemIds?: Set<string>;
   onItemClick?: (itemId: string, itemLabel: string, groupType: string) => void;
 }
 
 function ColumnNode({ data, id }: { data: ColumnNodeData; id: string }) {
+  const Icon = columnIcons[id] || Building2;
   return (
     <div 
       className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-visible"
@@ -41,40 +55,59 @@ function ColumnNode({ data, id }: { data: ColumnNodeData; id: string }) {
         className="flex items-center justify-between px-3 py-2 rounded-t-lg"
         style={{ backgroundColor: data.headerColor }}
       >
-        <span className="text-white text-xs font-medium">{data.label}</span>
+        <div className="flex items-center gap-1.5">
+          <Icon className="w-3 h-3 text-white/80" />
+          <span className="text-white text-xs font-medium">{data.label}</span>
+        </div>
         <button className="w-4 h-4 rounded bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
           <Plus className="w-3 h-3 text-white" />
         </button>
       </div>
       <div className="p-1.5 space-y-0.5">
-        {data.items.map((item) => (
-          <div 
-            key={item.id}
-            className={`relative px-2.5 py-1.5 text-xs rounded transition-colors cursor-pointer ${
-              item.highlighted 
-                ? "bg-[#266C92]/15 text-[#266C92] dark:bg-[#266C92]/25 dark:text-[#4a9bc7] font-medium border border-[#266C92]/30" 
-                : "bg-slate-50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
-            }`}
-            onClick={() => data.onItemClick?.(item.id, item.label, id)}
-            data-testid={`item-${item.id}`}
-          >
-            <span className="line-clamp-1">{item.label}</span>
-            <Handle
-              type="source"
-              position={Position.Right}
-              id={`source-${item.id}`}
-              className="!w-1.5 !h-1.5 !bg-[#266C92] !border-0 !right-[-3px]"
-              style={{ top: '50%', transform: 'translateY(-50%)' }}
-            />
-            <Handle
-              type="target"
-              position={Position.Left}
-              id={`target-${item.id}`}
-              className="!w-1.5 !h-1.5 !bg-[#266C92] !border-0 !left-[-3px]"
-              style={{ top: '50%', transform: 'translateY(-50%)' }}
-            />
-          </div>
-        ))}
+        {data.items.map((item) => {
+          const isConnected = data.connectedItemIds?.has(item.id);
+          return (
+            <div 
+              key={item.id}
+              className={`relative px-2.5 py-1.5 text-xs rounded cursor-pointer ${
+                item.highlighted 
+                  ? "bg-[#266C92]/15 text-[#266C92] dark:bg-[#266C92]/25 dark:text-[#4a9bc7] font-medium border border-[#266C92]/30" 
+                  : "bg-slate-50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300"
+              }`}
+              style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
+              onMouseEnter={(e) => {
+                if (isConnected) {
+                  e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.15)';
+                  e.currentTarget.style.color = '#7c3aed';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (isConnected) {
+                  e.currentTarget.style.backgroundColor = '';
+                  e.currentTarget.style.color = '';
+                }
+              }}
+              onClick={() => data.onItemClick?.(item.id, item.label, id)}
+              data-testid={`item-${item.id}`}
+            >
+              <span className="line-clamp-1">{item.label}</span>
+              <Handle
+                type="source"
+                position={Position.Right}
+                id={`source-${item.id}`}
+                className="!w-1.5 !h-1.5 !bg-[#266C92] !border-0 !right-[-3px]"
+                style={{ top: '50%', transform: 'translateY(-50%)' }}
+              />
+              <Handle
+                type="target"
+                position={Position.Left}
+                id={`target-${item.id}`}
+                className="!w-1.5 !h-1.5 !bg-[#266C92] !border-0 !left-[-3px]"
+                style={{ top: '50%', transform: 'translateY(-50%)' }}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -84,11 +117,13 @@ const nodeTypes = {
   columnNode: ColumnNode,
 };
 
-export default function AllInventoryPage() {
+function AllInventoryFlow() {
   const [selectedEntity, setSelectedEntity] = useState<EntityDetails | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const { fitView } = useReactFlow();
 
   const { currentWorkspace } = useWorkspaceStore();
+  const { isCollapsed } = useSideNavStore();
 
   const handleItemClick = useCallback((itemId: string, itemLabel: string, groupType: string) => {
     const details = generateEntityDetails(itemId, itemLabel, groupType);
@@ -100,9 +135,23 @@ export default function AllInventoryPage() {
     [currentWorkspace.id, currentWorkspace.isCustom]
   );
 
+  const connectedItemIds = useMemo(() => {
+    const ids = new Set<string>();
+    config.inventory.edges.forEach((e) => {
+      const srcId = e.sourceHandle.replace("source-", "");
+      const tgtId = e.targetHandle.replace("target-", "");
+      ids.add(srcId);
+      ids.add(tgtId);
+    });
+    return ids;
+  }, [config]);
+
   const initialNodes = useMemo(
-    () => buildInventoryNodes(config.inventory, handleItemClick),
-    [config, handleItemClick]
+    () => buildInventoryNodes(config.inventory, handleItemClick).map((n) => ({
+      ...n,
+      data: { ...n.data, connectedItemIds },
+    })),
+    [config, handleItemClick, connectedItemIds]
   );
 
   const initialEdges = useMemo(
@@ -117,6 +166,13 @@ export default function AllInventoryPage() {
     setNodes(initialNodes);
     setEdges(initialEdges);
   }, [config]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fitView({ padding: 0.15, duration: 300 });
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [isCollapsed, selectedEntity, fitView]);
 
   const tabLabels = useMemo(() => {
     return config.inventory.columns.map((col) => ({
@@ -204,5 +260,13 @@ export default function AllInventoryPage() {
         }}
       />
     </AppLayout>
+  );
+}
+
+export default function AllInventoryPage() {
+  return (
+    <ReactFlowProvider>
+      <AllInventoryFlow />
+    </ReactFlowProvider>
   );
 }

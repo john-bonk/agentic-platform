@@ -31,6 +31,8 @@ import {
   Database,
   Brain,
   LayoutDashboard,
+  Layers,
+  GitBranch,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +55,10 @@ function shouldShowQuickAccess(location: string, workspace: Workspace): boolean 
   const isHomeModule = activeModuleIndex === 0;
   const isAdminWorkspace = workspace.persona === "Admin";
   return isHomeModule && !isAdminWorkspace;
+}
+
+function isDatabaseModule(location: string): boolean {
+  return getActiveModuleIndex(location) === 1;
 }
 import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreationWizard";
 
@@ -518,6 +524,31 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
                   title="Favorites"
                 >
                   <Star className={`w-3 h-3 ${location === "/favorites" ? "text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
+                </button>
+              </Link>
+            </div>
+          )}
+
+          {isDatabaseModule(location) && (
+            <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
+              <Link href="/inventory">
+                <button
+                  className="w-7 h-7 flex items-center justify-center rounded transition-colors"
+                  style={location === "/inventory" ? { backgroundColor: '#1d212b' } : undefined}
+                  data-testid="nav-collapsed-inventory"
+                  title="All Inventory"
+                >
+                  <Layers className={`w-3 h-3 ${location === "/inventory" ? "text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
+                </button>
+              </Link>
+              <Link href="/coverage-mapping">
+                <button
+                  className="w-7 h-7 flex items-center justify-center rounded transition-colors"
+                  style={location === "/coverage-mapping" ? { backgroundColor: '#1d212b' } : undefined}
+                  data-testid="nav-collapsed-coverage"
+                  title="Coverage Mapping"
+                >
+                  <GitBranch className={`w-3 h-3 ${location === "/coverage-mapping" ? "text-white" : "text-gray-500 dark:text-muted-foreground"}`} />
                 </button>
               </Link>
             </div>

@@ -1,10 +1,12 @@
 import { useCallback, useState, useMemo, useEffect } from "react";
 import {
   ReactFlow,
+  ReactFlowProvider,
   Background,
   Controls,
   useNodesState,
   useEdgesState,
+  useReactFlow,
   Node,
   Edge,
   ConnectionLineType,
@@ -17,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Info, Filter, MoreHorizontal } from "lucide-react";
 import { EntityDetailPanel, EntityDetails, generateEntityDetails } from "@/components/inventory/EntityDetailPanel";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
+import { useSideNavStore } from "@/lib/sideNavStore";
 import {
   getWorkspaceViewConfig,
   buildCoverageNodes,
@@ -28,6 +31,7 @@ interface GroupNodeData {
   items: { id: string; label: string; highlighted?: boolean }[];
   headerColor: string;
   column: "left" | "right";
+  connectedItemIds?: Set<string>;
   onItemClick?: (itemId: string, itemLabel: string, groupType: string) => void;
 }
 
@@ -47,38 +51,54 @@ function GroupNode({ data, id }: { data: GroupNodeData; id: string }) {
         </button>
       </div>
       <div className="p-1.5 space-y-0.5">
-        {data.items.map((item) => (
-          <div 
-            key={item.id}
-            className={`relative px-2.5 py-1.5 text-xs rounded transition-colors cursor-pointer ${
-              item.highlighted 
-                ? "bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4a9bc7] font-medium" 
-                : "bg-slate-50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
-            }`}
-            onClick={() => data.onItemClick?.(item.id, item.label, id)}
-            data-testid={`item-${item.id}`}
-          >
-            {item.label}
-            {data.column === "left" && (
-              <Handle
-                type="source"
-                position={Position.Right}
-                id={`source-${item.id}`}
-                className="!w-2 !h-2 !bg-[#266C92] !border-0 !right-[-4px]"
-                style={{ top: '50%', transform: 'translateY(-50%)' }}
-              />
-            )}
-            {data.column === "right" && (
-              <Handle
-                type="target"
-                position={Position.Left}
-                id={`target-${item.id}`}
-                className="!w-2 !h-2 !bg-[#266C92] !border-0 !left-[-4px]"
-                style={{ top: '50%', transform: 'translateY(-50%)' }}
-              />
-            )}
-          </div>
-        ))}
+        {data.items.map((item) => {
+          const isConnected = data.connectedItemIds?.has(item.id);
+          return (
+            <div 
+              key={item.id}
+              className={`relative px-2.5 py-1.5 text-xs rounded cursor-pointer ${
+                item.highlighted 
+                  ? "bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4a9bc7] font-medium" 
+                  : "bg-slate-50 dark:bg-slate-700/50 text-slate-700 dark:text-slate-300"
+              }`}
+              style={{ transition: 'background-color 0.2s ease, color 0.2s ease' }}
+              onMouseEnter={(e) => {
+                if (isConnected) {
+                  e.currentTarget.style.backgroundColor = 'rgba(124, 58, 237, 0.15)';
+                  e.currentTarget.style.color = '#7c3aed';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (isConnected) {
+                  e.currentTarget.style.backgroundColor = '';
+                  e.currentTarget.style.color = '';
+                }
+              }}
+              onClick={() => data.onItemClick?.(item.id, item.label, id)}
+              data-testid={`item-${item.id}`}
+            >
+              {item.label}
+              {data.column === "left" && (
+                <Handle
+                  type="source"
+                  position={Position.Right}
+                  id={`source-${item.id}`}
+                  className="!w-2 !h-2 !bg-[#266C92] !border-0 !right-[-4px]"
+                  style={{ top: '50%', transform: 'translateY(-50%)' }}
+                />
+              )}
+              {data.column === "right" && (
+                <Handle
+                  type="target"
+                  position={Position.Left}
+                  id={`target-${item.id}`}
+                  className="!w-2 !h-2 !bg-[#266C92] !border-0 !left-[-4px]"
+                  style={{ top: '50%', transform: 'translateY(-50%)' }}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -88,10 +108,12 @@ const nodeTypes = {
   groupNode: GroupNode,
 };
 
-export default function CoverageMappingPage() {
+function CoverageMappingFlow() {
   const [selectedEntity, setSelectedEntity] = useState<EntityDetails | null>(null);
+  const { fitView } = useReactFlow();
 
   const { currentWorkspace } = useWorkspaceStore();
+  const { isCollapsed } = useSideNavStore();
 
   const handleItemClick = useCallback((itemId: string, itemLabel: string, groupType: string) => {
     const details = generateEntityDetails(itemId, itemLabel, groupType);
@@ -103,9 +125,23 @@ export default function CoverageMappingPage() {
     [currentWorkspace.id, currentWorkspace.isCustom]
   );
 
+  const connectedItemIds = useMemo(() => {
+    const ids = new Set<string>();
+    config.coverage.edges.forEach((e) => {
+      const srcId = e.sourceHandle.replace("source-", "");
+      const tgtId = e.targetHandle.replace("target-", "");
+      ids.add(srcId);
+      ids.add(tgtId);
+    });
+    return ids;
+  }, [config]);
+
   const initialNodes = useMemo(
-    () => buildCoverageNodes(config.coverage, handleItemClick),
-    [config, handleItemClick]
+    () => buildCoverageNodes(config.coverage, handleItemClick).map((n) => ({
+      ...n,
+      data: { ...n.data, connectedItemIds },
+    })),
+    [config, handleItemClick, connectedItemIds]
   );
 
   const initialEdges = useMemo(
@@ -120,6 +156,13 @@ export default function CoverageMappingPage() {
     setNodes(initialNodes);
     setEdges(initialEdges);
   }, [config]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fitView({ padding: 0.2, duration: 300 });
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [isCollapsed, selectedEntity, fitView]);
 
   return (
     <AppLayout>
@@ -190,5 +233,13 @@ export default function CoverageMappingPage() {
         }}
       />
     </AppLayout>
+  );
+}
+
+export default function CoverageMappingPage() {
+  return (
+    <ReactFlowProvider>
+      <CoverageMappingFlow />
+    </ReactFlowProvider>
   );
 }
