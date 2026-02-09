@@ -144,18 +144,20 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInN
                   </Button>
                 </Link>
                 {item.openInNewTab && onOpenInNewTab && (
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       onOpenInNewTab(item.path, item.label);
                     }}
-                    className="flex-shrink-0 w-[28px] h-[28px] flex items-center justify-center rounded transition-colors opacity-0 group-hover/navitem:opacity-100 hover:bg-gray-200 dark:hover:bg-accent"
+                    className="flex-shrink-0 opacity-0 group-hover/navitem:opacity-100"
                     title={`Open ${item.label} in new tab`}
                     data-testid={`nav-open-tab-${item.id}`}
                   >
                     <ExternalLink className="w-3.5 h-3.5 text-gray-400 dark:text-muted-foreground" />
-                  </button>
+                  </Button>
                 )}
               </div>
             </li>
@@ -486,7 +488,7 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
 
   const isHomeActive = location === "/" || location === "/my-dashboard" || location === "/custom-workspace";
 
-  const { openTab } = useBrowserTabStore();
+  const { openTab, setPreviousRoute } = useBrowserTabStore();
 
   const handleOpenInNewTab = (path: string, label: string) => {
     const STORAGE_KEY = "dashboard-settings";
@@ -503,7 +505,7 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
       // fallback
     }
 
-    useBrowserTabStore.getState().previousRoute = location;
+    setPreviousRoute(location);
     openTab(path, label);
     setLocation(path);
   };

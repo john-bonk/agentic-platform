@@ -58,6 +58,7 @@ import {
   RecentPage,
   FavoritesPage,
   RiskCalculationPage,
+  AIGovernancePage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 import { BrowserChrome } from "@/components/layout/BrowserChrome";
@@ -164,6 +165,7 @@ function Router() {
       
       {/* Prototype Meta View */}
       <Route path="/prototype-meta" component={PrototypeMetaPage} />
+      <Route path="/ai-governance" component={AIGovernancePage} />
       
       {/* 404 - Must be last */}
       <Route component={NotFound} />

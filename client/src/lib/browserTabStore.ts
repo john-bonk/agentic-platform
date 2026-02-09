@@ -14,6 +14,7 @@ interface BrowserTabState {
   openTab: (route: string, label: string) => void;
   closeTab: (id: string) => void;
   setActiveTab: (id: string) => void;
+  setPreviousRoute: (route: string) => void;
   getActiveRoute: () => string | null;
   resetTabs: () => void;
 }
@@ -51,6 +52,10 @@ export const useBrowserTabStore = create<BrowserTabState>((set, get) => ({
       tabs: [...state.tabs, newTab],
       activeTabId: tabId,
     });
+  },
+
+  setPreviousRoute: (route: string) => {
+    set({ previousRoute: route });
   },
 
   closeTab: (id: string) => {
