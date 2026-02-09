@@ -165,7 +165,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
     sections: [
       {
         id: "ciso-dashboards",
-        title: "Dashboards",
+        title: "My Apps",
         defaultExpanded: true,
         collapsible: true,
         items: [
