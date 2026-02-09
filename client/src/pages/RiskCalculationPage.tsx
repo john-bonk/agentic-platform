@@ -20,6 +20,14 @@ interface RiskEdge {
   to: string;
 }
 
+interface NodeDetail {
+  id: string;
+  displayName: string;
+  category: "Input" | "Factor" | "Model" | "Output";
+  value: string;
+  weight?: string;
+}
+
 const NODES: RiskNode[] = [
   { id: "trade-data", label: "Trade\nData", x: 150, y: 175, size: "lg", color: "teal" },
   { id: "policy-intel", label: "Policy\nIntelligence", x: 150, y: 305, size: "lg", color: "teal" },
@@ -32,6 +40,20 @@ const NODES: RiskNode[] = [
   { id: "risk-weighting", label: "Risk\nWeighting", x: 490, y: 320, size: "md", color: "teal" },
   { id: "exposure-calc", label: "Exposure\nCalculation", x: 480, y: 450, size: "md", color: "teal" },
   { id: "tariff-assessment", label: "Tariff Risk\nAssessment", x: 660, y: 305, size: "xl", color: "dark" },
+];
+
+const NODE_DETAILS: NodeDetail[] = [
+  { id: "trade-data", displayName: "Trade Data", category: "Input", value: "1.25M units" },
+  { id: "policy-intel", displayName: "Policy Intelligence", category: "Input", value: "0.68 vol." },
+  { id: "supplier-network", displayName: "Supplier Network", category: "Input", value: "342 vendors" },
+  { id: "tariff-rate", displayName: "Tariff Rate Changes", category: "Factor", value: "+25%", weight: "0.40" },
+  { id: "geopolitical", displayName: "Geopolitical Risk", category: "Factor", value: "0.82 idx", weight: "0.35" },
+  { id: "supply-chain", displayName: "Supply Chain Disruption", category: "Factor", value: "0.71", weight: "0.35" },
+  { id: "volume-analysis", displayName: "Volume Analysis", category: "Factor", value: "$480 avg", weight: "0.25" },
+  { id: "cost-impact", displayName: "Cost Impact Model", category: "Model", value: "$10M" },
+  { id: "risk-weighting", displayName: "Risk Weighting", category: "Model", value: "Composite" },
+  { id: "exposure-calc", displayName: "Exposure Calculation", category: "Model", value: "$142.5M" },
+  { id: "tariff-assessment", displayName: "Tariff Risk Assessment", category: "Output", value: "92" },
 ];
 
 const EDGES: RiskEdge[] = [
@@ -221,14 +243,32 @@ function CircleNode({ node, isHovered, isSelected, highlighted, faded, onHover, 
   );
 }
 
-function RiskScoreDetails() {
+const CANVAS_HEIGHT = "calc((100vh - var(--browser-chrome-height, 0px)) * 0.55)";
+
+function categoryColor(cat: NodeDetail["category"]): string {
+  switch (cat) {
+    case "Input": return "#266C92";
+    case "Factor": return "#1e293b";
+    case "Model": return "#266C92";
+    case "Output": return "#991b1b";
+  }
+}
+
+function RiskScoreDetails({ traceNodes, isFiltered }: { traceNodes: Set<string> | null; isFiltered: boolean }) {
+  const visibleDetails = isFiltered && traceNodes
+    ? NODE_DETAILS.filter(d => traceNodes.has(d.id))
+    : NODE_DETAILS;
+
+  const categories: NodeDetail["category"][] = ["Input", "Factor", "Model", "Output"];
+
   return (
     <Card
-      style={{ width: 230 }}
+      className="flex flex-col"
+      style={{ width: 260, height: CANVAS_HEIGHT, minHeight: 320 }}
       data-testid="risk-score-details"
     >
-      <div className="px-4 pt-4 pb-3">
-        <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
+      <div className="px-4 pt-3.5 pb-2.5 flex-shrink-0">
+        <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
           <p className="text-sm font-medium text-foreground">Risk Score Details</p>
           <Badge
             variant="destructive"
@@ -237,34 +277,67 @@ function RiskScoreDetails() {
             CRITICAL
           </Badge>
         </div>
-        <div className="flex items-center justify-between gap-2 mb-1">
+        <div className="flex items-center justify-between gap-2">
           <p className="text-xs text-muted-foreground">Overall Risk Score</p>
-          <p className="text-3xl font-bold text-foreground">92</p>
+          <p className="text-2xl font-bold text-foreground">92</p>
         </div>
-        <div className="w-full h-2 rounded-full bg-muted mt-1 mb-4">
+        <div className="w-full h-1.5 rounded-full bg-muted mt-1">
           <div
-            className="h-2 rounded-full"
+            className="h-1.5 rounded-full"
             style={{ width: "92%", backgroundColor: "#dc2626" }}
           />
         </div>
       </div>
-      <div className="border-t border-border px-4 py-3 space-y-2.5">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-xs text-muted-foreground">Cost Impact</p>
-          <p className="text-xs font-semibold text-foreground">$10M</p>
-        </div>
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-xs text-muted-foreground">Geopolitical Weight</p>
-          <p className="text-xs font-semibold text-foreground">0.82</p>
-        </div>
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-xs text-muted-foreground">Exposure Level</p>
-          <p className="text-xs font-semibold text-foreground">High</p>
+
+      <div className="border-t border-border flex-1 min-h-0 overflow-y-auto">
+        <div className="px-4 py-2.5">
+          {isFiltered && (
+            <p className="text-[10px] text-muted-foreground mb-2 uppercase tracking-wider font-medium">
+              Showing {visibleDetails.length} of {NODE_DETAILS.length} nodes in trace
+            </p>
+          )}
+
+          {categories.map(cat => {
+            const items = visibleDetails.filter(d => d.category === cat);
+            if (items.length === 0) return null;
+            return (
+              <div key={cat} className="mb-2.5 last:mb-0">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1.5">{cat}{cat !== "Output" ? "s" : ""}</p>
+                <div className="space-y-1">
+                  {items.map(item => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between gap-2 py-1 px-2 rounded-md bg-muted/40"
+                      data-testid={`detail-row-${item.id}`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div
+                          className="w-2 h-2 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: categoryColor(item.category) }}
+                        />
+                        <p className="text-[11px] text-foreground truncate">{item.displayName}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        {item.weight && (
+                          <span className="text-[9px] text-muted-foreground">{item.weight}w</span>
+                        )}
+                        <p className="text-[11px] font-semibold text-foreground">{item.value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-      <div className="border-t border-border px-4 py-2.5">
+
+      <div className="border-t border-border px-4 py-2 flex-shrink-0">
         <p className="text-[10px] text-muted-foreground italic">
-          Click any node to view detailed calculations and data sources
+          {isFiltered
+            ? "Click another node or clear trace to see all"
+            : "Click any node to filter trace path"
+          }
         </p>
       </div>
     </Card>
@@ -392,7 +465,7 @@ export default function RiskCalculationPage() {
           <div className="flex gap-5 mb-5">
             <Card
               className="flex-1 relative p-0"
-              style={{ height: "calc((100vh - var(--browser-chrome-height, 0px)) * 0.55)", minHeight: 320 }}
+              style={{ height: CANVAS_HEIGHT, minHeight: 320 }}
               data-testid="risk-canvas"
             >
               <svg
@@ -460,7 +533,10 @@ export default function RiskCalculationPage() {
             </Card>
 
             <div className="flex-shrink-0">
-              <RiskScoreDetails />
+              <RiskScoreDetails
+                traceNodes={trace ? trace.nodes : null}
+                isFiltered={!!selectedNode}
+              />
             </div>
           </div>
 
