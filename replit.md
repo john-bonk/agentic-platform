@@ -128,8 +128,9 @@ Preferred communication style: Simple, everyday language.
 - Main tab always exists and cannot be closed
 
 ### AI Governance Page
-- `client/src/pages/AIGovernancePage.tsx` - Standalone page with its own sidebar layout (not wrapped in AppLayout), matching the FairNow/AuditBoard AI Governance screenshot
-- Features: own dark sidebar nav (Dashboard, My Work, AI Applications, Vendors, Frameworks, Admin, Resources), breadcrumb header, 3 metric cards, risk levels bar chart, development statuses donut charts, notification history, compliance table, acquisition banner
+- `client/src/pages/AIGovernancePage.tsx` - Wrapped in AppLayout (uses existing framework nav), matching the FairNow/AuditBoard AI Governance screenshot
+- Features: breadcrumb header, 3 metric cards, risk levels bar chart, development statuses donut charts, notification history, compliance table, acquisition banner
+- AI Gov nav items (Dashboard, My Work, AI Applications, Vendors, Frameworks, Admin, Resources) are mapped into the CISO workspace side nav as an "AI Governance" section
 - Accessed via IT Security workspace CISO Security Environment nav with openInNewTab enabled
 - Route: `/ai-governance`
 
