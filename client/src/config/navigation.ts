@@ -202,24 +202,26 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
           { id: "penetration-tests", label: "Penetration Tests", path: "/pen-tests" },
         ],
       },
-      {
-        id: "aigov-nav",
-        title: "AI Governance",
-        defaultExpanded: true,
-        collapsible: true,
-        items: [
-          { id: "aigov-dashboard", label: "Dashboard", path: "/ai-governance" },
-          { id: "aigov-my-work", label: "My Work", path: "/ai-governance" },
-          { id: "aigov-ai-applications", label: "AI Applications", path: "/ai-governance" },
-          { id: "aigov-vendors", label: "Vendors", path: "/ai-governance" },
-          { id: "aigov-frameworks", label: "Frameworks", path: "/ai-governance" },
-          { id: "aigov-admin", label: "Admin", path: "/ai-governance" },
-          { id: "aigov-resources", label: "Resources", path: "/ai-governance" },
-        ],
-      },
     ],
   },
 };
+
+export const aiGovNewTabNavSections: SideNavSection[] = [
+  {
+    id: "aigov-main",
+    title: "",
+    defaultExpanded: true,
+    items: [
+      { id: "aigov-dashboard", label: "Dashboard", path: "/ai-governance" },
+      { id: "aigov-my-work", label: "My Work", path: "/ai-governance" },
+      { id: "aigov-ai-applications", label: "AI Applications", path: "/ai-governance" },
+      { id: "aigov-vendors", label: "Vendors", path: "/ai-governance" },
+      { id: "aigov-frameworks", label: "Frameworks", path: "/ai-governance" },
+      { id: "aigov-admin", label: "Admin", path: "/ai-governance" },
+      { id: "aigov-resources", label: "Resources", path: "/ai-governance" },
+    ],
+  },
+];
 
 /**
  * Get workspace-specific home navigation

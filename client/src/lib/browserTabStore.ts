@@ -5,6 +5,7 @@ export interface BrowserTabData {
   label: string;
   faviconUrl: string;
   route: string;
+  isNewTab?: boolean;
 }
 
 interface BrowserTabState {
@@ -46,6 +47,7 @@ export const useBrowserTabStore = create<BrowserTabState>((set, get) => ({
       label,
       faviconUrl: FAVICON_URL,
       route,
+      isNewTab: true,
     };
 
     set({

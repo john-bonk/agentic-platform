@@ -21,10 +21,11 @@ import { useLocation } from "wouter";
 import { LeftIconNavbar } from "./LeftIconNavbar";
 import { SideNavigation } from "./SideNavigation";
 import { AppHeader } from "./AppHeader";
-import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav } from "@/config/navigation";
+import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav, aiGovNewTabNavSections } from "@/config/navigation";
 import { type Tab } from "@/lib/tabStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
+import { useBrowserTabStore } from "@/lib/browserTabStore";
 
 const ASSISTANT_PANEL_WIDTH = 420;
 
@@ -49,16 +50,20 @@ export function AppLayout({
   const currentModule = getModuleFromPath(location);
   const { currentWorkspace } = useWorkspaceStore();
   const { isOpen: isAssistantOpen } = useHomeAssistantStore();
+  const { activeTabId, getActiveRoute } = useBrowserTabStore();
+  
+  const isAiGovNewTab = location === "/ai-governance" && activeTabId !== "main" && getActiveRoute() === "/ai-governance";
   
   const isHomeModule = currentModule.id === "home";
   const workspaceNav = isHomeModule 
     ? getWorkspaceHomeNav(currentWorkspace.persona, currentWorkspace.moduleConfig) 
     : null;
   
-  const sideNavSections = workspaceNav ? workspaceNav.sections : currentModule.sideNavSections;
-  const sideNavModuleGroups = workspaceNav?.moduleGroups;
-  // Use the actual workspace name for the title - especially important for custom workspaces
-  const sideNavTitle = isHomeModule ? currentWorkspace.name : currentModule.name;
+  const sideNavSections = isAiGovNewTab 
+    ? aiGovNewTabNavSections 
+    : (workspaceNav ? workspaceNav.sections : currentModule.sideNavSections);
+  const sideNavModuleGroups = isAiGovNewTab ? undefined : workspaceNav?.moduleGroups;
+  const sideNavTitle = isAiGovNewTab ? "AI Governance" : (isHomeModule ? currentWorkspace.name : currentModule.name);
   
   return (
     <div 
