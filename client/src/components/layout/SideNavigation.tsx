@@ -585,8 +585,8 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
             </button>
           </div>
 
-          {/* Quick access icons - Only show on Home module and not Admin */}
-          {shouldShowQuickAccess(location, currentWorkspace) && (
+          {/* Quick access icons - Only show on Home module, not Admin, not new-tab */}
+          {!hideQuickAccess && shouldShowQuickAccess(location, currentWorkspace) && (
             <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
               <Link href={currentWorkspace.isCustom ? "/custom-workspace" : "/"}>
                 <button
