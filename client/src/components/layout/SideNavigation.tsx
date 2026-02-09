@@ -34,6 +34,11 @@ import {
   Layers,
   GitBranch,
   ExternalLink,
+  Settings,
+  BookOpen,
+  Flame,
+  Target,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,6 +67,20 @@ function shouldShowQuickAccess(location: string, workspace: Workspace): boolean 
 function isDatabaseModule(location: string): boolean {
   return getActiveModuleIndex(location) === 1;
 }
+
+const navIconMap: Record<string, LucideIcon> = {
+  "layout-dashboard": LayoutDashboard,
+  "clipboard-list": ClipboardList,
+  "brain": Brain,
+  "users": Users,
+  "shield-check": ShieldCheck,
+  "settings": Settings,
+  "book-open": BookOpen,
+  "trending-up": TrendingUp,
+  "flame": Flame,
+  "target": Target,
+};
+
 import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreationWizard";
 
 interface SideNavigationProps {
@@ -619,6 +638,38 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
                   <GitBranch className={`w-3 h-3 ${location === "/coverage-mapping" ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
                 </button>
               </Link>
+            </div>
+          )}
+
+          {hideQuickAccess && (
+            <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
+              {sections.flatMap(s => s.items).map(item => {
+                if (!item.icon) return null;
+                const IconComp = navIconMap[item.icon];
+                if (!IconComp) return null;
+                const active = isActive(item.path);
+                return (
+                  <button
+                    key={item.id}
+                    className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${active ? "bg-teal-50 dark:bg-primary/10" : ""}`}
+                    data-testid={`nav-collapsed-${item.id}`}
+                    title={item.label}
+                    onClick={() => {
+                      const hasHash = item.path.includes("#");
+                      if (hasHash) {
+                        const hashPart = item.path.split("#")[1] || "";
+                        window.location.hash = hashPart ? `#${hashPart}` : "";
+                      } else {
+                        window.location.hash = "";
+                        window.history.replaceState(null, "", item.path);
+                        setLocation(item.path);
+                      }
+                    }}
+                  >
+                    <IconComp className={`w-3 h-3 ${active ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>

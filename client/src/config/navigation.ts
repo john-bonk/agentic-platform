@@ -213,13 +213,13 @@ export const aiGovNewTabNavSections: SideNavSection[] = [
     collapsible: false,
     defaultExpanded: true,
     items: [
-      { id: "aigov-dashboard", label: "Dashboard", path: "/ai-governance" },
-      { id: "aigov-my-work", label: "My Work", path: "/ai-governance#my-work" },
-      { id: "aigov-ai-applications", label: "AI Applications", path: "/ai-governance#ai-applications" },
-      { id: "aigov-vendors", label: "Vendors", path: "/ai-governance#vendors" },
-      { id: "aigov-frameworks", label: "Frameworks", path: "/ai-governance#frameworks" },
-      { id: "aigov-admin", label: "Admin", path: "/ai-governance#admin" },
-      { id: "aigov-resources", label: "Resources", path: "/ai-governance#resources" },
+      { id: "aigov-dashboard", label: "Dashboard", path: "/ai-governance", icon: "layout-dashboard" },
+      { id: "aigov-my-work", label: "My Work", path: "/ai-governance#my-work", icon: "clipboard-list" },
+      { id: "aigov-ai-applications", label: "AI Applications", path: "/ai-governance#ai-applications", icon: "brain" },
+      { id: "aigov-vendors", label: "Vendors", path: "/ai-governance#vendors", icon: "users" },
+      { id: "aigov-frameworks", label: "Frameworks", path: "/ai-governance#frameworks", icon: "shield-check" },
+      { id: "aigov-admin", label: "Admin", path: "/ai-governance#admin", icon: "settings" },
+      { id: "aigov-resources", label: "Resources", path: "/ai-governance#resources", icon: "book-open" },
     ],
   },
 ];
@@ -231,9 +231,9 @@ export const globalRiskNewTabNavSections: SideNavSection[] = [
     collapsible: true,
     defaultExpanded: true,
     items: [
-      { id: "grr-cro", label: "Enterprise Risk", path: "/global-residual-risk#cro" },
-      { id: "grr-cae", label: "Enterprise Audit", path: "/global-residual-risk#cae" },
-      { id: "grr-ciso", label: "IT Security", path: "/global-residual-risk#ciso" },
+      { id: "grr-cro", label: "Enterprise Risk", path: "/global-residual-risk#cro", icon: "trending-up" },
+      { id: "grr-cae", label: "Enterprise Audit", path: "/global-residual-risk#cae", icon: "clipboard-list" },
+      { id: "grr-ciso", label: "IT Security", path: "/global-residual-risk#ciso", icon: "shield-check" },
     ],
   },
   {
@@ -242,8 +242,8 @@ export const globalRiskNewTabNavSections: SideNavSection[] = [
     collapsible: true,
     defaultExpanded: true,
     items: [
-      { id: "grr-risk-heatmap", label: "Risk Heatmap", path: "/global-residual-risk#risk-heatmap" },
-      { id: "grr-mitigation-tracker", label: "Mitigation Tracker", path: "/global-residual-risk#mitigation-tracker" },
+      { id: "grr-risk-heatmap", label: "Risk Heatmap", path: "/global-residual-risk#risk-heatmap", icon: "flame" },
+      { id: "grr-mitigation-tracker", label: "Mitigation Tracker", path: "/global-residual-risk#mitigation-tracker", icon: "target" },
     ],
   },
 ];
