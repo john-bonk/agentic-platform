@@ -370,7 +370,7 @@ function AllInventoryFlow() {
         fitView({ padding: 0.15, duration: 500 });
       }, 200);
     }, 2000);
-  }, [isUploading, showMaItems, toast, fitView]);
+  }, [isUploading, showMaItems, toast, fitView, markUploaded, currentWorkspace.id]);
 
   const config = useMemo(
     () => getWorkspaceViewConfig(currentWorkspace.id, currentWorkspace.isCustom),

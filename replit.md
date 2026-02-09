@@ -78,7 +78,7 @@ Preferred communication style: Simple, everyday language.
 
 **State Management**: 
 - React Query (@tanstack/react-query) for server state management
-- Zustand for local UI state (tab management)
+- Zustand for local UI state (tab management, inventory upload session state)
 - React Hook Form with Zod resolvers for form validation
 - ThemeProvider context for dark/light mode (localStorage: "app-theme")
 - SettingsPanel with localStorage persistence ("dashboard-settings") and CustomEvent sync
@@ -106,6 +106,7 @@ Preferred communication style: Simple, everyday language.
 - `client/src/config/inventoryMappingConfig.ts` - Workspace-specific data for All Inventory and Coverage Mapping pages (3 scenarios: enterprise-audit, enterprise-risk, it-security; custom workspaces use hash-based deterministic selection)
 - `client/src/pages/AllInventoryPage.tsx` - ReactFlow inventory view with dynamic tabs per workspace
 - `client/src/pages/CoverageMappingPage.tsx` - ReactFlow coverage mapping with left→right source/target handles, single TEAL edges
+- `client/src/lib/inventoryStore.ts` - Session-level Zustand store tracking M&A upload state per workspace (no localStorage, resets on refresh)
 
 ### Global Navigation (Left Icon Navbar)
 - Module ORDER: Home (0), Database (1), Global Risk (2), Reporting (3), Intelligence (4), Workflows (5)
