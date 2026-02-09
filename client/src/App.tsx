@@ -92,6 +92,26 @@ function Router() {
       <Route path="/financial-accounts-view" component={ComingSoonPage} />
       <Route path="/financial-applications-view" component={ComingSoonPage} />
       
+      {/* CAE/CISO Environment & Views (Coming Soon) */}
+      <Route path="/audit-plans" component={ComingSoonPage} />
+      <Route path="/workpapers" component={ComingSoonPage} />
+      <Route path="/findings" component={ComingSoonPage} />
+      <Route path="/recommendations" component={ComingSoonPage} />
+      <Route path="/follow-ups" component={ComingSoonPage} />
+      <Route path="/audit-universe" component={ComingSoonPage} />
+      <Route path="/annual-plan" component={ComingSoonPage} />
+      <Route path="/resource-allocation" component={ComingSoonPage} />
+      <Route path="/stakeholder-reports" component={ComingSoonPage} />
+      <Route path="/vulnerabilities" component={ComingSoonPage} />
+      <Route path="/threat-intel" component={ComingSoonPage} />
+      <Route path="/incidents" component={ComingSoonPage} />
+      <Route path="/compliance-gaps" component={ComingSoonPage} />
+      <Route path="/vendor-risks" component={ComingSoonPage} />
+      <Route path="/security-posture" component={ComingSoonPage} />
+      <Route path="/compliance-matrix" component={ComingSoonPage} />
+      <Route path="/asset-inventory" component={ComingSoonPage} />
+      <Route path="/pen-tests" component={ComingSoonPage} />
+      
       {/* Intelligence Hub Routes */}
       <Route path="/intelligence" component={IntelligenceHubPage} />
       <Route path="/intelligence/data-explorer" component={ListPage} />

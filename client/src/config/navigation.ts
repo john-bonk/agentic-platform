@@ -461,8 +461,13 @@ const homePaths = [
   "/issues", "/financial-accounts", "/risk-control-matrix", "/coso-framework", 
   "/open-tasks", "/financial-accounts-view", "/financial-applications-view", 
   "/profile", "/wizard", "/demo", "/items", "/global-residual-risk",
-  "/risk-calculation",
-  "/admin", "/admin/workspaces", "/admin/permissions"
+  "/risk-calculation", "/vendor-exposure", "/org-impact", "/threat-detection", "/vulnerability-scan",
+  "/admin", "/admin/workspaces", "/admin/permissions", "/admin/data",
+  "/audit-plans", "/workpapers", "/findings", "/recommendations", "/follow-ups",
+  "/audit-universe", "/annual-plan", "/resource-allocation", "/stakeholder-reports",
+  "/vulnerabilities", "/threat-intel", "/incidents", "/compliance-gaps", "/vendor-risks",
+  "/security-posture", "/compliance-matrix", "/asset-inventory", "/pen-tests",
+  "/recent", "/favorites",
 ];
 
 /**

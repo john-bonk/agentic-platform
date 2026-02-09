@@ -22,7 +22,7 @@ export default function ComingSoonPage() {
 
   return (
     <AppLayout>
-      <div className="flex-1 flex items-center justify-center bg-gray-50">
+      <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-background">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-[#266C92] flex items-center justify-center">
             <img
@@ -32,11 +32,11 @@ export default function ComingSoonPage() {
             />
           </div>
           
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2" data-testid="coming-soon-title">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-foreground mb-2" data-testid="coming-soon-title">
             Coming Soon
           </h1>
           
-          <p className="text-gray-500 mb-6" data-testid="coming-soon-feature">
+          <p className="text-gray-500 dark:text-muted-foreground mb-6" data-testid="coming-soon-feature">
             {pageName}
           </p>
 

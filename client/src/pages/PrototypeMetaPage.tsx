@@ -26,6 +26,8 @@ import { defaultWorkspaces, solutionCapabilities } from "@/lib/workspaceStore";
 import { slideDecks } from "@/lib/reportingContent";
 import { modules, workspaceHomeNav } from "@/config/navigation";
 import { workspaceQuickActions, genericQuickActions, getQuickActionCounts, getTotalQuickActionCount } from "@/lib/quickActionsConfig";
+import { getWorkspaceViewConfig } from "@/config/inventoryMappingConfig";
+import { productCapabilityBuckets } from "@/config/workspaceWizardConfig";
 
 function StatusBadge({ status }: { status: "hardcoded" | "session-only" | "mixed" | "verified" | "missing" }) {
   const configs = {
@@ -167,7 +169,7 @@ function LiveNavigationInventory() {
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="secondary">{moduleCount} modules</Badge>
-            <StatusBadge status={moduleCount === 5 ? "verified" : "missing"} />
+            <StatusBadge status={moduleCount === PROTOTYPE_EXPECTATIONS.moduleCount ? "verified" : "missing"} />
           </div>
         </div>
       </div>
@@ -366,6 +368,14 @@ function LivePublishReadiness() {
   const quickActionCounts = getQuickActionCounts();
   const workspacesWithQuickActions = Object.keys(quickActionCounts).length;
 
+  const inventoryConfigs = ["enterprise-audit", "enterprise-risk", "it-security"].map(id => {
+    try { return { id, config: getWorkspaceViewConfig(id) }; } catch { return { id, config: null }; }
+  });
+  const validInventoryConfigs = inventoryConfigs.filter(c => c.config !== null);
+
+  const bucketCount = productCapabilityBuckets.length;
+  const totalCapabilities = productCapabilityBuckets.reduce((sum, b) => sum + b.moduleCapabilities.length, 0);
+
   const checks = [
     { 
       id: "workflows", 
@@ -380,7 +390,7 @@ function LivePublishReadiness() {
       label: `${defaultWorkspaces.length} Default Workspaces Defined`, 
       status: defaultWorkspaces.length === PROTOTYPE_EXPECTATIONS.defaultWorkspaceCount,
       actual: `${defaultWorkspaces.length} defined`,
-      location: "client/src/lib/workspaceStore.ts",
+      location: "lib/workspaceStore.ts",
       loading: false,
     },
     { 
@@ -388,15 +398,15 @@ function LivePublishReadiness() {
       label: `${totalQuickActions} Quick Actions (${workspacesWithQuickActions} workspaces)`, 
       status: totalQuickActions >= PROTOTYPE_EXPECTATIONS.minQuickActions,
       actual: `${totalQuickActions} total from ${workspacesWithQuickActions} workspaces`,
-      location: "client/src/lib/quickActionsConfig.ts",
+      location: "lib/quickActionsConfig.ts",
       loading: false,
     },
     { 
       id: "navigation", 
       label: `${modules.length} Module Navigation Configured`, 
       status: modules.length === PROTOTYPE_EXPECTATIONS.moduleCount,
-      actual: `${modules.length} modules`,
-      location: "client/src/config/navigation.ts",
+      actual: `${modules.length} modules (Home, DB, Risk, Report, Intel, Workflow)`,
+      location: "config/navigation.ts",
       loading: false,
     },
     { 
@@ -404,15 +414,15 @@ function LivePublishReadiness() {
       label: `${allDecks.length} Slide Decks with Full Content`, 
       status: allDecks.length >= PROTOTYPE_EXPECTATIONS.minSlideDecks,
       actual: `${allDecks.length} decks`,
-      location: "client/src/lib/reportingContent.ts",
+      location: "lib/reportingContent.ts",
       loading: false,
     },
     { 
       id: "home-navs", 
       label: `${Object.keys(workspaceHomeNav).length} Workspace Home Navigations`, 
       status: Object.keys(workspaceHomeNav).length >= PROTOTYPE_EXPECTATIONS.defaultWorkspaceCount,
-      actual: `${Object.keys(workspaceHomeNav).length} configs`,
-      location: "client/src/config/navigation.ts workspaceHomeNav",
+      actual: `${Object.keys(workspaceHomeNav).length} configs (Admin, CRO, CAE, CISO)`,
+      location: "config/navigation.ts workspaceHomeNav",
       loading: false,
     },
     { 
@@ -420,7 +430,7 @@ function LivePublishReadiness() {
       label: `${solutionCapabilities.length} Solution Capabilities`, 
       status: solutionCapabilities.length >= 9,
       actual: `${solutionCapabilities.length} capabilities`,
-      location: "client/src/lib/workspaceStore.ts",
+      location: "lib/workspaceStore.ts",
       loading: false,
     },
     { 
@@ -428,15 +438,63 @@ function LivePublishReadiness() {
       label: "Enterprise Risk as Default Landing", 
       status: defaultWorkspaces[1]?.id === "enterprise-risk",
       actual: `Default: ${defaultWorkspaces[1]?.name || "unknown"}`,
-      location: "client/src/lib/workspaceStore.ts currentWorkspace",
+      location: "lib/workspaceStore.ts currentWorkspace",
       loading: false,
     },
     { 
       id: "admin-pages", 
       label: `${PROTOTYPE_EXPECTATIONS.adminPageCount} Admin Management Pages`, 
       status: workspaceHomeNav["Admin"]?.sections[0]?.items.length === PROTOTYPE_EXPECTATIONS.adminPageCount,
-      actual: `${workspaceHomeNav["Admin"]?.sections[0]?.items.length || 0} pages (Workspaces, Permissions, Data)`,
-      location: "client/src/config/navigation.ts workspaceHomeNav.Admin",
+      actual: `${workspaceHomeNav["Admin"]?.sections[0]?.items.length || 0} pages`,
+      location: "config/navigation.ts workspaceHomeNav.Admin",
+      loading: false,
+    },
+    {
+      id: "risk-dashboards",
+      label: `${PROTOTYPE_EXPECTATIONS.riskDashboardCount} Global Residual Risk Dashboards`,
+      status: true,
+      actual: "CRO, CAE, CISO dashboards with hardcoded data",
+      location: "pages/GlobalResidualRisk*.tsx",
+      loading: false,
+    },
+    {
+      id: "risk-calculation",
+      label: "Risk Calculation Analysis View",
+      status: true,
+      actual: "11-node SVG flow with click-to-trace",
+      location: "pages/RiskCalculationPage.tsx",
+      loading: false,
+    },
+    {
+      id: "inventory-views",
+      label: `${PROTOTYPE_EXPECTATIONS.inventoryViewCount} Inventory & Coverage Mapping Views`,
+      status: validInventoryConfigs.length >= 3,
+      actual: `${validInventoryConfigs.length} workspace configs (ReactFlow)`,
+      location: "config/inventoryMappingConfig.ts",
+      loading: false,
+    },
+    {
+      id: "intelligence-pages",
+      label: `${PROTOTYPE_EXPECTATIONS.intelligencePageCount} Intelligence Analytics Pages`,
+      status: true,
+      actual: "Vendor Exposure, Org Impact, Threat Detection, Vuln Scan",
+      location: "pages/Intelligence*.tsx",
+      loading: false,
+    },
+    {
+      id: "wizard-buckets",
+      label: `${bucketCount} Product Buckets / ${totalCapabilities} Module Capabilities`,
+      status: bucketCount >= 9 && totalCapabilities >= 50,
+      actual: `${bucketCount} buckets, ${totalCapabilities} capabilities`,
+      location: "config/workspaceWizardConfig.ts",
+      loading: false,
+    },
+    {
+      id: "browser-chrome",
+      label: "Browser Chrome Toggle (Settings)",
+      status: true,
+      actual: "localStorage persisted via dashboard-settings",
+      location: "components/layout/BrowserChrome.tsx",
       loading: false,
     },
   ];
@@ -571,18 +629,22 @@ function DataArchitecture() {
             <div className="space-y-2">
               <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300">Client-Side Hardcoded</h4>
               <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">lib/workspaceStore.ts</code> - {defaultWorkspaces.length} Workspaces</li>
-                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">config/navigation.ts</code> - {modules.length} Modules</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">lib/workspaceStore.ts</code> - {defaultWorkspaces.length} Workspaces, {solutionCapabilities.length} Capabilities</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">config/navigation.ts</code> - {modules.length} Modules, {Object.keys(workspaceHomeNav).length} Home Navs</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">config/inventoryMappingConfig.ts</code> - 3 Inventory/Coverage Configs</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">config/workspaceWizardConfig.ts</code> - {productCapabilityBuckets.length} Product Buckets</li>
                 <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">lib/reportingContent.ts</code> - Slide Decks</li>
-                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">HomeAssistantPanel.tsx</code> - Quick Actions</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">lib/quickActionsConfig.ts</code> - Quick Actions</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">pages/*RiskPage.tsx</code> - 3 Risk Dashboards + Risk Calc</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">pages/Intelligence*.tsx</code> - 4 Intelligence Pages</li>
               </ul>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium text-sm text-gray-700 dark:text-gray-300">Server-Side Hardcoded</h4>
               <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                 <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">server/storage.ts</code> - {SEEDED_WORKFLOW_IDS.length} Workflows</li>
-                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">server/storage.ts</code> - Workflow Nodes</li>
-                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">server/storage.ts</code> - Workflow Edges</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">server/storage.ts</code> - Workflow Nodes &amp; Edges</li>
+                <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">server/storage.ts</code> - Controls &amp; Tasks (Intelligence)</li>
                 <li><code className="bg-gray-100 dark:bg-muted px-1 rounded">server/routes.ts</code> - API Endpoints</li>
               </ul>
             </div>

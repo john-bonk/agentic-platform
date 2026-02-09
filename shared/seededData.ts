@@ -41,8 +41,11 @@ export const WORKSPACE_WORKFLOW_MAP: Record<string, SeededWorkflowId> = {
 export const PROTOTYPE_EXPECTATIONS = {
   workflowCount: SEEDED_WORKFLOW_IDS.length,
   defaultWorkspaceCount: 4,
-  moduleCount: 5,
+  moduleCount: 6, // Home, Database, Global Risk, Reporting, Intelligence Hub, Workflows
   minSlideDecks: 3,
   minQuickActions: 16, // 4+4+4+4 (Admin now has 4 quick actions including Data)
   adminPageCount: 3, // Workspaces, Permissions, Data
+  riskDashboardCount: 3, // CRO, CAE, CISO
+  intelligencePageCount: 4, // Vendor Exposure, Org Impact, Threat Detection, Vulnerability Scan
+  inventoryViewCount: 2, // All Inventory, Coverage Mapping
 } as const;
