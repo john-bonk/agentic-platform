@@ -25,6 +25,7 @@ import { MapPin, Building2, Package, Users, Server, Plus, Filter, MoreHorizontal
 import { EntityDetailPanel, EntityDetails, generateEntityDetails } from "@/components/inventory/EntityDetailPanel";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { useSideNavStore } from "@/lib/sideNavStore";
+import { useInventoryStore } from "@/lib/inventoryStore";
 import { useToast } from "@/hooks/use-toast";
 import {
   getWorkspaceViewConfig,
@@ -301,15 +302,16 @@ function AllInventoryFlow() {
   const [activeTab, setActiveTab] = useState("overview");
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  const [showMaItems, setShowMaItems] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const { fitView } = useReactFlow();
   const { toast } = useToast();
 
   const { currentWorkspace } = useWorkspaceStore();
   const { isCollapsed, setCollapsed } = useSideNavStore();
+  const { isUploaded, markUploaded } = useInventoryStore();
   const autoCollapsedRef = useRef(false);
 
+  const showMaItems = isUploaded(currentWorkspace.id);
   const isEnterpriseAudit = currentWorkspace.id === "enterprise-audit";
   const maActive = isEnterpriseAudit ? showMaItems : true;
 
@@ -336,6 +338,7 @@ function AllInventoryFlow() {
   const handleUpload = useCallback(() => {
     if (isUploading || showMaItems) return;
     setIsUploading(true);
+    justUploadedRef.current = true;
 
     toast({
       title: "Processing M&A files...",
@@ -356,7 +359,7 @@ function AllInventoryFlow() {
     });
 
     setTimeout(() => {
-      setShowMaItems(true);
+      markUploaded(currentWorkspace.id);
       setIsUploading(false);
       toast({
         title: "M&A inventory imported",
@@ -406,18 +409,23 @@ function AllInventoryFlow() {
     [config, handleItemClick, connectedItemIds, onItemHover, onItemLeave, maActive, columnCount, isEnterpriseAudit, selectedItemId]
   );
 
+  const justUploadedRef = useRef(false);
+
   const initialEdges = useMemo(
     () => {
       const allEdges = buildInventoryEdges(config.inventory);
       if (!isEnterpriseAudit) return allEdges;
       if (!maActive) return [];
+      if (showMaItems && !justUploadedRef.current) {
+        return allEdges;
+      }
       return allEdges.map(e => ({
         ...e,
         animated: true,
         style: { ...e.style, opacity: 0 },
       }));
     },
-    [config, maActive, isEnterpriseAudit]
+    [config, maActive, isEnterpriseAudit, showMaItems]
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -439,7 +447,7 @@ function AllInventoryFlow() {
 
   const edgesFadedIn = useRef(false);
   useEffect(() => {
-    if (isEnterpriseAudit && maActive && !edgesFadedIn.current) {
+    if (isEnterpriseAudit && maActive && justUploadedRef.current && !edgesFadedIn.current) {
       edgesFadedIn.current = true;
       const timer = setTimeout(() => {
         setEdges((eds) =>
@@ -449,10 +457,11 @@ function AllInventoryFlow() {
             style: { ...e.style, opacity: 1 },
           }))
         );
+        justUploadedRef.current = false;
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [showMaItems, setEdges]);
+  }, [showMaItems, setEdges, isEnterpriseAudit, maActive]);
 
   useEffect(() => {
     if (activeHighlightId) {
