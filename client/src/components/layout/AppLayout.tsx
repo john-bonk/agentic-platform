@@ -70,7 +70,7 @@ export function AppLayout({
       className={`flex items-start relative overflow-hidden bg-background ${className}`}
       style={{ height: 'calc(100vh - var(--browser-chrome-height, 0px))' }}
     >
-      {showIconNav && (
+      {showIconNav && !isAiGovNewTab && (
         <LeftIconNavbar 
           items={iconNavItems} 
           logoPath={appConfig.logoPath}
