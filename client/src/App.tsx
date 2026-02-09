@@ -57,6 +57,7 @@ import {
   CustomWorkspaceHome,
   RecentPage,
   FavoritesPage,
+  RiskCalculationPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 import { BrowserChrome } from "@/components/layout/BrowserChrome";
@@ -74,6 +75,7 @@ function Router() {
       <Route path="/recent" component={RecentPage} />
       <Route path="/favorites" component={FavoritesPage} />
       <Route path="/global-residual-risk" component={GlobalResidualRiskRouter} />
+      <Route path="/risk-calculation" component={RiskCalculationPage} />
       <Route path="/vendor-exposure" component={VendorExposurePage} />
       <Route path="/org-impact" component={OrgImpactPage} />
       <Route path="/threat-detection" component={ThreatDetectionPage} />

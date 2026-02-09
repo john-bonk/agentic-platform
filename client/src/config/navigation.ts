@@ -86,6 +86,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
           { id: "global-residual-risk-cro", label: "Global Residual Risk", path: "/global-residual-risk" },
+          { id: "risk-calculation", label: "Risk Calculation", path: "/risk-calculation" },
           { id: "vendor-exposure", label: "Vendor Exposure", path: "/vendor-exposure" },
         ],
       },
@@ -460,6 +461,7 @@ const homePaths = [
   "/issues", "/financial-accounts", "/risk-control-matrix", "/coso-framework", 
   "/open-tasks", "/financial-accounts-view", "/financial-applications-view", 
   "/profile", "/wizard", "/demo", "/items", "/global-residual-risk",
+  "/risk-calculation",
   "/admin", "/admin/workspaces", "/admin/permissions"
 ];
 

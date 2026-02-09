@@ -43,3 +43,4 @@ export { default as GeneratedReportPage } from "./GeneratedReportPage";
 export { default as CustomWorkspaceHome } from "./CustomWorkspaceHome";
 export { default as RecentPage } from "./RecentPage";
 export { default as FavoritesPage } from "./FavoritesPage";
+export { default as RiskCalculationPage } from "./RiskCalculationPage";
