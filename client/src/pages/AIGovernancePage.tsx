@@ -41,9 +41,9 @@ function RiskLevelsChart() {
     { label: "Not Assigned", value: 44, color: "#266C92" },
   ];
   const maxVal = 50;
-  const chartH = 180;
-  const barW = 44;
-  const gap = 24;
+  const chartH = 207;
+  const barW = 50;
+  const gap = 28;
   const startX = 40;
   const totalW = startX + data.length * (barW + gap) + 10;
 
@@ -62,7 +62,7 @@ function RiskLevelsChart() {
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4 pb-4">
-        <svg viewBox={`0 0 ${totalW} ${chartH + 30}`} className="w-full" style={{ maxHeight: 220 }}>
+        <svg viewBox={`0 0 ${totalW} ${chartH + 30}`} className="w-full" style={{ maxHeight: 253 }}>
           {[0, 10, 20, 30, 40, 50].map((v) => {
             const y = 10 + (chartH - ((v / maxVal) * chartH));
             return (
@@ -157,11 +157,11 @@ function DevelopmentStatusesSection() {
           <LinkIcon className="w-3 h-3 text-muted-foreground" />
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
-        <div className="flex gap-6">
+      <CardContent className="px-4 pb-4 flex-1 flex items-center">
+        <div className="flex gap-6 w-full">
           <div className="flex-1 flex flex-col items-center">
             <span className="text-xs font-medium text-muted-foreground mb-2">Pre-Deployment</span>
-            <DonutChart data={preDeployData} size={110} />
+            <DonutChart data={preDeployData} size={127} />
             <div className="flex items-center gap-3 mt-2">
               {preDeployData.map((d, i) => (
                 <div key={i} className="flex items-center gap-1">
@@ -173,7 +173,7 @@ function DevelopmentStatusesSection() {
           </div>
           <div className="flex-1 flex flex-col items-center">
             <span className="text-xs font-medium text-muted-foreground mb-2">Deployed</span>
-            <DonutChart data={deployedData} size={110} />
+            <DonutChart data={deployedData} size={127} />
             <div className="flex items-center gap-3 mt-2">
               {deployedData.map((d, i) => (
                 <div key={i} className="flex items-center gap-1">
@@ -297,7 +297,7 @@ export default function AIGovernancePage() {
             <MetricCard
               title="Frameworks"
               icon={<Shield className="w-3.5 h-3.5 text-white" />}
-              iconBg="bg-emerald-600"
+              iconBg="bg-[#266C92]"
               metrics={[
                 { value: 27, label: "Active" },
                 { value: 102, label: "Total Controls" },
@@ -306,7 +306,7 @@ export default function AIGovernancePage() {
             <MetricCard
               title="Development Status Counts"
               icon={<Settings className="w-3.5 h-3.5 text-white" />}
-              iconBg="bg-orange-500"
+              iconBg="bg-[#266C92]"
               metrics={[
                 { value: 13, label: "Pre-deployment" },
                 { value: 10, label: "Deployed" },

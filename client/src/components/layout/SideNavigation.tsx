@@ -511,7 +511,6 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
 
     setPreviousRoute(location);
     openTab(path, label);
-    setCollapsed(true);
     setLocation(path);
   };
 
