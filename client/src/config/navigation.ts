@@ -231,9 +231,9 @@ export const globalRiskNewTabNavSections: SideNavSection[] = [
     collapsible: true,
     defaultExpanded: true,
     items: [
-      { id: "grr-cro", label: "CRO Dashboard", path: "/global-residual-risk" },
-      { id: "grr-cae", label: "CAE Dashboard", path: "/global-residual-risk#cae" },
-      { id: "grr-ciso", label: "CISO Dashboard", path: "/global-residual-risk#ciso" },
+      { id: "grr-cro", label: "Enterprise Risk", path: "/global-residual-risk#cro" },
+      { id: "grr-cae", label: "Enterprise Audit", path: "/global-residual-risk#cae" },
+      { id: "grr-ciso", label: "IT Security", path: "/global-residual-risk#ciso" },
     ],
   },
   {

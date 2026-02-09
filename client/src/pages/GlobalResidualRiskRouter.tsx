@@ -280,8 +280,9 @@ function MitigationTrackerView() {
 
 export default function GlobalResidualRiskRouter() {
   const { currentWorkspace } = useWorkspaceStore();
-  const { activeTabId, getActiveRoute } = useBrowserTabStore();
+  const { activeTabId, getActiveRoute, getActiveTab } = useBrowserTabStore();
   const [hash, setHash] = useState(window.location.hash);
+  const [defaultSet, setDefaultSet] = useState(false);
 
   useEffect(() => {
     const onHashChange = () => setHash(window.location.hash);
@@ -291,8 +292,23 @@ export default function GlobalResidualRiskRouter() {
 
   const isNewTab = activeTabId !== "main" && getActiveRoute() === "/global-residual-risk";
 
+  useEffect(() => {
+    if (isNewTab && !defaultSet && !window.location.hash) {
+      const activeTab = getActiveTab();
+      const originPersona = activeTab?.metadata?.originPersona || currentWorkspace.persona || "CRO";
+      let defaultHash = "#cro";
+      if (originPersona === "CAE") defaultHash = "#cae";
+      else if (originPersona === "CISO") defaultHash = "#ciso";
+      window.location.hash = defaultHash;
+      setHash(defaultHash);
+      setDefaultSet(true);
+    }
+  }, [isNewTab, defaultSet]);
+
   if (isNewTab) {
     switch (hash) {
+      case "#cro":
+        return <GlobalResidualRiskPage />;
       case "#cae":
         return <CAEResidualRiskPage />;
       case "#ciso":

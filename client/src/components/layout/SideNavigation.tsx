@@ -461,9 +461,6 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
       if (path === "/") {
         return location === "/" || location === "/my-dashboard";
       }
-      if (path === "/global-residual-risk") {
-        return location === "/global-residual-risk" && !currentHash;
-      }
       if (path === "/admin/workspaces") {
         return location === "/admin" || location === "/admin/workspaces";
       }
@@ -538,7 +535,7 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
     }
 
     setPreviousRoute(location);
-    openTab(path, label);
+    openTab(path, label, { originPersona: currentWorkspace.persona || "CRO" });
     setLocation(path);
   };
 

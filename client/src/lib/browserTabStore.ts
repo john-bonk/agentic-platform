@@ -6,17 +6,19 @@ export interface BrowserTabData {
   faviconUrl: string;
   route: string;
   isNewTab?: boolean;
+  metadata?: Record<string, string>;
 }
 
 interface BrowserTabState {
   tabs: BrowserTabData[];
   activeTabId: string;
   previousRoute: string;
-  openTab: (route: string, label: string) => void;
+  openTab: (route: string, label: string, metadata?: Record<string, string>) => void;
   closeTab: (id: string) => void;
   setActiveTab: (id: string) => void;
   setPreviousRoute: (route: string) => void;
   getActiveRoute: () => string | null;
+  getActiveTab: () => BrowserTabData | null;
   resetTabs: () => void;
 }
 
@@ -32,7 +34,7 @@ export const useBrowserTabStore = create<BrowserTabState>((set, get) => ({
   activeTabId: MAIN_TAB_ID,
   previousRoute: "/",
 
-  openTab: (route: string, label: string) => {
+  openTab: (route: string, label: string, metadata?: Record<string, string>) => {
     const state = get();
     const tabId = makeTabId(route);
     const existingTab = state.tabs.find(t => t.id === tabId);
@@ -48,6 +50,7 @@ export const useBrowserTabStore = create<BrowserTabState>((set, get) => ({
       faviconUrl: FAVICON_URL,
       route,
       isNewTab: true,
+      metadata,
     };
 
     set({
@@ -85,6 +88,12 @@ export const useBrowserTabStore = create<BrowserTabState>((set, get) => ({
     if (state.activeTabId === MAIN_TAB_ID) return null;
     const tab = state.tabs.find(t => t.id === state.activeTabId);
     return tab?.route || null;
+  },
+
+  getActiveTab: () => {
+    const state = get();
+    if (state.activeTabId === MAIN_TAB_ID) return null;
+    return state.tabs.find(t => t.id === state.activeTabId) || null;
   },
 
   resetTabs: () => {
