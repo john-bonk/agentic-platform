@@ -21,7 +21,7 @@ import { useLocation } from "wouter";
 import { LeftIconNavbar } from "./LeftIconNavbar";
 import { SideNavigation } from "./SideNavigation";
 import { AppHeader } from "./AppHeader";
-import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav, aiGovNewTabNavSections } from "@/config/navigation";
+import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav, aiGovNewTabNavSections, globalRiskNewTabNavSections } from "@/config/navigation";
 import { type Tab } from "@/lib/tabStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
@@ -52,7 +52,11 @@ export function AppLayout({
   const { isOpen: isAssistantOpen } = useHomeAssistantStore();
   const { activeTabId, getActiveRoute } = useBrowserTabStore();
   
-  const isAiGovNewTab = location === "/ai-governance" && activeTabId !== "main" && getActiveRoute() === "/ai-governance";
+  const isNewTab = activeTabId !== "main";
+  const activeRoute = getActiveRoute();
+  const isAiGovNewTab = location === "/ai-governance" && isNewTab && activeRoute === "/ai-governance";
+  const isGlobalRiskNewTab = location === "/global-residual-risk" && isNewTab && activeRoute === "/global-residual-risk";
+  const isSpecialNewTab = isAiGovNewTab || isGlobalRiskNewTab;
   
   const isHomeModule = currentModule.id === "home";
   const workspaceNav = isHomeModule 
@@ -61,9 +65,11 @@ export function AppLayout({
   
   const sideNavSections = isAiGovNewTab 
     ? aiGovNewTabNavSections 
+    : isGlobalRiskNewTab
+    ? globalRiskNewTabNavSections
     : (workspaceNav ? workspaceNav.sections : currentModule.sideNavSections);
-  const sideNavModuleGroups = isAiGovNewTab ? undefined : workspaceNav?.moduleGroups;
-  const sideNavTitle = isAiGovNewTab ? "AI Governance" : (isHomeModule ? currentWorkspace.name : currentModule.name);
+  const sideNavModuleGroups = isSpecialNewTab ? undefined : workspaceNav?.moduleGroups;
+  const sideNavTitle = isAiGovNewTab ? "AI Governance" : isGlobalRiskNewTab ? "Global Residual Risk" : (isHomeModule ? currentWorkspace.name : currentModule.name);
   
   return (
     <div 
@@ -74,7 +80,7 @@ export function AppLayout({
         <LeftIconNavbar 
           items={iconNavItems} 
           logoPath={appConfig.logoPath}
-          homeOnly={isAiGovNewTab}
+          homeOnly={isSpecialNewTab}
         />
       )}
 
@@ -84,8 +90,8 @@ export function AppLayout({
           sections={sideNavSections} 
           moduleGroups={sideNavModuleGroups}
           title={sideNavTitle}
-          hideQuickAccess={isAiGovNewTab}
-          staticTitle={isAiGovNewTab}
+          hideQuickAccess={isSpecialNewTab}
+          staticTitle={isSpecialNewTab}
         />
       )}
 

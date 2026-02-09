@@ -86,7 +86,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         collapsible: true,
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
-          { id: "global-residual-risk-cro", label: "Global Residual Risk", path: "/global-residual-risk" },
+          { id: "global-residual-risk-cro", label: "Global Residual Risk", path: "/global-residual-risk", openInNewTab: true },
           { id: "risk-calculation", label: "Risk Calculation", path: "/risk-calculation" },
           { id: "vendor-exposure", label: "Vendor Exposure", path: "/vendor-exposure" },
         ],
@@ -128,7 +128,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         collapsible: true,
         items: [
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
-          { id: "global-residual-risk-cae", label: "Global Residual Risk", path: "/global-residual-risk" },
+          { id: "global-residual-risk-cae", label: "Global Residual Risk", path: "/global-residual-risk", openInNewTab: true },
           { id: "org-impact", label: "Org Impact Analysis", path: "/org-impact" },
         ],
       },
@@ -171,7 +171,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         items: [
           { id: "ai-governance", label: "AI Governance", path: "/ai-governance", openInNewTab: true },
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
-          { id: "global-residual-risk-ciso", label: "Global Residual Risk", path: "/global-residual-risk" },
+          { id: "global-residual-risk-ciso", label: "Global Residual Risk", path: "/global-residual-risk", openInNewTab: true },
           { id: "threat-detection", label: "Threat Detection", path: "/threat-detection" },
           { id: "vulnerability-scan", label: "Vulnerability Scan", path: "/vulnerability-scan" },
         ],
@@ -220,6 +220,30 @@ export const aiGovNewTabNavSections: SideNavSection[] = [
       { id: "aigov-frameworks", label: "Frameworks", path: "/ai-governance#frameworks" },
       { id: "aigov-admin", label: "Admin", path: "/ai-governance#admin" },
       { id: "aigov-resources", label: "Resources", path: "/ai-governance#resources" },
+    ],
+  },
+];
+
+export const globalRiskNewTabNavSections: SideNavSection[] = [
+  {
+    id: "grr-dashboards",
+    title: "Dashboards",
+    collapsible: true,
+    defaultExpanded: true,
+    items: [
+      { id: "grr-cro", label: "CRO Dashboard", path: "/global-residual-risk" },
+      { id: "grr-cae", label: "CAE Dashboard", path: "/global-residual-risk#cae" },
+      { id: "grr-ciso", label: "CISO Dashboard", path: "/global-residual-risk#ciso" },
+    ],
+  },
+  {
+    id: "grr-analytics",
+    title: "Analytics",
+    collapsible: true,
+    defaultExpanded: true,
+    items: [
+      { id: "grr-risk-heatmap", label: "Risk Heatmap", path: "/global-residual-risk#risk-heatmap" },
+      { id: "grr-mitigation-tracker", label: "Mitigation Tracker", path: "/global-residual-risk#mitigation-tracker" },
     ],
   },
 ];
