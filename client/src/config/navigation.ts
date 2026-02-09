@@ -210,15 +210,16 @@ export const aiGovNewTabNavSections: SideNavSection[] = [
   {
     id: "aigov-main",
     title: "",
+    collapsible: false,
     defaultExpanded: true,
     items: [
       { id: "aigov-dashboard", label: "Dashboard", path: "/ai-governance" },
-      { id: "aigov-my-work", label: "My Work", path: "/ai-governance" },
-      { id: "aigov-ai-applications", label: "AI Applications", path: "/ai-governance" },
-      { id: "aigov-vendors", label: "Vendors", path: "/ai-governance" },
-      { id: "aigov-frameworks", label: "Frameworks", path: "/ai-governance" },
-      { id: "aigov-admin", label: "Admin", path: "/ai-governance" },
-      { id: "aigov-resources", label: "Resources", path: "/ai-governance" },
+      { id: "aigov-my-work", label: "My Work", path: "/ai-governance#my-work" },
+      { id: "aigov-ai-applications", label: "AI Applications", path: "/ai-governance#ai-applications" },
+      { id: "aigov-vendors", label: "Vendors", path: "/ai-governance#vendors" },
+      { id: "aigov-frameworks", label: "Frameworks", path: "/ai-governance#frameworks" },
+      { id: "aigov-admin", label: "Admin", path: "/ai-governance#admin" },
+      { id: "aigov-resources", label: "Resources", path: "/ai-governance#resources" },
     ],
   },
 ];

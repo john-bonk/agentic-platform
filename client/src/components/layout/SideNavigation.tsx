@@ -85,24 +85,26 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInN
 
   return (
     <div className="flex flex-col">
-      <button
-        onClick={isCollapsible ? onToggle : undefined}
-        className={`flex items-center justify-between px-2 py-1.5 w-full text-left ${
-          isCollapsible ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-accent rounded transition-colors" : "cursor-default"
-        }`}
-        data-testid={`nav-section-${section.id}`}
-      >
-        <span className="text-xs font-medium text-gray-400 dark:text-muted-foreground uppercase tracking-wider">
-          {section.title}
-        </span>
-        {isCollapsible && (
-          <ChevronDown 
-            className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
-              isExpanded ? "" : "-rotate-90"
-            }`}
-          />
-        )}
-      </button>
+      {section.title && (
+        <button
+          onClick={isCollapsible ? onToggle : undefined}
+          className={`flex items-center justify-between px-2 py-1.5 w-full text-left ${
+            isCollapsible ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-accent rounded transition-colors" : "cursor-default"
+          }`}
+          data-testid={`nav-section-${section.id}`}
+        >
+          <span className="text-xs font-medium text-gray-400 dark:text-muted-foreground uppercase tracking-wider">
+            {section.title}
+          </span>
+          {isCollapsible && (
+            <ChevronDown 
+              className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
+                isExpanded ? "" : "-rotate-90"
+              }`}
+            />
+          )}
+        </button>
+      )}
       
       <div 
         className={`overflow-hidden transition-all duration-200 ease-in-out ${
