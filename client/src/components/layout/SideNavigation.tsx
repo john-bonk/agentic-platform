@@ -69,6 +69,7 @@ interface SideNavigationProps {
   moduleGroups?: ModuleNavGroup[];
   title: string;
   className?: string;
+  hideQuickAccess?: boolean;
   onWorkspaceCreated?: (workspace: Workspace) => void;
 }
 
@@ -340,7 +341,7 @@ function QuickAccessItem({ icon: Icon, label, path, isActive, onClick }: QuickAc
   return content;
 }
 
-export function SideNavigation({ sections, moduleGroups, title, className = "", onWorkspaceCreated }: SideNavigationProps) {
+export function SideNavigation({ sections, moduleGroups, title, className = "", hideQuickAccess, onWorkspaceCreated }: SideNavigationProps) {
   const [location, setLocation] = useLocation();
   const { isCollapsed, setCollapsed } = useSideNavStore();
   const { currentWorkspace, setWorkspace, getAllWorkspaces, refreshKey } = useWorkspaceStore();
@@ -660,7 +661,7 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
           </div>
 
           {/* Quick Access Items - Home, Recent, Favorites - Only show on Home module and not Admin */}
-          {shouldShowQuickAccess(location, currentWorkspace) && (
+          {!hideQuickAccess && shouldShowQuickAccess(location, currentWorkspace) && (
             <div className={`flex flex-col gap-0.5 px-3 pt-3 pb-2 border-b border-gray-100 dark:border-border transition-all duration-300 ease-in-out ${
               isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
             }`}>
