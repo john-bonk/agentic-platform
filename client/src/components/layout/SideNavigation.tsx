@@ -114,10 +114,9 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInN
         }`}
       >
         <ul className="flex flex-col gap-0.5 pt-1">
-          {section.items.map((item) => (
-            <li key={item.id}>
-              <div className="flex items-center group/navitem">
-                <Link href={item.path} className="flex-1 min-w-0">
+          {section.items.map((item) => {
+            const hasHash = item.path.includes("#");
+            const navButton = (
                   <Button
                     variant="ghost"
                     className={`h-[33px] w-full items-center gap-2 px-2 py-1.5 rounded flex justify-start ${
@@ -126,6 +125,15 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInN
                         : "hover:bg-gray-100 dark:hover:bg-accent"
                     } ${item.openInNewTab ? "pr-1" : ""}`}
                     data-testid={`nav-item-${item.id}`}
+                    onClick={hasHash ? (e) => {
+                      e.preventDefault();
+                      const hashPart = item.path.split("#")[1] || "";
+                      window.location.hash = hashPart ? `#${hashPart}` : "";
+                      if (!hashPart) {
+                        window.location.hash = "";
+                        window.history.replaceState(null, "", window.location.pathname);
+                      }
+                    } : undefined}
                   >
                     <span
                       className={`flex-1 text-left text-sm whitespace-nowrap ${
@@ -146,7 +154,15 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInN
                       </Badge>
                     )}
                   </Button>
-                </Link>
+            );
+            return (
+            <li key={item.id}>
+              <div className="flex items-center group/navitem">
+                {hasHash ? (
+                  <div className="flex-1 min-w-0 cursor-pointer">{navButton}</div>
+                ) : (
+                  <Link href={item.path} className="flex-1 min-w-0">{navButton}</Link>
+                )}
                 {item.openInNewTab && onOpenInNewTab && (
                   <Button
                     variant="ghost"
@@ -165,7 +181,8 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInN
                 )}
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </div>
     </div>
@@ -428,13 +445,24 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
 
   const activeModuleIndex = getActiveModuleIndex(location);
 
+  const [currentHash, setCurrentHash] = useState(window.location.hash);
+  useEffect(() => {
+    const onHashChange = () => setCurrentHash(window.location.hash);
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
   const isActive = (path: string) => {
+    if (path.includes("#")) {
+      const [basePath, hashPart] = path.split("#");
+      return location === basePath && currentHash === `#${hashPart}`;
+    }
     if (activeModuleIndex === 0) {
       if (path === "/") {
         return location === "/" || location === "/my-dashboard";
       }
       if (path === "/global-residual-risk") {
-        return location === "/global-residual-risk";
+        return location === "/global-residual-risk" && !currentHash;
       }
       if (path === "/admin/workspaces") {
         return location === "/admin" || location === "/admin/workspaces";

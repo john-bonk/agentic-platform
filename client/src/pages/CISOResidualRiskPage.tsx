@@ -22,7 +22,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
-  Shield, 
   Share2,
   MoreHorizontal,
   Pin,
@@ -374,17 +373,9 @@ export default function CISOResidualRiskPage() {
         <div className="sticky top-0 z-40 bg-white dark:bg-card border-b border-gray-200 dark:border-border" data-testid="header-ciso-security">
           <div className="flex items-center justify-between px-6 py-4 gap-4">
             <div className="flex items-center gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#266C92] flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-white" />
-                </div>
-                <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground" data-testid="text-ciso-page-title">
-                  Overview: Cybersecurity Risk Management
-                </h1>
-              </div>
-              <Badge variant="secondary" className="text-xs" data-testid="badge-ciso-workspace">
-                CISO Workspace
-              </Badge>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground" data-testid="text-ciso-page-title">
+                Global Residual Risk
+              </h1>
             </div>
             
             <div className="flex items-center gap-2">

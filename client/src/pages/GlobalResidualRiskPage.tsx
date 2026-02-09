@@ -23,7 +23,6 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   AlertTriangle, 
-  Shield, 
   TrendingDown,
   Download,
   Filter,
@@ -513,17 +512,9 @@ export default function GlobalResidualRiskPage() {
         <div className="sticky top-0 z-40 bg-white dark:bg-card border-b border-gray-200 dark:border-border" data-testid="header-global-risk">
           <div className="flex items-center justify-between px-6 py-4 gap-4">
             <div className="flex items-center gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#266C92] flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-white" />
-                </div>
-                <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground" data-testid="text-page-title">
-                  Global Residual Risk
-                </h1>
-              </div>
-              <Badge variant="secondary" className="text-xs" data-testid="badge-workspace">
-                CRO Workspace
-              </Badge>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground" data-testid="text-page-title">
+                Global Residual Risk
+              </h1>
             </div>
             
             <div className="flex items-center gap-3 flex-wrap">
