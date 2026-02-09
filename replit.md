@@ -117,8 +117,21 @@ Preferred communication style: Simple, everyday language.
 ### Layout Components
 - `client/src/components/layout/AppLayout.tsx` - Main page wrapper
 - `client/src/components/layout/PageHeader.tsx` - Reusable page header
-- `client/src/components/layout/SideNavigation.tsx` - Side navigation panel
+- `client/src/components/layout/SideNavigation.tsx` - Side navigation panel (supports openInNewTab items with ExternalLink icon)
 - `client/src/components/layout/LeftIconNavbar.tsx` - Icon navbar
+- `client/src/components/layout/BrowserChrome.tsx` - Interactive browser chrome with clickable/closeable tabs, driven by browserTabStore
+
+### Browser Tab System
+- `client/src/lib/browserTabStore.ts` - Zustand store managing browser tab state (open/close/activate tabs, route tracking, previousRoute for return navigation)
+- Nav items with `openInNewTab: true` show an ExternalLink icon on hover; clicking opens a new browser tab, auto-enables browser chrome, and navigates to the route
+- Closing a tab returns to the previous route (tracked via `setPreviousRoute`)
+- Main tab always exists and cannot be closed
+
+### AI Governance Page
+- `client/src/pages/AIGovernancePage.tsx` - Standalone page with its own sidebar layout (not wrapped in AppLayout), matching the FairNow/AuditBoard AI Governance screenshot
+- Features: own dark sidebar nav (Dashboard, My Work, AI Applications, Vendors, Frameworks, Admin, Resources), breadcrumb header, 3 metric cards, risk levels bar chart, development statuses donut charts, notification history, compliance table, acquisition banner
+- Accessed via IT Security workspace CISO Security Environment nav with openInNewTab enabled
+- Route: `/ai-governance`
 
 ### Template Pages
 - `client/src/pages/DashboardPage.tsx` - Dashboard with metrics, charts, and data table (default landing page)
