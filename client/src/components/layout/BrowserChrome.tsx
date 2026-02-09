@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
+import { useBrowserTabStore } from "@/lib/browserTabStore";
 import { X } from "lucide-react";
+import { useLocation } from "wouter";
 
 export const BROWSER_CHROME_HEIGHT = 70;
 
@@ -19,6 +21,8 @@ interface BrowserChromeProps {
 
 export function BrowserChrome({ children, visible, tabs: externalTabs }: BrowserChromeProps) {
   const { currentWorkspace } = useWorkspaceStore();
+  const { tabs: storeTabs, activeTabId, setActiveTab, closeTab } = useBrowserTabStore();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     if (visible) {
@@ -28,16 +32,49 @@ export function BrowserChrome({ children, visible, tabs: externalTabs }: Browser
     }
   }, [visible]);
 
-  const defaultTabs: BrowserTab[] = [
-    {
-      id: "main",
-      label: currentWorkspace.name,
-      faviconUrl: "/figmaAssets/auditboard-logo.png",
-      isActive: true,
-    },
-  ];
+  const mainTab: BrowserTab = {
+    id: "main",
+    label: currentWorkspace.name,
+    faviconUrl: "/figmaAssets/auditboard-logo.png",
+    isActive: activeTabId === "main",
+  };
 
-  const tabs = externalTabs || defaultTabs;
+  const dynamicTabs: BrowserTab[] = storeTabs.map(t => ({
+    id: t.id,
+    label: t.label,
+    faviconUrl: t.faviconUrl,
+    isActive: activeTabId === t.id,
+  }));
+
+  const allTabs = externalTabs || [mainTab, ...dynamicTabs];
+
+  const handleTabClick = useCallback((tabId: string) => {
+    if (externalTabs) return;
+    setActiveTab(tabId);
+    if (tabId === "main") {
+      const store = useBrowserTabStore.getState();
+      setLocation(store.previousRoute || "/");
+    } else {
+      const tab = storeTabs.find(t => t.id === tabId);
+      if (tab) {
+        setLocation(tab.route);
+      }
+    }
+  }, [externalTabs, setActiveTab, setLocation, storeTabs]);
+
+  const handleTabClose = useCallback((e: React.MouseEvent, tabId: string) => {
+    e.stopPropagation();
+    if (externalTabs) return;
+    if (tabId === "main") return;
+
+    const wasActive = activeTabId === tabId;
+    closeTab(tabId);
+
+    if (wasActive) {
+      const store = useBrowserTabStore.getState();
+      setLocation(store.previousRoute || "/");
+    }
+  }, [externalTabs, activeTabId, closeTab, setLocation]);
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden" data-testid="browser-chrome-wrapper">
@@ -54,13 +91,14 @@ export function BrowserChrome({ children, visible, tabs: externalTabs }: Browser
               <div className="w-[12px] h-[12px] rounded-full" style={{ backgroundColor: '#62c554' }} />
             </div>
 
-            {tabs.map((tab) => (
+            {allTabs.map((tab) => (
               <div
                 key={tab.id}
-                className={`flex items-center gap-1.5 h-[30px] px-3 text-xs max-w-[220px] min-w-[120px] rounded-t-lg ${
+                onClick={() => handleTabClick(tab.id)}
+                className={`flex items-center gap-1.5 h-[30px] px-3 text-xs max-w-[220px] min-w-[120px] rounded-t-lg cursor-pointer transition-colors ${
                   tab.isActive
                     ? "bg-[#35363a]"
-                    : "bg-[#292a2d]"
+                    : "bg-[#292a2d] hover:bg-[#303134]"
                 }`}
                 data-testid={`browser-tab-${tab.id}`}
               >
@@ -74,7 +112,17 @@ export function BrowserChrome({ children, visible, tabs: externalTabs }: Browser
                 <span className="truncate flex-1 text-[12px] text-[#e8eaed]">
                   {tab.label}
                 </span>
-                <X className="w-3 h-3 text-[#9aa0a6] flex-shrink-0" />
+                {tab.id !== "main" ? (
+                  <button
+                    onClick={(e) => handleTabClose(e, tab.id)}
+                    className="flex-shrink-0 rounded-sm hover:bg-[#5f6368] p-0.5 transition-colors"
+                    data-testid={`browser-tab-close-${tab.id}`}
+                  >
+                    <X className="w-3 h-3 text-[#9aa0a6]" />
+                  </button>
+                ) : (
+                  <X className="w-3 h-3 text-[#9aa0a6] flex-shrink-0 opacity-0" />
+                )}
               </div>
             ))}
           </div>
