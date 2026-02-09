@@ -1,5 +1,5 @@
-import { AppLayout } from "@/components/layout";
-import { Bell, Bot, Shield, Settings, ExternalLink as LinkIcon, ChevronRight } from "lucide-react";
+import { AppLayout, PageHeader } from "@/components/layout";
+import { Bell, Bot, Shield, Settings, ExternalLink as LinkIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 function MetricCard({ title, icon, iconBg, metrics }: {
@@ -281,13 +281,8 @@ export default function AIGovernancePage() {
   return (
     <AppLayout>
       <div className="flex flex-col h-full" data-testid="page-ai-governance">
+        <PageHeader title="AI Governance" />
         <div className="flex-1 overflow-auto p-5">
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4" data-testid="aigov-breadcrumb">
-            <span>Home</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="font-medium text-foreground">AI Governance Dashboard</span>
-          </div>
-
           <div className="flex gap-4 mb-4 flex-wrap">
             <MetricCard
               title="Applications"
