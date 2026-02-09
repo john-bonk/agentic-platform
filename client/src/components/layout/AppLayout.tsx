@@ -70,10 +70,11 @@ export function AppLayout({
       className={`flex items-start relative overflow-hidden bg-background ${className}`}
       style={{ height: 'calc(100vh - var(--browser-chrome-height, 0px))' }}
     >
-      {showIconNav && !isAiGovNewTab && (
+      {showIconNav && (
         <LeftIconNavbar 
           items={iconNavItems} 
           logoPath={appConfig.logoPath}
+          homeOnly={isAiGovNewTab}
         />
       )}
 
@@ -84,6 +85,7 @@ export function AppLayout({
           moduleGroups={sideNavModuleGroups}
           title={sideNavTitle}
           hideQuickAccess={isAiGovNewTab}
+          staticTitle={isAiGovNewTab}
         />
       )}
 

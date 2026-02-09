@@ -18,9 +18,10 @@ interface LeftIconNavbarProps {
   items: IconNavItem[];
   logoPath: string;
   className?: string;
+  homeOnly?: boolean;
 }
 
-export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavbarProps) {
+export function LeftIconNavbar({ items, logoPath, className = "", homeOnly }: LeftIconNavbarProps) {
   const [location] = useLocation();
   const { currentWorkspace } = useWorkspaceStore();
   
@@ -95,8 +96,8 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
         </Link>
 
         {items.map((item, index) => {
-          // Admin workspace: only show Home icon (index 0)
-          if (isAdminWorkspace && index !== 0) {
+          // Admin workspace or homeOnly mode: only show Home icon (index 0)
+          if ((isAdminWorkspace || homeOnly) && index !== 0) {
             return null;
           }
           
@@ -137,25 +138,27 @@ export function LeftIconNavbar({ items, logoPath, className = "" }: LeftIconNavb
         })}
       </nav>
 
-      <div className="flex flex-col items-center gap-1">
-        <Link href="/prototype-meta">
+      {!homeOnly && (
+        <div className="flex flex-col items-center gap-1">
+          <Link href="/prototype-meta">
+            <div 
+              className={`w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-colors ${
+                location === "/prototype-meta" ? "bg-teal-500" : "hover:bg-gray-800"
+              }`}
+              data-testid="navbar-prototype-meta"
+              title="Prototype Meta View"
+            >
+              <Cog className={`w-4 h-4 ${location === "/prototype-meta" ? "text-white" : "text-gray-400"}`} />
+            </div>
+          </Link>
           <div 
-            className={`w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-colors ${
-              location === "/prototype-meta" ? "bg-teal-500" : "hover:bg-gray-800"
-            }`}
-            data-testid="navbar-prototype-meta"
-            title="Prototype Meta View"
+            className="w-10 h-10 rounded flex items-center justify-center hover:bg-gray-800 cursor-pointer" 
+            data-testid="navbar-help"
           >
-            <Cog className={`w-4 h-4 ${location === "/prototype-meta" ? "text-white" : "text-gray-400"}`} />
+            <HelpCircle className="w-4 h-4 text-gray-400" />
           </div>
-        </Link>
-        <div 
-          className="w-10 h-10 rounded flex items-center justify-center hover:bg-gray-800 cursor-pointer" 
-          data-testid="navbar-help"
-        >
-          <HelpCircle className="w-4 h-4 text-gray-400" />
         </div>
-      </div>
+      )}
     </aside>
   );
 }

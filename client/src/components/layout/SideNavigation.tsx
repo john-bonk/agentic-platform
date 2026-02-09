@@ -70,6 +70,7 @@ interface SideNavigationProps {
   title: string;
   className?: string;
   hideQuickAccess?: boolean;
+  staticTitle?: boolean;
   onWorkspaceCreated?: (workspace: Workspace) => void;
 }
 
@@ -341,7 +342,7 @@ function QuickAccessItem({ icon: Icon, label, path, isActive, onClick }: QuickAc
   return content;
 }
 
-export function SideNavigation({ sections, moduleGroups, title, className = "", hideQuickAccess, onWorkspaceCreated }: SideNavigationProps) {
+export function SideNavigation({ sections, moduleGroups, title, className = "", hideQuickAccess, staticTitle, onWorkspaceCreated }: SideNavigationProps) {
   const [location, setLocation] = useLocation();
   const { isCollapsed, setCollapsed } = useSideNavStore();
   const { currentWorkspace, setWorkspace, getAllWorkspaces, refreshKey } = useWorkspaceStore();
@@ -607,47 +608,51 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
             className="flex items-center justify-between h-12 px-3 flex-shrink-0 transition-all duration-300 ease-in-out"
             style={{ backgroundColor: '#101827' }}
           >
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="flex items-center gap-1.5 h-8 px-2 text-white hover:bg-gray-700"
-                  data-testid="sidenav-workspace-switcher"
-                >
-                  <span className="text-sm font-semibold truncate max-w-[160px]">{currentWorkspace.name}</span>
-                  <ChevronDownIcon className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56" data-testid="sidenav-workspace-dropdown">
-                <DropdownMenuLabel className="text-xs text-gray-500 font-normal">Your workspaces</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {allWorkspaces.map((workspace) => {
-                  const isActiveWs = workspace.id === currentWorkspace.id;
-                  return (
-                    <DropdownMenuItem
-                      key={workspace.id}
-                      onClick={() => handleWorkspaceChange(workspace)}
-                      className="flex items-center gap-2 cursor-pointer"
-                      data-testid={`sidenav-workspace-option-${workspace.id}`}
-                    >
-                      <span>{workspace.name}</span>
-                      {isActiveWs && (
-                        <Check className="ml-auto w-4 h-4 text-[#266C92]" />
-                      )}
-                    </DropdownMenuItem>
-                  );
-                })}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => setCreateDialogOpen(true)}
-                  className="flex items-center gap-2 cursor-pointer text-[#266C92]"
-                  data-testid="sidenav-workspace-create-new"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Create new</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {staticTitle ? (
+              <span className="text-sm font-semibold text-white truncate max-w-[160px] px-2" data-testid="sidenav-static-title">{title}</span>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="flex items-center gap-1.5 h-8 px-2 text-white hover:bg-gray-700"
+                    data-testid="sidenav-workspace-switcher"
+                  >
+                    <span className="text-sm font-semibold truncate max-w-[160px]">{currentWorkspace.name}</span>
+                    <ChevronDownIcon className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-56" data-testid="sidenav-workspace-dropdown">
+                  <DropdownMenuLabel className="text-xs text-gray-500 font-normal">Your workspaces</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {allWorkspaces.map((workspace) => {
+                    const isActiveWs = workspace.id === currentWorkspace.id;
+                    return (
+                      <DropdownMenuItem
+                        key={workspace.id}
+                        onClick={() => handleWorkspaceChange(workspace)}
+                        className="flex items-center gap-2 cursor-pointer"
+                        data-testid={`sidenav-workspace-option-${workspace.id}`}
+                      >
+                        <span>{workspace.name}</span>
+                        {isActiveWs && (
+                          <Check className="ml-auto w-4 h-4 text-[#266C92]" />
+                        )}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => setCreateDialogOpen(true)}
+                    className="flex items-center gap-2 cursor-pointer text-[#266C92]"
+                    data-testid="sidenav-workspace-create-new"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Create new</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             <button
               onClick={() => setCollapsed(true)}
