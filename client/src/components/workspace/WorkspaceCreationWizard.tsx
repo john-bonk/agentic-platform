@@ -1303,7 +1303,7 @@ export function WorkspaceCreationWizard({
                     </Button>
                   </div>
                   
-                  <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                  <div className="space-y-2 max-h-[280px] overflow-y-auto">
                     {workspaceMembers.map((member, index) => (
                       <div 
                         key={member.id}
