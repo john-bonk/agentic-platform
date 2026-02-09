@@ -8,7 +8,7 @@
  * - Stage 4: Review with live navigation preview
  */
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -872,6 +872,179 @@ function MembersSummary({ members }: { members: WorkspaceMember[] }) {
   );
 }
 
+function CapabilitiesStep({
+  selectedBuckets,
+  enabledModules,
+  setEnabledModules,
+  activeBucketTab,
+  setActiveBucketTab,
+  toggleModule,
+}: {
+  selectedBuckets: string[];
+  enabledModules: Record<string, string[]>;
+  setEnabledModules: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
+  activeBucketTab: string | null;
+  setActiveBucketTab: (id: string) => void;
+  toggleModule: (bucketId: string, moduleId: string) => void;
+}) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const scrollToSection = (bucketId: string) => {
+    setActiveBucketTab(bucketId);
+    const el = sectionRefs.current[bucketId];
+    const container = scrollContainerRef.current;
+    if (el && container) {
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const scrollOffset = elRect.top - containerRect.top + container.scrollTop;
+      container.scrollTo({ top: scrollOffset, behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const containerRect = container.getBoundingClientRect();
+      const threshold = containerRect.top + 100;
+      let closest: string | null = null;
+      let closestDist = Infinity;
+
+      for (const bucketId of selectedBuckets) {
+        const el = sectionRefs.current[bucketId];
+        if (el) {
+          const elRect = el.getBoundingClientRect();
+          const dist = Math.abs(elRect.top - threshold);
+          if (dist < closestDist) {
+            closestDist = dist;
+            closest = bucketId;
+          }
+        }
+      }
+
+      if (closest && closest !== activeBucketTab) {
+        setActiveBucketTab(closest);
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [selectedBuckets, activeBucketTab, setActiveBucketTab]);
+
+  const selectedBucketData = selectedBuckets
+    .map(id => productCapabilityBuckets.find(b => b.id === id))
+    .filter(Boolean) as ProductCapabilityBucket[];
+
+  return (
+    <div className="h-full flex">
+      <div className="w-56 border-r border-gray-200 dark:border-border bg-gray-50 dark:bg-muted/30 p-4 flex flex-col">
+        <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase mb-3 block">
+          Modules
+        </Label>
+        <div className="space-y-1 flex-1 overflow-y-auto">
+          {selectedBuckets.map(bucketId => {
+            const bucket = productCapabilityBuckets.find(b => b.id === bucketId);
+            if (!bucket) return null;
+            const moduleCount = enabledModules[bucketId]?.length || 0;
+
+            return (
+              <button
+                key={bucketId}
+                onClick={() => scrollToSection(bucketId)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors ${
+                  activeBucketTab === bucketId
+                    ? "bg-[#266C92]/10 text-[#266C92]"
+                    : "text-gray-700 dark:text-foreground hover:bg-gray-100 dark:hover:bg-muted"
+                }`}
+                data-testid={`tab-${bucketId}`}
+              >
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                  activeBucketTab === bucketId
+                    ? "bg-[#266C92]/15 text-[#266C92]"
+                    : "bg-gray-100 dark:bg-muted text-gray-500"
+                }`}>
+                  {getBucketIcon(bucket.icon, "w-3.5 h-3.5")}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium truncate">{bucket.navShortName || bucket.name}</p>
+                  <p className="text-[10px] text-gray-500 dark:text-muted-foreground">
+                    {moduleCount}/{bucket.moduleCapabilities.length}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div ref={scrollContainerRef} className="flex-1 p-6 overflow-y-auto">
+        <div className="space-y-8 max-w-4xl mx-auto">
+          {selectedBucketData.map(bucket => {
+            const bucketModules = enabledModules[bucket.id] || [];
+            const allModuleIds = bucket.moduleCapabilities.map(m => m.id);
+            const allSelected = bucketModules.length === allModuleIds.length;
+
+            return (
+              <div
+                key={bucket.id}
+                ref={el => { sectionRefs.current[bucket.id] = el; }}
+                data-testid={`capabilities-section-${bucket.id}`}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: `${bucket.color}15`, color: bucket.color }}
+                  >
+                    {getBucketIcon(bucket.icon, "w-4.5 h-4.5")}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm text-gray-900 dark:text-foreground">{bucket.name}</h3>
+                    <p className="text-xs text-gray-500 dark:text-muted-foreground">{bucket.description}</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (allSelected) {
+                        setEnabledModules(prev => ({ ...prev, [bucket.id]: [] }));
+                      } else {
+                        setEnabledModules(prev => ({ ...prev, [bucket.id]: allModuleIds }));
+                      }
+                    }}
+                    data-testid={`button-toggle-all-${bucket.id}`}
+                  >
+                    {allSelected ? "Deselect All" : "Select All"}
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  {bucket.moduleCapabilities.map(module => (
+                    <ModuleCard
+                      key={module.id}
+                      module={module}
+                      isEnabled={bucketModules.includes(module.id)}
+                      onToggle={() => toggleModule(bucket.id, module.id)}
+                      bucketColor={bucket.color}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          {selectedBucketData.length === 0 && (
+            <div className="flex items-center justify-center h-64 text-gray-500 dark:text-muted-foreground">
+              <p className="text-sm">No modules selected. Go back and select modules first.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function WorkspaceCreationWizard({
   open,
   onOpenChange,
@@ -883,7 +1056,10 @@ export function WorkspaceCreationWizard({
   const [enabledModules, setEnabledModules] = useState<Record<string, string[]>>({});
   const [activeBucketTab, setActiveBucketTab] = useState<string | null>(null);
   const [workspaceMembers, setWorkspaceMembers] = useState<WorkspaceMember[]>([
-    { id: "1", email: "admin@company.org", role: "Org Admin" }
+    { id: "1", email: "admin@company.org", role: "Org Admin" },
+    { id: "2", email: "exec@company.org", role: "Executive" },
+    { id: "3", email: "manager@company.org", role: "Manager" },
+    { id: "4", email: "analyst@company.org", role: "Analyst" },
   ]);
   const [selectedArchetype, setSelectedArchetype] = useState<string>("auditboard-default");
   
@@ -1048,10 +1224,6 @@ export function WorkspaceCreationWizard({
   };
 
   if (!open) return null;
-
-  const activeBucketData = activeBucketTab 
-    ? productCapabilityBuckets.find(b => b.id === activeBucketTab) 
-    : null;
 
   return (
     <div 
@@ -1250,101 +1422,14 @@ export function WorkspaceCreationWizard({
           )}
           
           {currentStep === "modules" && (
-            <div className="h-full flex">
-              {/* Bucket Tabs Sidebar */}
-              <div className="w-64 border-r border-gray-200 dark:border-border bg-gray-50 dark:bg-muted/30 p-4">
-                <Label className="text-xs text-gray-500 dark:text-muted-foreground uppercase mb-3 block">
-                  Configure Capabilities
-                </Label>
-                <div className="space-y-1">
-                  {selectedBuckets.map(bucketId => {
-                    const bucket = productCapabilityBuckets.find(b => b.id === bucketId);
-                    if (!bucket) return null;
-                    const moduleCount = enabledModules[bucketId]?.length || 0;
-                    
-                    return (
-                      <button
-                        key={bucketId}
-                        onClick={() => setActiveBucketTab(bucketId)}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
-                          activeBucketTab === bucketId
-                            ? "bg-[#266C92]/10 text-[#266C92]"
-                            : "text-gray-700 dark:text-foreground hover:bg-gray-100 dark:hover:bg-muted"
-                        }`}
-                        data-testid={`tab-${bucketId}`}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-muted flex items-center justify-center">
-                          {getBucketIcon(bucket.icon, "w-4 h-4")}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{bucket.name}</p>
-                          <p className="text-xs text-gray-500 dark:text-muted-foreground">
-                            {moduleCount} / {bucket.moduleCapabilities.length} capabilities
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              
-              {/* Module Grid */}
-              <div className="flex-1 p-6 overflow-auto">
-                {activeBucketData ? (
-                  <div>
-                    <div className="flex items-center gap-3 mb-6">
-                      <div 
-                        className="w-10 h-10 rounded-xl flex items-center justify-center"
-                        style={{ backgroundColor: `${activeBucketData.color}15`, color: activeBucketData.color }}
-                      >
-                        {getBucketIcon(activeBucketData.icon)}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-foreground">{activeBucketData.name}</h3>
-                        <p className="text-sm text-gray-500 dark:text-muted-foreground">{activeBucketData.description}</p>
-                      </div>
-                      <div className="ml-auto">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            const allModuleIds = activeBucketData.moduleCapabilities.map(m => m.id);
-                            const currentEnabled = enabledModules[activeBucketData.id] || [];
-                            if (currentEnabled.length === allModuleIds.length) {
-                              setEnabledModules(prev => ({ ...prev, [activeBucketData.id]: [] }));
-                            } else {
-                              setEnabledModules(prev => ({ ...prev, [activeBucketData.id]: allModuleIds }));
-                            }
-                          }}
-                          data-testid="button-toggle-all"
-                        >
-                          {(enabledModules[activeBucketData.id]?.length || 0) === activeBucketData.moduleCapabilities.length
-                            ? "Deselect All"
-                            : "Select All"}
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    {/* 3x3 Module Grid */}
-                    <div className="grid grid-cols-3 gap-3">
-                      {activeBucketData.moduleCapabilities.map(module => (
-                        <ModuleCard
-                          key={module.id}
-                          module={module}
-                          isEnabled={(enabledModules[activeBucketData.id] || []).includes(module.id)}
-                          onToggle={() => toggleModule(activeBucketData.id, module.id)}
-                          bucketColor={activeBucketData.color}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-500 dark:text-muted-foreground">
-                    Select a module from the left to configure its capabilities
-                  </div>
-                )}
-              </div>
-            </div>
+            <CapabilitiesStep
+              selectedBuckets={selectedBuckets}
+              enabledModules={enabledModules}
+              setEnabledModules={setEnabledModules}
+              activeBucketTab={activeBucketTab}
+              setActiveBucketTab={setActiveBucketTab}
+              toggleModule={toggleModule}
+            />
           )}
           
           {currentStep === "homeView" && (
