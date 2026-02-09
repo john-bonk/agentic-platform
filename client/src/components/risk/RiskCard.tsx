@@ -8,6 +8,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ import {
   Calendar,
   TrendingDown,
   ArrowDown,
+  ExternalLink,
 } from "lucide-react";
 import {
   LineChart,
@@ -121,13 +123,33 @@ function TrendSparkline({ data }: { data: { value: number }[] }) {
   );
 }
 
-function RiskScoreIndicator({ score }: { score: number }) {
+function RiskScoreIndicator({ score, navigateTo }: { score: number; navigateTo?: string }) {
+  const [, setLocation] = useLocation();
   const getColor = (s: number) => {
     if (s >= 80) return "text-red-600";
     if (s >= 60) return "text-orange-500";
     if (s >= 40) return "text-amber-500";
     return "text-green-600";
   };
+
+  if (navigateTo) {
+    return (
+      <button
+        className="flex items-center gap-1.5 rounded-md px-1.5 py-0.5 -mx-1.5 -my-0.5 hover-elevate active-elevate-2 transition-colors group"
+        onClick={(e) => {
+          e.stopPropagation();
+          setLocation(navigateTo);
+        }}
+        data-testid="button-risk-score-nav"
+      >
+        <AlertTriangle className={`w-4 h-4 ${getColor(score)}`} />
+        <span className={`text-sm font-semibold ${getColor(score)}`}>
+          {score}
+        </span>
+        <ExternalLink className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+      </button>
+    );
+  }
 
   return (
     <div className="flex items-center gap-1.5">
@@ -184,7 +206,10 @@ export function RiskCard({ risk, isExpanded = false, onToggleExpand }: RiskCardP
           <div className="flex flex-col items-end gap-1">
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500 dark:text-muted-foreground">Risk Score</span>
-              <RiskScoreIndicator score={risk.riskScore} />
+              <RiskScoreIndicator
+                score={risk.riskScore}
+                navigateTo={risk.id === "risk-1" ? "/risk-calculation" : undefined}
+              />
             </div>
           </div>
           

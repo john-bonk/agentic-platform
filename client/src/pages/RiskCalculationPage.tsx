@@ -190,10 +190,11 @@ function CircleNode({ node, isHovered, isSelected, highlighted, faded, onHover, 
   const totalHeight = lines.length * lineHeight;
   const startY = cy - totalHeight / 2 + lineHeight / 2;
 
-  const normalFill = node.color === "teal" ? "#266C92" : "#1e293b";
+  const isFinalNode = node.id === "tariff-assessment";
+  const normalFill = isFinalNode ? "#0f172a" : node.color === "teal" ? "#266C92" : "#1e293b";
   const activeFill = "#b91c1c";
   const selectedFill = isSelected ? "#991b1b" : highlighted ? activeFill : normalFill;
-  const hoverFill = isHovered && !highlighted ? (node.color === "teal" ? "#1d5a7a" : "#0f172a") : selectedFill;
+  const hoverFill = isHovered && !highlighted ? (isFinalNode ? "#020617" : node.color === "teal" ? "#1d5a7a" : "#0f172a") : selectedFill;
   const fillColor = isHovered ? hoverFill : selectedFill;
   const nodeOpacity = faded ? 0.2 : 1;
 
@@ -205,7 +206,30 @@ function CircleNode({ node, isHovered, isSelected, highlighted, faded, onHover, 
       style={{ cursor: "pointer", opacity: nodeOpacity, transition: "opacity 0.3s ease" }}
       data-testid={`risk-node-${node.id}`}
     >
-      {(isHovered || isSelected) && (
+      {isFinalNode && !faded && (
+        <>
+          <circle
+            cx={cx}
+            cy={cy}
+            r={r + 10}
+            fill="none"
+            stroke={highlighted || isSelected ? "#b91c1c" : "#266C92"}
+            strokeWidth="1"
+            opacity="0.2"
+            strokeDasharray="4 3"
+          />
+          <circle
+            cx={cx}
+            cy={cy}
+            r={r + 5}
+            fill="none"
+            stroke={highlighted || isSelected ? "#b91c1c" : "#266C92"}
+            strokeWidth="1.5"
+            opacity="0.4"
+          />
+        </>
+      )}
+      {(isHovered || isSelected) && !isFinalNode && (
         <circle
           cx={cx}
           cy={cy}
@@ -221,6 +245,8 @@ function CircleNode({ node, isHovered, isSelected, highlighted, faded, onHover, 
         cy={cy}
         r={r}
         fill={fillColor}
+        stroke={isFinalNode && !highlighted && !isSelected ? "#266C92" : "none"}
+        strokeWidth={isFinalNode ? 2 : 0}
         style={{ transition: "fill 0.2s ease" }}
       />
       {lines.map((line, i) => (
