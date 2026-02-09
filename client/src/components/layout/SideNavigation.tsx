@@ -33,6 +33,7 @@ import {
   LayoutDashboard,
   Layers,
   GitBranch,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +48,7 @@ import {
 import { type SideNavSection, type ModuleNavGroup, getActiveModuleIndex } from "@/config/navigation";
 import { useSideNavStore } from "@/lib/sideNavStore";
 import { useWorkspaceStore, type Workspace } from "@/lib/workspaceStore";
+import { useBrowserTabStore } from "@/lib/browserTabStore";
 
 // Determine if quick access items (Home/Recent/Favorites) should be shown
 // Only show on Home module (index 0) and NOT for Admin workspace
@@ -75,9 +77,10 @@ interface CollapsibleSectionProps {
   isExpanded: boolean;
   onToggle: () => void;
   isActive: (path: string) => boolean;
+  onOpenInNewTab?: (path: string, label: string) => void;
 }
 
-function CollapsibleSection({ section, isExpanded, onToggle, isActive }: CollapsibleSectionProps) {
+function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInNewTab }: CollapsibleSectionProps) {
   const isCollapsible = section.collapsible !== false;
 
   return (
@@ -109,36 +112,52 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive }: Collaps
         <ul className="flex flex-col gap-0.5 pt-1">
           {section.items.map((item) => (
             <li key={item.id}>
-              <Link href={item.path}>
-                <Button
-                  variant="ghost"
-                  className={`h-[33px] w-full items-center gap-2 px-2 py-1.5 rounded flex justify-start ${
-                    isActive(item.path)
-                      ? "bg-teal-50 dark:bg-primary/10 hover:bg-teal-50 dark:hover:bg-primary/10" 
-                      : "hover:bg-gray-100 dark:hover:bg-accent"
-                  }`}
-                  data-testid={`nav-item-${item.id}`}
-                >
-                  <span
-                    className={`flex-1 text-left text-sm whitespace-nowrap ${
+              <div className="flex items-center group/navitem">
+                <Link href={item.path} className="flex-1 min-w-0">
+                  <Button
+                    variant="ghost"
+                    className={`h-[33px] w-full items-center gap-2 px-2 py-1.5 rounded flex justify-start ${
                       isActive(item.path)
-                        ? "font-semibold text-teal-600 dark:text-primary"
-                        : "font-normal text-gray-600 dark:text-foreground"
-                    }`}
+                        ? "bg-teal-50 dark:bg-primary/10 hover:bg-teal-50 dark:hover:bg-primary/10" 
+                        : "hover:bg-gray-100 dark:hover:bg-accent"
+                    } ${item.openInNewTab ? "pr-1" : ""}`}
+                    data-testid={`nav-item-${item.id}`}
                   >
-                    {item.label}
-                  </span>
-                  {item.badge && (
-                    <Badge 
-                      variant="secondary" 
-                      className="bg-[#266C92] text-white text-xs h-5 min-w-5 flex items-center justify-center"
-                      data-testid={`nav-badge-${item.id}`}
+                    <span
+                      className={`flex-1 text-left text-sm whitespace-nowrap ${
+                        isActive(item.path)
+                          ? "font-semibold text-teal-600 dark:text-primary"
+                          : "font-normal text-gray-600 dark:text-foreground"
+                      }`}
                     >
-                      {item.badge}
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
+                      {item.label}
+                    </span>
+                    {item.badge && (
+                      <Badge 
+                        variant="secondary" 
+                        className="bg-[#266C92] text-white text-xs h-5 min-w-5 flex items-center justify-center"
+                        data-testid={`nav-badge-${item.id}`}
+                      >
+                        {item.badge}
+                      </Badge>
+                    )}
+                  </Button>
+                </Link>
+                {item.openInNewTab && onOpenInNewTab && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onOpenInNewTab(item.path, item.label);
+                    }}
+                    className="flex-shrink-0 w-[28px] h-[28px] flex items-center justify-center rounded transition-colors opacity-0 group-hover/navitem:opacity-100 hover:bg-gray-200 dark:hover:bg-accent"
+                    title={`Open ${item.label} in new tab`}
+                    data-testid={`nav-open-tab-${item.id}`}
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-gray-400 dark:text-muted-foreground" />
+                  </button>
+                )}
+              </div>
             </li>
           ))}
         </ul>
@@ -467,6 +486,28 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
 
   const isHomeActive = location === "/" || location === "/my-dashboard" || location === "/custom-workspace";
 
+  const { openTab } = useBrowserTabStore();
+
+  const handleOpenInNewTab = (path: string, label: string) => {
+    const STORAGE_KEY = "dashboard-settings";
+    const SETTINGS_EVENT = "settings-updated";
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      const settings = stored ? JSON.parse(stored) : {};
+      if (!settings.showBrowser) {
+        const newSettings = { ...settings, showBrowser: true };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newSettings));
+        window.dispatchEvent(new CustomEvent(SETTINGS_EVENT, { detail: newSettings }));
+      }
+    } catch (e) {
+      // fallback
+    }
+
+    useBrowserTabStore.getState().previousRoute = location;
+    openTab(path, label);
+    setLocation(path);
+  };
+
   return (
     <>
       <nav 
@@ -663,6 +704,7 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
                   isExpanded={expandedSections[section.id] ?? true}
                   onToggle={() => toggleSection(section.id)}
                   isActive={isActive}
+                  onOpenInNewTab={handleOpenInNewTab}
                 />
               ))
             )}

@@ -26,6 +26,7 @@ export interface SideNavItem {
   path: string;
   badge?: string;
   icon?: string;
+  openInNewTab?: boolean;
 }
 
 export interface SideNavSection {
@@ -185,6 +186,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
           { id: "incidents", label: "Security Incidents", path: "/incidents" },
           { id: "compliance-gaps", label: "Compliance Gaps", path: "/compliance-gaps" },
           { id: "vendor-risks", label: "Vendor Security Risks", path: "/vendor-risks" },
+          { id: "ai-governance", label: "AI Governance", path: "/ai-governance", openInNewTab: true },
         ],
       },
       {
@@ -467,7 +469,7 @@ const homePaths = [
   "/audit-universe", "/annual-plan", "/resource-allocation", "/stakeholder-reports",
   "/vulnerabilities", "/threat-intel", "/incidents", "/compliance-gaps", "/vendor-risks",
   "/security-posture", "/compliance-matrix", "/asset-inventory", "/pen-tests",
-  "/recent", "/favorites",
+  "/recent", "/favorites", "/ai-governance",
 ];
 
 /**
