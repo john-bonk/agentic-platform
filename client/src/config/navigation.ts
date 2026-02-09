@@ -169,6 +169,7 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
         defaultExpanded: true,
         collapsible: true,
         items: [
+          { id: "ai-governance", label: "AI Governance", path: "/ai-governance", openInNewTab: true },
           { id: "my-dashboard", label: "My Dashboard", path: "/" },
           { id: "global-residual-risk-ciso", label: "Global Residual Risk", path: "/global-residual-risk" },
           { id: "threat-detection", label: "Threat Detection", path: "/threat-detection" },
@@ -186,7 +187,6 @@ export const workspaceHomeNav: Record<string, { title: string; sections: SideNav
           { id: "incidents", label: "Security Incidents", path: "/incidents" },
           { id: "compliance-gaps", label: "Compliance Gaps", path: "/compliance-gaps" },
           { id: "vendor-risks", label: "Vendor Security Risks", path: "/vendor-risks" },
-          { id: "ai-governance", label: "AI Governance", path: "/ai-governance", openInNewTab: true },
         ],
       },
       {
