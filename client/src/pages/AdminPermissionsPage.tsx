@@ -50,7 +50,7 @@ import {
   Scale,
   Gavel
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import {
   Table,
@@ -80,6 +80,16 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, ArrowRight, Calendar, Filter, Copy, ToggleLeft, AlertCircle, ArrowLeftRight } from "lucide-react";
 
 type PivotView = "user" | "role" | "data-classification" | "module" | "workspace";
 
@@ -93,7 +103,7 @@ const pivotTabs: PivotTab[] = [
   { id: "user", label: "By User", icon: Users },
   { id: "role", label: "By Role", icon: Shield },
   { id: "data-classification", label: "By Data Classification", icon: FileKey },
-  { id: "module", label: "By Module", icon: Layers },
+  // { id: "module", label: "By Module", icon: Layers }, // Hidden for now — ByModuleView code retained below for future reintroduction
   { id: "workspace", label: "By Workspace", icon: Building2 },
 ];
 
@@ -833,9 +843,9 @@ function ByDataClassificationView() {
             <CardDescription>Classification assignments by data category</CardDescription>
           </CardHeader>
           <CardContent className="max-h-[360px] overflow-y-auto">
-            <Accordion type="multiple" className="space-y-2">
+            <Accordion type="multiple" className="w-full space-y-2">
               {dataCategories.map((cat, i) => (
-                <AccordionItem key={i} value={`cat-${i}`} className="border rounded-lg px-4" data-testid={`accordion-category-${i}`}>
+                <AccordionItem key={i} value={`cat-${i}`} data-testid={`accordion-category-${i}`}>
                   <AccordionTrigger className="text-sm font-medium hover:no-underline" data-testid={`accordion-trigger-${i}`}>
                     {cat.category}
                   </AccordionTrigger>
@@ -1100,9 +1110,266 @@ function ByModuleView() {
   );
 }
 
+type AccessDirection = "one-way" | "bidirectional";
+type AccessLevel = "read" | "read-write" | "read-export" | "full";
+type RuleStatus = "active" | "pending-approval" | "expired" | "suspended" | "draft";
+type DataScope = "all-data" | "findings" | "risks" | "controls" | "evidence" | "assessments" | "incidents" | "vulnerabilities" | "reports" | "workpapers" | "custom";
+type ApprovalRequirement = "none" | "workspace-owner" | "org-admin" | "dual-approval";
+
+interface CrossWorkspaceRule {
+  id: string;
+  name: string;
+  sourceWorkspace: string;
+  targetWorkspace: string;
+  direction: AccessDirection;
+  dataScope: DataScope[];
+  customScopeDescription: string;
+  accessLevel: AccessLevel;
+  status: RuleStatus;
+  approvalRequirement: ApprovalRequirement;
+  approvedBy: string;
+  approvalDate: string;
+  expiresAt: string;
+  allowedRoles: string[];
+  conditions: string[];
+  rationale: string;
+  lastModified: string;
+  createdBy: string;
+}
+
+const accessLevelLabels: Record<AccessLevel, string> = {
+  "read": "Read Only",
+  "read-write": "Read & Write",
+  "read-export": "Read & Export",
+  "full": "Full Access",
+};
+
+const accessLevelColors: Record<AccessLevel, string> = {
+  "read": "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-400",
+  "read-write": "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-400",
+  "read-export": "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-400",
+  "full": "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-400",
+};
+
+const statusLabels: Record<RuleStatus, string> = {
+  "active": "Active",
+  "pending-approval": "Pending Approval",
+  "expired": "Expired",
+  "suspended": "Suspended",
+  "draft": "Draft",
+};
+
+const statusColors: Record<RuleStatus, string> = {
+  "active": "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400",
+  "pending-approval": "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
+  "expired": "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400",
+  "suspended": "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
+  "draft": "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
+};
+
+const dataScopeLabels: Record<DataScope, string> = {
+  "all-data": "All Data",
+  "findings": "Audit Findings",
+  "risks": "Risk Records",
+  "controls": "Controls & Testing",
+  "evidence": "Evidence & Attachments",
+  "assessments": "Risk Assessments",
+  "incidents": "Security Incidents",
+  "vulnerabilities": "Vulnerabilities",
+  "reports": "Reports & Dashboards",
+  "workpapers": "Workpapers",
+  "custom": "Custom Scope",
+};
+
+const allDataScopes: DataScope[] = ["all-data", "findings", "risks", "controls", "evidence", "assessments", "incidents", "vulnerabilities", "reports", "workpapers", "custom"];
+const allAccessLevels: AccessLevel[] = ["read", "read-write", "read-export", "full"];
+const allRoleOptions = ["Org Admin", "Workspace Admin", "Executive", "Manager", "Auditor", "Analyst", "Viewer"];
+const allConditionOptions = [
+  "Require MFA authentication",
+  "Business hours only (6AM–10PM)",
+  "VPN connection required",
+  "IP whitelist enforced",
+  "Data masking for PII fields",
+  "No bulk export (max 100 records)",
+  "Watermark on exported documents",
+  "Read-only during audit freeze periods",
+  "Requires active NDA on file",
+  "Auto-revoke after 24h inactivity",
+];
+
+const defaultCrossWorkspaceRules: CrossWorkspaceRule[] = [
+  {
+    id: "rule-1",
+    name: "Risk Findings Sharing",
+    sourceWorkspace: "Enterprise Risk",
+    targetWorkspace: "Enterprise Audit",
+    direction: "bidirectional",
+    dataScope: ["findings", "risks", "assessments"],
+    customScopeDescription: "",
+    accessLevel: "read-export",
+    status: "active",
+    approvalRequirement: "workspace-owner",
+    approvedBy: "James Smith (Org Admin)",
+    approvalDate: "2025-11-15",
+    expiresAt: "2026-11-15",
+    allowedRoles: ["Executive", "Manager", "Auditor"],
+    conditions: ["Require MFA authentication", "Data masking for PII fields"],
+    rationale: "Audit needs visibility into risk assessment findings to plan audit engagements and verify control effectiveness. Risk team needs access to audit findings to update risk registers.",
+    lastModified: "2026-01-10",
+    createdBy: "James Smith",
+  },
+  {
+    id: "rule-2",
+    name: "Vulnerability Intelligence Feed",
+    sourceWorkspace: "IT Security",
+    targetWorkspace: "Enterprise Risk",
+    direction: "one-way",
+    dataScope: ["vulnerabilities", "incidents"],
+    customScopeDescription: "",
+    accessLevel: "read",
+    status: "active",
+    approvalRequirement: "org-admin",
+    approvedBy: "James Smith (Org Admin)",
+    approvalDate: "2025-09-01",
+    expiresAt: "2026-09-01",
+    allowedRoles: ["Manager", "Analyst"],
+    conditions: ["Require MFA authentication", "No bulk export (max 100 records)", "VPN connection required"],
+    rationale: "Risk management requires real-time vulnerability intelligence to accurately assess technology risk exposure and update KRIs. One-way flow prevents risk team from modifying security data.",
+    lastModified: "2026-02-05",
+    createdBy: "Mary Smith",
+  },
+  {
+    id: "rule-3",
+    name: "Audit Evidence Collection",
+    sourceWorkspace: "Enterprise Audit",
+    targetWorkspace: "IT Security",
+    direction: "bidirectional",
+    dataScope: ["evidence", "controls", "workpapers"],
+    customScopeDescription: "",
+    accessLevel: "read-write",
+    status: "active",
+    approvalRequirement: "dual-approval",
+    approvedBy: "James Smith & Mary Smith",
+    approvalDate: "2025-12-01",
+    expiresAt: "2026-06-30",
+    allowedRoles: ["Auditor", "Manager"],
+    conditions: ["Require MFA authentication", "Watermark on exported documents", "Read-only during audit freeze periods"],
+    rationale: "IT Security must provide evidence for ITGC testing. Auditors need write access to link evidence to workpapers. Bidirectional flow enables the security team to fulfill audit requests directly.",
+    lastModified: "2026-02-18",
+    createdBy: "James Smith",
+  },
+  {
+    id: "rule-4",
+    name: "Security Metrics Dashboard",
+    sourceWorkspace: "Enterprise Risk",
+    targetWorkspace: "IT Security",
+    direction: "one-way",
+    dataScope: ["reports"],
+    customScopeDescription: "",
+    accessLevel: "read",
+    status: "pending-approval",
+    approvalRequirement: "workspace-owner",
+    approvedBy: "",
+    approvalDate: "",
+    expiresAt: "2026-12-31",
+    allowedRoles: ["Executive", "Manager"],
+    conditions: ["Business hours only (6AM–10PM)"],
+    rationale: "CISO team requests read-only access to enterprise risk dashboards and reports to align security strategy with organizational risk appetite.",
+    lastModified: "2026-02-20",
+    createdBy: "Emily Chen",
+  },
+  {
+    id: "rule-5",
+    name: "Cross-Audit Control Testing",
+    sourceWorkspace: "Enterprise Audit",
+    targetWorkspace: "Enterprise Risk",
+    direction: "one-way",
+    dataScope: ["controls"],
+    customScopeDescription: "",
+    accessLevel: "read",
+    status: "active",
+    approvalRequirement: "workspace-owner",
+    approvedBy: "David Wilson (Workspace Admin)",
+    approvalDate: "2026-01-05",
+    expiresAt: "2026-07-05",
+    allowedRoles: ["Auditor", "Analyst"],
+    conditions: ["Require MFA authentication", "Auto-revoke after 24h inactivity"],
+    rationale: "Risk team needs read access to audit control testing results to validate control effectiveness ratings in the risk register and recalibrate residual risk scores.",
+    lastModified: "2026-01-05",
+    createdBy: "David Wilson",
+  },
+  {
+    id: "rule-6",
+    name: "Incident Response Coordination",
+    sourceWorkspace: "IT Security",
+    targetWorkspace: "Enterprise Audit",
+    direction: "one-way",
+    dataScope: ["incidents"],
+    customScopeDescription: "",
+    accessLevel: "read",
+    status: "suspended",
+    approvalRequirement: "org-admin",
+    approvedBy: "James Smith (Org Admin)",
+    approvalDate: "2025-08-15",
+    expiresAt: "2026-08-15",
+    allowedRoles: ["Auditor"],
+    conditions: ["Require MFA authentication", "IP whitelist enforced", "Data masking for PII fields"],
+    rationale: "Audit team had temporary read access to security incidents for annual IT audit. Suspended after audit completion; will reactivate for next audit cycle.",
+    lastModified: "2026-02-01",
+    createdBy: "Mary Smith",
+  },
+  {
+    id: "rule-7",
+    name: "Vendor Risk Intelligence Sync",
+    sourceWorkspace: "Enterprise Risk",
+    targetWorkspace: "IT Security",
+    direction: "bidirectional",
+    dataScope: ["assessments", "risks"],
+    customScopeDescription: "",
+    accessLevel: "read-write",
+    status: "expired",
+    approvalRequirement: "dual-approval",
+    approvedBy: "James Smith & Mary Smith",
+    approvalDate: "2025-06-01",
+    expiresAt: "2025-12-01",
+    allowedRoles: ["Manager", "Analyst"],
+    conditions: ["Require MFA authentication", "Requires active NDA on file"],
+    rationale: "Third-party vendor risk assessments require input from both security and risk teams. Expired — pending renewal with updated scope.",
+    lastModified: "2025-12-01",
+    createdBy: "James Smith",
+  },
+];
+
+const emptyRule: Omit<CrossWorkspaceRule, "id"> = {
+  name: "",
+  sourceWorkspace: "Enterprise Risk",
+  targetWorkspace: "Enterprise Audit",
+  direction: "one-way",
+  dataScope: [],
+  customScopeDescription: "",
+  accessLevel: "read",
+  status: "draft",
+  approvalRequirement: "workspace-owner",
+  approvedBy: "",
+  approvalDate: "",
+  expiresAt: "",
+  allowedRoles: [],
+  conditions: [],
+  rationale: "",
+  lastModified: new Date().toISOString().split("T")[0],
+  createdBy: "James Smith",
+};
+
 function ByWorkspaceView() {
   const { customWorkspaces } = useWorkspaceStore();
-  
+  const [rules, setRules] = useState<CrossWorkspaceRule[]>(defaultCrossWorkspaceRules);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingRule, setEditingRule] = useState<CrossWorkspaceRule | null>(null);
+  const [formData, setFormData] = useState<Omit<CrossWorkspaceRule, "id">>(emptyRule);
+  const [statusFilter, setStatusFilter] = useState<RuleStatus | "all">("all");
+  const [expandedRuleId, setExpandedRuleId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
   const defaultWorkspaces = [
     {
       id: "enterprise-risk",
@@ -1141,8 +1408,7 @@ function ByWorkspaceView() {
       ]
     },
   ];
-  
-  // Combine default workspaces with custom ones
+
   const workspaces = useMemo(() => {
     const customWsCards = customWorkspaces.map((ws) => ({
       id: ws.id,
@@ -1156,12 +1422,118 @@ function ByWorkspaceView() {
     return [...defaultWorkspaces, ...customWsCards];
   }, [customWorkspaces]);
 
-  const crossWorkspaceRules = [
-    { source: "Enterprise Risk", target: "Enterprise Audit", permission: "Read Findings", status: "active" },
-    { source: "IT Security", target: "Enterprise Risk", permission: "Share Vulnerabilities", status: "active" },
-    { source: "Enterprise Audit", target: "IT Security", permission: "Request Evidence", status: "active" },
-    { source: "Enterprise Risk", target: "IT Security", permission: "View Security Metrics", status: "pending" },
-  ];
+  const workspaceNames = useMemo(() => workspaces.map(ws => ws.name), [workspaces]);
+
+  const filteredRules = useMemo(() => {
+    if (statusFilter === "all") return rules;
+    return rules.filter(r => r.status === statusFilter);
+  }, [rules, statusFilter]);
+
+  const ruleStats = useMemo(() => ({
+    total: rules.length,
+    active: rules.filter(r => r.status === "active").length,
+    pending: rules.filter(r => r.status === "pending-approval").length,
+    expired: rules.filter(r => r.status === "expired").length,
+    suspended: rules.filter(r => r.status === "suspended").length,
+  }), [rules]);
+
+  const openAddDialog = useCallback(() => {
+    setEditingRule(null);
+    setFormData({ ...emptyRule });
+    setDialogOpen(true);
+  }, []);
+
+  const openEditDialog = useCallback((rule: CrossWorkspaceRule) => {
+    setEditingRule(rule);
+    setFormData({
+      name: rule.name,
+      sourceWorkspace: rule.sourceWorkspace,
+      targetWorkspace: rule.targetWorkspace,
+      direction: rule.direction,
+      dataScope: [...rule.dataScope],
+      customScopeDescription: rule.customScopeDescription,
+      accessLevel: rule.accessLevel,
+      status: rule.status,
+      approvalRequirement: rule.approvalRequirement,
+      approvedBy: rule.approvedBy,
+      approvalDate: rule.approvalDate,
+      expiresAt: rule.expiresAt,
+      allowedRoles: [...rule.allowedRoles],
+      conditions: [...rule.conditions],
+      rationale: rule.rationale,
+      lastModified: rule.lastModified,
+      createdBy: rule.createdBy,
+    });
+    setDialogOpen(true);
+  }, []);
+
+  const handleSave = useCallback(() => {
+    if (editingRule) {
+      setRules(prev => prev.map(r => r.id === editingRule.id ? { ...formData, id: editingRule.id, lastModified: new Date().toISOString().split("T")[0] } : r));
+    } else {
+      const newRule: CrossWorkspaceRule = {
+        ...formData,
+        id: `rule-${Date.now()}`,
+        lastModified: new Date().toISOString().split("T")[0],
+      };
+      setRules(prev => [...prev, newRule]);
+    }
+    setDialogOpen(false);
+    setEditingRule(null);
+  }, [editingRule, formData]);
+
+  const handleDelete = useCallback((ruleId: string) => {
+    setRules(prev => prev.filter(r => r.id !== ruleId));
+    setDeleteConfirmId(null);
+  }, []);
+
+  const handleDuplicate = useCallback((rule: CrossWorkspaceRule) => {
+    const duplicate: CrossWorkspaceRule = {
+      ...rule,
+      id: `rule-${Date.now()}`,
+      name: `${rule.name} (Copy)`,
+      status: "draft",
+      approvedBy: "",
+      approvalDate: "",
+      lastModified: new Date().toISOString().split("T")[0],
+    };
+    setRules(prev => [...prev, duplicate]);
+  }, []);
+
+  const handleToggleStatus = useCallback((ruleId: string) => {
+    setRules(prev => prev.map(r => {
+      if (r.id !== ruleId) return r;
+      const newStatus: RuleStatus = r.status === "active" ? "suspended" : r.status === "suspended" ? "active" : r.status;
+      return { ...r, status: newStatus, lastModified: new Date().toISOString().split("T")[0] };
+    }));
+  }, []);
+
+  const toggleDataScope = (scope: DataScope) => {
+    setFormData(prev => ({
+      ...prev,
+      dataScope: prev.dataScope.includes(scope)
+        ? prev.dataScope.filter(s => s !== scope)
+        : [...prev.dataScope, scope],
+    }));
+  };
+
+  const toggleRole = (role: string) => {
+    setFormData(prev => ({
+      ...prev,
+      allowedRoles: prev.allowedRoles.includes(role)
+        ? prev.allowedRoles.filter(r => r !== role)
+        : [...prev.allowedRoles, role],
+    }));
+  };
+
+  const toggleCondition = (condition: string) => {
+    setFormData(prev => ({
+      ...prev,
+      conditions: prev.conditions.includes(condition)
+        ? prev.conditions.filter(c => c !== condition)
+        : [...prev.conditions, condition],
+    }));
+  };
 
   return (
     <div className="flex-1 p-6 flex flex-col gap-6 overflow-y-auto">
@@ -1204,11 +1576,11 @@ function ByWorkspaceView() {
                   ))}
                 </div>
               </div>
-              
+
               <div>
                 <h5 className="text-sm font-medium mb-2">Active Delegations</h5>
                 <div className="space-y-2">
-                  {ws.delegations.map((del, i) => (
+                  {ws.delegations.length > 0 ? ws.delegations.map((del, i) => (
                     <div key={i} className="p-2 bg-muted/50 rounded text-xs">
                       <div className="flex items-center gap-1 mb-1">
                         <span className="font-medium">{del.from}</span>
@@ -1220,10 +1592,12 @@ function ByWorkspaceView() {
                         <span>Exp: {del.expires}</span>
                       </div>
                     </div>
-                  ))}
+                  )) : (
+                    <p className="text-xs text-muted-foreground">No active delegations</p>
+                  )}
                 </div>
               </div>
-              
+
               <Button variant="outline" size="sm" className="w-full" data-testid={`button-manage-workspace-${ws.id}`}>
                 <UserCog className="w-4 h-4 mr-2" />
                 Manage Workspace
@@ -1235,52 +1609,173 @@ function ByWorkspaceView() {
 
       <Card className="border">
         <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <Globe className="w-5 h-5 text-primary" />
-            <CardTitle className="text-base">Cross-Workspace Access Rules</CardTitle>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <ArrowLeftRight className="w-5 h-5 text-primary" />
+                <CardTitle className="text-base">Cross-Workspace Access Rules</CardTitle>
+              </div>
+              <CardDescription className="mt-1">Define data sharing policies, access levels, and approval workflows between workspaces</CardDescription>
+            </div>
+            <Button size="sm" onClick={openAddDialog} data-testid="button-add-access-rule">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Rule
+            </Button>
           </div>
-          <CardDescription>Data sharing permissions between workspaces</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Source Workspace</TableHead>
-                <TableHead className="text-center">Direction</TableHead>
-                <TableHead>Target Workspace</TableHead>
-                <TableHead>Permission Granted</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-center">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {crossWorkspaceRules.map((rule, i) => (
-                <TableRow key={i} data-testid={`cross-workspace-rule-${i}`}>
-                  <TableCell className="font-medium">{rule.source}</TableCell>
-                  <TableCell className="text-center">
-                    <ChevronRight className="w-4 h-4 mx-auto text-muted-foreground" />
-                  </TableCell>
-                  <TableCell className="font-medium">{rule.target}</TableCell>
-                  <TableCell>{rule.permission}</TableCell>
-                  <TableCell>
-                    <Badge variant={rule.status === "active" ? "default" : "secondary"} data-testid={`cross-workspace-status-${i}`}>
-                      {rule.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-center gap-1">
-                      <Button variant="ghost" size="icon" data-testid={`button-edit-rule-${i}`}>
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" data-testid={`button-delete-rule-${i}`}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Status:</span>
+            </div>
+            {([["all", `All (${ruleStats.total})`], ["active", `Active (${ruleStats.active})`], ["pending-approval", `Pending (${ruleStats.pending})`], ["expired", `Expired (${ruleStats.expired})`], ["suspended", `Suspended (${ruleStats.suspended})`]] as const).map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => setStatusFilter(value as RuleStatus | "all")}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
+                  statusFilter === value
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background border-border hover-elevate"
+                }`}
+                data-testid={`filter-rule-status-${value}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="space-y-3">
+            {filteredRules.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                <Globe className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No rules match the selected filter</p>
+              </div>
+            )}
+            {filteredRules.map((rule) => (
+              <div key={rule.id} className="border rounded-lg overflow-hidden" data-testid={`access-rule-${rule.id}`}>
+                <div
+                  className="flex items-center gap-4 p-4 cursor-pointer hover-elevate transition-colors"
+                  onClick={() => setExpandedRuleId(expandedRuleId === rule.id ? null : rule.id)}
+                  data-testid={`access-rule-header-${rule.id}`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-sm truncate">{rule.name}</span>
+                      <Badge className={`text-xs border-0 ${statusColors[rule.status]}`}>{statusLabels[rule.status]}</Badge>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">{rule.sourceWorkspace}</span>
+                      {rule.direction === "bidirectional" ? (
+                        <ArrowLeftRight className="w-3.5 h-3.5 text-primary" />
+                      ) : (
+                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                      )}
+                      <span className="font-medium text-foreground">{rule.targetWorkspace}</span>
+                      <span className="mx-1">·</span>
+                      <Badge variant="outline" className={`text-xs ${accessLevelColors[rule.accessLevel]}`}>
+                        {accessLevelLabels[rule.accessLevel]}
+                      </Badge>
+                      <span className="mx-1">·</span>
+                      <span>{rule.dataScope.map(s => dataScopeLabels[s]).join(", ")}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); openEditDialog(rule); }} data-testid={`button-edit-rule-${rule.id}`}>
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); handleDuplicate(rule); }} data-testid={`button-duplicate-rule-${rule.id}`}>
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                    {(rule.status === "active" || rule.status === "suspended") && (
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); handleToggleStatus(rule.id); }} data-testid={`button-toggle-rule-${rule.id}`}>
+                        <ToggleLeft className="w-4 h-4" />
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(rule.id); }} data-testid={`button-delete-rule-${rule.id}`}>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                    {expandedRuleId === rule.id ? (
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </div>
+                </div>
+
+                {expandedRuleId === rule.id && (
+                  <div className="border-t bg-muted/20 p-4">
+                    <div className="grid md:grid-cols-3 gap-6">
+                      <div className="space-y-3">
+                        <div>
+                          <h6 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Data Scope</h6>
+                          <div className="flex flex-wrap gap-1">
+                            {rule.dataScope.map(scope => (
+                              <Badge key={scope} variant="outline" className="text-xs">{dataScopeLabels[scope]}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <h6 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Allowed Roles</h6>
+                          <div className="flex flex-wrap gap-1">
+                            {rule.allowedRoles.map(role => (
+                              <Badge key={role} variant="secondary" className="text-xs">{role}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div>
+                          <h6 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Conditions</h6>
+                          <div className="space-y-1">
+                            {rule.conditions.map((cond, i) => (
+                              <div key={i} className="flex items-start gap-1.5 text-xs">
+                                <ShieldCheck className="w-3 h-3 text-primary mt-0.5 shrink-0" />
+                                <span>{cond}</span>
+                              </div>
+                            ))}
+                            {rule.conditions.length === 0 && <span className="text-xs text-muted-foreground">No conditions applied</span>}
+                          </div>
+                        </div>
+                        <div>
+                          <h6 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Approval</h6>
+                          <p className="text-xs">{rule.approvalRequirement === "none" ? "No approval required" : rule.approvalRequirement === "dual-approval" ? "Dual approval required" : `${rule.approvalRequirement.replace("-", " ")} approval`}</p>
+                          {rule.approvedBy && <p className="text-xs text-muted-foreground">Approved by: {rule.approvedBy}</p>}
+                          {rule.approvalDate && <p className="text-xs text-muted-foreground">Date: {rule.approvalDate}</p>}
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div>
+                          <h6 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Rationale</h6>
+                          <p className="text-xs text-muted-foreground leading-relaxed">{rule.rationale || "No rationale provided"}</p>
+                        </div>
+                        <div className="space-y-1 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1"><Calendar className="w-3 h-3" /> Expires: {rule.expiresAt || "No expiry"}</div>
+                          <div className="flex items-center gap-1"><Clock className="w-3 h-3" /> Modified: {rule.lastModified}</div>
+                          <div className="flex items-center gap-1"><Users className="w-3 h-3" /> Created by: {rule.createdBy}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {deleteConfirmId === rule.id && (
+                  <div className="border-t bg-red-50 dark:bg-red-950/30 p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                      <span className="text-sm text-red-700 dark:text-red-400">Delete this access rule permanently?</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => setDeleteConfirmId(null)} data-testid={`button-cancel-delete-${rule.id}`}>Cancel</Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleDelete(rule.id)} data-testid={`button-confirm-delete-${rule.id}`}>Delete</Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
@@ -1310,6 +1805,226 @@ function ByWorkspaceView() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingRule ? "Edit Access Rule" : "Create Access Rule"}</DialogTitle>
+            <DialogDescription>
+              {editingRule ? "Modify the cross-workspace data access rule" : "Define a new data sharing policy between workspaces"}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-5 py-2">
+            <div>
+              <Label className="text-sm font-medium">Rule Name</Label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g., Risk Findings Sharing"
+                className="mt-1.5"
+                data-testid="input-rule-name"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium">Source Workspace</Label>
+                <Select value={formData.sourceWorkspace} onValueChange={(v) => setFormData(prev => ({ ...prev, sourceWorkspace: v }))}>
+                  <SelectTrigger className="mt-1.5" data-testid="select-source-workspace">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {workspaceNames.map(name => (
+                      <SelectItem key={name} value={name}>{name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Target Workspace</Label>
+                <Select value={formData.targetWorkspace} onValueChange={(v) => setFormData(prev => ({ ...prev, targetWorkspace: v }))}>
+                  <SelectTrigger className="mt-1.5" data-testid="select-target-workspace">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {workspaceNames.filter(n => n !== formData.sourceWorkspace).map(name => (
+                      <SelectItem key={name} value={name}>{name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium">Direction</Label>
+                <Select value={formData.direction} onValueChange={(v) => setFormData(prev => ({ ...prev, direction: v as AccessDirection }))}>
+                  <SelectTrigger className="mt-1.5" data-testid="select-direction">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="one-way">One-Way (Source → Target)</SelectItem>
+                    <SelectItem value="bidirectional">Bidirectional (Both Ways)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Access Level</Label>
+                <Select value={formData.accessLevel} onValueChange={(v) => setFormData(prev => ({ ...prev, accessLevel: v as AccessLevel }))}>
+                  <SelectTrigger className="mt-1.5" data-testid="select-access-level">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allAccessLevels.map(level => (
+                      <SelectItem key={level} value={level}>{accessLevelLabels[level]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium">Data Scope</Label>
+              <p className="text-xs text-muted-foreground mb-2">Select which data types this rule grants access to</p>
+              <div className="grid grid-cols-3 gap-2">
+                {allDataScopes.map(scope => (
+                  <div
+                    key={scope}
+                    className={`flex items-center gap-2 p-2 rounded border cursor-pointer transition-colors ${
+                      formData.dataScope.includes(scope) ? "bg-primary/10 border-primary" : "hover-elevate"
+                    }`}
+                    onClick={() => toggleDataScope(scope)}
+                    data-testid={`scope-toggle-${scope}`}
+                  >
+                    <Checkbox checked={formData.dataScope.includes(scope)} />
+                    <span className="text-xs">{dataScopeLabels[scope]}</span>
+                  </div>
+                ))}
+              </div>
+              {formData.dataScope.includes("custom") && (
+                <Textarea
+                  value={formData.customScopeDescription}
+                  onChange={(e) => setFormData(prev => ({ ...prev, customScopeDescription: e.target.value }))}
+                  placeholder="Describe the custom data scope..."
+                  className="mt-2"
+                  rows={2}
+                  data-testid="input-custom-scope"
+                />
+              )}
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium">Allowed Roles</Label>
+              <p className="text-xs text-muted-foreground mb-2">Only users in these roles can access shared data</p>
+              <div className="flex flex-wrap gap-2">
+                {allRoleOptions.map(role => (
+                  <button
+                    key={role}
+                    onClick={() => toggleRole(role)}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
+                      formData.allowedRoles.includes(role)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background border-border hover-elevate"
+                    }`}
+                    data-testid={`role-toggle-${role.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    {role}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium">Access Conditions</Label>
+              <p className="text-xs text-muted-foreground mb-2">Security and compliance guardrails for this rule</p>
+              <div className="grid grid-cols-2 gap-2">
+                {allConditionOptions.map(condition => (
+                  <div
+                    key={condition}
+                    className={`flex items-center gap-2 p-2 rounded border cursor-pointer transition-colors ${
+                      formData.conditions.includes(condition) ? "bg-primary/10 border-primary" : "hover-elevate"
+                    }`}
+                    onClick={() => toggleCondition(condition)}
+                    data-testid={`condition-toggle-${condition.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-')}`}
+                  >
+                    <Checkbox checked={formData.conditions.includes(condition)} />
+                    <span className="text-xs">{condition}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium">Approval Requirement</Label>
+                <Select value={formData.approvalRequirement} onValueChange={(v) => setFormData(prev => ({ ...prev, approvalRequirement: v as ApprovalRequirement }))}>
+                  <SelectTrigger className="mt-1.5" data-testid="select-approval">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No Approval Required</SelectItem>
+                    <SelectItem value="workspace-owner">Workspace Owner Approval</SelectItem>
+                    <SelectItem value="org-admin">Org Admin Approval</SelectItem>
+                    <SelectItem value="dual-approval">Dual Approval (Two Approvers)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Expiration Date</Label>
+                <Input
+                  type="date"
+                  value={formData.expiresAt}
+                  onChange={(e) => setFormData(prev => ({ ...prev, expiresAt: e.target.value }))}
+                  className="mt-1.5"
+                  data-testid="input-expires-at"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm font-medium">Business Rationale</Label>
+              <Textarea
+                value={formData.rationale}
+                onChange={(e) => setFormData(prev => ({ ...prev, rationale: e.target.value }))}
+                placeholder="Explain the business justification for this cross-workspace data sharing rule..."
+                className="mt-1.5"
+                rows={3}
+                data-testid="input-rationale"
+              />
+            </div>
+
+            {editingRule && (
+              <div>
+                <Label className="text-sm font-medium">Status</Label>
+                <Select value={formData.status} onValueChange={(v) => setFormData(prev => ({ ...prev, status: v as RuleStatus }))}>
+                  <SelectTrigger className="mt-1.5" data-testid="select-status">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="pending-approval">Pending Approval</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="suspended">Suspended</SelectItem>
+                    <SelectItem value="expired">Expired</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDialogOpen(false)} data-testid="button-cancel-rule">Cancel</Button>
+            <Button
+              onClick={handleSave}
+              disabled={!formData.name || !formData.sourceWorkspace || !formData.targetWorkspace || formData.dataScope.length === 0}
+              data-testid="button-save-rule"
+            >
+              {editingRule ? "Save Changes" : "Create Rule"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -1357,6 +2072,7 @@ export function AdminPermissionsPage() {
         {activePivot === "user" && <ByUserView />}
         {activePivot === "role" && <ByRoleView />}
         {activePivot === "data-classification" && <ByDataClassificationView />}
+        {/* ByModuleView hidden from navigation — code retained for future reintroduction */}
         {activePivot === "module" && <ByModuleView />}
         {activePivot === "workspace" && <ByWorkspaceView />}
       </div>
