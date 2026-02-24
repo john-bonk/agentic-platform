@@ -82,6 +82,7 @@ import {
 } from "@/components/ui/accordion";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -1369,6 +1370,7 @@ function ByWorkspaceView() {
   const [statusFilter, setStatusFilter] = useState<RuleStatus | "all">("all");
   const [expandedRuleId, setExpandedRuleId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 
   const defaultWorkspaces = [
     {
@@ -1555,56 +1557,71 @@ function ByWorkspaceView() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4">
-        {workspaces.map((ws) => (
-          <Card key={ws.id} className="border" data-testid={`workspace-perm-card-${ws.id}`}>
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-3">
-                <div className={`w-3 h-12 rounded-full ${ws.color}`} />
-                <div className="flex-1">
-                  <CardTitle className="text-base">{ws.name}</CardTitle>
-                  <CardDescription>{ws.persona} Workspace</CardDescription>
+        {workspaces.map((ws) => {
+          const isExpanded = expandedCards.has(ws.id);
+          return (
+            <Card key={ws.id} className="border" data-testid={`workspace-perm-card-${ws.id}`}>
+              <CardHeader
+                className="pb-3 cursor-pointer hover-elevate transition-colors rounded-t-lg"
+                onClick={() => setExpandedCards(prev => {
+                  const next = new Set(prev);
+                  if (next.has(ws.id)) next.delete(ws.id);
+                  else next.add(ws.id);
+                  return next;
+                })}
+                data-testid={`workspace-card-toggle-${ws.id}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-3 h-12 rounded-full ${ws.color}`} />
+                  <div className="flex-1">
+                    <CardTitle className="text-base">{ws.name}</CardTitle>
+                    <CardDescription>{ws.persona} Workspace</CardDescription>
+                  </div>
+                  <Badge variant="secondary">{ws.userCount} users</Badge>
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
                 </div>
-                <Badge variant="secondary">{ws.userCount} users</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h5 className="text-sm font-medium mb-2">Active Modules</h5>
-                <div className="flex flex-wrap gap-1">
-                  {ws.modules.map((mod) => (
-                    <Badge key={mod} variant="outline" className="text-xs">{mod}</Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h5 className="text-sm font-medium mb-2">Active Delegations</h5>
-                <div className="space-y-2">
-                  {ws.delegations.length > 0 ? ws.delegations.map((del, i) => (
-                    <div key={i} className="p-2 bg-muted/50 rounded text-xs">
-                      <div className="flex items-center gap-1 mb-1">
-                        <span className="font-medium">{del.from}</span>
-                        <ChevronRight className="w-3 h-3" />
-                        <span className="font-medium">{del.to}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-muted-foreground">
-                        <span>{del.scope}</span>
-                        <span>Exp: {del.expires}</span>
-                      </div>
+              </CardHeader>
+              {isExpanded && (
+                <CardContent className="space-y-4">
+                  <div>
+                    <h5 className="text-sm font-medium mb-2">Active Modules</h5>
+                    <div className="flex flex-wrap gap-1">
+                      {ws.modules.map((mod) => (
+                        <Badge key={mod} variant="outline" className="text-xs">{mod}</Badge>
+                      ))}
                     </div>
-                  )) : (
-                    <p className="text-xs text-muted-foreground">No active delegations</p>
-                  )}
-                </div>
-              </div>
+                  </div>
 
-              <Button variant="outline" size="sm" className="w-full" data-testid={`button-manage-workspace-${ws.id}`}>
-                <UserCog className="w-4 h-4 mr-2" />
-                Manage Workspace
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
+                  <div>
+                    <h5 className="text-sm font-medium mb-2">Active Delegations</h5>
+                    <div className="space-y-2">
+                      {ws.delegations.length > 0 ? ws.delegations.map((del, i) => (
+                        <div key={i} className="p-2 bg-muted/50 rounded text-xs">
+                          <div className="flex items-center gap-1 mb-1">
+                            <span className="font-medium">{del.from}</span>
+                            <ChevronRight className="w-3 h-3" />
+                            <span className="font-medium">{del.to}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-muted-foreground">
+                            <span>{del.scope}</span>
+                            <span>Exp: {del.expires}</span>
+                          </div>
+                        </div>
+                      )) : (
+                        <p className="text-xs text-muted-foreground">No active delegations</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <Button variant="outline" size="sm" className="w-full" data-testid={`button-manage-workspace-${ws.id}`}>
+                    <UserCog className="w-4 h-4 mr-2" />
+                    Manage Workspace
+                  </Button>
+                </CardContent>
+              )}
+            </Card>
+          );
+        })}
       </div>
 
       <Card className="border">
@@ -1807,7 +1824,7 @@ function ByWorkspaceView() {
       </Card>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>{editingRule ? "Edit Access Rule" : "Create Access Rule"}</DialogTitle>
             <DialogDescription>
@@ -1815,7 +1832,7 @@ function ByWorkspaceView() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-5 py-2">
+          <DialogBody className="flex-1 overflow-y-auto space-y-5">
             <div>
               <Label className="text-sm font-medium">Rule Name</Label>
               <Input
@@ -2011,7 +2028,7 @@ function ByWorkspaceView() {
                 </Select>
               </div>
             )}
-          </div>
+          </DialogBody>
 
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setDialogOpen(false)} data-testid="button-cancel-rule">Cancel</Button>
