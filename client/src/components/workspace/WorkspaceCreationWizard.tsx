@@ -96,6 +96,12 @@ import {
   GitCompare,
   Presentation,
   Link,
+  Bot,
+  Wand2,
+  ToggleLeft,
+  ToggleRight,
+  Zap,
+  RefreshCw,
 } from "lucide-react";
 import {
   productCapabilityBuckets,
@@ -1045,12 +1051,761 @@ function CapabilitiesStep({
   );
 }
 
+type AIStage = "greeting" | "name" | "members" | "modules" | "capabilities" | "homeview" | "confirm";
+
+interface ChatMessage {
+  id: string;
+  sender: "ai" | "user";
+  text: string;
+  options?: ChatOption[];
+  multiSelect?: boolean;
+  selectedOptions?: string[];
+  inputType?: "text" | "none";
+  inputPlaceholder?: string;
+  stage: AIStage;
+  rendered?: boolean;
+}
+
+interface ChatOption {
+  id: string;
+  label: string;
+  description?: string;
+  icon?: string;
+  recommended?: boolean;
+}
+
+const ROLE_RECOMMENDATIONS: Record<string, string[]> = {
+  "risk": ["Org Admin", "Executive", "Manager", "Analyst"],
+  "audit": ["Org Admin", "Auditor", "Manager", "Analyst"],
+  "security": ["Org Admin", "Manager", "Analyst", "Viewer"],
+  "compliance": ["Org Admin", "Executive", "Auditor", "Analyst"],
+  "default": ["Org Admin", "Executive", "Manager", "Analyst"],
+};
+
+const MODULE_KEYWORDS: Record<string, string[]> = {
+  "controls-management": ["controls", "internal controls", "sox", "testing", "control framework"],
+  "enterprise-risk": ["risk", "erm", "enterprise risk", "risk assessment", "risk management"],
+  "audit-management": ["audit", "internal audit", "audit plan", "fieldwork", "findings"],
+  "cyber-it-compliance": ["cyber", "security", "it compliance", "infosec", "cybersecurity", "vulnerabilities"],
+  "information-technology": ["it", "technology", "it management", "assets", "infrastructure"],
+  "regulatory-compliance": ["regulatory", "compliance", "regulations", "policy", "frameworks"],
+  "third-party": ["vendor", "third party", "supplier", "tprm", "vendor risk"],
+  "ai-governance": ["ai", "artificial intelligence", "ai governance", "machine learning", "model risk"],
+  "environmental-compliance": ["esg", "environmental", "sustainability", "climate", "carbon"],
+};
+
+function getModuleRecommendations(description: string): string[] {
+  const lower = description.toLowerCase();
+  const matches: string[] = [];
+  for (const [bucketId, keywords] of Object.entries(MODULE_KEYWORDS)) {
+    if (keywords.some(kw => lower.includes(kw))) {
+      matches.push(bucketId);
+    }
+  }
+  if (matches.length === 0) {
+    return ["controls-management", "enterprise-risk", "audit-management"];
+  }
+  return matches;
+}
+
+function getRoleSetForModules(modules: string[]): string[] {
+  if (modules.some(m => m === "audit-management")) return ROLE_RECOMMENDATIONS["audit"];
+  if (modules.some(m => m === "cyber-it-compliance" || m === "information-technology")) return ROLE_RECOMMENDATIONS["security"];
+  if (modules.some(m => m === "regulatory-compliance")) return ROLE_RECOMMENDATIONS["compliance"];
+  if (modules.some(m => m === "enterprise-risk")) return ROLE_RECOMMENDATIONS["risk"];
+  return ROLE_RECOMMENDATIONS["default"];
+}
+
+function AIAssistantFlow({
+  workspaceName,
+  setWorkspaceName,
+  workspaceMembers,
+  setWorkspaceMembers,
+  selectedBuckets,
+  setSelectedBuckets,
+  enabledModules,
+  setEnabledModules,
+  selectedArchetype,
+  setSelectedArchetype,
+  onComplete,
+}: {
+  workspaceName: string;
+  setWorkspaceName: (name: string) => void;
+  workspaceMembers: WorkspaceMember[];
+  setWorkspaceMembers: React.Dispatch<React.SetStateAction<WorkspaceMember[]>>;
+  selectedBuckets: string[];
+  setSelectedBuckets: React.Dispatch<React.SetStateAction<string[]>>;
+  enabledModules: Record<string, string[]>;
+  setEnabledModules: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
+  selectedArchetype: string;
+  setSelectedArchetype: (id: string) => void;
+  onComplete: () => void;
+}) {
+  const [currentStage, setCurrentStage] = useState<AIStage>("greeting");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [userInput, setUserInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [pendingSelections, setPendingSelections] = useState<Set<string>>(new Set());
+  const [showConfirmPanel, setShowConfirmPanel] = useState(false);
+
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  }, []);
+
+  const addAIMessage = useCallback((text: string, stage: AIStage, options?: ChatOption[], multiSelect?: boolean, inputType?: "text" | "none", inputPlaceholder?: string) => {
+    setIsTyping(true);
+    setTimeout(() => {
+      setMessages(prev => [...prev, {
+        id: `ai-${Date.now()}-${Math.random()}`,
+        sender: "ai",
+        text,
+        options,
+        multiSelect,
+        inputType,
+        inputPlaceholder,
+        stage,
+      }]);
+      setIsTyping(false);
+      scrollToBottom();
+    }, 600);
+  }, [scrollToBottom]);
+
+  const addUserMessage = useCallback((text: string, stage: AIStage) => {
+    setMessages(prev => [...prev, {
+      id: `user-${Date.now()}-${Math.random()}`,
+      sender: "user",
+      text,
+      stage,
+    }]);
+    scrollToBottom();
+  }, [scrollToBottom]);
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      addAIMessage(
+        "Hi! I'm your workspace assistant. I'll help you set up a workspace tailored to your team's needs. Let's start — what would you like to call this workspace?",
+        "greeting",
+        undefined,
+        false,
+        "text",
+        "e.g., Enterprise Risk & Compliance"
+      );
+    }
+  }, []);
+
+  const advanceToMembers = useCallback((name: string) => {
+    setWorkspaceName(name);
+    addUserMessage(name, "name");
+    
+    setTimeout(() => {
+      const suggestedRoles = getRoleSetForModules([]);
+      addAIMessage(
+        `Great name! Now let's set up your team for "${name}". I've pre-populated recommended members based on common workspace patterns. You can adjust these, or tell me about your team structure.`,
+        "members",
+        suggestedRoles.map(role => ({
+          id: role,
+          label: role,
+          description: (ROLE_CAPABILITIES[role] || []).slice(0, 2).join(", "),
+          recommended: true,
+        })),
+        true,
+        "text",
+        "Add custom member email, or type 'next' to continue"
+      );
+      setPendingSelections(new Set(suggestedRoles));
+      setCurrentStage("members");
+    }, 300);
+  }, [addAIMessage, addUserMessage, setWorkspaceName]);
+
+  const advanceToModules = useCallback(() => {
+    addUserMessage(
+      workspaceMembers.length > 0
+        ? `Team set: ${workspaceMembers.map(m => `${m.email} (${m.role})`).join(", ")}`
+        : "Using default team setup",
+      "members"
+    );
+    
+    setTimeout(() => {
+      const bucketOptions: ChatOption[] = productCapabilityBuckets.map(b => ({
+        id: b.id,
+        label: b.name,
+        description: b.description,
+        icon: b.icon,
+        recommended: ["controls-management", "enterprise-risk", "audit-management"].includes(b.id),
+      }));
+      
+      addAIMessage(
+        "Now let's choose the product modules for your workspace. What areas does your team focus on? Select all that apply, or describe your team's work and I'll recommend the right modules.",
+        "modules",
+        bucketOptions,
+        true,
+        "text",
+        "Describe your focus, e.g. 'We do SOX audits and risk assessments'"
+      );
+      setPendingSelections(new Set());
+      setCurrentStage("modules");
+    }, 300);
+  }, [addAIMessage, addUserMessage, workspaceMembers]);
+
+  const advanceToCapabilities = useCallback((buckets: string[]) => {
+    const bucketNames = buckets.map(id => 
+      productCapabilityBuckets.find(b => b.id === id)?.name || id
+    ).join(", ");
+    addUserMessage(`Selected modules: ${bucketNames}`, "modules");
+
+    setSelectedBuckets(buckets);
+    const initialModules = initializeEnabledModules(buckets);
+    setEnabledModules(initialModules);
+
+    setTimeout(() => {
+      const totalCaps = buckets.reduce((sum, bId) => {
+        const bucket = productCapabilityBuckets.find(b => b.id === bId);
+        return sum + (bucket?.moduleCapabilities.length || 0);
+      }, 0);
+      const enabledCount = Object.values(initialModules).reduce((sum, arr) => sum + arr.length, 0);
+
+      const capOptions: ChatOption[] = buckets.flatMap(bId => {
+        const bucket = productCapabilityBuckets.find(b => b.id === bId);
+        if (!bucket) return [];
+        return bucket.moduleCapabilities.map(mc => ({
+          id: `${bId}::${mc.id}`,
+          label: mc.name,
+          description: `${bucket.navShortName} — ${mc.description}`,
+          recommended: mc.defaultEnabled,
+        }));
+      });
+
+      const defaultEnabled = new Set(
+        buckets.flatMap(bId => (initialModules[bId] || []).map(mId => `${bId}::${mId}`))
+      );
+      setPendingSelections(defaultEnabled);
+
+      addAIMessage(
+        `I've enabled ${enabledCount} of ${totalCaps} available capabilities across your ${buckets.length} modules. The recommended ones are pre-selected. You can toggle any on/off, or type 'all' to enable everything.`,
+        "capabilities",
+        capOptions,
+        true,
+        "text",
+        "Type 'all' to enable everything, or 'next' to continue"
+      );
+      setCurrentStage("capabilities");
+    }, 300);
+  }, [addAIMessage, addUserMessage, setSelectedBuckets, setEnabledModules]);
+
+  const advanceToHomeView = useCallback((buckets: string[]) => {
+    const enabledCount = Object.values(enabledModules).reduce((sum, arr) => sum + arr.length, 0);
+    addUserMessage(`Configured ${enabledCount} capabilities`, "capabilities");
+
+    setTimeout(() => {
+      const recommended = getRecommendedArchetype(buckets);
+      const archOptions: ChatOption[] = archetypeTemplates.map(t => ({
+        id: t.id,
+        label: t.name,
+        description: `${t.persona} — ${t.description}`,
+        recommended: t.id === recommended,
+      }));
+
+      addAIMessage(
+        `Almost done! Let's pick the right home view layout for your workspace. Based on your modules, I recommend the "${archetypeTemplates.find(t => t.id === recommended)?.name}" layout. Choose one or I'll use the recommendation.`,
+        "homeview",
+        archOptions,
+        false,
+        "text",
+        "Type 'recommended' to use my suggestion, or pick one"
+      );
+      setPendingSelections(new Set([recommended]));
+      setCurrentStage("homeview");
+    }, 300);
+  }, [addAIMessage, addUserMessage, enabledModules]);
+
+  const advanceToConfirm = useCallback((archetypeId: string) => {
+    const arch = archetypeTemplates.find(t => t.id === archetypeId);
+    addUserMessage(`Home view: ${arch?.name || archetypeId}`, "homeview");
+    setSelectedArchetype(archetypeId);
+
+    setTimeout(() => {
+      setShowConfirmPanel(true);
+      addAIMessage(
+        `Here's your workspace summary. Everything look good? Click "Create Workspace" to build it, or tell me what you'd like to change.`,
+        "confirm",
+        [
+          { id: "create", label: "Create Workspace", description: "Build this workspace now", recommended: true },
+          { id: "restart", label: "Start Over", description: "Reset and begin again" },
+        ],
+        false,
+        "text",
+        "Tell me what to change, or click Create"
+      );
+      setCurrentStage("confirm");
+    }, 300);
+  }, [addAIMessage, addUserMessage, setSelectedArchetype]);
+
+  const handleOptionToggle = useCallback((optionId: string) => {
+    setPendingSelections(prev => {
+      const next = new Set(prev);
+      if (next.has(optionId)) {
+        next.delete(optionId);
+      } else {
+        next.add(optionId);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleSingleSelect = useCallback((optionId: string) => {
+    setPendingSelections(new Set([optionId]));
+  }, []);
+
+  const handleConfirmSelections = useCallback(() => {
+    const selected = Array.from(pendingSelections);
+    
+    if (currentStage === "members") {
+      const memberRoles = selected;
+      const roleMembers: WorkspaceMember[] = memberRoles.map((role, i) => {
+        const existing = workspaceMembers.find(m => m.role === role);
+        return existing || {
+          id: `ai-member-${Date.now()}-${i}`,
+          email: `${role.toLowerCase().replace(/\s+/g, ".")}@company.org`,
+          role,
+        };
+      });
+      const customMembers = workspaceMembers.filter(m => 
+        !memberRoles.includes(m.role) && m.email && !m.email.endsWith("@company.org")
+      );
+      setWorkspaceMembers([...roleMembers, ...customMembers]);
+      advanceToModules();
+    } else if (currentStage === "modules") {
+      advanceToCapabilities(selected);
+    } else if (currentStage === "capabilities") {
+      const newEnabledModules: Record<string, string[]> = {};
+      for (const key of selected) {
+        const [bucketId, moduleId] = key.split("::");
+        if (!newEnabledModules[bucketId]) newEnabledModules[bucketId] = [];
+        newEnabledModules[bucketId].push(moduleId);
+      }
+      setEnabledModules(newEnabledModules);
+      advanceToHomeView(selectedBuckets);
+    } else if (currentStage === "homeview") {
+      const archId = selected[0] || "auditboard-default";
+      advanceToConfirm(archId);
+    } else if (currentStage === "confirm") {
+      if (selected.includes("create")) {
+        onComplete();
+      } else if (selected.includes("restart")) {
+        setMessages([]);
+        setCurrentStage("greeting");
+        setPendingSelections(new Set());
+        setShowConfirmPanel(false);
+        setWorkspaceName("");
+        setSelectedBuckets([]);
+        setEnabledModules({});
+        setSelectedArchetype("auditboard-default");
+        setWorkspaceMembers([
+          { id: "1", email: "admin@company.org", role: "Org Admin" },
+          { id: "2", email: "exec@company.org", role: "Executive" },
+          { id: "3", email: "manager@company.org", role: "Manager" },
+          { id: "4", email: "analyst@company.org", role: "Analyst" },
+        ]);
+        setTimeout(() => {
+          addAIMessage(
+            "Let's start fresh! What would you like to call your workspace?",
+            "greeting",
+            undefined,
+            false,
+            "text",
+            "e.g., Enterprise Risk & Compliance"
+          );
+        }, 100);
+      }
+    }
+  }, [currentStage, pendingSelections, advanceToModules, advanceToCapabilities, advanceToHomeView, advanceToConfirm, onComplete, workspaceMembers, selectedBuckets, setWorkspaceMembers, setEnabledModules, addAIMessage]);
+
+  const handleSendMessage = useCallback(() => {
+    const text = userInput.trim();
+    if (!text) return;
+    setUserInput("");
+
+    if (currentStage === "greeting" || currentStage === "name") {
+      advanceToMembers(text);
+    } else if (currentStage === "members") {
+      if (text.toLowerCase() === "next" || text.toLowerCase() === "continue") {
+        const selected = Array.from(pendingSelections);
+        const roleMembers: WorkspaceMember[] = selected.map((role, i) => {
+          const existing = workspaceMembers.find(m => m.role === role);
+          return existing || {
+            id: `ai-member-${Date.now()}-${i}`,
+            email: `${role.toLowerCase().replace(/\s+/g, ".")}@company.org`,
+            role,
+          };
+        });
+        const customMembers = workspaceMembers.filter(m => 
+          !selected.includes(m.role) && m.email && !m.email.endsWith("@company.org")
+        );
+        setWorkspaceMembers([...roleMembers, ...customMembers]);
+        advanceToModules();
+      } else if (text.includes("@")) {
+        const newMember: WorkspaceMember = {
+          id: `ai-member-${Date.now()}`,
+          email: text,
+          role: "Analyst",
+        };
+        setWorkspaceMembers(prev => [...prev, newMember]);
+        addUserMessage(`Added ${text}`, "members");
+        setTimeout(() => {
+          addAIMessage(
+            `Added ${text} as Analyst. Add more members or type 'next' to continue.`,
+            "members",
+            undefined,
+            false,
+            "text",
+            "Add another email, or type 'next'"
+          );
+        }, 200);
+      } else {
+        addUserMessage(text, "members");
+        setTimeout(() => {
+          addAIMessage(
+            `I see. Select the roles above, add member emails, or type 'next' to continue with the current team setup.`,
+            "members",
+            undefined,
+            false,
+            "text",
+            "Type 'next' to continue"
+          );
+        }, 200);
+      }
+    } else if (currentStage === "modules") {
+      addUserMessage(text, "modules");
+      const recommended = getModuleRecommendations(text);
+      setPendingSelections(new Set(recommended));
+      setTimeout(() => {
+        const names = recommended.map(id => productCapabilityBuckets.find(b => b.id === id)?.name).filter(Boolean).join(", ");
+        addAIMessage(
+          `Based on "${text}", I recommend: ${names}. I've selected these for you. Adjust if needed, then click the confirm button to proceed.`,
+          "modules",
+          undefined,
+          false,
+          "text",
+          "Type 'next' to confirm selections"
+        );
+      }, 200);
+    } else if (currentStage === "capabilities") {
+      if (text.toLowerCase() === "all") {
+        const allCaps = new Set(
+          selectedBuckets.flatMap(bId => {
+            const bucket = productCapabilityBuckets.find(b => b.id === bId);
+            return bucket ? bucket.moduleCapabilities.map(mc => `${bId}::${mc.id}`) : [];
+          })
+        );
+        setPendingSelections(allCaps);
+        addUserMessage("Enable all capabilities", "capabilities");
+        setTimeout(() => {
+          addAIMessage(
+            `All capabilities enabled! Click confirm to proceed, or deselect any you don't need.`,
+            "capabilities",
+            undefined,
+            false,
+            "text",
+            "Type 'next' to confirm"
+          );
+        }, 200);
+      } else if (text.toLowerCase() === "next" || text.toLowerCase() === "continue") {
+        handleConfirmSelections();
+      } else {
+        addUserMessage(text, "capabilities");
+        setTimeout(() => {
+          addAIMessage(
+            `Toggle capabilities above, type 'all' to enable everything, or 'next' to continue.`,
+            "capabilities"
+          );
+        }, 200);
+      }
+    } else if (currentStage === "homeview") {
+      if (text.toLowerCase().includes("recommend")) {
+        handleConfirmSelections();
+      } else {
+        addUserMessage(text, "homeview");
+        const match = archetypeTemplates.find(t => 
+          t.name.toLowerCase().includes(text.toLowerCase()) ||
+          t.tags.some(tag => text.toLowerCase().includes(tag))
+        );
+        if (match) {
+          setPendingSelections(new Set([match.id]));
+          setTimeout(() => {
+            addAIMessage(
+              `Selected "${match.name}". Click confirm to proceed.`,
+              "homeview"
+            );
+          }, 200);
+        } else {
+          setTimeout(() => {
+            addAIMessage(
+              `I couldn't find that layout. Please select one from the options above, or type 'recommended'.`,
+              "homeview"
+            );
+          }, 200);
+        }
+      }
+    } else if (currentStage === "confirm") {
+      addUserMessage(text, "confirm");
+      setTimeout(() => {
+        addAIMessage(
+          `Click "Create Workspace" when you're ready, or "Start Over" to begin again.`,
+          "confirm"
+        );
+      }, 200);
+    }
+  }, [userInput, currentStage, advanceToMembers, advanceToModules, handleConfirmSelections, addUserMessage, addAIMessage, pendingSelections, selectedBuckets, workspaceMembers, setWorkspaceMembers]);
+
+  const stats = useMemo(() => 
+    getCapabilityStats(selectedBuckets, enabledModules),
+    [selectedBuckets, enabledModules]
+  );
+
+  const lastAIMessage = messages.filter(m => m.sender === "ai").at(-1);
+
+  return (
+    <div className="flex h-full" data-testid="ai-assistant-flow">
+      <div className={`flex flex-col ${showConfirmPanel ? "flex-1" : "flex-1"}`}>
+        <div className="flex-1 overflow-y-auto p-6 space-y-4" data-testid="ai-chat-messages">
+          {messages.map((msg) => (
+            <div key={msg.id} className={`flex ${msg.sender === "ai" ? "justify-start" : "justify-end"}`}>
+              <div className={`max-w-[700px] ${msg.sender === "ai" ? "w-full" : ""}`}>
+                <div className={`flex items-start gap-3 ${msg.sender === "user" ? "flex-row-reverse" : ""}`}>
+                  {msg.sender === "ai" && (
+                    <div className="w-8 h-8 rounded-full bg-[#266C92]/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <Bot className="w-4 h-4 text-[#266C92]" />
+                    </div>
+                  )}
+                  <div className={`rounded-2xl px-4 py-3 ${
+                    msg.sender === "ai" 
+                      ? "bg-gray-50 dark:bg-muted/50 text-gray-800 dark:text-foreground" 
+                      : "bg-[#266C92] text-white"
+                  }`}>
+                    <p className="text-sm leading-relaxed">{msg.text}</p>
+                  </div>
+                </div>
+
+                {msg.sender === "ai" && msg.options && msg === lastAIMessage && (
+                  <div className="mt-3 ml-11">
+                    <div className={`flex flex-wrap gap-2 ${msg.options.length > 5 ? "max-h-[240px] overflow-y-auto pr-1" : ""}`}>
+                      {msg.options.map(opt => {
+                        const isSelected = pendingSelections.has(opt.id);
+                        return (
+                          <button
+                            key={opt.id}
+                            onClick={() => msg.multiSelect ? handleOptionToggle(opt.id) : handleSingleSelect(opt.id)}
+                            className={`group relative flex items-center gap-2 px-3 py-2 rounded-xl border text-left transition-all text-sm ${
+                              isSelected
+                                ? "border-[#266C92] bg-[#266C92]/5 dark:bg-[#266C92]/10 text-[#266C92]"
+                                : "border-gray-200 dark:border-border bg-white dark:bg-card text-gray-700 dark:text-foreground hover:border-[#266C92]/50"
+                            }`}
+                            data-testid={`ai-option-${opt.id}`}
+                          >
+                            {msg.multiSelect && (
+                              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                                isSelected ? "border-[#266C92] bg-[#266C92]" : "border-gray-300 dark:border-border"
+                              }`}>
+                                {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
+                              </div>
+                            )}
+                            {!msg.multiSelect && (
+                              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                                isSelected ? "border-[#266C92]" : "border-gray-300 dark:border-border"
+                              }`}>
+                                {isSelected && <div className="w-2 h-2 rounded-full bg-[#266C92]" />}
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <span className="font-medium">{opt.label}</span>
+                              {opt.description && (
+                                <p className="text-[10px] text-gray-500 dark:text-muted-foreground truncate max-w-[200px]">{opt.description}</p>
+                              )}
+                            </div>
+                            {opt.recommended && (
+                              <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-[#266C92]/10 text-[#266C92] border-0 shrink-0">
+                                <Zap className="w-2.5 h-2.5 mr-0.5" />
+                                Rec
+                              </Badge>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {pendingSelections.size > 0 && (
+                      <div className="mt-3 flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          onClick={handleConfirmSelections}
+                          className="bg-[#266C92] gap-1.5"
+                          data-testid="ai-confirm-selections"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          Confirm {pendingSelections.size > 0 ? `(${pendingSelections.size})` : ""}
+                        </Button>
+                        {msg.multiSelect && (
+                          <span className="text-[10px] text-gray-400 dark:text-muted-foreground">
+                            {pendingSelections.size} selected
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {isTyping && (
+            <div className="flex justify-start">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#266C92]/10 flex items-center justify-center shrink-0">
+                  <Bot className="w-4 h-4 text-[#266C92]" />
+                </div>
+                <div className="rounded-2xl px-4 py-3 bg-gray-50 dark:bg-muted/50">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={chatEndRef} />
+        </div>
+
+        <div className="border-t border-gray-200 dark:border-border bg-white dark:bg-card px-6 py-4">
+          <div className="flex items-center gap-3 max-w-[700px] mx-auto">
+            <div className="flex-1 relative">
+              <Input
+                ref={inputRef}
+                value={userInput}
+                onChange={e => setUserInput(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") handleSendMessage(); }}
+                placeholder={lastAIMessage?.inputPlaceholder || "Type your response..."}
+                className="h-11 pr-10 rounded-xl"
+                data-testid="ai-chat-input"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleSendMessage}
+                disabled={!userInput.trim()}
+                className="absolute right-1 top-1/2 -translate-y-1/2 text-[#266C92]"
+                data-testid="ai-send-button"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-4 mt-2">
+            <div className="flex items-center gap-1.5 text-[10px] text-gray-400 dark:text-muted-foreground">
+              <div className={`w-2 h-2 rounded-full ${currentStage === "greeting" || currentStage === "name" ? "bg-[#266C92]" : "bg-gray-300 dark:bg-muted"}`} />
+              <span>Name</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-gray-400 dark:text-muted-foreground">
+              <div className={`w-2 h-2 rounded-full ${currentStage === "members" ? "bg-[#266C92]" : "bg-gray-300 dark:bg-muted"}`} />
+              <span>Team</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-gray-400 dark:text-muted-foreground">
+              <div className={`w-2 h-2 rounded-full ${currentStage === "modules" ? "bg-[#266C92]" : "bg-gray-300 dark:bg-muted"}`} />
+              <span>Modules</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-gray-400 dark:text-muted-foreground">
+              <div className={`w-2 h-2 rounded-full ${currentStage === "capabilities" ? "bg-[#266C92]" : "bg-gray-300 dark:bg-muted"}`} />
+              <span>Capabilities</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-gray-400 dark:text-muted-foreground">
+              <div className={`w-2 h-2 rounded-full ${currentStage === "homeview" ? "bg-[#266C92]" : "bg-gray-300 dark:bg-muted"}`} />
+              <span>Home View</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-gray-400 dark:text-muted-foreground">
+              <div className={`w-2 h-2 rounded-full ${currentStage === "confirm" ? "bg-[#266C92]" : "bg-gray-300 dark:bg-muted"}`} />
+              <span>Confirm</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {showConfirmPanel && (
+        <div className="w-[380px] border-l border-gray-200 dark:border-border bg-gray-50 dark:bg-muted/20 p-4 overflow-y-auto shrink-0">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground flex items-center gap-2 mb-3">
+                <Sparkles className="w-4 h-4 text-[#266C92]" />
+                Workspace Preview
+              </h3>
+            </div>
+
+            <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-3">
+              <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Name</p>
+              <p className="font-semibold text-gray-900 dark:text-foreground">{workspaceName || "Untitled"}</p>
+            </div>
+
+            <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-3">
+              <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Team ({workspaceMembers.length})</p>
+              <div className="space-y-1.5">
+                {workspaceMembers.map(m => (
+                  <div key={m.id} className="flex items-center justify-between text-xs">
+                    <span className="text-gray-700 dark:text-foreground truncate">{m.email}</span>
+                    <Badge variant="secondary" className="text-[9px] shrink-0">{m.role}</Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-3">
+              <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Modules ({selectedBuckets.length})</p>
+              <div className="space-y-1">
+                {selectedBuckets.map(bId => {
+                  const bucket = productCapabilityBuckets.find(b => b.id === bId);
+                  const modCount = enabledModules[bId]?.length || 0;
+                  return bucket ? (
+                    <div key={bId} className="flex items-center justify-between text-xs">
+                      <span className="text-gray-700 dark:text-foreground">{bucket.name}</span>
+                      <span className="text-gray-400">{modCount} caps</span>
+                    </div>
+                  ) : null;
+                })}
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-3">
+              <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Home Layout</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-foreground">
+                {archetypeTemplates.find(t => t.id === selectedArchetype)?.name || "Default"}
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-card rounded-xl border border-gray-200 dark:border-border p-3">
+              <div className="flex items-center justify-between text-xs mb-2">
+                <span className="text-gray-500">Total Capabilities</span>
+                <span className="font-bold text-[#266C92]">{stats.totalModules}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-500">Nav Items</span>
+                <span className="font-bold text-[#266C92]">{stats.totalNavItems}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function WorkspaceCreationWizard({
   open,
   onOpenChange,
   onWorkspaceCreated,
 }: WorkspaceCreationWizardProps) {
   const [currentStep, setCurrentStep] = useState<WizardStep>("name");
+  const [assistantMode, setAssistantMode] = useState(false);
   const [workspaceName, setWorkspaceName] = useState("");
   const [selectedBuckets, setSelectedBuckets] = useState<string[]>([]);
   const [enabledModules, setEnabledModules] = useState<Record<string, string[]>>({});
@@ -1182,6 +1937,22 @@ export function WorkspaceCreationWizard({
     }
   };
 
+  const resetWizard = () => {
+    setCurrentStep("name");
+    setAssistantMode(false);
+    setWorkspaceName("");
+    setSelectedBuckets([]);
+    setEnabledModules({});
+    setActiveBucketTab(null);
+    setSelectedArchetype("auditboard-default");
+    setWorkspaceMembers([
+      { id: "1", email: "admin@company.org", role: "Org Admin" },
+      { id: "2", email: "exec@company.org", role: "Executive" },
+      { id: "3", email: "manager@company.org", role: "Manager" },
+      { id: "4", email: "analyst@company.org", role: "Analyst" },
+    ]);
+  };
+
   const handleCreate = () => {
     if (!workspaceName.trim()) return;
     
@@ -1204,23 +1975,12 @@ export function WorkspaceCreationWizard({
     addWorkspace(newWorkspace);
     onWorkspaceCreated?.(newWorkspace);
     onOpenChange(false);
-    
-    setCurrentStep("name");
-    setWorkspaceName("");
-    setSelectedBuckets([]);
-    setEnabledModules({});
-    setActiveBucketTab(null);
-    setSelectedArchetype("auditboard-default");
+    resetWizard();
   };
 
   const handleClose = () => {
     onOpenChange(false);
-    setCurrentStep("name");
-    setWorkspaceName("");
-    setSelectedBuckets([]);
-    setEnabledModules({});
-    setActiveBucketTab(null);
-    setSelectedArchetype("auditboard-default");
+    resetWizard();
   };
 
   if (!open) return null;
@@ -1240,12 +2000,41 @@ export function WorkspaceCreationWizard({
       <div className="relative w-full h-full bg-white dark:bg-background shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-gray-200 dark:border-border">
-          <div>
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground">Create New Workspace</h1>
-            <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5">Configure your workspace modules</p>
+          <div className="flex items-center gap-6">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground">Create New Workspace</h1>
+              <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5">
+                {assistantMode ? "AI-guided workspace setup" : "Configure your workspace modules"}
+              </p>
+            </div>
+            <button
+              onClick={() => setAssistantMode(prev => !prev)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${
+                assistantMode
+                  ? "border-[#266C92] bg-[#266C92]/5 dark:bg-[#266C92]/10 text-[#266C92]"
+                  : "border-gray-200 dark:border-border bg-gray-50 dark:bg-muted text-gray-600 dark:text-muted-foreground hover:border-[#266C92]/50"
+              }`}
+              data-testid="toggle-assistant-mode"
+            >
+              {assistantMode ? (
+                <>
+                  <Bot className="w-4 h-4" />
+                  <span className="text-sm font-medium">AI Assistant</span>
+                  <ToggleRight className="w-5 h-5" />
+                </>
+              ) : (
+                <>
+                  <Wand2 className="w-4 h-4" />
+                  <span className="text-sm font-medium">Manual</span>
+                  <ToggleLeft className="w-5 h-5" />
+                </>
+              )}
+            </button>
           </div>
           <div className="flex items-center gap-6">
-            <StepIndicator currentStep={currentStep} completedSteps={completedSteps} />
+            {!assistantMode && (
+              <StepIndicator currentStep={currentStep} completedSteps={completedSteps} />
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -1260,6 +2049,21 @@ export function WorkspaceCreationWizard({
         
         {/* Content */}
         <div className="flex-1 overflow-hidden">
+          {assistantMode ? (
+            <AIAssistantFlow
+              workspaceName={workspaceName}
+              setWorkspaceName={setWorkspaceName}
+              workspaceMembers={workspaceMembers}
+              setWorkspaceMembers={setWorkspaceMembers}
+              selectedBuckets={selectedBuckets}
+              setSelectedBuckets={setSelectedBuckets}
+              enabledModules={enabledModules}
+              setEnabledModules={setEnabledModules}
+              selectedArchetype={selectedArchetype}
+              setSelectedArchetype={setSelectedArchetype}
+              onComplete={handleCreate}
+            />
+          ) : (<>
           {currentStep === "name" && (
             <div className="flex items-center justify-center h-full p-8 overflow-auto">
               <div className="w-full max-w-xl space-y-6">
@@ -1495,9 +2299,10 @@ export function WorkspaceCreationWizard({
               </div>
             </div>
           )}
+          </>)}
         </div>
         
-        {/* Footer */}
+        {!assistantMode && (
         <div className="flex items-center justify-between px-8 py-5 border-t border-gray-200 dark:border-border bg-gray-50 dark:bg-muted/30">
           <Button
             variant="outline"
@@ -1535,6 +2340,7 @@ export function WorkspaceCreationWizard({
             </Button>
           )}
         </div>
+        )}
       </div>
     </div>
   );
