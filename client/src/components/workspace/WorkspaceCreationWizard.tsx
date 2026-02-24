@@ -98,8 +98,6 @@ import {
   Link,
   Bot,
   Wand2,
-  ToggleLeft,
-  ToggleRight,
   Zap,
   RefreshCw,
 } from "lucide-react";
@@ -2000,36 +1998,11 @@ export function WorkspaceCreationWizard({
       <div className="relative w-full h-full bg-white dark:bg-background shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-gray-200 dark:border-border">
-          <div className="flex items-center gap-6">
-            <div>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground">Create New Workspace</h1>
-              <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5">
-                {assistantMode ? "AI-guided workspace setup" : "Configure your workspace modules"}
-              </p>
-            </div>
-            <button
-              onClick={() => setAssistantMode(prev => !prev)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${
-                assistantMode
-                  ? "border-[#266C92] bg-[#266C92]/5 dark:bg-[#266C92]/10 text-[#266C92]"
-                  : "border-gray-200 dark:border-border bg-gray-50 dark:bg-muted text-gray-600 dark:text-muted-foreground hover:border-[#266C92]/50"
-              }`}
-              data-testid="toggle-assistant-mode"
-            >
-              {assistantMode ? (
-                <>
-                  <Bot className="w-4 h-4" />
-                  <span className="text-sm font-medium">AI Assistant</span>
-                  <ToggleRight className="w-5 h-5" />
-                </>
-              ) : (
-                <>
-                  <Wand2 className="w-4 h-4" />
-                  <span className="text-sm font-medium">Manual</span>
-                  <ToggleLeft className="w-5 h-5" />
-                </>
-              )}
-            </button>
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-foreground">Create New Workspace</h1>
+            <p className="text-sm text-gray-500 dark:text-muted-foreground mt-0.5">
+              {assistantMode ? "AI-guided workspace setup" : "Configure your workspace modules"}
+            </p>
           </div>
           <div className="flex items-center gap-6">
             {!assistantMode && (
@@ -2048,7 +2021,37 @@ export function WorkspaceCreationWizard({
         </div>
         
         {/* Content */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden relative">
+          {/* Mode Toggle - segmented control */}
+          <div className="absolute top-4 right-6 z-10" data-testid="toggle-assistant-mode">
+            <div className="flex items-center bg-gray-100 dark:bg-muted rounded-lg p-0.5">
+              <button
+                onClick={() => setAssistantMode(false)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  !assistantMode
+                    ? "bg-white dark:bg-background text-gray-900 dark:text-foreground shadow-sm"
+                    : "text-gray-500 dark:text-muted-foreground hover:text-gray-700 dark:hover:text-foreground"
+                }`}
+                data-testid="toggle-manual-mode"
+              >
+                <Wand2 className="w-3.5 h-3.5" />
+                <span>Manual</span>
+              </button>
+              <button
+                onClick={() => setAssistantMode(true)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  assistantMode
+                    ? "bg-white dark:bg-background text-[#266C92] shadow-sm"
+                    : "text-gray-500 dark:text-muted-foreground hover:text-gray-700 dark:hover:text-foreground"
+                }`}
+                data-testid="toggle-ai-mode"
+              >
+                <Bot className="w-3.5 h-3.5" />
+                <span>AI Assistant</span>
+              </button>
+            </div>
+          </div>
+
           {assistantMode ? (
             <AIAssistantFlow
               workspaceName={workspaceName}
