@@ -6,7 +6,6 @@ import {
   ChevronDown,
   ChevronRight,
   Sparkles,
-  Send,
   Target,
   Shield,
   Zap,
@@ -15,6 +14,8 @@ import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 import { useWorkspaceStore, workspaces as storeWorkspaces } from "@/lib/workspaceStore";
 import headerBgImage from "@/assets/header-background.png";
 import type { UserPersona } from "@/lib/workspaceStore";
+import { generateCustomWorkspaceContent } from "./HomePageContent";
+import type { WorkspaceContentData, Issue, Control, Narrative, Risk, TabComment, Task } from "./HomePageContent";
 
 const defaultWorkspaces = [
   {
@@ -40,193 +41,157 @@ const defaultWorkspaces = [
   },
 ];
 
-interface Task {
-  id: string;
-  title: string;
-  context: string;
-  preparers: string[];
-  dueDate: string;
-  status: "incomplete" | "complete" | "in-progress";
-}
-
-interface InboxStat {
-  label: string;
-  value: number;
-}
-
-interface ScenarioPlanning {
-  title: string;
-  progress: string;
-  completed: number;
+interface ChartStats {
+  segments: { count: number; color: string; label: string }[];
   total: number;
+  openCount: number;
+  centerLabel: string;
 }
 
-interface DefaultHomeContent {
-  scenarioPlanning: ScenarioPlanning;
-  tasks: Task[];
-  inboxStats: InboxStat[];
-  quickActions: { label: string; id: string }[];
+function getTabChartStats(activeTab: string, content: WorkspaceContentData): ChartStats {
+  const tc = content.tabContent;
+  switch (activeTab) {
+    case "My Tasks": {
+      const items = tc?.tasks || content.tasks;
+      const incomplete = items.filter(t => t.status === "incomplete").length;
+      const inProgress = items.filter(t => t.status === "in-progress").length;
+      const complete = items.filter(t => t.status === "complete").length;
+      return {
+        segments: [
+          { count: incomplete, color: "#f59e0b", label: "Incomplete" },
+          { count: inProgress, color: "#3b82f6", label: "In Progress" },
+          { count: complete, color: "#10b981", label: "Complete" },
+        ],
+        total: items.length,
+        openCount: incomplete + inProgress,
+        centerLabel: "Open Tasks",
+      };
+    }
+    case "My Issues": {
+      const items = tc?.issues || [];
+      const open = items.filter(i => i.status === "open").length;
+      const investigating = items.filter(i => i.status === "investigating").length;
+      const resolved = items.filter(i => i.status === "resolved").length;
+      return {
+        segments: [
+          { count: open, color: "#f59e0b", label: "Open" },
+          { count: investigating, color: "#3b82f6", label: "Investigating" },
+          { count: resolved, color: "#10b981", label: "Resolved" },
+        ],
+        total: items.length,
+        openCount: open + investigating,
+        centerLabel: "Open Issues",
+      };
+    }
+    case "My Controls": {
+      const items = tc?.controls || [];
+      const needsTesting = items.filter(c => c.effectiveness === "needs-testing").length;
+      const ineffective = items.filter(c => c.effectiveness === "ineffective").length;
+      const effective = items.filter(c => c.effectiveness === "effective").length;
+      return {
+        segments: [
+          { count: needsTesting, color: "#f59e0b", label: "Needs Testing" },
+          { count: ineffective, color: "#ef4444", label: "Ineffective" },
+          { count: effective, color: "#10b981", label: "Effective" },
+        ],
+        total: items.length,
+        openCount: needsTesting + ineffective,
+        centerLabel: "Action Needed",
+      };
+    }
+    case "My Narratives": {
+      const items = tc?.narratives || [];
+      const draft = items.filter(n => n.status === "draft").length;
+      const inReview = items.filter(n => n.status === "in-review").length;
+      const approved = items.filter(n => n.status === "approved").length;
+      return {
+        segments: [
+          { count: draft, color: "#f59e0b", label: "Draft" },
+          { count: inReview, color: "#3b82f6", label: "In Review" },
+          { count: approved, color: "#10b981", label: "Approved" },
+        ],
+        total: items.length,
+        openCount: draft + inReview,
+        centerLabel: "Pending",
+      };
+    }
+    case "My Risks": {
+      const items = tc?.risks || [];
+      const notStarted = items.filter(r => r.mitigationStatus === "not-started").length;
+      const inProgress = items.filter(r => r.mitigationStatus === "in-progress").length;
+      const mitigated = items.filter(r => r.mitigationStatus === "mitigated").length;
+      return {
+        segments: [
+          { count: notStarted, color: "#f59e0b", label: "Not Started" },
+          { count: inProgress, color: "#3b82f6", label: "In Progress" },
+          { count: mitigated, color: "#10b981", label: "Mitigated" },
+        ],
+        total: items.length,
+        openCount: notStarted + inProgress,
+        centerLabel: "Open Risks",
+      };
+    }
+    case "My Comments": {
+      const items = tc?.comments || [];
+      const newC = items.filter(c => c.status === "new").length;
+      const flagged = items.filter(c => c.status === "flagged").length;
+      const read = items.filter(c => c.status === "read").length;
+      return {
+        segments: [
+          { count: newC, color: "#f59e0b", label: "New" },
+          { count: flagged, color: "#ef4444", label: "Flagged" },
+          { count: read, color: "#10b981", label: "Read" },
+        ],
+        total: items.length,
+        openCount: newC + flagged,
+        centerLabel: "Unread",
+      };
+    }
+    default:
+      return { segments: [], total: 0, openCount: 0, centerLabel: "" };
+  }
 }
 
-interface TaskStats {
-  incomplete: number;
-  inProgress: number;
-  complete: number;
-  total: number;
-}
-
-const moduleTaskTemplates: Record<string, Task[]> = {
-  "controls-management": [
-    { id: "ctrl-1", title: "Review SOX Control Documentation", context: "Controls: Q4 Review", preparers: ["Sarah Chen", "Control Team"], dueDate: "11-15-2025", status: "incomplete" },
-    { id: "ctrl-2", title: "Update Control Testing Schedule", context: "Planning: Control Testing", preparers: ["Audit Lead"], dueDate: "11-20-2025", status: "in-progress" },
-  ],
-  "enterprise-risk": [
-    { id: "erm-1", title: "Assess Supply Chain Tariff Exposure", context: "Risk Assessment: Tariff Mitigation", preparers: ["Sarah Chen", "Michael Torres"], dueDate: "10-31-2025", status: "incomplete" },
-    { id: "erm-2", title: "Update Vendor Cost Impact Analysis", context: "Analysis: Tariff Mitigation", preparers: ["James Wilson"], dueDate: "11-15-2025", status: "incomplete" },
-    { id: "erm-3", title: "Review Alternative Sourcing Options", context: "Strategy: Tariff Mitigation", preparers: ["Sarah Chen", "Amanda Liu"], dueDate: "11-30-2025", status: "in-progress" },
-  ],
-  "audit-management": [
-    { id: "aud-1", title: "Update Inventory Structure & Coverage Mapping", context: "Inventory: M&A Integration", preparers: ["Steven Yeun", "Michelle Tu"], dueDate: "10-31-2025", status: "complete" },
-    { id: "aud-2", title: "Review Organizational Impact Assessment", context: "Overview: M&A Integration", preparers: ["Steven Yeun", "Michelle Tu"], dueDate: "10-31-2025", status: "complete" },
-    { id: "aud-3", title: "Evaluate Target Company Financial Controls", context: "Due Diligence: Acquisition", preparers: ["Michelle Tu", "Alex Park"], dueDate: "11-05-2025", status: "in-progress" },
-  ],
-  "cyber-it-compliance": [
-    { id: "sec-1", title: "Identify All Log4j Instances Across Environment", context: "Discovery: CVE-2021-44228", preparers: ["David Kim", "Rachel Green"], dueDate: "10-25-2025", status: "complete" },
-    { id: "sec-2", title: "Complete Vulnerability Assessment", context: "Assessment: Critical Severity", preparers: ["David Kim"], dueDate: "10-31-2025", status: "in-progress" },
-    { id: "sec-3", title: "Patch Critical Production Systems", context: "Remediation: Production", preparers: ["Tom Anderson", "David Kim"], dueDate: "11-01-2025", status: "incomplete" },
-  ],
-  "regulatory-compliance": [
-    { id: "reg-1", title: "ESG Disclosure Review", context: "Compliance: ESG Reporting", preparers: ["Compliance Team"], dueDate: "11-14-2025", status: "in-progress" },
-    { id: "reg-2", title: "Regulatory Filing Preparation", context: "Compliance: Q4 Filing", preparers: ["Legal Team"], dueDate: "12-05-2025", status: "incomplete" },
-  ],
-  "third-party": [
-    { id: "tp-1", title: "Vendor Risk Assessment", context: "Vendor: Annual Review", preparers: ["Vendor Team"], dueDate: "11-16-2025", status: "incomplete" },
-    { id: "tp-2", title: "Update Vendor Contracts", context: "Vendor: Contract Review", preparers: ["Procurement"], dueDate: "11-28-2025", status: "in-progress" },
-  ],
-  "ai-governance": [
-    { id: "ai-1", title: "AI Model Risk Assessment", context: "AI: Governance Review", preparers: ["AI Team"], dueDate: "11-20-2025", status: "incomplete" },
-    { id: "ai-2", title: "Update AI Use Policies", context: "AI: Policy Development", preparers: ["Data Science"], dueDate: "12-10-2025", status: "incomplete" },
-  ],
-  "environmental-compliance": [
-    { id: "env-1", title: "Environmental Impact Assessment", context: "ESG: Environmental Review", preparers: ["ESG Team"], dueDate: "11-22-2025", status: "in-progress" },
-    { id: "env-2", title: "Carbon Emissions Reporting", context: "ESG: Emissions Tracking", preparers: ["Sustainability"], dueDate: "12-15-2025", status: "incomplete" },
-  ],
-  "information-technology": [
-    { id: "it-1", title: "Review IT General Controls", context: "IT: Control Assessment", preparers: ["IT Team"], dueDate: "11-18-2025", status: "incomplete" },
-    { id: "it-2", title: "Update System Inventory", context: "IT: Asset Management", preparers: ["IT Admin"], dueDate: "12-01-2025", status: "incomplete" },
-  ],
-};
-
-const moduleQuickActions: Record<string, { label: string; id: string }[]> = {
-  "controls-management": [{ label: "Create Control", id: "new-control" }, { label: "Start Testing", id: "new-test" }],
-  "enterprise-risk": [{ label: "Create Risk Event", id: "risk-event" }, { label: "Start Assessment", id: "risk-assessment" }],
-  "audit-management": [{ label: "Create Audit", id: "new-audit" }, { label: "Log Finding", id: "new-finding" }],
-  "cyber-it-compliance": [{ label: "Report Incident", id: "new-incident" }, { label: "Log Vulnerability", id: "new-vuln" }],
-  "regulatory-compliance": [{ label: "Create Filing", id: "new-filing" }, { label: "Log Gap", id: "new-gap" }],
-  "third-party": [{ label: "Add Vendor", id: "new-vendor" }, { label: "Start Review", id: "vendor-review" }],
-  "ai-governance": [{ label: "Log AI Model", id: "new-model" }, { label: "Start AI Review", id: "ai-review" }],
-  "environmental-compliance": [{ label: "Log Emission", id: "new-emission" }, { label: "ESG Report", id: "esg-report" }],
-  "information-technology": [{ label: "Create IT Request", id: "it-request" }, { label: "Log Issue", id: "it-issue" }],
-};
-
-function generateDefaultContent(selectedModules: string[]): DefaultHomeContent {
-  const tasks: Task[] = [];
-  const quickActionsMap: Record<string, { label: string; id: string }> = {};
-
-  selectedModules.forEach(modId => {
-    const modTasks = moduleTaskTemplates[modId] || [];
-    tasks.push(...modTasks);
-    const modActions = moduleQuickActions[modId] || [];
-    modActions.forEach(a => { quickActionsMap[a.id] = a; });
-  });
-
-  const uniqueTasks = tasks.slice(0, 10);
-  const quickActions = Object.values(quickActionsMap).slice(0, 4);
-
-  const incomplete = uniqueTasks.filter(t => t.status === "incomplete").length;
-  const inProgress = uniqueTasks.filter(t => t.status === "in-progress").length;
-  const complete = uniqueTasks.filter(t => t.status === "complete").length;
-
-  const scenarioTitle = selectedModules.length > 0
-    ? (() => {
-        if (selectedModules.includes("enterprise-risk")) return "Tariff Mitigation Strategy";
-        if (selectedModules.includes("audit-management")) return "Vertical Farming M&A";
-        if (selectedModules.includes("cyber-it-compliance")) return "Zero Day Event Response";
-        if (selectedModules.includes("controls-management")) return "SOX Compliance Initiative";
-        if (selectedModules.includes("regulatory-compliance")) return "ESG Regulatory Readiness";
-        if (selectedModules.includes("third-party")) return "Vendor Risk Consolidation";
-        return "Strategic Initiative";
-      })()
-    : "Strategic Initiative";
-
-  return {
-    scenarioPlanning: {
-      title: scenarioTitle,
-      progress: `${complete}/${uniqueTasks.length} Completed`,
-      completed: complete,
-      total: uniqueTasks.length,
-    },
-    tasks: uniqueTasks,
-    inboxStats: [
-      { label: "My Tasks", value: uniqueTasks.length },
-      { label: "My Issues", value: Math.max(0, Math.floor(selectedModules.length * 1.5)) },
-      { label: "My Controls", value: selectedModules.includes("controls-management") ? 8 : 2 },
-      { label: "My Narratives", value: selectedModules.includes("audit-management") ? 3 : 0 },
-      { label: "My Risks", value: selectedModules.includes("enterprise-risk") ? 6 : 1 },
-      { label: "My Comments", value: Math.max(0, selectedModules.length * 2) },
-    ],
-    quickActions: quickActions.length > 0 ? quickActions : [
-      { label: "Create New Item", id: "new-item" },
-      { label: "Start Review", id: "start-review" },
-      { label: "Generate Report", id: "new-report" },
-    ],
-  };
-}
-
-function DonutChart({ stats }: { stats: TaskStats }) {
+function DonutChart({ stats }: { stats: ChartStats }) {
   const circumference = 2 * Math.PI * 45;
-  const total = stats.total || 1;
+  if (stats.total === 0) {
+    return (
+      <div className="relative w-40 h-40 mx-auto">
+        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" strokeWidth="10" />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-4xl font-bold text-gray-900 dark:text-foreground">0</span>
+          <span className="text-sm text-gray-500 dark:text-muted-foreground">{stats.centerLabel}</span>
+        </div>
+      </div>
+    );
+  }
 
-  const incompletePercent = (stats.incomplete / total) * 100;
-  const inProgressPercent = (stats.inProgress / total) * 100;
-  const completePercent = (stats.complete / total) * 100;
-
-  const incompleteOffset = 0;
-  const inProgressOffset = incompletePercent;
-  const completeOffset = incompletePercent + inProgressPercent;
-
+  let offset = 0;
   return (
     <div className="relative w-40 h-40 mx-auto">
       <svg className="w-full h-full transform -rotate-90 transition-all duration-500 ease-out" viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" strokeWidth="10" />
-        {stats.complete > 0 && (
-          <circle
-            cx="50" cy="50" r="45" fill="none" stroke="#10b981" strokeWidth="10"
-            strokeDasharray={`${(completePercent / 100) * circumference} ${circumference}`}
-            strokeDashoffset={-(completeOffset / 100) * circumference}
-            strokeLinecap="round" className="transition-all duration-500 ease-out"
-          />
-        )}
-        {stats.inProgress > 0 && (
-          <circle
-            cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" strokeWidth="10"
-            strokeDasharray={`${(inProgressPercent / 100) * circumference} ${circumference}`}
-            strokeDashoffset={-(inProgressOffset / 100) * circumference}
-            strokeLinecap="round" className="transition-all duration-500 ease-out"
-          />
-        )}
-        {stats.incomplete > 0 && (
-          <circle
-            cx="50" cy="50" r="45" fill="none" stroke="#f59e0b" strokeWidth="10"
-            strokeDasharray={`${(incompletePercent / 100) * circumference} ${circumference}`}
-            strokeDashoffset={-(incompleteOffset / 100) * circumference}
-            strokeLinecap="round" className="transition-all duration-500 ease-out"
-          />
-        )}
+        {stats.segments.map((seg, idx) => {
+          const pct = (seg.count / stats.total) * 100;
+          const el = seg.count > 0 ? (
+            <circle
+              key={idx}
+              cx="50" cy="50" r="45" fill="none" stroke={seg.color} strokeWidth="10"
+              strokeDasharray={`${(pct / 100) * circumference} ${circumference}`}
+              strokeDashoffset={-(offset / 100) * circumference}
+              strokeLinecap="round"
+              className="transition-all duration-500 ease-out"
+            />
+          ) : null;
+          offset += pct;
+          return el;
+        })}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center transition-all duration-300">
-        <span className="text-4xl font-bold text-gray-900 dark:text-foreground">{stats.incomplete + stats.inProgress}</span>
-        <span className="text-sm text-gray-500 dark:text-muted-foreground">Open Tasks</span>
+        <span className="text-4xl font-bold text-gray-900 dark:text-foreground">{stats.openCount}</span>
+        <span className="text-sm text-gray-500 dark:text-muted-foreground">{stats.centerLabel}</span>
       </div>
     </div>
   );
@@ -243,6 +208,87 @@ function getStatusBadge(status: Task["status"]) {
   }
 }
 
+function getIssueSeverityBadge(severity: Issue["severity"]) {
+  switch (severity) {
+    case "critical":
+      return { label: "Critical", className: "text-red-600 bg-red-50 dark:bg-red-900/30 dark:text-red-400" };
+    case "high":
+      return { label: "High", className: "text-orange-600 bg-orange-50 dark:bg-orange-900/30 dark:text-orange-400" };
+    case "medium":
+      return { label: "Medium", className: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400" };
+    default:
+      return { label: "Low", className: "text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400" };
+  }
+}
+
+function getControlBadge(effectiveness: Control["effectiveness"]) {
+  switch (effectiveness) {
+    case "effective":
+      return { label: "Effective", className: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400" };
+    case "ineffective":
+      return { label: "Ineffective", className: "text-red-600 bg-red-50 dark:bg-red-900/30 dark:text-red-400" };
+    default:
+      return { label: "Needs Testing", className: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400" };
+  }
+}
+
+function getNarrativeBadge(status: Narrative["status"]) {
+  switch (status) {
+    case "approved":
+      return { label: "Approved", className: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400" };
+    case "in-review":
+      return { label: "In Review", className: "text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400" };
+    default:
+      return { label: "Draft", className: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400" };
+  }
+}
+
+function getRiskBadge(status: Risk["mitigationStatus"]) {
+  switch (status) {
+    case "mitigated":
+      return { label: "Mitigated", className: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400" };
+    case "in-progress":
+      return { label: "In Progress", className: "text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400" };
+    default:
+      return { label: "Not Started", className: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400" };
+  }
+}
+
+function getCommentBadge(status: TabComment["status"]) {
+  switch (status) {
+    case "read":
+      return { label: "Read", className: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-400" };
+    case "flagged":
+      return { label: "Flagged", className: "text-red-600 bg-red-50 dark:bg-red-900/30 dark:text-red-400" };
+    default:
+      return { label: "New", className: "text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400" };
+  }
+}
+
+function getTabOverviewTitle(activeTab: string): string {
+  switch (activeTab) {
+    case "My Tasks": return "Task Overview";
+    case "My Issues": return "Issue Overview";
+    case "My Controls": return "Control Overview";
+    case "My Narratives": return "Narrative Overview";
+    case "My Risks": return "Risk Overview";
+    case "My Comments": return "Comment Overview";
+    default: return "Overview";
+  }
+}
+
+function getTabListTitle(activeTab: string, content: WorkspaceContentData): string {
+  switch (activeTab) {
+    case "My Tasks": return content.scenarioPlanning.title;
+    case "My Issues": return "Open Issues";
+    case "My Controls": return "Control Status";
+    case "My Narratives": return "Narratives";
+    case "My Risks": return "Risk Register";
+    case "My Comments": return "Recent Comments";
+    default: return content.scenarioPlanning.title;
+  }
+}
+
 interface DefaultHomeDashboardProps {
   workspaceName: string;
   userPersona: UserPersona;
@@ -255,14 +301,8 @@ export function DefaultHomeDashboard({ workspaceName, userPersona, selectedModul
   const { setOpen: setAssistantOpen } = useHomeAssistantStore();
   const { currentWorkspace, setWorkspace } = useWorkspaceStore();
 
-  const content = useMemo(() => generateDefaultContent(selectedModules), [selectedModules]);
-
-  const taskStats: TaskStats = useMemo(() => ({
-    incomplete: content.tasks.filter(t => t.status === "incomplete").length,
-    inProgress: content.tasks.filter(t => t.status === "in-progress").length,
-    complete: content.tasks.filter(t => t.status === "complete").length,
-    total: content.tasks.length,
-  }), [content.tasks]);
+  const content = useMemo(() => generateCustomWorkspaceContent(selectedModules), [selectedModules]);
+  const chartStats = useMemo(() => getTabChartStats(activeTab, content), [activeTab, content]);
 
   const welcomeMessage = (() => {
     switch (userPersona) {
@@ -284,7 +324,7 @@ export function DefaultHomeDashboard({ workspaceName, userPersona, selectedModul
           <h1 className="text-2xl font-semibold" data-testid="welcome-message">
             {welcomeMessage}
             <span className="ml-4 text-base font-normal text-white/80">
-              {taskStats.incomplete} New critical{" "}
+              {chartStats.openCount} New critical{" "}
               <span className="underline cursor-pointer hover:text-white">tasks to review</span>
             </span>
           </h1>
@@ -363,41 +403,23 @@ export function DefaultHomeDashboard({ workspaceName, userPersona, selectedModul
           <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
             <Card className="shadow-sm border border-slate-200 dark:border-border bg-white dark:bg-card" data-testid="task-overview-card">
               <CardContent className="p-6">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">Task Overview</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-foreground mb-1">{getTabOverviewTitle(activeTab)}</h3>
                 <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-muted-foreground mb-6 flex-wrap">
-                  {taskStats.incomplete > 0 && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-400" />
-                      <span>{taskStats.incomplete} Incomplete</span>
+                  {chartStats.segments.filter(s => s.count > 0).map((seg) => (
+                    <div key={seg.label} className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: seg.color }} />
+                      <span>{seg.count} {seg.label}</span>
                     </div>
-                  )}
-                  {taskStats.inProgress > 0 && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-blue-500" />
-                      <span>{taskStats.inProgress} In Progress</span>
-                    </div>
-                  )}
-                  {taskStats.complete > 0 && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                      <span>{taskStats.complete} Complete</span>
-                    </div>
-                  )}
+                  ))}
                 </div>
-                <DonutChart stats={taskStats} />
+                <DonutChart stats={chartStats} />
                 <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500 dark:text-muted-foreground flex-wrap">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                    Incomplete
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                    In Progress
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                    Complete
-                  </div>
+                  {chartStats.segments.map((seg) => (
+                    <div key={seg.label} className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: seg.color }} />
+                      {seg.label}
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -414,7 +436,7 @@ export function DefaultHomeDashboard({ workspaceName, userPersona, selectedModul
                   ) : (
                     <ChevronRight className="w-4 h-4 text-gray-500 dark:text-muted-foreground" />
                   )}
-                  <span className="font-medium text-gray-900 dark:text-foreground">{content.scenarioPlanning.title}</span>
+                  <span className="font-medium text-gray-900 dark:text-foreground">{getTabListTitle(activeTab, content)}</span>
                 </button>
 
                 {scenarioExpanded && (
@@ -422,26 +444,94 @@ export function DefaultHomeDashboard({ workspaceName, userPersona, selectedModul
                     className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-border"
                     data-testid="task-list-default"
                   >
-                    {content.tasks.map((task) => {
+                    {activeTab === "My Tasks" && (content.tabContent?.tasks || content.tasks).map((task) => {
                       const badge = getStatusBadge(task.status);
                       return (
-                        <div
-                          key={task.id}
-                          className="flex items-start gap-4 px-4 py-3 hover-elevate cursor-pointer transition-colors"
-                          data-testid={`task-item-${task.id}`}
-                        >
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded mt-0.5 ${badge.className}`}>
-                            {badge.label}
-                          </span>
+                        <div key={task.id} className="flex items-start gap-4 px-4 py-3 hover-elevate cursor-pointer transition-colors" data-testid={`task-item-${task.id}`}>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded mt-0.5 ${badge.className}`}>{badge.label}</span>
                           <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-[#266C92] dark:text-[#7BC4E0] hover:underline cursor-pointer" data-testid={`task-title-${task.id}`}>
-                              {task.title}
-                            </div>
+                            <div className="text-sm font-medium text-[#266C92] dark:text-[#7BC4E0] hover:underline cursor-pointer" data-testid={`task-title-${task.id}`}>{task.title}</div>
                             <div className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{task.context}</div>
                           </div>
                           <div className="text-right flex-shrink-0">
                             <div className="text-xs text-gray-400 dark:text-muted-foreground">Due Date</div>
                             <div className="text-sm text-gray-700 dark:text-foreground" data-testid={`task-due-${task.id}`}>{task.dueDate}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {activeTab === "My Issues" && (content.tabContent?.issues || []).map((issue) => {
+                      const badge = getIssueSeverityBadge(issue.severity);
+                      return (
+                        <div key={issue.id} className="flex items-start gap-4 px-4 py-3 hover-elevate cursor-pointer transition-colors" data-testid={`issue-item-${issue.id}`}>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded mt-0.5 ${badge.className}`}>{badge.label}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-[#266C92] dark:text-[#7BC4E0] hover:underline cursor-pointer">{issue.title}</div>
+                            <div className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{issue.source} &middot; {issue.assignee}</div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <div className="text-xs text-gray-400 dark:text-muted-foreground">Reported</div>
+                            <div className="text-sm text-gray-700 dark:text-foreground">{issue.dateReported}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {activeTab === "My Controls" && (content.tabContent?.controls || []).map((ctrl) => {
+                      const badge = getControlBadge(ctrl.effectiveness);
+                      return (
+                        <div key={ctrl.id} className="flex items-start gap-4 px-4 py-3 hover-elevate cursor-pointer transition-colors" data-testid={`control-item-${ctrl.id}`}>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded mt-0.5 ${badge.className}`}>{badge.label}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-[#266C92] dark:text-[#7BC4E0] hover:underline cursor-pointer">{ctrl.controlId} - {ctrl.title}</div>
+                            <div className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{ctrl.framework} &middot; {ctrl.owner}</div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <div className="text-xs text-gray-400 dark:text-muted-foreground">Last Test</div>
+                            <div className="text-sm text-gray-700 dark:text-foreground">{ctrl.testDate}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {activeTab === "My Narratives" && (content.tabContent?.narratives || []).map((narr) => {
+                      const badge = getNarrativeBadge(narr.status);
+                      return (
+                        <div key={narr.id} className="flex items-start gap-4 px-4 py-3 hover-elevate cursor-pointer transition-colors" data-testid={`narrative-item-${narr.id}`}>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded mt-0.5 ${badge.className}`}>{badge.label}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-[#266C92] dark:text-[#7BC4E0] hover:underline cursor-pointer">{narr.title}</div>
+                            <div className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{narr.process} &middot; {narr.author}</div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <div className="text-xs text-gray-400 dark:text-muted-foreground">Updated</div>
+                            <div className="text-sm text-gray-700 dark:text-foreground">{narr.lastUpdated}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {activeTab === "My Risks" && (content.tabContent?.risks || []).map((risk) => {
+                      const badge = getRiskBadge(risk.mitigationStatus);
+                      return (
+                        <div key={risk.id} className="flex items-start gap-4 px-4 py-3 hover-elevate cursor-pointer transition-colors" data-testid={`risk-item-${risk.id}`}>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded mt-0.5 ${badge.className}`}>{badge.label}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-[#266C92] dark:text-[#7BC4E0] hover:underline cursor-pointer">{risk.title}</div>
+                            <div className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{risk.riskCategory} &middot; L: {risk.likelihood} / I: {risk.impact} &middot; {risk.owner}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {activeTab === "My Comments" && (content.tabContent?.comments || []).map((comment) => {
+                      const badge = getCommentBadge(comment.status);
+                      return (
+                        <div key={comment.id} className="flex items-start gap-4 px-4 py-3 hover-elevate cursor-pointer transition-colors" data-testid={`comment-item-${comment.id}`}>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded mt-0.5 ${badge.className}`}>{badge.label}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-[#266C92] dark:text-[#7BC4E0] hover:underline cursor-pointer">{comment.title}</div>
+                            <div className="text-xs text-gray-500 dark:text-muted-foreground mt-0.5">{comment.context} &middot; {comment.author} &middot; {comment.threadCount} replies</div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <div className="text-xs text-gray-400 dark:text-muted-foreground">Date</div>
+                            <div className="text-sm text-gray-700 dark:text-foreground">{comment.date}</div>
                           </div>
                         </div>
                       );

@@ -127,6 +127,15 @@ Preferred communication style: Simple, everyday language.
 - Closing a tab returns to the previous route (tracked via `setPreviousRoute`)
 - Main tab always exists and cannot be closed
 
+### Dynamic Inbox Tab Content System
+- `HomePageContent.tsx` exports 7 type interfaces: Task, Issue, Control, Narrative, Risk, TabComment, WorkspaceContentData
+- Each workspace has `tabContent` field with per-tab arrays for all 6 tabs (Tasks, Issues, Controls, Narratives, Risks, Comments)
+- Switching inbox tabs updates: donut chart (status breakdown), overview card title, content list header, and list items with tab-specific columns/badges
+- Status categories per tab: Tasks (Incomplete/In Progress/Complete), Issues (Open/Investigating/Resolved), Controls (Needs Testing/Ineffective/Effective), Narratives (Draft/In Review/Approved), Risks (Not Started/In Progress/Mitigated), Comments (New/Flagged/Read)
+- `generateCustomWorkspaceContent()` produces tabContent from 5 capability pools (capabilityIssuePool, capabilityControlPool, capabilityNarrativePool, capabilityRiskPool, capabilityCommentPool) plus existing capabilityTaskPool
+- DefaultHomeDashboard imports generateCustomWorkspaceContent and types from HomePageContent for full parity
+- Adding new tab types: add interface, add to TabContentMap in WorkspaceContentData, add pool, add chart stats case, add badge function, add list renderer
+
 ### AI Governance Page
 - `client/src/pages/AIGovernancePage.tsx` - Wrapped in AppLayout (uses existing framework nav), matching the FairNow/AuditBoard AI Governance screenshot
 - Features: breadcrumb header, 3 metric cards, risk levels bar chart, development statuses donut charts, notification history, compliance table, acquisition banner
