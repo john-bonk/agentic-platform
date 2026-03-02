@@ -285,14 +285,14 @@ const categoryMeta: Record<AgentCategory, { label: string; description: string; 
   scheduled: {
     label: "Scheduled",
     description: "Calendar-based workflows that run on defined cadences",
-    color: "text-[#1a2332] dark:text-slate-300",
-    iconBg: "bg-[#1a2332]/10 dark:bg-slate-700/40",
+    color: "text-[#266C92] dark:text-[#4da3c9]",
+    iconBg: "bg-[#266C92]/10 dark:bg-[#266C92]/20",
   },
   emergent: {
     label: "Emergent",
     description: "Real-time responses triggered by changing signals and system parameters",
-    color: "text-[#1a2332] dark:text-slate-300",
-    iconBg: "bg-[#1a2332]/10 dark:bg-slate-700/40",
+    color: "text-[#266C92] dark:text-[#4da3c9]",
+    iconBg: "bg-[#266C92]/10 dark:bg-[#266C92]/20",
   },
 };
 

@@ -36,14 +36,14 @@ const categoryIcons: Record<AgentCategory, typeof Zap> = {
 const statusConfig: Record<AgentStatus, { label: string; className: string }> = {
   active: { label: "Active", className: "bg-[#266C92] hover:bg-[#266C92] text-white" },
   idle: { label: "Idle", className: "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300" },
-  "pending-review": { label: "Pending Review", className: "bg-[#1a2332] hover:bg-[#1a2332] text-white dark:bg-slate-600" },
-  completed: { label: "Completed", className: "bg-[#266C92]/70 hover:bg-[#266C92]/70 text-white" },
+  "pending-review": { label: "Pending", className: "bg-[#1a2332] hover:bg-[#1a2332] text-white dark:bg-slate-600" },
+  completed: { label: "Complete", className: "bg-[#266C92]/70 hover:bg-[#266C92]/70 text-white" },
 };
 
 function StatusBadge({ status }: { status: AgentStatus }) {
   const config = statusConfig[status];
   return (
-    <Badge className={`text-xs font-medium ${config.className}`} data-testid={`badge-status-${status}`}>
+    <Badge className={`text-xs font-medium w-[5.5rem] justify-center ${config.className}`} data-testid={`badge-status-${status}`}>
       {status === "active" && <CircleDot className="w-3 h-3 mr-1" />}
       {status === "pending-review" && <Eye className="w-3 h-3 mr-1" />}
       {status === "completed" && <CheckCircle2 className="w-3 h-3 mr-1" />}
@@ -85,14 +85,18 @@ function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
         <h4 className="text-sm font-medium text-foreground flex-1 min-w-0 truncate">{workflow.name}</h4>
 
         <div className="flex items-center gap-3 shrink-0">
-          <StatusBadge status={workflow.status} />
+          <div className="w-[5.5rem] shrink-0">
+            <StatusBadge status={workflow.status} />
+          </div>
 
-          {workflow.status === "active" && workflow.progress < 100 && (
-            <div className="flex items-center gap-2">
-              <ProgressBar value={workflow.progress} />
-              <span className="text-xs text-muted-foreground font-medium w-8 text-right">{workflow.progress}%</span>
-            </div>
-          )}
+          <div className="w-[9.5rem] shrink-0">
+            {workflow.status === "active" && workflow.progress < 100 ? (
+              <div className="flex items-center gap-2">
+                <ProgressBar value={workflow.progress} />
+                <span className="text-xs text-muted-foreground font-medium w-8 text-right">{workflow.progress}%</span>
+              </div>
+            ) : null}
+          </div>
 
           {workflow.humanActionNeeded && (
             <button
