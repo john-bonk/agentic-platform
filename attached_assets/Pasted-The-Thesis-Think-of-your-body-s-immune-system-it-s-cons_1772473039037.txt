@@ -1,0 +1,19 @@
+The Thesis
+Think of your body's immune system — it's constantly monitoring, detecting threats, neutralizing small issues before they escalate, and escalating to your conscious attention only when something needs a real decision. That's Dragonfly. An always-on immune system for the enterprise, with risk at the center of a connected ecosystem that spans audit, compliance, and cybersecurity.
+Today, these disciplines live in silos. Risk runs assessments. Audit collects evidence. Cyber monitors threats. Compliance tracks frameworks. Each produces its own reports on its own timeline. By the time anyone synthesizes the picture, the information is stale and too late to act on. Traditional ERM is an academic exercise — months of work, enormous cost, and a report that's already outdated when it lands.
+Dragonfly asks: what if the process itself changed? Assessments, audit findings, cyber signals, compliance data, KRI metrics — these are all inputs into a single living system. Dragonfly weaves them together in real time, quantifies them in dollars, and proposes actions. The human's job shifts from data gathering to decision-making.
+Risk can be real-time. Risk can be practical. Risk can be opportunistic. Risk is for taking action, being bold, and reaching more of your business goals faster than you ever imagined. Our mission is turn risk into opportunity — Dragonfly is what that looks like as a product.
+The ecosystem model
+Risk is the hub. Audit, compliance, and cybersecurity are connected spokes. But every company organizes differently — so Dragonfly lets you customize the walled gardens. You decide which parts of the ecosystem talk to which. Each team gets their own lens on the same universe of data. The system trains on your company's taxonomy, policies, appetite, and history. It's not a generic model — it speaks your language, respects your thresholds, and learns from your decisions over time.
+Where does the human belong?
+Every step in the user journey falls into one of three tiers. A key sprint activity is mapping the journey and deciding which tier applies at each point:
+
+Automate: The system handles it — ingesting signals, collecting evidence, running samples, quantifying risks, drafting proposals, generating scenarios
+Human-in-the-loop: The system does the work, the human reviews before it takes effect — accepting/rejecting proposals, adjusting parameters, tuning permissions
+Human-only: Full human judgment — final sign-off on material decisions, executive alignment, setting organizational risk appetite
+How Dragonfly replaces the Big 4
+Companies hire the Big 4 for three things. Dragonfly addresses all three:
+
+"Help us use our software" — Dragonfly is opinionated, not just a tool. It guides you through how to run your program, not just where to click.
+"Give us strategic expertise" — The agent provides the strategic thinking: quantified options, trade-off analysis, recommended paths. The trust comes from transparency — every recommendation shows its evidence and reasoning.
+"Do the grunt work" — Evidence collection, sampling, annotation, control testing, report generation. This is where automation hits hardest. Every persona — exec, manager, analyst — gets the tedious parts of their job automated so they can focus on review and decisions.
