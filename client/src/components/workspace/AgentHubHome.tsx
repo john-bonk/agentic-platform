@@ -77,30 +77,29 @@ function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
       data-testid={`workflow-card-${workflow.id}`}
     >
       <div
-        className="px-4 py-2.5 flex items-center gap-3 cursor-pointer"
+        className="px-4 py-2.5 cursor-pointer grid items-center gap-3"
+        style={{ gridTemplateColumns: "auto 1fr 5.5rem 9.5rem 1.75rem" }}
         onClick={() => setExpanded(!expanded)}
         data-testid={`workflow-toggle-${workflow.id}`}
       >
         <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground shrink-0 transition-transform ${expanded ? "rotate-180" : "-rotate-90"}`} />
-        <h4 className="text-sm font-medium text-foreground flex-1 min-w-0 truncate">{workflow.name}</h4>
+        <h4 className="text-sm font-medium text-foreground min-w-0 truncate">{workflow.name}</h4>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="w-[5.5rem] shrink-0">
-            <StatusBadge status={workflow.status} />
-          </div>
+        <StatusBadge status={workflow.status} />
 
-          <div className="w-[9.5rem] shrink-0">
-            {workflow.status === "active" && workflow.progress < 100 ? (
-              <div className="flex items-center gap-2">
-                <ProgressBar value={workflow.progress} />
-                <span className="text-xs text-muted-foreground font-medium w-8 text-right">{workflow.progress}%</span>
-              </div>
-            ) : null}
-          </div>
+        <div>
+          {workflow.status === "active" && workflow.progress < 100 ? (
+            <div className="flex items-center gap-2">
+              <ProgressBar value={workflow.progress} />
+              <span className="text-xs text-muted-foreground font-medium w-8 text-right">{workflow.progress}%</span>
+            </div>
+          ) : null}
+        </div>
 
-          {workflow.humanActionNeeded && (
+        <div className="flex items-center justify-center">
+          {workflow.humanActionNeeded ? (
             <button
-              className="shrink-0 w-7 h-7 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              className="w-7 h-7 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
               aria-label="Review workflow"
               title="Review"
               data-testid={`button-review-${workflow.id}`}
@@ -108,7 +107,7 @@ function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
             >
               <Eye className="w-3.5 h-3.5 text-[#266C92]" />
             </button>
-          )}
+          ) : null}
         </div>
       </div>
 
