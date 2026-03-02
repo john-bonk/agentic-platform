@@ -30,11 +30,21 @@ import {
 import { AgentHubHome } from "@/components/workspace/AgentHubHome";
 import { isAgentHubSupported } from "@/config/agentHubConfig";
 import { useSettings } from "@/components/settings-panel";
+import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 
 export default function HomePage() {
   const { currentWorkspace, refreshKey, userPersona } = useWorkspaceStore();
   const [, setLocation] = useLocation();
   const settings = useSettings();
+  const { setOpen: setAssistantOpen } = useHomeAssistantStore();
+
+  const isAgentHub = settings.agentHubEnabled && isAgentHubSupported(currentWorkspace.id);
+
+  useEffect(() => {
+    if (isAgentHub) {
+      setAssistantOpen(true);
+    }
+  }, [isAgentHub, setAssistantOpen]);
   
   useEffect(() => {
     if (currentWorkspace.isCustom) {
@@ -56,7 +66,7 @@ export default function HomePage() {
   };
   const welcomeMessage = getWelcomeMessage();
 
-  if (settings.agentHubEnabled && isAgentHubSupported(currentWorkspace.id)) {
+  if (isAgentHub) {
     return (
       <AppLayout showHeader={true} showSideNav={true}>
         <AgentHubHome

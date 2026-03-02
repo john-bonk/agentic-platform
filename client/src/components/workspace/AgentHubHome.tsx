@@ -1,10 +1,8 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
-  Sparkles,
   ChevronDown,
   Zap,
   Activity,
@@ -17,10 +15,8 @@ import {
   Bot,
   ArrowRight,
   CircleDot,
-  Send,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
-import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 import {
   getAgentHubData,
   type AgentCategory,
@@ -59,7 +55,7 @@ function StatusBadge({ status }: { status: AgentStatus }) {
 
 function ProgressBar({ value }: { value: number }) {
   return (
-    <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+    <div className="w-24 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
       <div
         className="h-full rounded-full transition-all bg-[#266C92]"
         style={{ width: `${value}%` }}
@@ -69,6 +65,8 @@ function ProgressBar({ value }: { value: number }) {
 }
 
 function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <div
       className={`border rounded-lg bg-white dark:bg-card transition-all ${
@@ -78,14 +76,42 @@ function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
       }`}
       data-testid={`workflow-card-${workflow.id}`}
     >
-      <div className="px-5 py-4">
-        <div className="flex items-start gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-1.5">
-              <h4 className="text-sm font-semibold text-foreground">{workflow.name}</h4>
-              <StatusBadge status={workflow.status} />
+      <div
+        className="px-4 py-3 flex items-center gap-3 cursor-pointer"
+        onClick={() => setExpanded(!expanded)}
+        data-testid={`workflow-toggle-${workflow.id}`}
+      >
+        <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground shrink-0 transition-transform ${expanded ? "rotate-180" : "-rotate-90"}`} />
+        <h4 className="text-sm font-medium text-foreground flex-1 min-w-0 truncate">{workflow.name}</h4>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <StatusBadge status={workflow.status} />
+
+          {workflow.status === "active" && workflow.progress < 100 && (
+            <div className="flex items-center gap-2">
+              <ProgressBar value={workflow.progress} />
+              <span className="text-xs text-muted-foreground font-medium w-8 text-right">{workflow.progress}%</span>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">{workflow.description}</p>
+          )}
+
+          {workflow.humanActionNeeded && (
+            <Button
+              size="sm"
+              className="shrink-0 bg-[#266C92] hover:bg-[#1e5a7a] text-white text-xs h-7 px-3"
+              data-testid={`button-review-${workflow.id}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Eye className="w-3 h-3 mr-1" />
+              Review
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="px-4 pb-3 pt-0 border-t border-slate-100 dark:border-border">
+          <div className="pt-3 space-y-2.5">
+            <p className="text-sm text-muted-foreground">{workflow.description}</p>
 
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <div className="flex items-center gap-1.5">
@@ -98,37 +124,16 @@ function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
               </div>
               <span>{workflow.relatedItemsCount} related items</span>
             </div>
-          </div>
 
-          {workflow.status === "active" && workflow.progress < 100 && (
-            <div className="w-32 shrink-0 pt-1">
-              <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                <span>Progress</span>
-                <span className="font-medium">{workflow.progress}%</span>
+            {workflow.humanActionNeeded && workflow.humanActionDescription && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-[#266C92]/5 dark:bg-[#266C92]/10 rounded border border-[#266C92]/15 dark:border-[#266C92]/20">
+                <Eye className="w-3.5 h-3.5 text-[#266C92] shrink-0" />
+                <p className="text-xs text-[#266C92] dark:text-[#4da3c9]">{workflow.humanActionDescription}</p>
               </div>
-              <ProgressBar value={workflow.progress} />
-            </div>
-          )}
-
-          {workflow.humanActionNeeded && (
-            <Button
-              size="sm"
-              className="shrink-0 bg-[#266C92] hover:bg-[#1e5a7a] text-white text-xs h-8"
-              data-testid={`button-review-${workflow.id}`}
-            >
-              <Eye className="w-3.5 h-3.5 mr-1.5" />
-              Review
-            </Button>
-          )}
-        </div>
-
-        {workflow.humanActionNeeded && workflow.humanActionDescription && (
-          <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-[#266C92]/5 dark:bg-[#266C92]/10 rounded border border-[#266C92]/15 dark:border-[#266C92]/20">
-            <Eye className="w-3.5 h-3.5 text-[#266C92] shrink-0" />
-            <p className="text-xs text-[#266C92] dark:text-[#4da3c9]">{workflow.humanActionDescription}</p>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -143,14 +148,14 @@ function CategorySection({ category, sectionRef }: CategorySectionProps) {
   const Icon = categoryIcons[category.category];
 
   return (
-    <div ref={sectionRef} className="space-y-3" data-testid={`category-section-${category.category}`}>
+    <div ref={sectionRef} className="space-y-2" data-testid={`category-section-${category.category}`}>
       <button
         className="flex items-center gap-3 w-full group cursor-pointer"
         onClick={() => setExpanded(!expanded)}
         data-testid={`category-toggle-${category.category}`}
       >
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${category.iconBg}`}>
-          <Icon className={`w-4 h-4 ${category.color}`} />
+        <div className={`w-7 h-7 rounded-md flex items-center justify-center ${category.iconBg}`}>
+          <Icon className={`w-3.5 h-3.5 ${category.color}`} />
         </div>
         <div className="flex-1 text-left">
           <div className="flex items-center gap-2">
@@ -162,13 +167,12 @@ function CategorySection({ category, sectionRef }: CategorySectionProps) {
               )}
             </span>
           </div>
-          <p className="text-xs text-muted-foreground">{category.description}</p>
         </div>
         <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`} />
       </button>
 
       {expanded && (
-        <div className="space-y-2 pl-11">
+        <div className="space-y-1.5 pl-10">
           {category.workflows.map((wf) => (
             <WorkflowRow key={wf.id} workflow={wf} />
           ))}
@@ -180,44 +184,38 @@ function CategorySection({ category, sectionRef }: CategorySectionProps) {
 
 function ActivityFeed({ entries }: { entries: AgentActivityEntry[] }) {
   return (
-    <Card className="border border-slate-200 dark:border-border" data-testid="activity-feed">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+    <div className="flex flex-col border border-slate-200 dark:border-border rounded-lg bg-white dark:bg-card overflow-hidden" data-testid="activity-feed">
+      <div className="px-4 py-3 border-b border-slate-100 dark:border-border shrink-0">
+        <h3 className="text-sm font-semibold flex items-center gap-2">
           <Activity className="w-4 h-4 text-muted-foreground" />
           Agent Activity
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="max-h-[400px] overflow-y-auto divide-y divide-slate-100 dark:divide-border">
-          {entries.map((entry) => (
-            <div
-              key={entry.id}
-              className={`px-4 py-3 border-l-2 ${
-                entry.type === "action-needed"
-                  ? "border-l-[#266C92]"
-                  : "border-l-slate-300 dark:border-l-slate-600"
-              }`}
-              data-testid={`activity-entry-${entry.id}`}
-            >
-              <div className="flex items-start gap-2">
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-foreground">{entry.message}</p>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                    <Bot className="w-3 h-3" />
-                    <span>{entry.agentName}</span>
-                    <span>·</span>
-                    <span>{entry.timestamp}</span>
-                  </div>
-                </div>
-                {entry.type === "action-needed" && (
-                  <Badge className="text-xs bg-[#266C92] hover:bg-[#266C92] text-white shrink-0">Action Needed</Badge>
-                )}
-              </div>
+        </h3>
+      </div>
+      <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-border">
+        {entries.map((entry) => (
+          <div
+            key={entry.id}
+            className={`px-4 py-2.5 border-l-2 ${
+              entry.type === "action-needed"
+                ? "border-l-[#266C92]"
+                : "border-l-slate-300 dark:border-l-slate-600"
+            }`}
+            data-testid={`activity-entry-${entry.id}`}
+          >
+            <p className="text-xs text-foreground leading-relaxed">{entry.message}</p>
+            <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+              <Bot className="w-3 h-3" />
+              <span>{entry.agentName}</span>
+              <span>·</span>
+              <span>{entry.timestamp}</span>
+              {entry.type === "action-needed" && (
+                <Badge className="text-[10px] h-4 bg-[#266C92] hover:bg-[#266C92] text-white ml-auto">Action Needed</Badge>
+              )}
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -228,26 +226,28 @@ interface AgentHubHomeProps {
 
 export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps) {
   const hubData = useMemo(() => getAgentHubData(workspaceId), [workspaceId]);
-  const { setOpen: setAssistantOpen } = useHomeAssistantStore();
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const scrollToCategory = (categoryId: string) => {
+  const scrollToCategory = useCallback((categoryId: string) => {
     const el = sectionRefs.current[categoryId];
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (el && scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const elTop = el.offsetTop - container.offsetTop;
+      container.scrollTo({ top: elTop, behavior: "smooth" });
     }
-  };
+  }, []);
 
   if (!hubData) return null;
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
+    <div className="flex flex-col h-full overflow-hidden">
       <div
-        className="text-white px-8 pt-6 pb-36 bg-cover bg-center bg-no-repeat relative"
+        className="text-white px-8 pt-5 pb-8 bg-cover bg-center bg-no-repeat relative shrink-0"
         style={{ backgroundImage: `url(${headerBgImage})` }}
       >
         <div className="max-w-6xl relative z-10">
-          <h1 className="text-2xl font-semibold mb-1" data-testid="agent-hub-welcome">
+          <h1 className="text-xl font-semibold mb-0.5" data-testid="agent-hub-welcome">
             {welcomeMessage}
           </h1>
           <p className="text-sm text-white/70">
@@ -256,35 +256,8 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
         </div>
       </div>
 
-      <div className="flex-1 bg-slate-50 dark:bg-background px-8 py-6 -mt-28 relative z-10">
-        <div className="max-w-6xl mx-auto space-y-6">
-          <Card className="shadow-md border border-slate-200 dark:border-border bg-white dark:bg-card" data-testid="orchestrator-input">
-            <CardContent className="p-5">
-              <h2 className="text-base font-semibold text-foreground text-center mb-3">
-                What should we work on?
-              </h2>
-              <div className="flex items-center gap-3 max-w-2xl mx-auto">
-                <div className="relative flex-1">
-                  <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-muted-foreground" />
-                  <Input
-                    placeholder="Ask Optro Assistant to run an assessment, generate a report, analyze a risk..."
-                    className="pl-10 h-10 bg-slate-50 dark:bg-muted border-slate-200 dark:border-border"
-                    data-testid="input-orchestrator"
-                    onFocus={() => setAssistantOpen(true)}
-                  />
-                </div>
-                <Button
-                  className="bg-[#266C92] hover:bg-[#1e5a7a] text-white px-5"
-                  data-testid="button-orchestrator-send"
-                  onClick={() => setAssistantOpen(true)}
-                >
-                  <Send className="w-4 h-4 mr-2" />
-                  Send
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
+      <div className="shrink-0 bg-slate-50 dark:bg-background px-8 pt-4 pb-3">
+        <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" data-testid="category-summary-bar">
             {hubData.categories.map((cat) => {
               const Icon = categoryIcons[cat.category];
@@ -295,9 +268,9 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
                   onClick={() => scrollToCategory(cat.category)}
                   data-testid={`category-stat-${cat.category}`}
                 >
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${cat.iconBg}`}>
-                      <Icon className={`w-5 h-5 ${cat.color}`} />
+                  <CardContent className="p-3 flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${cat.iconBg}`}>
+                      <Icon className={`w-4 h-4 ${cat.color}`} />
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground font-medium">{cat.label}</p>
@@ -317,9 +290,16 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
               );
             })}
           </div>
+        </div>
+      </div>
 
-          <div className="grid lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
+      <div className="flex-1 min-h-0 bg-slate-50 dark:bg-background px-8 pb-4">
+        <div className="max-w-6xl mx-auto h-full">
+          <div className="grid lg:grid-cols-3 gap-5 h-full">
+            <div
+              ref={scrollContainerRef}
+              className="lg:col-span-2 overflow-y-auto space-y-5 pr-1"
+            >
               {hubData.categories.map((cat) => (
                 <CategorySection
                   key={cat.category}
@@ -329,12 +309,12 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
               ))}
             </div>
 
-            <div className="space-y-4">
-              <Card className="border border-slate-200 dark:border-border" data-testid="hub-overview">
-                <CardHeader className="pb-2">
+            <div className="flex flex-col gap-4 min-h-0 overflow-hidden">
+              <Card className="border border-slate-200 dark:border-border shrink-0" data-testid="hub-overview">
+                <CardHeader className="pb-2 pt-3 px-4">
                   <CardTitle className="text-sm font-semibold">Orchestrator Overview</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="px-4 pb-3 space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Total Agents</span>
                     <span className="font-semibold">{hubData.totalAgents}</span>
@@ -361,7 +341,9 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
                 </CardContent>
               </Card>
 
-              <ActivityFeed entries={hubData.activityFeed} />
+              <div className="flex-1 min-h-0">
+                <ActivityFeed entries={hubData.activityFeed} />
+              </div>
             </div>
           </div>
         </div>
