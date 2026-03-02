@@ -48,7 +48,7 @@ Preferred communication style: Simple, everyday language.
 
 **Key Features**:
 -   **Dynamic Inbox Tab Content System**: Configurable `HomePageContent.tsx` to display workspace-specific data across multiple tabs (Tasks, Issues, Controls, Narratives, Risks, Comments) with dynamic charts, overview cards, and list renders.
--   **Agent Hub System**: Config-driven agent workflow management (`client/src/config/agentHubConfig.ts`) for specific workspaces, enabling an "Agent Hub Mode" with an "Optro Assistant."
+-   **Agent Hub System**: A toggle in Prototype Settings (`agentHubEnabled`) replaces the Home page with an agent-centric experience for supported workspaces. Config-driven via `client/src/config/agentHubConfig.ts`, which exports typed workflow data per workspace. Component: `client/src/components/workspace/AgentHubHome.tsx`. Currently supports `enterprise-risk` with 12 agent workflows across 4 categories (Direct Action, Continuous, Scheduled, Emergent). To add a new workspace: add workflow/activity arrays to the config, add a case to `getAgentHubData()`, and add the workspace id to `isAgentHubSupported()`. When enabled, the assistant is branded "Optro Assistant" across all surfaces (AppHeader, HomeAssistantPanel, HomePageContent, DefaultHomeDashboard, ReportingPage). The assistant panel auto-opens on the Agent Hub home page via `useHomeAssistantStore`.
 -   **AI Governance Page**: A dedicated page (`client/src/pages/AIGovernancePage.tsx`) integrated into the IT Security workspace, mirroring a professional AI governance dashboard with metrics, charts, and tables.
 
 ## Backend Architecture

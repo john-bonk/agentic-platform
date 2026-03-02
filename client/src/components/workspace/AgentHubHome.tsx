@@ -77,7 +77,7 @@ function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
       data-testid={`workflow-card-${workflow.id}`}
     >
       <div
-        className="px-4 py-3 flex items-center gap-3 cursor-pointer"
+        className="px-4 py-2.5 flex items-center gap-3 cursor-pointer"
         onClick={() => setExpanded(!expanded)}
         data-testid={`workflow-toggle-${workflow.id}`}
       >
@@ -95,15 +95,15 @@ function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
           )}
 
           {workflow.humanActionNeeded && (
-            <Button
-              size="sm"
-              className="shrink-0 bg-[#266C92] hover:bg-[#1e5a7a] text-white text-xs h-7 px-3"
+            <button
+              className="shrink-0 w-7 h-7 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              aria-label="Review workflow"
+              title="Review"
               data-testid={`button-review-${workflow.id}`}
               onClick={(e) => e.stopPropagation()}
             >
-              <Eye className="w-3 h-3 mr-1" />
-              Review
-            </Button>
+              <Eye className="w-3.5 h-3.5 text-[#266C92]" />
+            </button>
           )}
         </div>
       </div>
@@ -172,7 +172,7 @@ function CategorySection({ category, sectionRef }: CategorySectionProps) {
       </button>
 
       {expanded && (
-        <div className="space-y-1.5 pl-10">
+        <div className="space-y-1.5">
           {category.workflows.map((wf) => (
             <WorkflowRow key={wf.id} workflow={wf} />
           ))}
@@ -184,14 +184,14 @@ function CategorySection({ category, sectionRef }: CategorySectionProps) {
 
 function ActivityFeed({ entries }: { entries: AgentActivityEntry[] }) {
   return (
-    <div className="flex flex-col border border-slate-200 dark:border-border rounded-lg bg-white dark:bg-card overflow-hidden" data-testid="activity-feed">
-      <div className="px-4 py-3 border-b border-slate-100 dark:border-border shrink-0">
+    <div className="flex flex-col h-full border border-slate-200 dark:border-border rounded-lg bg-white dark:bg-card overflow-hidden" data-testid="activity-feed">
+      <div className="px-4 py-2.5 border-b border-slate-100 dark:border-border shrink-0">
         <h3 className="text-sm font-semibold flex items-center gap-2">
           <Activity className="w-4 h-4 text-muted-foreground" />
           Agent Activity
         </h3>
       </div>
-      <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-border">
+      <div className="flex-1 min-h-0 overflow-y-auto divide-y divide-slate-100 dark:divide-border">
         {entries.map((entry) => (
           <div
             key={entry.id}
@@ -243,20 +243,20 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div
-        className="text-white px-8 pt-5 pb-8 bg-cover bg-center bg-no-repeat relative shrink-0"
+        className="text-white px-8 py-3 bg-cover bg-center bg-no-repeat relative shrink-0"
         style={{ backgroundImage: `url(${headerBgImage})` }}
       >
-        <div className="max-w-6xl relative z-10">
-          <h1 className="text-xl font-semibold mb-0.5" data-testid="agent-hub-welcome">
+        <div className="max-w-6xl relative z-10 flex items-center justify-between gap-4 flex-wrap">
+          <h1 className="text-lg font-semibold truncate min-w-0" data-testid="agent-hub-welcome">
             {welcomeMessage}
           </h1>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-white/70 shrink-0">
             {hubData.activeAgents} agents active · {hubData.pendingReview} awaiting your review
           </p>
         </div>
       </div>
 
-      <div className="shrink-0 bg-slate-50 dark:bg-background px-8 pt-4 pb-3">
+      <div className="shrink-0 bg-slate-50 dark:bg-background px-8 pt-3 pb-3">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" data-testid="category-summary-bar">
             {hubData.categories.map((cat) => {
@@ -309,7 +309,7 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
               ))}
             </div>
 
-            <div className="flex flex-col gap-4 min-h-0 overflow-hidden">
+            <div className="flex flex-col gap-3 min-h-0 overflow-hidden">
               <Card className="border border-slate-200 dark:border-border shrink-0" data-testid="hub-overview">
                 <CardHeader className="pb-2 pt-3 px-4">
                   <CardTitle className="text-sm font-semibold">Orchestrator Overview</CardTitle>
@@ -341,7 +341,7 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
                 </CardContent>
               </Card>
 
-              <div className="flex-1 min-h-0">
+              <div className="flex-1 min-h-0 overflow-hidden">
                 <ActivityFeed entries={hubData.activityFeed} />
               </div>
             </div>

@@ -271,7 +271,7 @@ const enterpriseRiskActivity: AgentActivityEntry[] = [
 
 const categoryMeta: Record<AgentCategory, { label: string; description: string; color: string; iconBg: string }> = {
   "direct-realtime": {
-    label: "Direct / Real-time",
+    label: "Direct Action",
     description: "On-demand actions — ask the orchestrator and agents execute immediately",
     color: "text-[#266C92] dark:text-[#4da3c9]",
     iconBg: "bg-[#266C92]/10 dark:bg-[#266C92]/20",
