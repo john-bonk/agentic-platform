@@ -273,26 +273,26 @@ const categoryMeta: Record<AgentCategory, { label: string; description: string; 
   "direct-realtime": {
     label: "Direct / Real-time",
     description: "On-demand actions — ask the orchestrator and agents execute immediately",
-    color: "text-blue-600 dark:text-blue-400",
-    iconBg: "bg-blue-100 dark:bg-blue-950",
+    color: "text-[#266C92] dark:text-[#4da3c9]",
+    iconBg: "bg-[#266C92]/10 dark:bg-[#266C92]/20",
   },
   continuous: {
     label: "Continuous",
     description: "Always-on monitoring and ingestion — the enterprise immune system",
-    color: "text-emerald-600 dark:text-emerald-400",
-    iconBg: "bg-emerald-100 dark:bg-emerald-950",
+    color: "text-[#266C92] dark:text-[#4da3c9]",
+    iconBg: "bg-[#266C92]/10 dark:bg-[#266C92]/20",
   },
   scheduled: {
     label: "Scheduled",
     description: "Calendar-based workflows that run on defined cadences",
-    color: "text-amber-600 dark:text-amber-400",
-    iconBg: "bg-amber-100 dark:bg-amber-950",
+    color: "text-[#1a2332] dark:text-slate-300",
+    iconBg: "bg-[#1a2332]/10 dark:bg-slate-700/40",
   },
   emergent: {
     label: "Emergent",
     description: "Real-time responses triggered by changing signals and system parameters",
-    color: "text-rose-600 dark:text-rose-400",
-    iconBg: "bg-rose-100 dark:bg-rose-950",
+    color: "text-[#1a2332] dark:text-slate-300",
+    iconBg: "bg-[#1a2332]/10 dark:bg-slate-700/40",
   },
 };
 

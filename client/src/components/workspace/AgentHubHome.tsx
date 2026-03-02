@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,11 +37,11 @@ const categoryIcons: Record<AgentCategory, typeof Zap> = {
   emergent: AlertTriangle,
 };
 
-const statusConfig: Record<AgentStatus, { label: string; variant: "default" | "secondary" | "outline" | "destructive"; className: string }> = {
-  active: { label: "Active", variant: "default", className: "bg-emerald-600 hover:bg-emerald-600 text-white" },
-  idle: { label: "Idle", variant: "secondary", className: "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300" },
-  "pending-review": { label: "Pending Review", variant: "default", className: "bg-amber-500 hover:bg-amber-500 text-white" },
-  completed: { label: "Completed", variant: "default", className: "bg-blue-600 hover:bg-blue-600 text-white" },
+const statusConfig: Record<AgentStatus, { label: string; className: string }> = {
+  active: { label: "Active", className: "bg-[#266C92] hover:bg-[#266C92] text-white" },
+  idle: { label: "Idle", className: "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300" },
+  "pending-review": { label: "Pending Review", className: "bg-[#1a2332] hover:bg-[#1a2332] text-white dark:bg-slate-600" },
+  completed: { label: "Completed", className: "bg-[#266C92]/70 hover:bg-[#266C92]/70 text-white" },
 };
 
 function StatusBadge({ status }: { status: AgentStatus }) {
@@ -57,94 +57,93 @@ function StatusBadge({ status }: { status: AgentStatus }) {
   );
 }
 
-function ProgressBar({ value, category }: { value: number; category: AgentCategory }) {
-  const colorMap: Record<AgentCategory, string> = {
-    "direct-realtime": "bg-blue-500",
-    continuous: "bg-emerald-500",
-    scheduled: "bg-amber-500",
-    emergent: "bg-rose-500",
-  };
+function ProgressBar({ value }: { value: number }) {
   return (
     <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
       <div
-        className={`h-full rounded-full transition-all ${colorMap[category]}`}
+        className="h-full rounded-full transition-all bg-[#266C92]"
         style={{ width: `${value}%` }}
       />
     </div>
   );
 }
 
-function WorkflowCard({ workflow }: { workflow: AgentWorkflow }) {
+function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
   return (
-    <Card
-      className={`border transition-all ${
+    <div
+      className={`border rounded-lg bg-white dark:bg-card transition-all ${
         workflow.humanActionNeeded
-          ? "border-amber-300 dark:border-amber-600 shadow-sm shadow-amber-100 dark:shadow-amber-950"
+          ? "border-[#266C92]/40 dark:border-[#266C92]/50"
           : "border-slate-200 dark:border-border"
       }`}
       data-testid={`workflow-card-${workflow.id}`}
     >
-      <CardContent className="p-4 space-y-3">
-        <div className="flex items-start justify-between gap-3">
+      <div className="px-5 py-4">
+        <div className="flex items-start gap-4">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h4 className="text-sm font-semibold text-foreground truncate">{workflow.name}</h4>
+            <div className="flex items-center gap-3 mb-1.5">
+              <h4 className="text-sm font-semibold text-foreground">{workflow.name}</h4>
               <StatusBadge status={workflow.status} />
             </div>
-            <p className="text-xs text-muted-foreground line-clamp-2">{workflow.description}</p>
-          </div>
-        </div>
+            <p className="text-sm text-muted-foreground mb-3">{workflow.description}</p>
 
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Bot className="w-3 h-3" />
-            <span className="font-medium">{workflow.agentName}</span>
-          </div>
-          <span>·</span>
-          <div className="flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            <span>{workflow.lastActivity}</span>
-          </div>
-          <span>·</span>
-          <span>{workflow.relatedItemsCount} items</span>
-        </div>
-
-        {workflow.status === "active" && workflow.progress < 100 && (
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Progress</span>
-              <span>{workflow.progress}%</span>
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <Bot className="w-3.5 h-3.5" />
+                <span className="font-medium">{workflow.agentName}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                <span>{workflow.lastActivity}</span>
+              </div>
+              <span>{workflow.relatedItemsCount} related items</span>
             </div>
-            <ProgressBar value={workflow.progress} category={workflow.category} />
           </div>
-        )}
 
-        {workflow.humanActionNeeded && workflow.humanActionDescription && (
-          <div className="flex items-start gap-2 p-2.5 bg-amber-50 dark:bg-amber-950/40 rounded-md border border-amber-200 dark:border-amber-800">
-            <Eye className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-amber-800 dark:text-amber-300">{workflow.humanActionDescription}</p>
+          {workflow.status === "active" && workflow.progress < 100 && (
+            <div className="w-32 shrink-0 pt-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                <span>Progress</span>
+                <span className="font-medium">{workflow.progress}%</span>
+              </div>
+              <ProgressBar value={workflow.progress} />
             </div>
+          )}
+
+          {workflow.humanActionNeeded && (
             <Button
               size="sm"
-              className="h-6 px-2 text-xs bg-amber-600 hover:bg-amber-700 text-white shrink-0"
+              className="shrink-0 bg-[#266C92] hover:bg-[#1e5a7a] text-white text-xs h-8"
               data-testid={`button-review-${workflow.id}`}
             >
+              <Eye className="w-3.5 h-3.5 mr-1.5" />
               Review
             </Button>
+          )}
+        </div>
+
+        {workflow.humanActionNeeded && workflow.humanActionDescription && (
+          <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-[#266C92]/5 dark:bg-[#266C92]/10 rounded border border-[#266C92]/15 dark:border-[#266C92]/20">
+            <Eye className="w-3.5 h-3.5 text-[#266C92] shrink-0" />
+            <p className="text-xs text-[#266C92] dark:text-[#4da3c9]">{workflow.humanActionDescription}</p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
-function CategorySection({ category }: { category: AgentCategorySummary }) {
+interface CategorySectionProps {
+  category: AgentCategorySummary;
+  sectionRef: (el: HTMLDivElement | null) => void;
+}
+
+function CategorySection({ category, sectionRef }: CategorySectionProps) {
   const [expanded, setExpanded] = useState(true);
   const Icon = categoryIcons[category.category];
 
   return (
-    <div className="space-y-3" data-testid={`category-section-${category.category}`}>
+    <div ref={sectionRef} className="space-y-3" data-testid={`category-section-${category.category}`}>
       <button
         className="flex items-center gap-3 w-full group cursor-pointer"
         onClick={() => setExpanded(!expanded)}
@@ -159,7 +158,7 @@ function CategorySection({ category }: { category: AgentCategorySummary }) {
             <span className="text-xs text-muted-foreground">
               {category.activeCount} active
               {category.pendingCount > 0 && (
-                <span className="text-amber-600 dark:text-amber-400 ml-1">· {category.pendingCount} need review</span>
+                <span className="text-[#266C92] dark:text-[#4da3c9] ml-1">· {category.pendingCount} need review</span>
               )}
             </span>
           </div>
@@ -169,9 +168,9 @@ function CategorySection({ category }: { category: AgentCategorySummary }) {
       </button>
 
       {expanded && (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 pl-11">
+        <div className="space-y-2 pl-11">
           {category.workflows.map((wf) => (
-            <WorkflowCard key={wf.id} workflow={wf} />
+            <WorkflowRow key={wf.id} workflow={wf} />
           ))}
         </div>
       )}
@@ -180,13 +179,6 @@ function CategorySection({ category }: { category: AgentCategorySummary }) {
 }
 
 function ActivityFeed({ entries }: { entries: AgentActivityEntry[] }) {
-  const typeStyles: Record<string, string> = {
-    info: "border-l-blue-400",
-    warning: "border-l-amber-400",
-    success: "border-l-emerald-400",
-    "action-needed": "border-l-rose-400",
-  };
-
   return (
     <Card className="border border-slate-200 dark:border-border" data-testid="activity-feed">
       <CardHeader className="pb-3">
@@ -200,7 +192,11 @@ function ActivityFeed({ entries }: { entries: AgentActivityEntry[] }) {
           {entries.map((entry) => (
             <div
               key={entry.id}
-              className={`px-4 py-3 border-l-2 ${typeStyles[entry.type] || "border-l-gray-300"}`}
+              className={`px-4 py-3 border-l-2 ${
+                entry.type === "action-needed"
+                  ? "border-l-[#266C92]"
+                  : "border-l-slate-300 dark:border-l-slate-600"
+              }`}
               data-testid={`activity-entry-${entry.id}`}
             >
               <div className="flex items-start gap-2">
@@ -214,7 +210,7 @@ function ActivityFeed({ entries }: { entries: AgentActivityEntry[] }) {
                   </div>
                 </div>
                 {entry.type === "action-needed" && (
-                  <Badge className="text-xs bg-amber-500 hover:bg-amber-500 text-white shrink-0">Action Needed</Badge>
+                  <Badge className="text-xs bg-[#266C92] hover:bg-[#266C92] text-white shrink-0">Action Needed</Badge>
                 )}
               </div>
             </div>
@@ -233,6 +229,14 @@ interface AgentHubHomeProps {
 export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps) {
   const hubData = useMemo(() => getAgentHubData(workspaceId), [workspaceId]);
   const { setOpen: setAssistantOpen } = useHomeAssistantStore();
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const scrollToCategory = (categoryId: string) => {
+    const el = sectionRefs.current[categoryId];
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   if (!hubData) return null;
 
@@ -243,10 +247,6 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
         style={{ backgroundImage: `url(${headerBgImage})` }}
       >
         <div className="max-w-6xl relative z-10">
-          <div className="flex items-center gap-2 mb-1">
-            <Sparkles className="w-5 h-5 text-white/90" />
-            <span className="text-sm font-medium text-white/80 uppercase tracking-wider">Optro Assistant</span>
-          </div>
           <h1 className="text-2xl font-semibold mb-1" data-testid="agent-hub-welcome">
             {welcomeMessage}
           </h1>
@@ -291,7 +291,8 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
               return (
                 <Card
                   key={cat.category}
-                  className="border border-slate-200 dark:border-border hover:shadow-sm transition-shadow cursor-default"
+                  className="border border-slate-200 dark:border-border hover:shadow-sm transition-shadow cursor-pointer"
+                  onClick={() => scrollToCategory(cat.category)}
                   data-testid={`category-stat-${cat.category}`}
                 >
                   <CardContent className="p-4 flex items-center gap-3">
@@ -304,7 +305,7 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
                         <span className="text-lg font-bold text-foreground">{cat.activeCount}</span>
                         <span className="text-xs text-muted-foreground">active</span>
                         {cat.pendingCount > 0 && (
-                          <Badge className="text-xs bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800" variant="outline">
+                          <Badge className="text-xs bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9] border-[#266C92]/20" variant="outline">
                             {cat.pendingCount}
                             <Eye className="w-3 h-3 ml-1" />
                           </Badge>
@@ -320,7 +321,11 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               {hubData.categories.map((cat) => (
-                <CategorySection key={cat.category} category={cat} />
+                <CategorySection
+                  key={cat.category}
+                  category={cat}
+                  sectionRef={(el) => { sectionRefs.current[cat.category] = el; }}
+                />
               ))}
             </div>
 
@@ -336,11 +341,11 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Active Now</span>
-                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">{hubData.activeAgents}</span>
+                    <span className="font-semibold text-[#266C92]">{hubData.activeAgents}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Pending Review</span>
-                    <span className="font-semibold text-amber-600 dark:text-amber-400">{hubData.pendingReview}</span>
+                    <span className="font-semibold text-[#1a2332] dark:text-slate-300">{hubData.pendingReview}</span>
                   </div>
                   <div className="pt-2 border-t border-slate-100 dark:border-border">
                     <Button
