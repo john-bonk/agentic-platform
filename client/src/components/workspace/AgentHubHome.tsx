@@ -3,6 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
   ChevronDown,
   Zap,
   Activity,
@@ -15,6 +24,8 @@ import {
   Bot,
   ArrowRight,
   CircleDot,
+  FileText,
+  AlertCircle,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -31,6 +42,13 @@ const categoryIcons: Record<AgentCategory, typeof Zap> = {
   continuous: Activity,
   scheduled: CalendarClock,
   emergent: AlertTriangle,
+};
+
+const categoryLabels: Record<AgentCategory, string> = {
+  "direct-realtime": "Direct Action",
+  continuous: "Continuous",
+  scheduled: "Scheduled",
+  emergent: "Emergent",
 };
 
 const statusConfig: Record<AgentStatus, { label: string; className: string }> = {
@@ -64,80 +82,173 @@ function ProgressBar({ value }: { value: number }) {
   );
 }
 
-function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
-  const [expanded, setExpanded] = useState(false);
+function ReviewDialog({ workflow, open, onClose }: { workflow: AgentWorkflow; open: boolean; onClose: () => void }) {
+  const CatIcon = categoryIcons[workflow.category];
 
   return (
-    <div
-      className={`border rounded-lg bg-white dark:bg-card transition-all ${
-        workflow.humanActionNeeded
-          ? "border-[#266C92]/40 dark:border-[#266C92]/50"
-          : "border-slate-200 dark:border-border"
-      }`}
-      data-testid={`workflow-card-${workflow.id}`}
-    >
-      <div
-        className="px-4 py-2.5 cursor-pointer grid items-center gap-3"
-        style={{ gridTemplateColumns: "auto 1fr 5.5rem 9.5rem 1.75rem" }}
-        onClick={() => setExpanded(!expanded)}
-        data-testid={`workflow-toggle-${workflow.id}`}
-      >
-        <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground shrink-0 transition-transform ${expanded ? "rotate-180" : "-rotate-90"}`} />
-        <h4 className="text-sm font-medium text-foreground min-w-0 truncate">{workflow.name}</h4>
-
-        <StatusBadge status={workflow.status} />
-
-        <div>
-          {workflow.status === "active" && workflow.progress < 100 ? (
-            <div className="flex items-center gap-2">
-              <ProgressBar value={workflow.progress} />
-              <span className="text-xs text-muted-foreground font-medium w-8 text-right">{workflow.progress}%</span>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <Eye className="w-4 h-4 text-[#266C92]" />
+            Review: {workflow.name}
+          </DialogTitle>
+          <DialogDescription>
+            This workflow requires your review before proceeding.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody className="space-y-4">
+          <div className="flex items-center gap-3">
+            <StatusBadge status={workflow.status} />
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <CatIcon className="w-3.5 h-3.5" />
+              <span>{categoryLabels[workflow.category]}</span>
             </div>
-          ) : null}
-        </div>
-
-        <div className="flex items-center justify-center">
-          {workflow.humanActionNeeded ? (
-            <button
-              className="w-7 h-7 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-              aria-label="Review workflow"
-              title="Review"
-              data-testid={`button-review-${workflow.id}`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Eye className="w-3.5 h-3.5 text-[#266C92]" />
-            </button>
-          ) : null}
-        </div>
-      </div>
-
-      {expanded && (
-        <div className="px-4 pb-3 pt-0 border-t border-slate-100 dark:border-border">
-          <div className="pt-3 space-y-2.5">
-            <p className="text-sm text-muted-foreground">{workflow.description}</p>
-
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <Bot className="w-3.5 h-3.5" />
-                <span className="font-medium">{workflow.agentName}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
-                <span>{workflow.lastActivity}</span>
-              </div>
-              <span>{workflow.relatedItemsCount} related items</span>
-            </div>
-
-            {workflow.humanActionNeeded && workflow.humanActionDescription && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-[#266C92]/5 dark:bg-[#266C92]/10 rounded border border-[#266C92]/15 dark:border-[#266C92]/20">
-                <Eye className="w-3.5 h-3.5 text-[#266C92] shrink-0" />
-                <p className="text-xs text-[#266C92] dark:text-[#4da3c9]">{workflow.humanActionDescription}</p>
+            {workflow.progress > 0 && workflow.progress < 100 && (
+              <div className="flex items-center gap-2 ml-auto">
+                <ProgressBar value={workflow.progress} />
+                <span className="text-xs text-muted-foreground font-medium">{workflow.progress}%</span>
               </div>
             )}
           </div>
+
+          <div className="space-y-1.5">
+            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Description</h4>
+            <p className="text-sm text-foreground leading-relaxed">{workflow.description}</p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1 p-3 rounded-lg bg-slate-50 dark:bg-muted/30">
+              <p className="text-xs text-muted-foreground">Agent</p>
+              <div className="flex items-center gap-1.5">
+                <Bot className="w-3.5 h-3.5 text-[#266C92]" />
+                <span className="text-sm font-medium">{workflow.agentName}</span>
+              </div>
+            </div>
+            <div className="space-y-1 p-3 rounded-lg bg-slate-50 dark:bg-muted/30">
+              <p className="text-xs text-muted-foreground">Last Activity</p>
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-sm font-medium">{workflow.lastActivity}</span>
+              </div>
+            </div>
+            <div className="space-y-1 p-3 rounded-lg bg-slate-50 dark:bg-muted/30">
+              <p className="text-xs text-muted-foreground">Related Items</p>
+              <div className="flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-sm font-medium">{workflow.relatedItemsCount}</span>
+              </div>
+            </div>
+          </div>
+
+          {workflow.humanActionDescription && (
+            <div className="flex gap-3 p-3 bg-[#266C92]/5 dark:bg-[#266C92]/10 rounded-lg border border-[#266C92]/15 dark:border-[#266C92]/20">
+              <AlertCircle className="w-4 h-4 text-[#266C92] shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-[#266C92] dark:text-[#4da3c9]">Action Required</p>
+                <p className="text-sm text-foreground leading-relaxed">{workflow.humanActionDescription}</p>
+              </div>
+            </div>
+          )}
+        </DialogBody>
+        <DialogFooter className="gap-2 sm:gap-2">
+          <Button variant="outline" onClick={onClose} data-testid="button-review-cancel">
+            Close
+          </Button>
+          <Button className="bg-[#266C92] hover:bg-[#1e5a7a] text-white" data-testid="button-review-approve">
+            <CheckCircle2 className="w-4 h-4 mr-1.5" />
+            Approve & Continue
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
+  const [expanded, setExpanded] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+
+  return (
+    <>
+      <div
+        className={`border rounded-lg bg-white dark:bg-card transition-all ${
+          workflow.humanActionNeeded
+            ? "border-[#266C92]/40 dark:border-[#266C92]/50"
+            : "border-slate-200 dark:border-border"
+        }`}
+        data-testid={`workflow-card-${workflow.id}`}
+      >
+        <div
+          className="px-4 py-2.5 cursor-pointer grid items-center gap-3"
+          style={{ gridTemplateColumns: "auto 1fr 5.5rem 9.5rem 1.75rem" }}
+          onClick={() => setExpanded(!expanded)}
+          data-testid={`workflow-toggle-${workflow.id}`}
+        >
+          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground shrink-0 transition-transform ${expanded ? "rotate-180" : "-rotate-90"}`} />
+          <h4 className="text-sm font-medium text-foreground min-w-0 truncate">{workflow.name}</h4>
+
+          <StatusBadge status={workflow.status} />
+
+          <div>
+            {workflow.status === "active" && workflow.progress < 100 ? (
+              <div className="flex items-center gap-2">
+                <ProgressBar value={workflow.progress} />
+                <span className="text-xs text-muted-foreground font-medium w-8 text-right">{workflow.progress}%</span>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="flex items-center justify-center">
+            {workflow.humanActionNeeded ? (
+              <button
+                className="w-7 h-7 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                aria-label="Review workflow"
+                title="Review"
+                data-testid={`button-review-${workflow.id}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setReviewOpen(true);
+                }}
+              >
+                <Eye className="w-3.5 h-3.5 text-[#266C92]" />
+              </button>
+            ) : null}
+          </div>
         </div>
+
+        {expanded && (
+          <div className="px-4 pb-3 pt-0 border-t border-slate-100 dark:border-border">
+            <div className="pt-3 space-y-2.5">
+              <p className="text-sm text-muted-foreground">{workflow.description}</p>
+
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <Bot className="w-3.5 h-3.5" />
+                  <span className="font-medium">{workflow.agentName}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{workflow.lastActivity}</span>
+                </div>
+                <span>{workflow.relatedItemsCount} related items</span>
+              </div>
+
+              {workflow.humanActionNeeded && workflow.humanActionDescription && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-[#266C92]/5 dark:bg-[#266C92]/10 rounded border border-[#266C92]/15 dark:border-[#266C92]/20">
+                  <Eye className="w-3.5 h-3.5 text-[#266C92] shrink-0" />
+                  <p className="text-xs text-[#266C92] dark:text-[#4da3c9]">{workflow.humanActionDescription}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {workflow.humanActionNeeded && (
+        <ReviewDialog workflow={workflow} open={reviewOpen} onClose={() => setReviewOpen(false)} />
       )}
-    </div>
+    </>
   );
 }
 
@@ -190,7 +301,7 @@ function ActivityFeed({ entries }: { entries: AgentActivityEntry[] }) {
     <div className="flex flex-col h-full border border-slate-200 dark:border-border rounded-lg bg-white dark:bg-card overflow-hidden" data-testid="activity-feed">
       <div className="px-4 py-2.5 border-b border-slate-100 dark:border-border shrink-0">
         <h3 className="text-sm font-semibold flex items-center gap-2">
-          <Activity className="w-4 h-4 text-muted-foreground" />
+          <Bot className="w-4 h-4 text-muted-foreground" />
           Agent Activity
         </h3>
       </div>
@@ -249,11 +360,11 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
         className="text-white px-8 py-3 bg-cover bg-center bg-no-repeat relative shrink-0"
         style={{ backgroundImage: `url(${headerBgImage})` }}
       >
-        <div className="max-w-6xl relative z-10 flex items-center justify-between gap-4 flex-wrap">
+        <div className="w-full relative z-10 flex items-center justify-between gap-4">
           <h1 className="text-lg font-semibold truncate min-w-0" data-testid="agent-hub-welcome">
             {welcomeMessage}
           </h1>
-          <p className="text-sm text-white/70 shrink-0">
+          <p className="text-sm text-white/70 shrink-0 whitespace-nowrap">
             {hubData.activeAgents} agents active · {hubData.pendingReview} awaiting your review
           </p>
         </div>
