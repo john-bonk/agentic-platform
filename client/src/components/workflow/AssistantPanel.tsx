@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useWorkflowStore } from "@/lib/workflowStore";
+import { useSettings } from "@/components/settings-panel";
 import { apiRequest } from "@/lib/queryClient";
 import { 
   type ChatMessage, 
@@ -105,9 +106,10 @@ function ActionCard({ action, onApply, onReject, isPending }: ActionCardProps) {
 
 interface MessageBubbleProps {
   message: ChatMessage;
+  assistantLabel?: string;
 }
 
-function MessageBubble({ message }: MessageBubbleProps) {
+function MessageBubble({ message, assistantLabel = "AuditBoard Assistant" }: MessageBubbleProps) {
   const isUser = message.role === "user";
   
   return (
@@ -124,7 +126,7 @@ function MessageBubble({ message }: MessageBubbleProps) {
         {!isUser && (
           <div className="flex items-center gap-1.5 mb-1">
             <Bot className="w-3 h-3" />
-            <span className="text-xs font-medium">AuditBoard Assistant</span>
+            <span className="text-xs font-medium">{assistantLabel}</span>
           </div>
         )}
         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -159,6 +161,8 @@ export function AssistantPanel({ workflowId, onApplyAction }: AssistantPanelProp
     setAssistantLoading,
     selectedNodeIds,
   } = useWorkflowStore();
+  const apSettings = useSettings();
+  const apAssistantName = apSettings.agentHubEnabled ? "Optro Assistant" : "AuditBoard Assistant";
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -251,7 +255,7 @@ export function AssistantPanel({ workflowId, onApplyAction }: AssistantPanelProp
             <Bot className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold">AuditBoard Assistant</h3>
+            <h3 className="text-sm font-semibold">{apAssistantName}</h3>
             <p className="text-xs text-muted-foreground">
               AI-powered workflow builder
             </p>
@@ -286,7 +290,7 @@ export function AssistantPanel({ workflowId, onApplyAction }: AssistantPanelProp
         )}
         
         {messages.map((message) => (
-          <MessageBubble key={message.id} message={message} />
+          <MessageBubble key={message.id} message={message} assistantLabel={apAssistantName} />
         ))}
         
         {isAssistantLoading && (

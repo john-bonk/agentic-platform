@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useWorkspaceStore, workspaces as storeWorkspaces, solutionCapabilities } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
+import { useSettings } from "@/components/settings-panel";
 import headerBgImage from "@/assets/header-background.png";
 
 export interface Task {
@@ -1074,6 +1075,8 @@ export function HomePageContent({ content, welcomeMessage, showWorkspaces = true
   const [activeTab, setActiveTab] = useState("My Tasks");
   const [scenarioExpanded, setScenarioExpanded] = useState(true);
   const { setOpen: setAssistantOpen } = useHomeAssistantStore();
+  const hpcSettings = useSettings();
+  const assistantLabel = hpcSettings.agentHubEnabled ? "Optro Assistant" : "AuditBoard Assistant";
 
   const chartStats = useMemo(() => getTabChartStats(activeTab, content), [activeTab, content]);
 
@@ -1106,7 +1109,7 @@ export function HomePageContent({ content, welcomeMessage, showWorkspaces = true
                 <div className="relative flex-1">
                   <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                   <Input
-                    placeholder="Ask AuditBoard Assistant..."
+                    placeholder={`Ask ${assistantLabel}...`}
                     className="pl-10 h-10 bg-slate-50 dark:bg-muted border-slate-200 dark:border-border"
                     data-testid="input-assistant"
                     onFocus={() => setAssistantOpen(true)}

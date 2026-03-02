@@ -11,6 +11,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
+import { useSettings } from "@/components/settings-panel";
 import { useWorkspaceStore, workspaces as storeWorkspaces } from "@/lib/workspaceStore";
 import headerBgImage from "@/assets/header-background.png";
 import type { UserPersona } from "@/lib/workspaceStore";
@@ -300,6 +301,8 @@ export function DefaultHomeDashboard({ workspaceName, userPersona, selectedModul
   const [scenarioExpanded, setScenarioExpanded] = useState(true);
   const { setOpen: setAssistantOpen } = useHomeAssistantStore();
   const { currentWorkspace, setWorkspace } = useWorkspaceStore();
+  const dhdSettings = useSettings();
+  const dhdAssistantLabel = dhdSettings.agentHubEnabled ? "Optro Assistant" : "AuditBoard Assistant";
 
   const content = useMemo(() => generateCustomWorkspaceContent(selectedModules), [selectedModules]);
   const chartStats = useMemo(() => getTabChartStats(activeTab, content), [activeTab, content]);
@@ -343,7 +346,7 @@ export function DefaultHomeDashboard({ workspaceName, userPersona, selectedModul
                 <div className="relative flex-1">
                   <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                   <Input
-                    placeholder="Ask AuditBoard Assistant..."
+                    placeholder={`Ask ${dhdAssistantLabel}...`}
                     className="pl-10 h-10 bg-slate-50 dark:bg-muted border-slate-200 dark:border-border"
                     data-testid="input-assistant-default"
                     onFocus={() => setAssistantOpen(true)}

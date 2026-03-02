@@ -1,66 +1,13 @@
 # Overview
 
-A generic, well-structured React + Express full-stack starter template. This template provides professional UI patterns including:
-- Dashboard with metrics, charts, and filterable data tables
-- List Page with flat table format (no nesting)
-- Hierarchy Page with multi-level expandable rows (Region > Country > State > City)
-- Detail Page with tabbed sections
-- Multi-step Wizard with file upload
-- Config-driven navigation system
+This project is a generic, well-structured React and Express full-stack starter template. Its primary purpose is to provide a robust foundation for building professional web applications, incorporating common UI patterns and architectural best practices. Key capabilities include:
 
-All content uses generic naming making it easy to customize for any use case. Design uses #266C92 teal as the primary accent color.
+-   **Professional UI Patterns**: Dashboards with metrics and charts, list pages, hierarchical data displays, detailed views with tabbed sections, and multi-step wizards with file uploads.
+-   **Config-Driven Navigation**: A flexible system for managing application navigation.
+-   **Reusable Components**: A library of pre-built, tested components for consistent UI and accelerated development.
+-   **Full-Stack Integration**: Seamless interaction between a React frontend and an Express.js backend.
 
-# Component Usage Policy
-
-**IMPORTANT: Always use existing components before creating new ones.**
-
-This template includes pre-built, tested components that should be reused. Do NOT create new components for functionality that already exists.
-
-## Required Components (Always Use These)
-
-### Layout Components
-```typescript
-import { AppLayout, PageHeader } from "@/components/layout";
-```
-- `AppLayout` - Main page wrapper with navigation, always wrap pages with this
-- `PageHeader` - Consistent page headers with title, description, and action buttons
-
-### Feedback Components
-```typescript
-import { EmptyState } from "@/components/ui/empty-state";
-```
-- `EmptyState` - Empty state displays with 4 variants: "search", "no-items", "no-data", "empty-folder"
-- Supports illustrations (default) or icons (`useIllustration={false}`)
-- Use for empty lists, search results, folders, or any "no content" state
-
-### Wizard Components
-```typescript
-import { Wizard, WizardHeader, WizardContent, WizardFooter, useWizard } from "@/components/ui/wizard";
-```
-- Multi-step forms with progress indicators
-- Built-in navigation (Next/Previous/Finish buttons)
-- Use for any multi-step creation or configuration flow
-
-### Standard Shadcn Components
-Use existing Shadcn components from `@/components/ui/`:
-- `Button`, `Badge`, `Card` - Core interactive elements
-- `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` - Tabbed interfaces
-- `Input`, `Select`, `Checkbox`, `Label` - Form inputs
-- `Dialog`, `Sheet`, `Popover` - Overlays and modals
-- `Table` - Data tables
-
-## Anti-Patterns (Do NOT Do These)
-
-- Creating custom empty states instead of using `EmptyState`
-- Building new wizard/stepper components instead of using `Wizard`
-- Creating custom page wrappers instead of using `AppLayout`
-- Duplicating layout patterns instead of using `PageHeader`
-
-## Navigation Configuration
-
-All navigation is config-driven. To add new pages:
-1. Add route in `client/src/App.tsx`
-2. Add navigation item in `client/src/config/navigation.ts`
+The template uses generic naming to facilitate customization across various use cases and features a consistent design with teal (#266C92) as the primary accent color.
 
 # User Preferences
 
@@ -70,198 +17,74 @@ Preferred communication style: Simple, everyday language.
 
 ## Frontend Architecture
 
-**Technology Stack**: React 18+ with TypeScript, using Vite as the build tool and development server.
+**Technology Stack**: React 18+ with TypeScript, utilizing Vite for development and bundling.
 
-**UI Framework**: Shadcn/ui components built on Radix UI primitives with Tailwind CSS styling.
+**UI Framework**: Shadcn/ui components, built on Radix UI primitives, styled with Tailwind CSS.
 
-**Styling**: Tailwind CSS with custom design tokens defined in CSS variables. The theme uses a neutral base color with teal accents for primary actions.
+**Styling**: Tailwind CSS with custom design tokens defined via CSS variables, featuring a neutral base and teal accents.
 
-**State Management**: 
-- React Query (@tanstack/react-query) for server state management
-- Zustand for local UI state (tab management, inventory upload session state)
-- React Hook Form with Zod resolvers for form validation
-- ThemeProvider context for dark/light mode (localStorage: "app-theme")
-- SettingsPanel with localStorage persistence ("dashboard-settings") and CustomEvent sync
-- BrowserChrome wrapper (`client/src/components/layout/BrowserChrome.tsx`) — toggled via Settings > Appearance > "Show Browser". Uses `--browser-chrome-height` CSS variable to adjust layout heights. Extensible `tabs` prop for future multi-tab support.
+**State Management**:
+-   **Server State**: React Query for data fetching, caching, and synchronization.
+-   **Local UI State**: Zustand for managing transient UI states (e.g., tab management, wizard session data).
+-   **Form Management**: React Hook Form with Zod for robust form validation.
+-   **Theming**: `ThemeProvider` context for dark/light mode, persisted in local storage.
+-   **Settings**: A `SettingsPanel` with local storage persistence and `CustomEvent` for synchronization.
 
-**Routing**: Wouter library for lightweight client-side routing.
+**Routing**: Wouter library for lightweight, client-side routing.
 
 **Key Design Patterns**:
-- Reusable layout components (AppLayout, PageHeader, SideNavigation)
-- Config-driven navigation system
-- List-to-detail navigation with header tabs (click item → opens tab with detail view)
-- Component composition with separated concerns
+-   **Component Reusability**: Emphasis on `AppLayout`, `PageHeader`, and `SideNavigation`.
+-   **Config-Driven Navigation**: Centralized configuration for all navigation elements.
+-   **List-to-Detail Flow**: Navigation from list views to detailed views via dynamic tabs.
+-   **Component Composition**: Clear separation of concerns within components.
 
-**Tab Management** (Zustand store in `client/src/lib/tabStore.ts`):
-- Open tabs appear in AppHeader as clickable navigation items
-- Click item in list → opens new tab → navigates to detail page
-- Tabs can be closed, preserving navigation state
+**Tab Management**: Utilizes a Zustand store (`client/src/lib/tabStore.ts`) to manage dynamic tabs in the `AppHeader`, enabling navigation to detail pages and preserving state upon closure.
 
-## Key Files and Folders
+**Core Components**:
+-   **Layout**: `AppLayout`, `PageHeader`, `SideNavigation`, `LeftIconNavbar`, `BrowserChrome`.
+-   **Feedback**: `EmptyState` with various variants.
+-   **Wizard**: `Wizard`, `WizardHeader`, `WizardContent`, `WizardFooter`.
+-   **Shadcn UI**: Standard components like `Button`, `Badge`, `Card`, `Tabs`, `Input`, `Select`, `Dialog`, `Table`.
 
-### Navigation Configuration
-- `client/src/config/navigation.ts` - Central navigation config for icon navbar and side navigation
-
-### Workspace-Specific View Configs
-- `client/src/config/inventoryMappingConfig.ts` - Workspace-specific data for All Inventory and Coverage Mapping pages (3 scenarios: enterprise-audit, enterprise-risk, it-security; custom workspaces use hash-based deterministic selection)
-- `client/src/pages/AllInventoryPage.tsx` - ReactFlow inventory view with dynamic tabs per workspace
-- `client/src/pages/CoverageMappingPage.tsx` - ReactFlow coverage mapping with left→right source/target handles, single TEAL edges
-- `client/src/lib/inventoryStore.ts` - Session-level Zustand store tracking M&A upload state per workspace (no localStorage, resets on refresh)
-
-### Global Navigation (Left Icon Navbar)
-- Module ORDER: Home (0), Database (1), Global Risk (2), Reporting (3), Intelligence (4), Workflows (5)
-- Database module (icon: database) owns `/inventory` and `/coverage-mapping` paths
-- Inventory/Coverage Mapping nav items live ONLY in Database module side panel, NOT in workspace home nav panels (CRO/CAE/CISO/Home)
-- Both inventory pages display a simple page title header; navigation between them is via the Database module side panel
-
-### Layout Components
-- `client/src/components/layout/AppLayout.tsx` - Main page wrapper
-- `client/src/components/layout/PageHeader.tsx` - Reusable page header
-- `client/src/components/layout/SideNavigation.tsx` - Side navigation panel (supports openInNewTab items with ExternalLink icon)
-- `client/src/components/layout/LeftIconNavbar.tsx` - Icon navbar
-- `client/src/components/layout/BrowserChrome.tsx` - Interactive browser chrome with clickable/closeable tabs, driven by browserTabStore
-
-### Browser Tab System
-- `client/src/lib/browserTabStore.ts` - Zustand store managing browser tab state (open/close/activate tabs, route tracking, previousRoute for return navigation)
-- Nav items with `openInNewTab: true` show an ExternalLink icon on hover; clicking opens a new browser tab, auto-enables browser chrome, and navigates to the route
-- Closing a tab returns to the previous route (tracked via `setPreviousRoute`)
-- Main tab always exists and cannot be closed
-
-### Dynamic Inbox Tab Content System
-- `HomePageContent.tsx` exports 7 type interfaces: Task, Issue, Control, Narrative, Risk, TabComment, WorkspaceContentData
-- Each workspace has `tabContent` field with per-tab arrays for all 6 tabs (Tasks, Issues, Controls, Narratives, Risks, Comments)
-- Switching inbox tabs updates: donut chart (status breakdown), overview card title, content list header, and list items with tab-specific columns/badges
-- Status categories per tab: Tasks (Incomplete/In Progress/Complete), Issues (Open/Investigating/Resolved), Controls (Needs Testing/Ineffective/Effective), Narratives (Draft/In Review/Approved), Risks (Not Started/In Progress/Mitigated), Comments (New/Flagged/Read)
-- `generateCustomWorkspaceContent()` produces tabContent from 5 capability pools (capabilityIssuePool, capabilityControlPool, capabilityNarrativePool, capabilityRiskPool, capabilityCommentPool) plus existing capabilityTaskPool
-- DefaultHomeDashboard imports generateCustomWorkspaceContent and types from HomePageContent for full parity
-- Adding new tab types: add interface, add to TabContentMap in WorkspaceContentData, add pool, add chart stats case, add badge function, add list renderer
-
-### AI Governance Page
-- `client/src/pages/AIGovernancePage.tsx` - Wrapped in AppLayout (uses existing framework nav), matching the FairNow/AuditBoard AI Governance screenshot
-- Features: breadcrumb header, 3 metric cards, risk levels bar chart, development statuses donut charts, notification history, compliance table, acquisition banner
-- AI Gov nav items (Dashboard, My Work, AI Applications, Vendors, Frameworks, Admin, Resources) are mapped into the CISO workspace side nav as an "AI Governance" section
-- Accessed via IT Security workspace CISO Security Environment nav with openInNewTab enabled
-- Route: `/ai-governance`
-
-### Template Pages
-- `client/src/pages/DashboardPage.tsx` - Dashboard with metrics, charts, and data table (default landing page)
-- `client/src/pages/ListPage.tsx` - Flat table with search, filters, and item selection
-- `client/src/pages/HierarchyPage.tsx` - Multi-level hierarchical data with expandable rows (NAME, PARENT, TYPE, DATE CREATED, ALLOWED ON columns)
-- `client/src/pages/ItemDetailPage.tsx` - Detail page with tabbed sections (Tab 1-5)
-- `client/src/pages/WizardPage.tsx` - Multi-step wizard with file upload
-- `client/src/pages/DemoPage.tsx` - Component showcase
-- `client/src/pages/SettingsPage.tsx` - Settings page example
-
-### Backend
-- `server/routes.ts` - API route definitions
-- `server/storage.ts` - Data storage layer (in-memory)
-- `shared/schema.ts` - Database schemas and types
+**Key Features**:
+-   **Dynamic Inbox Tab Content System**: Configurable `HomePageContent.tsx` to display workspace-specific data across multiple tabs (Tasks, Issues, Controls, Narratives, Risks, Comments) with dynamic charts, overview cards, and list renders.
+-   **Agent Hub System**: Config-driven agent workflow management (`client/src/config/agentHubConfig.ts`) for specific workspaces, enabling an "Agent Hub Mode" with an "Optro Assistant."
+-   **AI Governance Page**: A dedicated page (`client/src/pages/AIGovernancePage.tsx`) integrated into the IT Security workspace, mirroring a professional AI governance dashboard with metrics, charts, and tables.
 
 ## Backend Architecture
 
 **Technology Stack**: Express.js with TypeScript running on Node.js.
 
-**API Structure**: RESTful API with `/api` prefix for all routes.
+**API Structure**: RESTful API with all endpoints prefixed by `/api`.
 
-**Storage Layer**: 
-- Interface-based design allowing multiple storage implementations
-- Currently implements in-memory storage
-- Prepared for database integration with Drizzle ORM
+**Storage Layer**: Interface-based design supporting multiple storage implementations. Currently uses in-memory storage (`MemStorage`) but is designed for future integration with Drizzle ORM and PostgreSQL.
 
-## Data Storage
-
-**ORM**: Drizzle ORM configured for PostgreSQL with:
-- Schema location: `./shared/schema.ts`
-- Type-safe schema definitions using Drizzle's type inference
-
-**Current State**: Application uses in-memory storage (`MemStorage`) but is prepared for PostgreSQL integration.
-
-## How to Add a New Page
-
-1. Create a component in `client/src/pages/`
-2. Import and add route in `client/src/App.tsx`
-3. Add navigation item in `client/src/config/navigation.ts`
-
-## How to Add an API Endpoint
-
-1. Define types in `shared/schema.ts`
-2. Add storage methods in `server/storage.ts`
-3. Create routes in `server/routes.ts`
-
-## External Dependencies
-
-**UI Libraries**:
-- Radix UI primitives
-- Lucide React icons
-- React Hook Form + Zod
-
-**Development Tools**:
-- Vite for fast development
-- TypeScript across the stack
-- Tailwind CSS for styling
+**Data Storage**:
+-   **ORM**: Drizzle ORM configured for PostgreSQL, with type-safe schema definitions in `./shared/schema.ts`.
+-   **Current State**: In-memory storage is used, with Drizzle ORM configured for future PostgreSQL integration.
 
 ## Intelligence System
 
-The AuditBoard Assistant includes an integrated intelligence layer for context-aware responses:
+An integrated intelligence layer provides context-aware responses and report generation:
 
-**Backend Services:**
-- `server/llm.ts` - Keyword-based intent detection with `generateHomeContextResponse()` function
-- Keywords: tasks, controls, risks, reports, dashboard, workflows, audit, help
-- Workspace-aware context (enterprise-risk, enterprise-audit, it-security scenarios)
+-   **Backend Services**: `server/llm.ts` uses keyword-based intent detection (`generateHomeContextResponse()`) for tasks, controls, risks, reports, etc., with workspace-aware context.
+-   **API Routes**: Dedicated routes for fetching controls, tasks, dashboard metrics, reports, and generating new reports (`/api/controls`, `/api/tasks`, `/api/dashboard/metrics`, `/api/reports`, `/api/generate-report`).
+-   **Data Schemas**: Zod-validated schemas in `shared/schema.ts` for controls, tasks, generated reports, and resource references.
+-   **Frontend Components**: `HomeAssistantPanel` for AI interaction, `ResourceCard` for clickable references, `GeneratedReportPage` for rich report visualization, and `ReportingPage` to list reports.
+-   **AI Report Generation**: Detects report requests from user prompts, supports various report types (SOX, cyber, risk assessment), extracts topics dynamically, and generates rich reports with embedded charts (bar, pie, line). Reports persist in session storage.
 
-**Intelligence API Routes:**
-- `GET /api/controls` - Fetch all controls
-- `GET /api/tasks` - Fetch all tasks
-- `GET /api/dashboard/metrics` - Dashboard analytics
-- `GET /api/reports` - List generated reports
-- `POST /api/generate-report` - Create new report based on prompt
+# External Dependencies
 
-**Data Schemas (shared/schema.ts):**
-- `controlSchema` / `insertControlSchema` - Audit control data with Zod validation
-- `taskSchema` / `insertTaskSchema` - Task intelligence data
-- `generatedReportSchema` - Report structure with sections and charts
-- `ResourceReference` - Task/Report/Control reference for assistant responses
+**UI Libraries**:
+-   Radix UI (primitives)
+-   Lucide React (icons)
+-   React Hook Form
+-   Zod (schema validation)
 
-**Frontend Components:**
-- `HomeAssistantPanel` - AI assistant panel with ResourceCard display and report generation
-- `ResourceCard` - Clickable cards for Task/Report/Control references in chat
-- `GeneratedReportPage` - Rich report view with sections, charts (bar/pie/line), TOC navigation
-- `ReportingPage` - Lists both template reports and AI-generated reports
+**Development Tools**:
+-   Vite (build tool and development server)
+-   TypeScript (language)
+-   Tailwind CSS (styling framework)
 
-**AI Report Generation:**
-- Detects report requests via keywords: "generate", "create", "build" + "report"
-- Supports multiple report types: SOX compliance, tariff/trade, security/cyber, vendor risk, risk assessment, audit findings
-- Dynamic topic extraction from prompts for personalized titles
-- Rich sections with embedded visualizations (pie charts, bar charts, line charts)
-- Reports persist in session storage and appear in Reporting page
-
-**Mock Data:**
-- 8 pre-seeded controls (SOX, ISO, GDPR frameworks)
-- 6 tasks with various statuses and assignments
-
-## Notable Decisions
-
-- Uses wouter instead of React Router for smaller bundle size
-- Prefers Radix UI headless components with Tailwind styling
-- Uses Drizzle ORM for type-safe database access
-- Implements shared types between client and server via `shared` directory
-- Intelligence uses keyword-based routing (no external APIs required)
-
-## CRITICAL: AuditBoard Default / Enterprise Risk Parity
-
-**HomePageContent is the SINGLE SOURCE OF TRUTH for the AuditBoard home dashboard.**
-
-The Enterprise Risk workspace home page (teal hero header, assistant card, inbox tabs, donut chart, tariff task list, workspace switcher) is rendered by `HomePageContent` component (`client/src/components/workspace/HomePageContent.tsx`).
-
-When users create a workspace via the wizard and select "AuditBoard Default" layout, the resulting workspace MUST render using this exact same `HomePageContent` component - NOT through `ArchetypeDashboard`.
-
-**Architecture:**
-- `HomePage.tsx` uses `HomePageContent` for default workspaces (Enterprise Risk, Enterprise Audit, IT Security)
-- `CustomWorkspaceHome.tsx` uses `HomePageContent` when archetype is `auditboard-default`
-- `HomeViewStep.tsx` uses `HomePageContent` for the wizard preview of `auditboard-default`
-- `ArchetypeDashboard` is used ONLY for other archetype layouts (Command Center, CISO, CAE, etc.)
-
-**DO NOT** route `auditboard-default` through `ArchetypeDashboard`. These are fundamentally different rendering systems.
-
-**Tests:** 35 parity tests in `client/src/components/workspace/__tests__/auditboard-default-parity.test.ts`
-Run with: `npx vitest run --config vitest.config.ts`
+**Data Storage**:
+-   Drizzle ORM (for future PostgreSQL integration)

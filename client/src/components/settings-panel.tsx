@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
-import { Wrench, Moon, Sun, Layout, RefreshCw, Bot, Filter, Globe } from "lucide-react";
+import { Wrench, Moon, Sun, Layout, RefreshCw, Bot, Filter, Globe, Cpu } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 
 interface SettingsState {
@@ -28,6 +28,7 @@ interface SettingsState {
   agentEnabled: boolean;
   agentTone: string;
   showBrowser: boolean;
+  agentHubEnabled: boolean;
 }
 
 const defaultSettings: SettingsState = {
@@ -37,6 +38,7 @@ const defaultSettings: SettingsState = {
   agentEnabled: true,
   agentTone: "professional",
   showBrowser: false,
+  agentHubEnabled: false,
 };
 
 const STORAGE_KEY = "dashboard-settings";
@@ -153,6 +155,31 @@ export function SettingsPanel() {
                 checked={settings.showBrowser}
                 onCheckedChange={(checked) => updateSetting("showBrowser", checked)}
                 data-testid="switch-show-browser"
+              />
+            </div>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Cpu className="w-4 h-4 text-muted-foreground" />
+              <span>Agent Hub</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex-1 mr-3">
+                <Label htmlFor="agent-hub" className="text-sm text-muted-foreground">
+                  Enable Agent Hub Mode
+                </Label>
+                <p className="text-xs text-muted-foreground/70 mt-0.5">
+                  Agent-centric experience with Optro Assistant
+                </p>
+              </div>
+              <Switch
+                id="agent-hub"
+                checked={settings.agentHubEnabled}
+                onCheckedChange={(checked) => updateSetting("agentHubEnabled", checked)}
+                data-testid="switch-agent-hub"
               />
             </div>
           </div>

@@ -23,7 +23,7 @@ import {
   Check,
   Plus,
 } from "lucide-react";
-import { SettingsPanel } from "@/components/settings-panel";
+import { SettingsPanel, useSettings } from "@/components/settings-panel";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -76,6 +76,8 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const headerSettings = useSettings();
+  const headerAssistantName = headerSettings.agentHubEnabled ? "Optro Assistant" : "AuditBoard Assistant";
 
   const handleWorkspaceChange = (workspace: Workspace) => {
     setWorkspace(workspace);
@@ -244,7 +246,9 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
                         <div className="w-8 h-8 rounded-md bg-gray-100 dark:bg-muted flex items-center justify-center">
                           <ActionIcon className="w-4 h-4 text-gray-600 dark:text-muted-foreground" />
                         </div>
-                        <span className="text-sm text-gray-700 dark:text-foreground">{action.label}</span>
+                        <span className="text-sm text-gray-700 dark:text-foreground">
+                          {action.id === "ask-assistant" ? `Ask ${headerAssistantName}...` : action.label}
+                        </span>
                       </button>
                     );
                   })}
@@ -262,7 +266,7 @@ export function AppHeader({ className = "" }: AppHeaderProps) {
                     <BotIcon className="w-4 h-4 text-[#266C92]" />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-700 dark:text-foreground">Ask AuditBoard Assistant...</div>
+                    <div className="text-sm text-gray-700 dark:text-foreground">Ask {headerAssistantName}...</div>
                     <div className="text-xs text-gray-500 dark:text-muted-foreground">Get Started</div>
                   </div>
                 </button>

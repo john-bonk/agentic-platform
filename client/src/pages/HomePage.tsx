@@ -27,10 +27,14 @@ import {
   workspaceContent,
   generateCustomWorkspaceContent,
 } from "@/components/workspace/HomePageContent";
+import { AgentHubHome } from "@/components/workspace/AgentHubHome";
+import { isAgentHubSupported } from "@/config/agentHubConfig";
+import { useSettings } from "@/components/settings-panel";
 
 export default function HomePage() {
   const { currentWorkspace, refreshKey, userPersona } = useWorkspaceStore();
   const [, setLocation] = useLocation();
+  const settings = useSettings();
   
   useEffect(() => {
     if (currentWorkspace.isCustom) {
@@ -51,6 +55,18 @@ export default function HomePage() {
       : `Welcome back, ${userPersona}`;
   };
   const welcomeMessage = getWelcomeMessage();
+
+  if (settings.agentHubEnabled && isAgentHubSupported(currentWorkspace.id)) {
+    return (
+      <AppLayout showHeader={true} showSideNav={true}>
+        <AgentHubHome
+          key={refreshKey}
+          workspaceId={currentWorkspace.id}
+          welcomeMessage={welcomeMessage}
+        />
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout showHeader={true} showSideNav={true}>

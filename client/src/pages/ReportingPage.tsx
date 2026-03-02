@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useSettings } from "@/components/settings-panel";
 
 interface GeneratedReport {
   reportId: string;
@@ -109,6 +110,8 @@ const getStatusBadge = (status: string) => {
 
 export default function ReportingPage() {
   const [, setLocation] = useLocation();
+  const rpSettings = useSettings();
+  const rpAssistantName = rpSettings.agentHubEnabled ? "Optro Assistant" : "AuditBoard Assistant";
   
   const { data: generatedReports = [] } = useQuery<GeneratedReport[]>({
     queryKey: ["/api/reports"],
@@ -199,7 +202,7 @@ export default function ReportingPage() {
                   <div>
                     <CardTitle className="text-base">AI Generated Reports</CardTitle>
                     <CardDescription className="text-xs">
-                      Reports created by the AuditBoard Assistant
+                      Reports created by the {rpAssistantName}
                     </CardDescription>
                   </div>
                 </div>

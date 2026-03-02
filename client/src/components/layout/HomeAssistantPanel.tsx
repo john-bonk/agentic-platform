@@ -27,6 +27,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useHomeAssistantStore, type ChatMessage, type SuggestedAction, type ResourceReference } from "@/lib/homeAssistantStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
+import { useSettings } from "@/components/settings-panel";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { getExperienceConfig } from "@/lib/reportingContent";
@@ -221,9 +222,10 @@ function ResourceCard({ resource, onNavigate }: ResourceCardProps) {
 interface MessageBubbleProps {
   message: ChatMessage;
   onResourceNavigate?: (route: string) => void;
+  assistantLabel: string;
 }
 
-function MessageBubble({ message, onResourceNavigate }: MessageBubbleProps) {
+function MessageBubble({ message, onResourceNavigate, assistantLabel }: MessageBubbleProps) {
   const isUser = message.role === "user";
   
   return (
@@ -240,7 +242,7 @@ function MessageBubble({ message, onResourceNavigate }: MessageBubbleProps) {
         {!isUser && (
           <div className="flex items-center gap-1.5 mb-1">
             <Bot className="w-3 h-3 text-[#266C92]" />
-            <span className="text-xs font-medium text-[#266C92]">AuditBoard Assistant</span>
+            <span className="text-xs font-medium text-[#266C92]">{assistantLabel}</span>
           </div>
         )}
         <div className={`text-sm max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&_strong]:font-semibold ${
@@ -448,6 +450,9 @@ export function HomeAssistantPanel() {
     clearChat,
   } = useHomeAssistantStore();
 
+  const settings = useSettings();
+  const assistantName = settings.agentHubEnabled ? "Optro Assistant" : "AuditBoard Assistant";
+
   const { currentWorkspace } = useWorkspaceStore();
 
   useEffect(() => {
@@ -631,7 +636,7 @@ export function HomeAssistantPanel() {
               <Bot className="w-4 h-4 text-white" />
             </div>
             <h3 className="text-sm font-medium text-white">
-              AuditBoard Assistant
+              {assistantName}
             </h3>
           </div>
           <div className="flex items-center gap-1">
@@ -782,6 +787,7 @@ export function HomeAssistantPanel() {
             <MessageBubble 
               key={message.id} 
               message={message}
+              assistantLabel={assistantName}
               onResourceNavigate={(route) => {
                 setOpen(false);
                 setLocation(route);
