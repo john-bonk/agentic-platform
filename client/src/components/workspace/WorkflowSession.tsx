@@ -219,11 +219,12 @@ export function WorkflowSession({ config, onBack }: WorkflowSessionProps) {
     }
   }, [config.blocks]);
 
-  if (fullScreenView) {
-    const viewConfig = fullScreenDetailViews[fullScreenView];
-    if (viewConfig) {
-      return (
-        <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-background animate-in fade-in duration-200">
+  const activeDetailView = fullScreenView ? fullScreenDetailViews[fullScreenView] : null;
+
+  return (
+    <div className="relative flex flex-col h-full overflow-hidden bg-white dark:bg-background">
+      {activeDetailView && (
+        <div className="absolute inset-0 z-10 flex flex-col overflow-hidden bg-white dark:bg-background animate-in fade-in duration-200">
           <div className="shrink-0 h-12 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
             <button
               onClick={() => setFullScreenView(null)}
@@ -235,20 +236,17 @@ export function WorkflowSession({ config, onBack }: WorkflowSessionProps) {
             </button>
             <div className="w-px h-5 bg-slate-200 dark:bg-border" />
             <div className="flex items-center gap-2">
-              {viewConfig.headerIcon}
-              <h2 className="text-sm font-semibold text-foreground">{viewConfig.title}</h2>
+              {activeDetailView.headerIcon}
+              <h2 className="text-sm font-semibold text-foreground">{activeDetailView.title}</h2>
             </div>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto">
-            {viewConfig.render()}
+            {activeDetailView.render()}
           </div>
         </div>
-      );
-    }
-  }
+      )}
 
-  return (
-    <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-background animate-in slide-in-from-right-8 fade-in duration-300">
+      <div className={`flex flex-col h-full overflow-hidden ${fullScreenView ? 'invisible pointer-events-none' : 'animate-in slide-in-from-right-8 fade-in duration-300'}`}>
       <div className="shrink-0 h-12 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
         <button
           onClick={onBack}
@@ -298,6 +296,7 @@ export function WorkflowSession({ config, onBack }: WorkflowSessionProps) {
             />
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

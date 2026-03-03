@@ -248,6 +248,42 @@ export const globalRiskNewTabNavSections: SideNavSection[] = [
   },
 ];
 
+export const agentHubNavSections: SideNavSection[] = [
+  {
+    id: "agent-hub-projects",
+    title: "Projects",
+    collapsible: false,
+    defaultExpanded: true,
+    items: [
+      { id: "ah-risk-assessment", label: "Risk Assessment", path: "/", icon: "trending-up" },
+      { id: "ah-scenario-analysis", label: "Scenario Analysis", path: "/#scenarios", icon: "flame" },
+      { id: "ah-mitigation-plans", label: "Mitigation Plans", path: "/#mitigation", icon: "target" },
+    ],
+  },
+  {
+    id: "agent-hub-monitoring",
+    title: "Monitoring",
+    collapsible: true,
+    defaultExpanded: true,
+    items: [
+      { id: "ah-risk-scores", label: "Risk Scores", path: "/#risk-scores", icon: "trending-up" },
+      { id: "ah-signal-intel", label: "Signal Intelligence", path: "/#signals", icon: "brain" },
+      { id: "ah-control-tracking", label: "Control Tracking", path: "/#controls", icon: "shield-check" },
+    ],
+  },
+  {
+    id: "agent-hub-scheduled",
+    title: "Scheduled",
+    collapsible: true,
+    defaultExpanded: false,
+    items: [
+      { id: "ah-quarterly-review", label: "Quarterly Review", path: "/#quarterly", icon: "clipboard-list" },
+      { id: "ah-kri-report", label: "KRI Report", path: "/#kri-report", icon: "trending-up" },
+      { id: "ah-risk-appetite", label: "Risk Appetite", path: "/#appetite", icon: "target" },
+    ],
+  },
+];
+
 /**
  * Get workspace-specific home navigation
  * For custom workspaces with moduleConfig, uses generateWizardNavSections from

@@ -21,11 +21,13 @@ import { useLocation } from "wouter";
 import { LeftIconNavbar } from "./LeftIconNavbar";
 import { SideNavigation } from "./SideNavigation";
 import { AppHeader } from "./AppHeader";
-import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav, aiGovNewTabNavSections, globalRiskNewTabNavSections } from "@/config/navigation";
+import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav, aiGovNewTabNavSections, globalRiskNewTabNavSections, agentHubNavSections } from "@/config/navigation";
 import { type Tab } from "@/lib/tabStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 import { useBrowserTabStore } from "@/lib/browserTabStore";
+import { useSettings } from "@/components/settings-panel";
+import { isAgentHubSupported } from "@/config/agentHubConfig";
 
 const ASSISTANT_PANEL_WIDTH = 420;
 
@@ -51,6 +53,7 @@ export function AppLayout({
   const { currentWorkspace } = useWorkspaceStore();
   const { isOpen: isAssistantOpen } = useHomeAssistantStore();
   const { activeTabId, getActiveRoute } = useBrowserTabStore();
+  const settings = useSettings();
   
   const isNewTab = activeTabId !== "main";
   const activeRoute = getActiveRoute();
@@ -59,17 +62,20 @@ export function AppLayout({
   const isSpecialNewTab = isAiGovNewTab || isGlobalRiskNewTab;
   
   const isHomeModule = currentModule.id === "home";
-  const workspaceNav = isHomeModule 
+  const isAgentHub = settings.agentHubEnabled && isHomeModule && isAgentHubSupported(currentWorkspace.id);
+  const workspaceNav = isHomeModule && !isAgentHub
     ? getWorkspaceHomeNav(currentWorkspace.persona, currentWorkspace.moduleConfig) 
     : null;
   
-  const sideNavSections = isAiGovNewTab 
+  const sideNavSections = isAgentHub
+    ? agentHubNavSections
+    : isAiGovNewTab 
     ? aiGovNewTabNavSections 
     : isGlobalRiskNewTab
     ? globalRiskNewTabNavSections
     : (workspaceNav ? workspaceNav.sections : currentModule.sideNavSections);
-  const sideNavModuleGroups = isSpecialNewTab ? undefined : workspaceNav?.moduleGroups;
-  const sideNavTitle = isAiGovNewTab ? "AI Governance" : isGlobalRiskNewTab ? "Global Residual Risk" : (isHomeModule ? currentWorkspace.name : currentModule.name);
+  const sideNavModuleGroups = (isSpecialNewTab || isAgentHub) ? undefined : workspaceNav?.moduleGroups;
+  const sideNavTitle = isAgentHub ? "Optro" : isAiGovNewTab ? "AI Governance" : isGlobalRiskNewTab ? "Global Residual Risk" : (isHomeModule ? currentWorkspace.name : currentModule.name);
   
   return (
     <div 
@@ -80,7 +86,7 @@ export function AppLayout({
         <LeftIconNavbar 
           items={iconNavItems} 
           logoPath={appConfig.logoPath}
-          homeOnly={isSpecialNewTab}
+          homeOnly={isSpecialNewTab || isAgentHub}
         />
       )}
 
@@ -90,8 +96,8 @@ export function AppLayout({
           sections={sideNavSections} 
           moduleGroups={sideNavModuleGroups}
           title={sideNavTitle}
-          hideQuickAccess={isSpecialNewTab}
-          staticTitle={isSpecialNewTab}
+          hideQuickAccess={isSpecialNewTab || isAgentHub}
+          staticTitle={isSpecialNewTab || isAgentHub}
         />
       )}
 
