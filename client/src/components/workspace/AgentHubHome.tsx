@@ -373,9 +373,12 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
   const hubData = useMemo(() => getAgentHubData(workspaceId), [workspaceId]);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const { currentSessionId, addProject, setCurrentSession, getSessionConfig } = useWorkflowSessionStore();
-
-  const activeSession = currentSessionId ? (getSessionConfig(currentSessionId) as WorkflowSessionConfig | null) : null;
+  const currentSessionId = useWorkflowSessionStore((s) => s.currentSessionId);
+  const addProject = useWorkflowSessionStore((s) => s.addProject);
+  const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
+  const activeSession = useWorkflowSessionStore((s) =>
+    s.currentSessionId ? (s.sessionConfigs[s.currentSessionId] as WorkflowSessionConfig | null) ?? null : null
+  );
 
   const launchWorkflow = useCallback((id: string) => {
     const sessionId = workflowRowToSession[id] || id;
@@ -408,10 +411,11 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
 
   if (!hubData) return null;
 
-  if (activeSession) {
+  if (activeSession && currentSessionId) {
     return (
       <WorkflowSession
         config={activeSession}
+        sessionId={currentSessionId}
         onBack={() => setCurrentSession(null)}
       />
     );

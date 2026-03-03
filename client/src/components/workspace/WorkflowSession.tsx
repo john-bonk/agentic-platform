@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useWorkflowSessionStore, usePersistedBlockState } from "@/lib/workflowSessionStore";
 import {
   ChevronLeft,
   ChevronDown,
@@ -60,6 +61,7 @@ export interface WorkflowBlock {
 export interface WorkflowBlockRenderProps {
   onComplete: () => void;
   isActive: boolean;
+  sessionId: string;
 }
 
 export interface WorkflowSessionConfig {
@@ -70,6 +72,7 @@ export interface WorkflowSessionConfig {
 
 interface WorkflowSessionProps {
   config: WorkflowSessionConfig;
+  sessionId: string;
   onBack: () => void;
 }
 
@@ -80,6 +83,7 @@ function BlockWrapper({
   completedIndices,
   onComplete,
   isLast,
+  sessionId,
 }: {
   block: WorkflowBlock;
   index: number;
@@ -87,6 +91,7 @@ function BlockWrapper({
   completedIndices: Set<number>;
   onComplete: () => void;
   isLast: boolean;
+  sessionId: string;
 }) {
   const isActive = index === activeIndex;
   const isCompleted = completedIndices.has(index);
@@ -156,7 +161,7 @@ function BlockWrapper({
             <div className="animate-in slide-in-from-bottom-4 fade-in duration-500">
               <Card className="border border-slate-200 dark:border-border">
                 <CardContent className="p-4">
-                  {block.render({ onComplete, isActive })}
+                  {block.render({ onComplete, isActive, sessionId })}
                 </CardContent>
               </Card>
             </div>
@@ -175,16 +180,22 @@ function BlockWrapper({
   );
 }
 
-export function WorkflowSession({ config, onBack }: WorkflowSessionProps) {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
-  const [fullScreenView, setFullScreenView] = useState<string | null>(null);
+export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionProps) {
+  const activeIndex = useWorkflowSessionStore((s) => s.runtimeStates[sessionId]?.activeIndex ?? 0);
+  const completedIndicesArr = useWorkflowSessionStore((s) => s.runtimeStates[sessionId]?.completedIndices ?? []);
+  const completedIndices = new Set(completedIndicesArr);
+  const fullScreenView = useWorkflowSessionStore((s) => s.runtimeStates[sessionId]?.fullScreenView ?? null);
+  const setRuntime = useWorkflowSessionStore((s) => s.setRuntime);
 
-  useEffect(() => {
-    setActiveIndex(0);
-    setCompletedIndices(new Set());
-    setFullScreenView(null);
-  }, [config.id]);
+  const setActiveIndex = useCallback((idx: number) => {
+    setRuntime(sessionId, { activeIndex: idx });
+  }, [sessionId, setRuntime]);
+
+  const setFullScreenView = useCallback((view: string | null) => {
+    setRuntime(sessionId, { fullScreenView: view });
+  }, [sessionId, setRuntime]);
+
+  const lastFiredBlockRef = useRef<number>(activeIndex);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -195,9 +206,11 @@ export function WorkflowSession({ config, onBack }: WorkflowSessionProps) {
     };
     window.addEventListener("workflow-session:open-detail", handler);
     return () => window.removeEventListener("workflow-session:open-detail", handler);
-  }, []);
+  }, [setFullScreenView]);
 
   useEffect(() => {
+    if (lastFiredBlockRef.current === activeIndex) return;
+    lastFiredBlockRef.current = activeIndex;
     const block = config.blocks[activeIndex];
     if (block) {
       window.dispatchEvent(new CustomEvent("workflow-session:block-event", { detail: { blockId: block.id, type: "activated" } }));
@@ -209,15 +222,15 @@ export function WorkflowSession({ config, onBack }: WorkflowSessionProps) {
     if (block) {
       window.dispatchEvent(new CustomEvent("workflow-session:block-event", { detail: { blockId: `${block.id}-complete`, type: "completed" } }));
     }
-    setCompletedIndices((prev) => {
-      const next = new Set(prev);
-      next.add(index);
-      return next;
-    });
+    const store = useWorkflowSessionStore.getState();
+    const existing = store.runtimeStates[sessionId]?.completedIndices ?? [];
+    if (!existing.includes(index)) {
+      setRuntime(sessionId, { completedIndices: [...existing, index] });
+    }
     if (index < config.blocks.length - 1) {
       setTimeout(() => setActiveIndex(index + 1), 400);
     }
-  }, [config.blocks]);
+  }, [config.blocks, sessionId, setRuntime, setActiveIndex]);
 
   const activeDetailView = fullScreenView ? fullScreenDetailViews[fullScreenView] : null;
 
@@ -293,6 +306,7 @@ export function WorkflowSession({ config, onBack }: WorkflowSessionProps) {
               activeIndex={activeIndex}
               completedIndices={completedIndices}
               onComplete={() => completeBlock(index)}
+              sessionId={sessionId}
             />
           ))}
         </div>
@@ -846,9 +860,9 @@ const fullScreenDetailViews: Record<string, { title: string; headerIcon: JSX.Ele
   "ns-reassess": { title: "Re-Assessment Schedule", headerIcon: <RefreshCcw className="w-4 h-4 text-[#266C92]" />, render: () => <ReassessmentView /> },
 };
 
-function SynthesisBlock({ onComplete }: { onComplete: () => void }) {
-  const [phase, setPhase] = useState<"thinking" | "signals" | "done">("thinking");
-  const [visibleSignals, setVisibleSignals] = useState(0);
+function SynthesisBlock({ onComplete, sessionId }: { onComplete: () => void; sessionId: string }) {
+  const [phase, setPhase] = usePersistedBlockState<"thinking" | "signals" | "done">(sessionId, "synthesis", "phase", "thinking");
+  const [visibleSignals, setVisibleSignals] = usePersistedBlockState<number>(sessionId, "synthesis", "visibleSignals", 0);
 
   useEffect(() => {
     if (phase === "thinking") {
@@ -932,8 +946,8 @@ function SynthesisBlock({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-function TemplateSelectionBlock({ onComplete }: { onComplete: () => void }) {
-  const [selected, setSelected] = useState<string | null>(null);
+function TemplateSelectionBlock({ onComplete, sessionId }: { onComplete: () => void; sessionId: string }) {
+  const [selected, setSelected] = usePersistedBlockState<string | null>(sessionId, "template-selection", "selected", null);
 
   return (
     <div className="space-y-3">
@@ -980,11 +994,11 @@ function TemplateSelectionBlock({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-function BaselineParamsBlock({ onComplete }: { onComplete: () => void }) {
-  const [assessmentName, setAssessmentName] = useState("Q1 2026 Enterprise Risk Assessment");
-  const [riskDomain, setRiskDomain] = useState("operational");
-  const [scoringMethod, setScoring] = useState("5x5");
-  const [period, setPeriod] = useState("quarterly");
+function BaselineParamsBlock({ onComplete, sessionId }: { onComplete: () => void; sessionId: string }) {
+  const [assessmentName, setAssessmentName] = usePersistedBlockState(sessionId, "baseline-params", "assessmentName", "Q1 2026 Enterprise Risk Assessment");
+  const [riskDomain, setRiskDomain] = usePersistedBlockState(sessionId, "baseline-params", "riskDomain", "operational");
+  const [scoringMethod, setScoring] = usePersistedBlockState(sessionId, "baseline-params", "scoringMethod", "5x5");
+  const [period, setPeriod] = usePersistedBlockState(sessionId, "baseline-params", "period", "quarterly");
 
   return (
     <div className="space-y-4">
@@ -1181,13 +1195,12 @@ interface TrackerRecipient {
   lastActivity: string;
 }
 
-function DistributionTracker({ onComplete }: { onComplete: () => void }) {
-  const [phase, setPhase] = useState<"distributing" | "monitoring" | "complete">("distributing");
-  const [recipients, setRecipients] = useState<TrackerRecipient[]>(
-    allLocations.map((l) => ({ name: l.name, entity: l.entity, assignee: l.assignee, status: "pending" as const, progress: 0, lastActivity: "" }))
-  );
-  const [autoProgress, setAutoProgress] = useState(0);
-  const [sentCount, setSentCount] = useState(0);
+function DistributionTracker({ onComplete, sessionId }: { onComplete: () => void; sessionId: string }) {
+  const defaultRecipients = allLocations.map((l) => ({ name: l.name, entity: l.entity, assignee: l.assignee, status: "pending" as const, progress: 0, lastActivity: "" }));
+  const [phase, setPhase] = usePersistedBlockState<"distributing" | "monitoring" | "complete">(sessionId, "tracking", "phase", "distributing");
+  const [recipients, setRecipients] = usePersistedBlockState<TrackerRecipient[]>(sessionId, "tracking", "recipients", defaultRecipients);
+  const [autoProgress, setAutoProgress] = usePersistedBlockState<number>(sessionId, "tracking", "autoProgress", 0);
+  const [sentCount, setSentCount] = usePersistedBlockState<number>(sessionId, "tracking", "sentCount", 0);
 
   useEffect(() => {
     if (phase === "distributing" && sentCount < recipients.length) {
@@ -1403,21 +1416,21 @@ export function getRiskAssessmentConfig(): WorkflowSessionConfig {
         title: "Intelligence Synthesis",
         description: "Agent analyzes company profile, historical data, and industry signals to inform the assessment approach",
         type: "automated",
-        render: ({ onComplete }) => <SynthesisBlock onComplete={onComplete} />,
+        render: ({ onComplete, sessionId }) => <SynthesisBlock onComplete={onComplete} sessionId={sessionId} />,
       },
       {
         id: "template-selection",
         title: "Assessment Approach",
         description: "Review synthesized intelligence and select an assessment template",
         type: "human-input",
-        render: ({ onComplete }) => <TemplateSelectionBlock onComplete={onComplete} />,
+        render: ({ onComplete, sessionId }) => <TemplateSelectionBlock onComplete={onComplete} sessionId={sessionId} />,
       },
       {
         id: "baseline-params",
         title: "Assessment Configuration",
         description: "Confirm scope, scoring methodology, and assessment parameters",
         type: "human-input",
-        render: ({ onComplete }) => <BaselineParamsBlock onComplete={onComplete} />,
+        render: ({ onComplete, sessionId }) => <BaselineParamsBlock onComplete={onComplete} sessionId={sessionId} />,
       },
       {
         id: "distribution",
@@ -1431,7 +1444,7 @@ export function getRiskAssessmentConfig(): WorkflowSessionConfig {
         title: "Assessment Execution",
         description: "Auto-assessment runs in parallel while survey responses are collected over time",
         type: "automated",
-        render: ({ onComplete }) => <DistributionTracker onComplete={onComplete} />,
+        render: ({ onComplete, sessionId }) => <DistributionTracker onComplete={onComplete} sessionId={sessionId} />,
       },
       {
         id: "next-steps",
