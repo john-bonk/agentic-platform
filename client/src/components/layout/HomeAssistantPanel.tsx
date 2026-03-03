@@ -589,6 +589,10 @@ export function HomeAssistantPanel() {
   };
 
   const handleQuickAction = async (action: QuickAction) => {
+    if (settings.agentHubEnabled && action.id === "risk-assessment") {
+      window.dispatchEvent(new CustomEvent("agent-hub:launch-workflow", { detail: { workflowId: "risk-assessment" } }));
+      return;
+    }
     if (action.type === "workflow") {
       try {
         const res = await apiRequest("POST", "/api/workflows", {

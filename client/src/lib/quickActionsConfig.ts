@@ -104,7 +104,7 @@ export const workspaceQuickActions: Record<string, QuickActionConfig[]> = {
     {
       id: "risk-assessment",
       label: "Start Risk Assessment",
-      description: "Launch comprehensive risk assessment for current tariff scenarios",
+      description: "Launch a comprehensive enterprise risk assessment cycle",
       iconName: "Target",
       type: "create",
       route: "/wizard",

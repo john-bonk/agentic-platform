@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import {
   CircleDot,
   FileText,
   AlertCircle,
+  Play,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -36,6 +37,7 @@ import {
   type AgentActivityEntry,
   type AgentCategorySummary,
 } from "@/config/agentHubConfig";
+import { WorkflowSession, getRiskAssessmentConfig, type WorkflowSessionConfig } from "./WorkflowSession";
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
   "direct-realtime": Zap,
@@ -165,7 +167,7 @@ function ReviewDialog({ workflow, open, onClose }: { workflow: AgentWorkflow; op
   );
 }
 
-function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
+function WorkflowRow({ workflow, onLaunch }: { workflow: AgentWorkflow; onLaunch?: (id: string) => void }) {
   const [expanded, setExpanded] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
 
@@ -240,6 +242,21 @@ function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
                   <p className="text-xs text-[#266C92] dark:text-[#4da3c9]">{workflow.humanActionDescription}</p>
                 </div>
               )}
+
+              {onLaunch && (
+                <Button
+                  size="sm"
+                  className="bg-[#266C92] hover:bg-[#1e5a7a] text-white text-xs h-7 mt-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onLaunch(workflow.id);
+                  }}
+                  data-testid={`button-launch-${workflow.id}`}
+                >
+                  <Play className="w-3 h-3 mr-1" />
+                  Launch Workflow
+                </Button>
+              )}
             </div>
           </div>
         )}
@@ -255,9 +272,10 @@ function WorkflowRow({ workflow }: { workflow: AgentWorkflow }) {
 interface CategorySectionProps {
   category: AgentCategorySummary;
   sectionRef: (el: HTMLDivElement | null) => void;
+  onLaunchWorkflow?: (workflowId: string) => void;
 }
 
-function CategorySection({ category, sectionRef }: CategorySectionProps) {
+function CategorySection({ category, sectionRef, onLaunchWorkflow }: CategorySectionProps) {
   const [expanded, setExpanded] = useState(true);
   const Icon = categoryIcons[category.category];
 
@@ -288,7 +306,11 @@ function CategorySection({ category, sectionRef }: CategorySectionProps) {
       {expanded && (
         <div className="space-y-1.5">
           {category.workflows.map((wf) => (
-            <WorkflowRow key={wf.id} workflow={wf} />
+            <WorkflowRow
+              key={wf.id}
+              workflow={wf}
+              onLaunch={workflowRowToSession[wf.id] ? onLaunchWorkflow : undefined}
+            />
           ))}
         </div>
       )}
@@ -338,10 +360,38 @@ interface AgentHubHomeProps {
   welcomeMessage: string;
 }
 
+const workflowSessionConfigs: Record<string, () => WorkflowSessionConfig> = {
+  "risk-assessment": getRiskAssessmentConfig,
+};
+
+const workflowRowToSession: Record<string, string> = {
+  "er-direct-1": "risk-assessment",
+};
+
 export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps) {
   const hubData = useMemo(() => getAgentHubData(workspaceId), [workspaceId]);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const [activeSession, setActiveSession] = useState<WorkflowSessionConfig | null>(null);
+
+  const launchWorkflow = useCallback((id: string) => {
+    const sessionId = workflowRowToSession[id] || id;
+    const configFn = workflowSessionConfigs[sessionId];
+    if (configFn) {
+      setActiveSession(configFn());
+    }
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.workflowId) {
+        launchWorkflow(detail.workflowId);
+      }
+    };
+    window.addEventListener("agent-hub:launch-workflow", handler);
+    return () => window.removeEventListener("agent-hub:launch-workflow", handler);
+  }, [launchWorkflow]);
 
   const scrollToCategory = useCallback((categoryId: string) => {
     const el = sectionRefs.current[categoryId];
@@ -353,6 +403,15 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
   }, []);
 
   if (!hubData) return null;
+
+  if (activeSession) {
+    return (
+      <WorkflowSession
+        config={activeSession}
+        onBack={() => setActiveSession(null)}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -419,6 +478,7 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
                   key={cat.category}
                   category={cat}
                   sectionRef={(el) => { sectionRefs.current[cat.category] = el; }}
+                  onLaunchWorkflow={launchWorkflow}
                 />
               ))}
             </div>
