@@ -38,6 +38,7 @@ import {
   type AgentCategorySummary,
 } from "@/config/agentHubConfig";
 import { WorkflowSession, getRiskAssessmentConfig, type WorkflowSessionConfig } from "./WorkflowSession";
+import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
   "direct-realtime": Zap,
@@ -360,8 +361,8 @@ interface AgentHubHomeProps {
   welcomeMessage: string;
 }
 
-const workflowSessionConfigs: Record<string, () => WorkflowSessionConfig> = {
-  "risk-assessment": getRiskAssessmentConfig,
+export const workflowSessionConfigs: Record<string, { create: () => WorkflowSessionConfig; label: string; icon: string }> = {
+  "risk-assessment": { create: getRiskAssessmentConfig, label: "Risk Assessment", icon: "trending-up" },
 };
 
 const workflowRowToSession: Record<string, string> = {
@@ -372,15 +373,18 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
   const hubData = useMemo(() => getAgentHubData(workspaceId), [workspaceId]);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const [activeSession, setActiveSession] = useState<WorkflowSessionConfig | null>(null);
+  const { currentSessionId, addProject, setCurrentSession, getSessionConfig } = useWorkflowSessionStore();
+
+  const activeSession = currentSessionId ? (getSessionConfig(currentSessionId) as WorkflowSessionConfig | null) : null;
 
   const launchWorkflow = useCallback((id: string) => {
     const sessionId = workflowRowToSession[id] || id;
-    const configFn = workflowSessionConfigs[sessionId];
-    if (configFn) {
-      setActiveSession(configFn());
+    const meta = workflowSessionConfigs[sessionId];
+    if (meta) {
+      const config = meta.create();
+      addProject({ sessionId, label: meta.label, icon: meta.icon }, config);
     }
-  }, []);
+  }, [addProject]);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -408,7 +412,7 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
     return (
       <WorkflowSession
         config={activeSession}
-        onBack={() => setActiveSession(null)}
+        onBack={() => setCurrentSession(null)}
       />
     );
   }

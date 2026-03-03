@@ -21,13 +21,15 @@ import { useLocation } from "wouter";
 import { LeftIconNavbar } from "./LeftIconNavbar";
 import { SideNavigation } from "./SideNavigation";
 import { AppHeader } from "./AppHeader";
-import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav, aiGovNewTabNavSections, globalRiskNewTabNavSections, agentHubNavSections } from "@/config/navigation";
+import { useMemo } from "react";
+import { iconNavItems, appConfig, getModuleFromPath, getWorkspaceHomeNav, aiGovNewTabNavSections, globalRiskNewTabNavSections, agentHubNavSections, type SideNavSection } from "@/config/navigation";
 import { type Tab } from "@/lib/tabStore";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 import { useBrowserTabStore } from "@/lib/browserTabStore";
 import { useSettings } from "@/components/settings-panel";
 import { isAgentHubSupported } from "@/config/agentHubConfig";
+import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 
 const ASSISTANT_PANEL_WIDTH = 420;
 
@@ -61,14 +63,36 @@ export function AppLayout({
   const isGlobalRiskNewTab = location === "/global-residual-risk" && isNewTab && activeRoute === "/global-residual-risk";
   const isSpecialNewTab = isAiGovNewTab || isGlobalRiskNewTab;
   
+  const { activeProjects, currentSessionId } = useWorkflowSessionStore();
+  
   const isHomeModule = currentModule.id === "home";
   const isAgentHub = settings.agentHubEnabled && isHomeModule && isAgentHubSupported(currentWorkspace.id);
   const workspaceNav = isHomeModule && !isAgentHub
     ? getWorkspaceHomeNav(currentWorkspace.persona, currentWorkspace.moduleConfig) 
     : null;
   
+  const agentHubSectionsWithProjects = useMemo((): SideNavSection[] => {
+    if (!isAgentHub) return agentHubNavSections;
+    const projectItems = activeProjects.map((p) => ({
+      id: `ah-active-${p.sessionId}`,
+      label: p.label,
+      path: `/#project-${p.sessionId}`,
+      icon: p.icon,
+      badge: currentSessionId === p.sessionId ? "Active" : undefined,
+    }));
+    return agentHubNavSections.map((section) => {
+      if (section.id === "agent-hub-projects" && projectItems.length > 0) {
+        const staticItems = section.items.filter(
+          (item) => !activeProjects.some((p) => item.id === `ah-active-${p.sessionId}`)
+        );
+        return { ...section, items: [...projectItems, ...staticItems] };
+      }
+      return section;
+    });
+  }, [isAgentHub, activeProjects]);
+
   const sideNavSections = isAgentHub
-    ? agentHubNavSections
+    ? agentHubSectionsWithProjects
     : isAiGovNewTab 
     ? aiGovNewTabNavSections 
     : isGlobalRiskNewTab

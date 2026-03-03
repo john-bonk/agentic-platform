@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Link, useLocation } from "wouter";
+import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 import { 
   ChevronDown, 
   Home, 
@@ -102,6 +103,8 @@ interface CollapsibleSectionProps {
 }
 
 function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInNewTab }: CollapsibleSectionProps) {
+  const [, setLocation] = useLocation();
+  const { setCurrentSession } = useWorkflowSessionStore();
   const isCollapsible = section.collapsible !== false;
 
   return (
@@ -147,6 +150,12 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInN
                     onClick={hasHash ? (e) => {
                       e.preventDefault();
                       const hashPart = item.path.split("#")[1] || "";
+                      if (hashPart.startsWith("project-")) {
+                        const sessionId = hashPart.replace("project-", "");
+                        setCurrentSession(sessionId);
+                        setLocation("/");
+                        return;
+                      }
                       window.location.hash = hashPart ? `#${hashPart}` : "";
                       if (!hashPart) {
                         window.location.hash = "";
@@ -471,9 +480,15 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
+  const { currentSessionId } = useWorkflowSessionStore();
+
   const isActive = (path: string) => {
     if (path.includes("#")) {
       const [basePath, hashPart] = path.split("#");
+      if (hashPart.startsWith("project-")) {
+        const sessionId = hashPart.replace("project-", "");
+        return currentSessionId === sessionId;
+      }
       return location === basePath && currentHash === `#${hashPart}`;
     }
     if (activeModuleIndex === 0) {

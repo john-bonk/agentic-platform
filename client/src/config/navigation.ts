@@ -255,7 +255,6 @@ export const agentHubNavSections: SideNavSection[] = [
     collapsible: false,
     defaultExpanded: true,
     items: [
-      { id: "ah-risk-assessment", label: "Risk Assessment", path: "/", icon: "trending-up" },
       { id: "ah-scenario-analysis", label: "Scenario Analysis", path: "/#scenarios", icon: "flame" },
       { id: "ah-mitigation-plans", label: "Mitigation Plans", path: "/#mitigation", icon: "target" },
     ],
