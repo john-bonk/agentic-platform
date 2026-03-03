@@ -435,6 +435,7 @@ export function HomeAssistantPanel() {
   const [activeExperience, setActiveExperience] = useState<string | null>(null);
   const [buildingReport, setBuildingReport] = useState<BuildingReportState | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const sidecarTimers = useRef<number[]>([]);
   const [, setLocation] = useLocation();
   
   const {
@@ -588,8 +589,72 @@ export function HomeAssistantPanel() {
     updateActionStatus(action.id, "dismissed");
   };
 
+  useEffect(() => {
+    if (!settings.agentHubEnabled) return;
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (!detail?.blockId) return;
+      const blockId = detail.blockId as string;
+
+      const sidecarMessages: Record<string, { content: string; delay: number }> = {
+        "synthesis": {
+          delay: 800,
+          content: "I'm scanning your company profile, historical assessments, and real-time risk signals now. I'll surface everything relevant so we can make an informed decision on the assessment approach.",
+        },
+        "synthesis-complete": {
+          delay: 600,
+          content: "Analysis complete. I found **6 key signals** that should shape this assessment:\n\n- Your last cycle was **147 days ago** — peer companies assess quarterly\n- **34 controls** lack recent test results (12 high-priority)\n- **3 regulatory changes** and **2 vendor alerts** detected since last cycle\n- **7 KRIs** have breached tolerance thresholds\n- **42 risk items** can be auto-scored from existing data — no survey needed\n- **47 items** will require human input via distributed surveys\n\nReview the templates I've prepared and select the approach that fits your needs.",
+        },
+        "template-selection-complete": {
+          delay: 500,
+          content: "Good choice. I've pre-populated the assessment parameters based on your selection and our historical patterns. Review and adjust anything before we lock it in.",
+        },
+        "baseline-params-complete": {
+          delay: 500,
+          content: "Parameters confirmed. I've auto-assembled the distribution list by mapping your org hierarchy to the **47 survey items**. Each location gets a primary assignee and a reviewer.\n\nThe **42 auto-assessable items** will be scored by me in parallel once you approve — no human involvement needed for those.",
+        },
+        "distribution-complete": {
+          delay: 600,
+          content: "Distribution approved. Here's what's happening now:\n\n**Auto-assessment track:** I'm scoring 42 risk items using existing control test results, KRI data, and incident history. This runs in parallel — no waiting.\n\n**Survey track:** Assessment questionnaires are being sent to 12 locations across 3 regions. Responses will come in asynchronously over the coming days. I'll track progress, send reminders at 48hr and 72hr marks, and notify you at key milestones.\n\nYou don't need to stay on this screen — I'll keep working in the background.",
+        },
+        "tracking-complete": {
+          delay: 500,
+          content: "All done. **89 total risk items** have been assessed:\n- **42** auto-scored from existing data sources (control tests, KRI feeds, incident logs)\n- **47** collected via survey responses across 12 locations\n\nI've consolidated everything into a unified view. You can now generate the risk register, run trend analysis, create heat maps, or draft the board report. What would you like to do next?",
+        },
+      };
+
+      const msg = sidecarMessages[blockId];
+      if (!msg) return;
+
+      const timerId = window.setTimeout(() => {
+        addMessage({
+          id: `msg-sidecar-${blockId}-${Date.now()}`,
+          role: "assistant",
+          content: msg.content,
+          timestamp: new Date().toISOString(),
+        });
+      }, msg.delay);
+      sidecarTimers.current.push(timerId);
+    };
+
+    window.addEventListener("workflow-session:block-event", handler);
+    return () => {
+      window.removeEventListener("workflow-session:block-event", handler);
+      sidecarTimers.current.forEach((t) => clearTimeout(t));
+      sidecarTimers.current = [];
+    };
+  }, [settings.agentHubEnabled, addMessage]);
+
   const handleQuickAction = async (action: QuickAction) => {
     if (settings.agentHubEnabled && action.id === "risk-assessment") {
+      clearChat();
+      addMessage({
+        id: `msg-sidecar-init-${Date.now()}`,
+        role: "assistant",
+        content: "Starting **Risk Assessment** workflow. I'll be working alongside you through each step — analyzing signals, recommending approaches, and handling the heavy lifting.\n\nLet me begin by synthesizing all available data points to inform our assessment strategy.",
+        timestamp: new Date().toISOString(),
+      });
+      setOpen(true);
       window.dispatchEvent(new CustomEvent("agent-hub:launch-workflow", { detail: { workflowId: "risk-assessment" } }));
       return;
     }
