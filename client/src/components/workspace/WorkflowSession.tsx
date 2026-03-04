@@ -62,6 +62,7 @@ export interface WorkflowBlockRenderProps {
   onComplete: () => void;
   isActive: boolean;
   sessionId: string;
+  isReviewMode?: boolean;
 }
 
 export interface WorkflowSessionConfig {
@@ -84,6 +85,8 @@ function BlockWrapper({
   onComplete,
   isLast,
   sessionId,
+  isReviewing,
+  onToggleReview,
 }: {
   block: WorkflowBlock;
   index: number;
@@ -92,10 +95,13 @@ function BlockWrapper({
   onComplete: () => void;
   isLast: boolean;
   sessionId: string;
+  isReviewing: boolean;
+  onToggleReview: () => void;
 }) {
   const isActive = index === activeIndex;
   const isCompleted = completedIndices.has(index);
   const isFuture = index > activeIndex;
+  const showContent = isActive || isReviewing;
   const blockRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -104,11 +110,17 @@ function BlockWrapper({
     }
   }, [isActive]);
 
+  useEffect(() => {
+    if (isReviewing && blockRef.current) {
+      blockRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [isReviewing]);
+
   return (
     <div
       ref={blockRef}
       className={`transition-all duration-500 ease-in-out ${
-        isActive ? "opacity-100" : isCompleted ? "opacity-60" : "opacity-30"
+        isActive || isReviewing ? "opacity-100" : isCompleted ? "opacity-60" : "opacity-30"
       }`}
       data-testid={`workflow-block-${block.id}`}
     >
@@ -117,7 +129,9 @@ function BlockWrapper({
           <div
             className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
               isCompleted
-                ? "bg-[#266C92] text-white"
+                ? isReviewing
+                  ? "bg-[#266C92] text-white ring-4 ring-[#266C92]/20"
+                  : "bg-[#266C92] text-white"
                 : isActive
                 ? "bg-[#266C92] text-white ring-4 ring-[#266C92]/20"
                 : "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500"
@@ -135,11 +149,15 @@ function BlockWrapper({
         </div>
 
         <div className="flex-1 min-w-0 pb-6">
-          <div className="flex items-center gap-2 mb-1">
+          <div
+            className={`flex items-center gap-2 mb-1 ${isCompleted && !isActive ? "cursor-pointer group/header" : ""}`}
+            onClick={isCompleted && !isActive ? onToggleReview : undefined}
+            data-testid={isCompleted && !isActive ? `block-review-toggle-${block.id}` : undefined}
+          >
             <h3
               className={`text-sm font-semibold transition-colors ${
                 isActive || isCompleted ? "text-foreground" : "text-muted-foreground"
-              }`}
+              } ${isCompleted && !isActive ? "group-hover/header:text-[#266C92] dark:group-hover/header:text-[#4da3c9]" : ""}`}
             >
               {block.title}
             </h3>
@@ -154,21 +172,32 @@ function BlockWrapper({
                 Processing
               </Badge>
             )}
+            {isCompleted && !isActive && (
+              <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground ml-auto transition-transform duration-200 ${isReviewing ? "rotate-180" : ""}`} />
+            )}
           </div>
           <p className="text-xs text-muted-foreground mb-3">{block.description}</p>
 
-          {isActive && (
-            <div className="animate-in slide-in-from-bottom-4 fade-in duration-500">
-              <Card className="border border-slate-200 dark:border-border">
+          {showContent && (
+            <div className={isActive ? "animate-in slide-in-from-bottom-4 fade-in duration-500" : "animate-in fade-in duration-300"}>
+              <Card className={`border ${isReviewing && !isActive ? "border-[#266C92]/20 bg-slate-50/50 dark:bg-muted/10" : "border-slate-200 dark:border-border"}`}>
                 <CardContent className="p-4">
-                  {block.render({ onComplete, isActive, sessionId })}
+                  {isReviewing && !isActive && (
+                    <div className="flex items-center gap-1.5 mb-3 pb-2 border-b border-slate-100 dark:border-border">
+                      <Eye className="w-3 h-3 text-[#266C92]" />
+                      <span className="text-[10px] font-medium text-[#266C92] dark:text-[#4da3c9] uppercase tracking-wider">Reviewing completed step</span>
+                    </div>
+                  )}
+                  {block.render({ onComplete, isActive, sessionId, isReviewMode: isReviewing && !isActive })}
                 </CardContent>
               </Card>
             </div>
           )}
 
-          {isCompleted && (
-            <div className="text-xs text-muted-foreground italic">Step completed</div>
+          {isCompleted && !showContent && (
+            <div className="text-xs text-muted-foreground italic cursor-pointer hover:text-[#266C92] dark:hover:text-[#4da3c9] transition-colors" onClick={onToggleReview} data-testid={`block-expand-hint-${block.id}`}>
+              Step completed — click to review
+            </div>
           )}
 
           {isFuture && !isCompleted && (
@@ -186,6 +215,14 @@ export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionPr
   const completedIndices = new Set(completedIndicesArr);
   const fullScreenView = useWorkflowSessionStore((s) => s.runtimeStates[sessionId]?.fullScreenView ?? null);
   const setRuntime = useWorkflowSessionStore((s) => s.setRuntime);
+  const [reviewingBlock, setReviewingBlock] = useState<number | null>(null);
+  const prevActiveRef = useRef(activeIndex);
+  useEffect(() => {
+    if (prevActiveRef.current !== activeIndex) {
+      prevActiveRef.current = activeIndex;
+      setReviewingBlock(null);
+    }
+  }, [activeIndex]);
 
   const setActiveIndex = useCallback((idx: number) => {
     setRuntime(sessionId, { activeIndex: idx });
@@ -307,6 +344,8 @@ export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionPr
               completedIndices={completedIndices}
               onComplete={() => completeBlock(index)}
               sessionId={sessionId}
+              isReviewing={reviewingBlock === index}
+              onToggleReview={() => setReviewingBlock(reviewingBlock === index ? null : index)}
             />
           ))}
         </div>
@@ -860,7 +899,7 @@ const fullScreenDetailViews: Record<string, { title: string; headerIcon: JSX.Ele
   "ns-reassess": { title: "Re-Assessment Schedule", headerIcon: <RefreshCcw className="w-4 h-4 text-[#266C92]" />, render: () => <ReassessmentView /> },
 };
 
-function SynthesisBlock({ onComplete, sessionId }: { onComplete: () => void; sessionId: string }) {
+function SynthesisBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
   const [phase, setPhase] = usePersistedBlockState<"thinking" | "signals" | "done">(sessionId, "synthesis", "phase", "thinking");
   const [visibleSignals, setVisibleSignals] = usePersistedBlockState<number>(sessionId, "synthesis", "visibleSignals", 0);
 
@@ -930,7 +969,7 @@ function SynthesisBlock({ onComplete, sessionId }: { onComplete: () => void; ses
         </div>
       )}
 
-      {phase === "done" && (
+      {phase === "done" && !isReviewMode && (
         <div className="pt-2 animate-in fade-in duration-500">
           <Button
             className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white"
@@ -946,7 +985,7 @@ function SynthesisBlock({ onComplete, sessionId }: { onComplete: () => void; ses
   );
 }
 
-function TemplateSelectionBlock({ onComplete, sessionId }: { onComplete: () => void; sessionId: string }) {
+function TemplateSelectionBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
   const [selected, setSelected] = usePersistedBlockState<string | null>(sessionId, "template-selection", "selected", null);
 
   return (
@@ -956,12 +995,16 @@ function TemplateSelectionBlock({ onComplete, sessionId }: { onComplete: () => v
         {templateOptions.map((t) => (
           <button
             key={t.id}
-            className={`w-full text-left p-3 rounded-lg border transition-all cursor-pointer ${
+            className={`w-full text-left p-3 rounded-lg border transition-all ${
+              isReviewMode ? "cursor-default" : "cursor-pointer"
+            } ${
               selected === t.id
                 ? "border-[#266C92] bg-[#266C92]/5 dark:bg-[#266C92]/10 ring-1 ring-[#266C92]/30"
-                : "border-slate-200 dark:border-border hover:border-slate-300 dark:hover:border-slate-600"
+                : isReviewMode
+                  ? "border-slate-200 dark:border-border opacity-50"
+                  : "border-slate-200 dark:border-border hover:border-slate-300 dark:hover:border-slate-600"
             }`}
-            onClick={() => setSelected(t.id)}
+            onClick={() => !isReviewMode && setSelected(t.id)}
             data-testid={`template-${t.id}`}
           >
             <div className="flex items-center gap-2 mb-1">
@@ -980,7 +1023,7 @@ function TemplateSelectionBlock({ onComplete, sessionId }: { onComplete: () => v
         ))}
       </div>
 
-      {selected && (
+      {selected && !isReviewMode && (
         <Button
           className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white animate-in fade-in duration-300"
           onClick={onComplete}
@@ -994,7 +1037,7 @@ function TemplateSelectionBlock({ onComplete, sessionId }: { onComplete: () => v
   );
 }
 
-function BaselineParamsBlock({ onComplete, sessionId }: { onComplete: () => void; sessionId: string }) {
+function BaselineParamsBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
   const [assessmentName, setAssessmentName] = usePersistedBlockState(sessionId, "baseline-params", "assessmentName", "Q1 2026 Enterprise Risk Assessment");
   const [riskDomain, setRiskDomain] = usePersistedBlockState(sessionId, "baseline-params", "riskDomain", "operational");
   const [scoringMethod, setScoring] = usePersistedBlockState(sessionId, "baseline-params", "scoringMethod", "5x5");
@@ -1004,12 +1047,12 @@ function BaselineParamsBlock({ onComplete, sessionId }: { onComplete: () => void
     <div className="space-y-4">
       <div className="space-y-1.5">
         <Label className="text-xs font-medium">Assessment Name</Label>
-        <Input value={assessmentName} onChange={(e) => setAssessmentName(e.target.value)} className="text-sm" data-testid="input-assessment-name" />
+        <Input value={assessmentName} onChange={(e) => setAssessmentName(e.target.value)} className="text-sm" data-testid="input-assessment-name" disabled={isReviewMode} />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label className="text-xs font-medium">Risk Domain</Label>
-          <Select value={riskDomain} onValueChange={setRiskDomain}>
+          <Select value={riskDomain} onValueChange={setRiskDomain} disabled={isReviewMode}>
             <SelectTrigger className="text-sm" data-testid="select-risk-domain"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="operational">Operational</SelectItem>
@@ -1022,7 +1065,7 @@ function BaselineParamsBlock({ onComplete, sessionId }: { onComplete: () => void
         </div>
         <div className="space-y-1.5">
           <Label className="text-xs font-medium">Scoring Methodology</Label>
-          <Select value={scoringMethod} onValueChange={setScoring}>
+          <Select value={scoringMethod} onValueChange={setScoring} disabled={isReviewMode}>
             <SelectTrigger className="text-sm" data-testid="select-scoring"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="5x5">5×5 Matrix (Likelihood × Impact)</SelectItem>
@@ -1035,7 +1078,7 @@ function BaselineParamsBlock({ onComplete, sessionId }: { onComplete: () => void
       </div>
       <div className="space-y-1.5">
         <Label className="text-xs font-medium">Assessment Period</Label>
-        <Select value={period} onValueChange={setPeriod}>
+        <Select value={period} onValueChange={setPeriod} disabled={isReviewMode}>
           <SelectTrigger className="text-sm" data-testid="select-period"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="quarterly">Quarterly</SelectItem>
@@ -1054,10 +1097,12 @@ function BaselineParamsBlock({ onComplete, sessionId }: { onComplete: () => void
         </ul>
       </div>
 
-      <Button className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white" onClick={onComplete} data-testid="button-confirm-params">
-        <ChevronRight className="w-4 h-4 mr-1.5" />
-        Confirm Parameters
-      </Button>
+      {!isReviewMode && (
+        <Button className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white" onClick={onComplete} data-testid="button-confirm-params">
+          <ChevronRight className="w-4 h-4 mr-1.5" />
+          Confirm Parameters
+        </Button>
+      )}
     </div>
   );
 }
@@ -1155,7 +1200,7 @@ function UnitNode({ unit }: { unit: typeof orgHierarchy[0]["units"][0] }) {
   );
 }
 
-function DistributionBlock({ onComplete }: { onComplete: () => void }) {
+function DistributionBlock({ onComplete, isReviewMode }: { onComplete: () => void; isReviewMode?: boolean }) {
   const totalRecipients = orgHierarchy.reduce((sum, e) => sum + e.units.reduce((s, u) => s + u.locations.length, 0), 0);
   return (
     <div className="space-y-3">
@@ -1176,10 +1221,12 @@ function DistributionBlock({ onComplete }: { onComplete: () => void }) {
       <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
         {orgHierarchy.map((entity) => <OrgNode key={entity.entity} entity={entity} />)}
       </div>
-      <Button className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white" onClick={onComplete} data-testid="button-distribute">
-        <Send className="w-4 h-4 mr-1.5" />
-        Approve & Begin Distribution
-      </Button>
+      {!isReviewMode && (
+        <Button className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white" onClick={onComplete} data-testid="button-distribute">
+          <Send className="w-4 h-4 mr-1.5" />
+          Approve & Begin Distribution
+        </Button>
+      )}
     </div>
   );
 }
@@ -1416,28 +1463,28 @@ export function getRiskAssessmentConfig(): WorkflowSessionConfig {
         title: "Intelligence Synthesis",
         description: "Agent analyzes company profile, historical data, and industry signals to inform the assessment approach",
         type: "automated",
-        render: ({ onComplete, sessionId }) => <SynthesisBlock onComplete={onComplete} sessionId={sessionId} />,
+        render: ({ onComplete, sessionId, isReviewMode }) => <SynthesisBlock onComplete={onComplete} sessionId={sessionId} isReviewMode={isReviewMode} />,
       },
       {
         id: "template-selection",
         title: "Assessment Approach",
         description: "Review synthesized intelligence and select an assessment template",
         type: "human-input",
-        render: ({ onComplete, sessionId }) => <TemplateSelectionBlock onComplete={onComplete} sessionId={sessionId} />,
+        render: ({ onComplete, sessionId, isReviewMode }) => <TemplateSelectionBlock onComplete={onComplete} sessionId={sessionId} isReviewMode={isReviewMode} />,
       },
       {
         id: "baseline-params",
         title: "Assessment Configuration",
         description: "Confirm scope, scoring methodology, and assessment parameters",
         type: "human-input",
-        render: ({ onComplete, sessionId }) => <BaselineParamsBlock onComplete={onComplete} sessionId={sessionId} />,
+        render: ({ onComplete, sessionId, isReviewMode }) => <BaselineParamsBlock onComplete={onComplete} sessionId={sessionId} isReviewMode={isReviewMode} />,
       },
       {
         id: "distribution",
         title: "Distribution Setup",
         description: "Review auto-assembled org hierarchy of survey recipients and confirm distribution",
         type: "human-input",
-        render: ({ onComplete }) => <DistributionBlock onComplete={onComplete} />,
+        render: ({ onComplete, isReviewMode }) => <DistributionBlock onComplete={onComplete} isReviewMode={isReviewMode} />,
       },
       {
         id: "tracking",
