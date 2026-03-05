@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from "react";
+import { useSettings } from "@/components/settings-panel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -356,6 +357,282 @@ function ActivityFeed({ entries }: { entries: AgentActivityEntry[] }) {
   );
 }
 
+interface TrackerRecipient {
+  name: string;
+  entity: string;
+  assignee: string;
+  status: "pending" | "sent" | "opened" | "in-progress" | "completed";
+  progress: number;
+  lastActivity: string;
+}
+
+const blockLabels: Record<string, string> = {
+  synthesis: "Intelligence Synthesis",
+  "template-selection": "Assessment Approach",
+  "baseline-params": "Assessment Configuration",
+  distribution: "Distribution Setup",
+  tracking: "Assessment Execution",
+  "next-steps": "Next Steps",
+};
+
+function WorkflowTracker({ sessionId }: { sessionId: string }) {
+  const runtime = useWorkflowSessionStore((s) => s.runtimeStates[sessionId]);
+  const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
+
+  if (!runtime) return null;
+
+  const totalBlocks = 6;
+  const activeIndex = runtime.activeIndex;
+  const completedIndices = new Set(runtime.completedIndices);
+  const blockIds = ["synthesis", "template-selection", "baseline-params", "distribution", "tracking", "next-steps"];
+  const overallProgress = Math.round((completedIndices.size / totalBlocks) * 100);
+
+  const trackingState = runtime.blockStates?.["tracking"];
+  const trackingPhase = (trackingState?.phase as string) ?? null;
+  const recipients = (trackingState?.recipients as TrackerRecipient[] | undefined) ?? [];
+  const autoProgress = (trackingState?.autoProgress as number) ?? 0;
+  const completedSurveys = recipients.filter((r) => r.status === "completed").length;
+  const totalSurveys = recipients.length;
+
+  const isInTrackingPhase = activeIndex >= 4 || completedIndices.has(4);
+  const isComplete = completedIndices.size === totalBlocks;
+  const currentBlockId = blockIds[Math.min(activeIndex, blockIds.length - 1)];
+  const currentBlockLabel = blockLabels[currentBlockId] || currentBlockId;
+
+  const statusIcon = (status: string) => {
+    switch (status) {
+      case "pending": return <Clock className="w-3 h-3 text-slate-400" />;
+      case "sent": return <ArrowRight className="w-3 h-3 text-[#266C92]" />;
+      case "opened": return <Eye className="w-3 h-3 text-amber-500" />;
+      case "in-progress": return <Activity className="w-3 h-3 text-[#266C92]" />;
+      case "completed": return <CheckCircle2 className="w-3 h-3 text-emerald-500" />;
+      default: return <Clock className="w-3 h-3 text-slate-400" />;
+    }
+  };
+
+  return (
+    <Card className="border border-slate-200 dark:border-border overflow-hidden" data-testid="simple-workflow-tracker">
+      <div className="px-5 py-4 border-b border-slate-100 dark:border-border bg-white dark:bg-card">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-[#266C92]/10 flex items-center justify-center">
+              <Bot className="w-5 h-5 text-[#266C92]" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground" data-testid="text-workflow-title">Risk Assessment</h3>
+              <p className="text-xs text-muted-foreground">
+                {isComplete ? "Assessment complete" : `Step ${activeIndex + 1} of ${totalBlocks} — ${currentBlockLabel}`}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {isComplete ? (
+              <Badge className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                <CheckCircle2 className="w-3 h-3 mr-1" />
+                Complete
+              </Badge>
+            ) : (
+              <Badge className="text-xs bg-[#266C92] text-white">
+                <Activity className="w-3 h-3 mr-1" />
+                In Progress
+              </Badge>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => setCurrentSession(sessionId)}
+              data-testid="button-open-workflow"
+            >
+              Open
+              <ArrowRight className="w-3 h-3 ml-1" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
+          <div
+            className={`h-full rounded-full transition-all duration-700 ${isComplete ? "bg-emerald-500" : "bg-[#266C92]"}`}
+            style={{ width: `${overallProgress}%` }}
+          />
+        </div>
+        <p className="text-[11px] text-muted-foreground text-right">{overallProgress}% complete</p>
+      </div>
+
+      <div className="px-5 py-3 bg-slate-50/50 dark:bg-muted/5">
+        <div className="flex gap-1">
+          {blockIds.map((id, i) => {
+            const done = completedIndices.has(i);
+            const active = i === activeIndex;
+            return (
+              <div key={id} className="flex-1 flex flex-col items-center gap-1" data-testid={`step-indicator-${id}`}>
+                <div
+                  className={`w-full h-1 rounded-full transition-all ${
+                    done ? "bg-[#266C92]" : active ? "bg-[#266C92]/40" : "bg-slate-200 dark:bg-slate-700"
+                  }`}
+                />
+                <span className={`text-[9px] truncate max-w-full px-0.5 ${done ? "text-[#266C92] font-medium" : active ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+                  {blockLabels[id]?.split(" ")[0]}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {isInTrackingPhase && totalSurveys > 0 && (
+        <div className="px-5 py-4 border-t border-slate-100 dark:border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <Activity className="w-3.5 h-3.5 text-[#266C92]" />
+            <span className="text-xs font-semibold text-foreground">Assessment Execution — Live Tracker</span>
+            {trackingPhase === "complete" && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 ml-auto" />}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Bot className="w-3.5 h-3.5 text-[#266C92]" />
+                <span className="text-[11px] font-semibold">Auto-Assessment</span>
+                {autoProgress >= 42 && <CheckCircle2 className="w-3 h-3 text-emerald-500 ml-auto" />}
+              </div>
+              <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
+                <div className="h-full rounded-full bg-[#266C92] transition-all duration-500" style={{ width: `${(autoProgress / 42) * 100}%` }} />
+              </div>
+              <p className="text-[10px] text-muted-foreground">{autoProgress}/42 items scored</p>
+            </div>
+            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border">
+              <div className="flex items-center gap-2 mb-1.5">
+                <FileText className="w-3.5 h-3.5 text-[#266C92]" />
+                <span className="text-[11px] font-semibold">Survey Responses</span>
+                {completedSurveys === totalSurveys && totalSurveys > 0 && <CheckCircle2 className="w-3 h-3 text-emerald-500 ml-auto" />}
+              </div>
+              <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
+                <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${totalSurveys > 0 ? (completedSurveys / totalSurveys) * 100 : 0}%` }} />
+              </div>
+              <p className="text-[10px] text-muted-foreground">{completedSurveys}/{totalSurveys} responses</p>
+            </div>
+          </div>
+
+          <div className="space-y-0.5 max-h-40 overflow-y-auto pr-1">
+            <div className="grid grid-cols-[1fr_4rem_4rem] gap-2 px-2 py-1 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Location</span>
+              <span>Status</span>
+              <span>Progress</span>
+            </div>
+            {recipients.map((r) => (
+              <div key={r.name} className="grid grid-cols-[1fr_4rem_4rem] gap-2 px-2 py-1 rounded text-xs items-center hover:bg-slate-50 dark:hover:bg-muted/20">
+                <span className="truncate font-medium text-[11px]">{r.name}</span>
+                <div className="flex items-center gap-1">
+                  {statusIcon(r.status)}
+                  <span className="text-[9px] capitalize">{r.status === "in-progress" ? "Active" : r.status}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="flex-1 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full transition-all duration-500 ${r.status === "completed" ? "bg-emerald-500" : "bg-[#266C92]"}`} style={{ width: `${r.progress}%` }} />
+                  </div>
+                  <span className="text-[9px] text-muted-foreground w-5 text-right">{r.progress}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function SimpleAgentHub({ welcomeMessage }: { welcomeMessage: string }) {
+  const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
+  const currentSessionId = useWorkflowSessionStore((s) => s.currentSessionId);
+  const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
+  const addProject = useWorkflowSessionStore((s) => s.addProject);
+  const activeSession = useWorkflowSessionStore((s) =>
+    s.currentSessionId ? (s.sessionConfigs[s.currentSessionId] as WorkflowSessionConfig | null) ?? null : null
+  );
+
+  const launchWorkflow = useCallback((id: string) => {
+    const sessionId = workflowRowToSession[id] || id;
+    const meta = workflowSessionConfigs[sessionId];
+    if (meta) {
+      const config = meta.create();
+      addProject({ sessionId, label: meta.label, icon: meta.icon }, config);
+    }
+  }, [addProject]);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.workflowId) {
+        launchWorkflow(detail.workflowId);
+      }
+    };
+    window.addEventListener("agent-hub:launch-workflow", handler);
+    return () => window.removeEventListener("agent-hub:launch-workflow", handler);
+  }, [launchWorkflow]);
+
+  if (activeSession && currentSessionId) {
+    return (
+      <WorkflowSession
+        config={activeSession}
+        sessionId={currentSessionId}
+        onBack={() => setCurrentSession(null)}
+      />
+    );
+  }
+
+  const hasProjects = activeProjects.length > 0;
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden">
+      <div
+        className="text-white px-8 py-3 bg-cover bg-center bg-no-repeat relative shrink-0"
+        style={{ backgroundImage: `url(${headerBgImage})` }}
+      >
+        <div className="w-full relative z-10 flex items-center justify-between gap-4">
+          <h1 className="text-lg font-semibold truncate min-w-0" data-testid="simple-hub-welcome">
+            {welcomeMessage}
+          </h1>
+          {hasProjects && (
+            <p className="text-sm text-white/70 shrink-0 whitespace-nowrap">
+              {activeProjects.length} active workflow{activeProjects.length !== 1 ? "s" : ""}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background px-8 py-6">
+        <div className="max-w-3xl mx-auto">
+          {hasProjects ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Activity className="w-4 h-4 text-[#266C92]" />
+                <h2 className="text-sm font-semibold text-foreground">Active Workflows</h2>
+              </div>
+              {activeProjects.map((project) => (
+                <WorkflowTracker key={project.sessionId} sessionId={project.sessionId} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-center" data-testid="simple-hub-empty">
+              <div className="w-16 h-16 rounded-2xl bg-[#266C92]/10 flex items-center justify-center mb-5">
+                <Bot className="w-8 h-8 text-[#266C92]/60" />
+              </div>
+              <h2 className="text-base font-semibold text-foreground mb-2">No active workflows</h2>
+              <p className="text-sm text-muted-foreground max-w-sm mb-6 leading-relaxed">
+                Use the Optro Assistant to start a workflow. Ask it to run a risk assessment, generate a scenario analysis, or propose a mitigation plan.
+              </p>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground/60 bg-slate-100 dark:bg-muted/20 rounded-full px-4 py-2">
+                <Bot className="w-3.5 h-3.5" />
+                <span>Try: "Start a risk assessment"</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface AgentHubHomeProps {
   workspaceId: string;
   welcomeMessage: string;
@@ -370,6 +647,17 @@ const workflowRowToSession: Record<string, string> = {
 };
 
 export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps) {
+  const settings = useSettings();
+  const isSimple = settings.agentHubViewMode === "simple";
+
+  if (isSimple) {
+    return <SimpleAgentHub welcomeMessage={welcomeMessage} />;
+  }
+
+  return <ComplexAgentHub workspaceId={workspaceId} welcomeMessage={welcomeMessage} />;
+}
+
+function ComplexAgentHub({ workspaceId, welcomeMessage }: AgentHubHomeProps) {
   const hubData = useMemo(() => getAgentHubData(workspaceId), [workspaceId]);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);

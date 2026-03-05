@@ -29,6 +29,7 @@ interface SettingsState {
   agentTone: string;
   showBrowser: boolean;
   agentHubEnabled: boolean;
+  agentHubViewMode: "simple" | "complex";
 }
 
 const defaultSettings: SettingsState = {
@@ -39,6 +40,7 @@ const defaultSettings: SettingsState = {
   agentTone: "professional",
   showBrowser: false,
   agentHubEnabled: false,
+  agentHubViewMode: "simple",
 };
 
 const STORAGE_KEY = "dashboard-settings";
@@ -182,6 +184,38 @@ export function SettingsPanel() {
                 data-testid="switch-agent-hub"
               />
             </div>
+            {settings.agentHubEnabled && (
+              <div className="mt-3 ml-1 space-y-2">
+                <Label className="text-xs text-muted-foreground">Hub Home View</Label>
+                <div className="flex gap-2">
+                  <button
+                    className={`flex-1 px-3 py-2 rounded-md border text-xs font-medium transition-all ${
+                      settings.agentHubViewMode === "simple"
+                        ? "border-[#266C92] bg-[#266C92]/10 text-[#266C92] dark:text-[#4da3c9] ring-1 ring-[#266C92]/30"
+                        : "border-slate-200 dark:border-border text-muted-foreground hover:border-slate-300"
+                    }`}
+                    onClick={() => updateSetting("agentHubViewMode", "simple")}
+                    data-testid="button-hub-simple"
+                  >
+                    Simple
+                  </button>
+                  <button
+                    className={`flex-1 px-3 py-2 rounded-md border text-xs font-medium transition-all ${
+                      settings.agentHubViewMode === "complex"
+                        ? "border-[#266C92] bg-[#266C92]/10 text-[#266C92] dark:text-[#4da3c9] ring-1 ring-[#266C92]/30"
+                        : "border-slate-200 dark:border-border text-muted-foreground hover:border-slate-300"
+                    }`}
+                    onClick={() => updateSetting("agentHubViewMode", "complex")}
+                    data-testid="button-hub-complex"
+                  >
+                    Complex
+                  </button>
+                </div>
+                <p className="text-[10px] text-muted-foreground/60">
+                  {settings.agentHubViewMode === "simple" ? "Clean start — workflows appear as you launch them" : "Full dashboard with all agent categories and activity feed"}
+                </p>
+              </div>
+            )}
           </div>
 
           <Separator />
