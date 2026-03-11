@@ -13,7 +13,7 @@ import ReactMarkdown from "react-markdown";
 import { 
   Send, Bot, Sparkles, X, Loader2, 
   FileText, AlertTriangle, ClipboardList, 
-  BarChart3, Users, Shield, ChevronRight,
+  BarChart3, Users, Shield, ChevronRight, ChevronDown,
   ExternalLink, Workflow, Plus, Search,
   TrendingUp, AlertCircle, CheckCircle2,
   Building2, Globe, Zap, Target, RefreshCcw,
@@ -309,6 +309,48 @@ function QuickActionCard({ action, onExecute }: QuickActionCardProps) {
         <ChevronRight className="w-4 h-4 text-gray-400 dark:text-muted-foreground group-hover:text-[#266C92] flex-shrink-0 mt-0.5" />
       </div>
     </button>
+  );
+}
+
+function QuickActionsSection({ quickActions, isAgentHub, onExecute }: { quickActions: QuickAction[]; isAgentHub: boolean; onExecute: (action: QuickAction) => void }) {
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  if (!isAgentHub) {
+    return (
+      <div className="space-y-2">
+        {quickActions.map((action) => (
+          <QuickActionCard key={action.id} action={action} onExecute={onExecute} />
+        ))}
+      </div>
+    );
+  }
+
+  const primary = quickActions.find((a) => a.id === "risk-assessment");
+  const secondary = quickActions.filter((a) => a.id !== "risk-assessment");
+
+  return (
+    <div className="space-y-2">
+      {primary && <QuickActionCard action={primary} onExecute={onExecute} />}
+      {secondary.length > 0 && (
+        <div>
+          <button
+            onClick={() => setMoreOpen((v) => !v)}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors py-1.5 px-1"
+            data-testid="toggle-more-actions"
+          >
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreOpen ? "" : "-rotate-90"}`} />
+            <span>More actions</span>
+          </button>
+          {moreOpen && (
+            <div className="space-y-2 mt-1">
+              {secondary.map((action) => (
+                <QuickActionCard key={action.id} action={action} onExecute={onExecute} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -749,15 +791,11 @@ export function HomeAssistantPanel() {
                 </p>
               </div>
               
-              <div className="space-y-2">
-                {quickActions.map((action) => (
-                  <QuickActionCard
-                    key={action.id}
-                    action={action}
-                    onExecute={handleQuickAction}
-                  />
-                ))}
-              </div>
+              <QuickActionsSection
+                quickActions={quickActions}
+                isAgentHub={settings.agentHubEnabled}
+                onExecute={handleQuickAction}
+              />
             </div>
           )}
 
