@@ -138,27 +138,27 @@ export function LeftIconNavbar({ items, logoPath, className = "", homeOnly }: Le
         })}
       </nav>
 
-      {!homeOnly && (
-        <div className="flex flex-col items-center gap-1">
-          <Link href="/prototype-meta">
-            <div 
-              className={`w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-colors ${
-                location === "/prototype-meta" ? "bg-teal-500" : "hover:bg-gray-800"
-              }`}
-              data-testid="navbar-prototype-meta"
-              title="Prototype Meta View"
-            >
-              <Cog className={`w-4 h-4 ${location === "/prototype-meta" ? "text-white" : "text-gray-400"}`} />
-            </div>
-          </Link>
+      <div className="flex flex-col items-center gap-1">
+        <Link href="/prototype-meta">
+          <div 
+            className={`w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-colors ${
+              location === "/prototype-meta" ? "bg-teal-500" : "hover:bg-gray-800"
+            }`}
+            data-testid="navbar-prototype-meta"
+            title="Prototype Meta View"
+          >
+            <Cog className={`w-4 h-4 ${location === "/prototype-meta" ? "text-white" : "text-gray-400"}`} />
+          </div>
+        </Link>
+        {!homeOnly && (
           <div 
             className="w-10 h-10 rounded flex items-center justify-center hover:bg-gray-800 cursor-pointer" 
             data-testid="navbar-help"
           >
             <HelpCircle className="w-4 h-4 text-gray-400" />
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </aside>
   );
 }

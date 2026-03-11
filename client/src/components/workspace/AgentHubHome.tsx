@@ -28,6 +28,7 @@ import {
   FileText,
   AlertCircle,
   Play,
+  Shield,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -464,13 +465,33 @@ function WorkflowTracker({ sessionId }: { sessionId: string }) {
           {blockIds.map((id, i) => {
             const done = completedIndices.has(i);
             const active = i === activeIndex;
+            const blockStates = runtime.blockStates || {};
+
+            const skippedAtCompletion = (blockStates["synthesis"]?.skippedAtCompletion as boolean) ?? false;
+            const templateAck = (blockStates["template-selection"]?.automationAcknowledged as boolean) ?? false;
+            const distConfirm = (blockStates["distribution"]?.scopeConfirmed as boolean) ?? false;
+
+            let engagementIcon = null;
+            if (done) {
+              if (id === "synthesis" && skippedAtCompletion) {
+                engagementIcon = <div className="w-2 h-2 rounded-full bg-amber-400" title="Skipped intelligence review" />;
+              } else if (id === "template-selection" && templateAck) {
+                engagementIcon = <Shield className="w-2.5 h-2.5 text-[#266C92]" />;
+              } else if (id === "distribution" && distConfirm) {
+                engagementIcon = <Shield className="w-2.5 h-2.5 text-[#266C92]" />;
+              }
+            }
+
             return (
               <div key={id} className="flex-1 flex flex-col items-center gap-1" data-testid={`step-indicator-${id}`}>
-                <div
-                  className={`w-full h-1 rounded-full transition-all ${
-                    done ? "bg-[#266C92]" : active ? "bg-[#266C92]/40" : "bg-slate-200 dark:bg-slate-700"
-                  }`}
-                />
+                <div className="flex items-center gap-0.5 w-full">
+                  <div
+                    className={`flex-1 h-1 rounded-full transition-all ${
+                      done ? "bg-[#266C92]" : active ? "bg-[#266C92]/40" : "bg-slate-200 dark:bg-slate-700"
+                    }`}
+                  />
+                  {engagementIcon && <div className="shrink-0 flex items-center justify-center">{engagementIcon}</div>}
+                </div>
                 <span className={`text-[9px] truncate max-w-full px-0.5 ${done ? "text-[#266C92] font-medium" : active ? "text-foreground font-medium" : "text-muted-foreground"}`}>
                   {blockLabels[id]?.split(" ")[0]}
                 </span>

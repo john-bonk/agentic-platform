@@ -902,6 +902,8 @@ const fullScreenDetailViews: Record<string, { title: string; headerIcon: JSX.Ele
 function SynthesisBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
   const [phase, setPhase] = usePersistedBlockState<"thinking" | "signals" | "done">(sessionId, "synthesis", "phase", "thinking");
   const [visibleSignals, setVisibleSignals] = usePersistedBlockState<number>(sessionId, "synthesis", "visibleSignals", 0);
+  const [signalClickCount, setSignalClickCount] = usePersistedBlockState<number>(sessionId, "synthesis", "signalClickCount", 0);
+  const [skippedAtCompletion, setSkippedAtCompletion] = usePersistedBlockState<boolean | null>(sessionId, "synthesis", "skippedAtCompletion", null);
 
   useEffect(() => {
     if (phase === "thinking") {
@@ -922,7 +924,17 @@ function SynthesisBlock({ onComplete, sessionId, isReviewMode }: { onComplete: (
   }, [phase, visibleSignals]);
 
   const openDetail = (viewId: string) => {
+    if (!isReviewMode) {
+      setSignalClickCount((c) => c + 1);
+    }
     window.dispatchEvent(new CustomEvent("workflow-session:open-detail", { detail: { viewId } }));
+  };
+
+  const hasEngaged = signalClickCount > 0;
+
+  const handleComplete = () => {
+    setSkippedAtCompletion(!hasEngaged);
+    onComplete();
   };
 
   return (
@@ -970,14 +982,29 @@ function SynthesisBlock({ onComplete, sessionId, isReviewMode }: { onComplete: (
       )}
 
       {phase === "done" && !isReviewMode && (
-        <div className="pt-2 animate-in fade-in duration-500">
+        <div className="pt-2 animate-in fade-in duration-500 space-y-2">
+          {!hasEngaged && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <p className="text-[11px] text-amber-700 dark:text-amber-400">You haven't reviewed any intelligence signals. Consider clicking on the findings above to understand the context before proceeding.</p>
+            </div>
+          )}
           <Button
-            className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-            onClick={onComplete}
+            className={`w-full ${hasEngaged ? "bg-[#266C92] hover:bg-[#1e5a7a]" : "bg-amber-600 hover:bg-amber-700"} text-white`}
+            onClick={handleComplete}
             data-testid="button-synthesis-continue"
           >
-            <Sparkles className="w-4 h-4 mr-1.5" />
-            View Assessment Templates
+            {hasEngaged ? (
+              <>
+                <Sparkles className="w-4 h-4 mr-1.5" />
+                View Assessment Templates
+              </>
+            ) : (
+              <>
+                <AlertTriangle className="w-4 h-4 mr-1.5" />
+                Skip Intelligence Review & Continue
+              </>
+            )}
           </Button>
         </div>
       )}
@@ -987,6 +1014,24 @@ function SynthesisBlock({ onComplete, sessionId, isReviewMode }: { onComplete: (
 
 function TemplateSelectionBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
   const [selected, setSelected] = usePersistedBlockState<string | null>(sessionId, "template-selection", "selected", null);
+  const [automationAcknowledged, setAutomationAcknowledged] = usePersistedBlockState<boolean>(sessionId, "template-selection", "automationAcknowledged", false);
+  const [acknowledgedForTemplate, setAcknowledgedForTemplate] = usePersistedBlockState<string | null>(sessionId, "template-selection", "acknowledgedForTemplate", null);
+
+  const handleSelectTemplate = (id: string) => {
+    if (isReviewMode) return;
+    setSelected(id);
+    if (id !== acknowledgedForTemplate) {
+      setAutomationAcknowledged(false);
+      setAcknowledgedForTemplate(null);
+    }
+  };
+
+  const handleAcknowledge = (checked: boolean) => {
+    setAutomationAcknowledged(checked);
+    setAcknowledgedForTemplate(checked ? selected : null);
+  };
+
+  const selectedTemplate = templateOptions.find((t) => t.id === selected);
 
   return (
     <div className="space-y-3">
@@ -1004,7 +1049,7 @@ function TemplateSelectionBlock({ onComplete, sessionId, isReviewMode }: { onCom
                   ? "border-slate-200 dark:border-border opacity-50"
                   : "border-slate-200 dark:border-border hover:border-slate-300 dark:hover:border-slate-600"
             }`}
-            onClick={() => !isReviewMode && setSelected(t.id)}
+            onClick={() => handleSelectTemplate(t.id)}
             data-testid={`template-${t.id}`}
           >
             <div className="flex items-center gap-2 mb-1">
@@ -1023,25 +1068,97 @@ function TemplateSelectionBlock({ onComplete, sessionId, isReviewMode }: { onCom
         ))}
       </div>
 
-      {selected && !isReviewMode && (
-        <Button
-          className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white animate-in fade-in duration-300"
-          onClick={onComplete}
-          data-testid="button-proceed-assessment"
-        >
-          <ArrowRight className="w-4 h-4 mr-1.5" />
-          Proceed with Assessment
-        </Button>
+      {selected && selectedTemplate && !isReviewMode && (
+        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden" data-testid="automation-awareness-panel">
+            <div className="px-3 py-2 bg-slate-50 dark:bg-muted/20 border-b border-slate-200 dark:border-border">
+              <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-[#266C92]" />
+                Automation Transparency
+              </p>
+            </div>
+            <div className="grid grid-cols-2 divide-x divide-slate-200 dark:divide-border">
+              <div className="p-3">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Bot className="w-3.5 h-3.5 text-[#266C92]" />
+                  <span className="text-[11px] font-semibold text-[#266C92] dark:text-[#4da3c9]">Agent Handles</span>
+                </div>
+                <p className="text-xs text-foreground font-medium">{selectedTemplate.autoItems} risk items</p>
+                <p className="text-[11px] text-muted-foreground leading-relaxed mt-1">Scored by AI from historical data and existing integrations</p>
+              </div>
+              <div className="p-3">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Users className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-400">Human Judgment</span>
+                </div>
+                <p className="text-xs text-foreground font-medium">{selectedTemplate.surveyItems} survey items</p>
+                <p className="text-[11px] text-muted-foreground leading-relaxed mt-1">Sent to domain experts for nuanced evaluation</p>
+              </div>
+            </div>
+            <div className="px-3 py-2 bg-amber-50/50 dark:bg-amber-950/10 border-t border-slate-200 dark:border-border">
+              <p className="text-[10px] text-muted-foreground leading-relaxed">
+                Auto-assessed items use historical patterns and may not capture emerging risks. Survey items ensure domain experts weigh in on nuanced areas.
+              </p>
+            </div>
+          </div>
+
+          <label className="flex items-start gap-2 cursor-pointer group" data-testid="automation-acknowledge-label">
+            <input
+              type="checkbox"
+              checked={automationAcknowledged}
+              onChange={(e) => handleAcknowledge(e.target.checked)}
+              className="mt-0.5 w-4 h-4 rounded border-slate-300 dark:border-border text-[#266C92] focus:ring-[#266C92] cursor-pointer"
+              data-testid="checkbox-automation-acknowledge"
+            />
+            <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+              I understand the automation scope for this assessment
+            </span>
+          </label>
+
+          <Button
+            className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={onComplete}
+            disabled={!automationAcknowledged}
+            data-testid="button-proceed-assessment"
+          >
+            <ArrowRight className="w-4 h-4 mr-1.5" />
+            Proceed with Assessment
+          </Button>
+        </div>
       )}
     </div>
   );
 }
+
+const scoringMethodImpact: Record<string, { description: string; confidence: "high" | "medium" | "low"; note: string }> = {
+  "5x5": { description: "Prioritizes likelihood-weighted risk ranking with structured 5-level scales", confidence: "high", note: "Well-established pattern matching — agent has high accuracy with this methodology" },
+  "3x3": { description: "Simplified risk categorization for rapid initial screening", confidence: "high", note: "Straightforward scoring — agent can reliably auto-score with minimal variance" },
+  "quantitative": { description: "Dollar-impact estimation requiring financial data correlation", confidence: "medium", note: "Requires financial data validation — consider reviewing auto-scored items after completion" },
+  "hybrid": { description: "Combines qualitative assessment with quantitative dollar impact analysis", confidence: "low", note: "Needs human calibration between qualitative and quantitative scales — higher variance in automated scoring" },
+};
+
+const confidenceColors = {
+  high: { bg: "bg-emerald-50 dark:bg-emerald-950/20", border: "border-emerald-200 dark:border-emerald-800/30", text: "text-emerald-700 dark:text-emerald-400", badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
+  medium: { bg: "bg-amber-50 dark:bg-amber-950/20", border: "border-amber-200 dark:border-amber-800/30", text: "text-amber-700 dark:text-amber-400", badge: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" },
+  low: { bg: "bg-orange-50 dark:bg-orange-950/20", border: "border-orange-200 dark:border-orange-800/30", text: "text-orange-700 dark:text-orange-400", badge: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" },
+};
 
 function BaselineParamsBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
   const [assessmentName, setAssessmentName] = usePersistedBlockState(sessionId, "baseline-params", "assessmentName", "Q1 2026 Enterprise Risk Assessment");
   const [riskDomain, setRiskDomain] = usePersistedBlockState(sessionId, "baseline-params", "riskDomain", "operational");
   const [scoringMethod, setScoring] = usePersistedBlockState(sessionId, "baseline-params", "scoringMethod", "5x5");
   const [period, setPeriod] = usePersistedBlockState(sessionId, "baseline-params", "period", "quarterly");
+  const [buttonReady, setButtonReady] = usePersistedBlockState<boolean>(sessionId, "baseline-params", "buttonReady", false);
+
+  useEffect(() => {
+    if (!buttonReady && !isReviewMode) {
+      const timer = setTimeout(() => setButtonReady(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [buttonReady, isReviewMode]);
+
+  const impact = scoringMethodImpact[scoringMethod];
+  const colors = impact ? confidenceColors[impact.confidence] : null;
 
   return (
     <div className="space-y-4">
@@ -1076,6 +1193,21 @@ function BaselineParamsBlock({ onComplete, sessionId, isReviewMode }: { onComple
           </Select>
         </div>
       </div>
+
+      {impact && colors && (
+        <div className={`p-3 rounded-lg ${colors.bg} border ${colors.border} animate-in fade-in duration-200`} data-testid="scoring-impact-preview">
+          <div className="flex items-center gap-2 mb-1.5">
+            <Gauge className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-[11px] font-semibold text-foreground">Methodology Impact</span>
+            <Badge className={`text-[9px] h-4 ml-auto ${colors.badge}`}>
+              {impact.confidence === "high" ? "High" : impact.confidence === "medium" ? "Medium" : "Low"} AI Confidence
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground mb-1.5">{impact.description}</p>
+          <p className={`text-[11px] ${colors.text} font-medium`}>{impact.note}</p>
+        </div>
+      )}
+
       <div className="space-y-1.5">
         <Label className="text-xs font-medium">Assessment Period</Label>
         <Select value={period} onValueChange={setPeriod} disabled={isReviewMode}>
@@ -1098,9 +1230,23 @@ function BaselineParamsBlock({ onComplete, sessionId, isReviewMode }: { onComple
       </div>
 
       {!isReviewMode && (
-        <Button className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white" onClick={onComplete} data-testid="button-confirm-params">
-          <ChevronRight className="w-4 h-4 mr-1.5" />
-          Confirm Parameters
+        <Button
+          className={`w-full text-white transition-all ${buttonReady ? "bg-[#266C92] hover:bg-[#1e5a7a]" : "bg-[#266C92]/60 cursor-wait"}`}
+          onClick={buttonReady ? onComplete : undefined}
+          disabled={!buttonReady}
+          data-testid="button-confirm-params"
+        >
+          {buttonReady ? (
+            <>
+              <ChevronRight className="w-4 h-4 mr-1.5" />
+              Confirm Parameters
+            </>
+          ) : (
+            <>
+              <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+              Reviewing parameters...
+            </>
+          )}
         </Button>
       )}
     </div>
@@ -1200,8 +1346,12 @@ function UnitNode({ unit }: { unit: typeof orgHierarchy[0]["units"][0] }) {
   );
 }
 
-function DistributionBlock({ onComplete, isReviewMode }: { onComplete: () => void; isReviewMode?: boolean }) {
+function DistributionBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
   const totalRecipients = orgHierarchy.reduce((sum, e) => sum + e.units.reduce((s, u) => s + u.locations.length, 0), 0);
+  const totalLocationsCount = orgHierarchy.reduce((sum, e) => sum + e.units.reduce((s, u) => s + u.locations.length, 0), 0);
+  const uniqueAssignees = new Set(orgHierarchy.flatMap(e => e.units.flatMap(u => u.locations.map(l => l.assignee)))).size;
+  const [scopeConfirmed, setScopeConfirmed] = usePersistedBlockState<boolean>(sessionId, "distribution", "scopeConfirmed", false);
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
@@ -1221,11 +1371,48 @@ function DistributionBlock({ onComplete, isReviewMode }: { onComplete: () => voi
       <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
         {orgHierarchy.map((entity) => <OrgNode key={entity.entity} entity={entity} />)}
       </div>
+
       {!isReviewMode && (
-        <Button className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white" onClick={onComplete} data-testid="button-distribute">
-          <Send className="w-4 h-4 mr-1.5" />
-          Approve & Begin Distribution
-        </Button>
+        <>
+          <div className="rounded-lg border border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-950/10 overflow-hidden" data-testid="distribution-accountability-summary">
+            <div className="px-3 py-2 bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-800/30">
+              <p className="text-xs font-semibold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                <AlertCircle className="w-3.5 h-3.5" />
+                Distribution Scope Confirmation
+              </p>
+            </div>
+            <div className="px-3 py-2.5 space-y-2">
+              <p className="text-xs text-foreground leading-relaxed">
+                You are authorizing the agent to distribute assessment surveys to <span className="font-semibold">{uniqueAssignees} people</span> across <span className="font-semibold">{totalLocationsCount} locations</span> in <span className="font-semibold">{orgHierarchy.length} entities</span>. Survey responses will be collected asynchronously.
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Expected completion: ~18 business days based on your Comprehensive Assessment selection
+              </p>
+              <label className="flex items-center gap-2 cursor-pointer group pt-1" data-testid="scope-confirm-label">
+                <input
+                  type="checkbox"
+                  checked={scopeConfirmed}
+                  onChange={(e) => setScopeConfirmed(e.target.checked)}
+                  className="w-4 h-4 rounded border-amber-300 dark:border-amber-700 text-[#266C92] focus:ring-[#266C92] cursor-pointer"
+                  data-testid="checkbox-scope-confirm"
+                />
+                <span className="text-xs text-amber-800 dark:text-amber-400 font-medium group-hover:text-foreground transition-colors">
+                  I confirm this distribution scope
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <Button
+            className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={onComplete}
+            disabled={!scopeConfirmed}
+            data-testid="button-distribute"
+          >
+            <Send className="w-4 h-4 mr-1.5" />
+            Approve & Begin Distribution
+          </Button>
+        </>
       )}
     </div>
   );
@@ -1484,7 +1671,7 @@ export function getRiskAssessmentConfig(): WorkflowSessionConfig {
         title: "Distribution Setup",
         description: "Review auto-assembled org hierarchy of survey recipients and confirm distribution",
         type: "human-input",
-        render: ({ onComplete, isReviewMode }) => <DistributionBlock onComplete={onComplete} isReviewMode={isReviewMode} />,
+        render: ({ onComplete, sessionId, isReviewMode }) => <DistributionBlock onComplete={onComplete} sessionId={sessionId} isReviewMode={isReviewMode} />,
       },
       {
         id: "tracking",

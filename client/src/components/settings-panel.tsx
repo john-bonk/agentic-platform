@@ -39,7 +39,7 @@ const defaultSettings: SettingsState = {
   agentEnabled: true,
   agentTone: "professional",
   showBrowser: false,
-  agentHubEnabled: false,
+  agentHubEnabled: true,
   agentHubViewMode: "simple",
 };
 

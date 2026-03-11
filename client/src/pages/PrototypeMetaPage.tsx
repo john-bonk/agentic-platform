@@ -655,6 +655,91 @@ function DataArchitecture() {
   );
 }
 
+function AgentHubOverview() {
+  const frictionPoints = [
+    { block: "Intelligence Synthesis", feature: "Engagement Indicator", description: "Tracks whether user clicked any signal detail views. If none reviewed, the continue button changes to amber 'Skip Intelligence Review & Continue' with a warning callout.", type: "Awareness" },
+    { block: "Assessment Approach", feature: "Automation Transparency Panel", description: "Shows 'Agent Handles' vs 'Human Judgment' split with item counts. Requires acknowledgment checkbox before proceeding.", type: "Acknowledgment Gate" },
+    { block: "Assessment Configuration", feature: "Scoring Impact Preview + Button Delay", description: "Dynamic methodology impact card with AI confidence level (High/Medium/Low). 1.5s button delay forces user to process configuration before confirming.", type: "Awareness + Pause" },
+    { block: "Distribution Setup", feature: "Accountability Summary", description: "Explicit scope card: X people, Y locations, Z entities. Requires 'I confirm this distribution scope' checkbox before approval.", type: "Acknowledgment Gate" },
+  ];
+
+  const features = [
+    { label: "Default Mode", value: "Agent Hub ON, Simple View", status: "active" },
+    { label: "Hub Views", value: "Simple (blank-start) / Complex (full dashboard)", status: "active" },
+    { label: "Branding", value: "Optro Assistant (replaces AuditBoard Assistant)", status: "active" },
+    { label: "Supported Workspace", value: "Enterprise Risk (CRO persona)", status: "active" },
+    { label: "Workflow Sessions", value: "Risk Assessment (6-block stepper)", status: "active" },
+    { label: "State Persistence", value: "Full session state via Zustand store + localStorage", status: "active" },
+    { label: "Stepper Review Mode", value: "Click completed steps to expand read-only view", status: "active" },
+    { label: "Navigation Override", value: "Stripped-down Projects/Monitoring/Scheduled nav", status: "active" },
+    { label: "WorkflowTracker", value: "Real-time mirror card with engagement indicators", status: "active" },
+    { label: "Agentic Chat Sidecar", value: "Contextual agent messages for each workflow block", status: "active" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div className="border dark:border-border rounded-lg overflow-hidden">
+        <div className="p-4 bg-slate-50 dark:bg-muted border-b dark:border-border">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-[#266C92]/10 flex items-center justify-center">
+              <Bot className="w-5 h-5 text-[#266C92]" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-foreground">Agent Hub System</h3>
+              <p className="text-sm text-gray-500 dark:text-muted-foreground">Agent-centric experience with Optro Assistant branding</p>
+            </div>
+            <Badge className="ml-auto bg-green-100 text-green-700 border-green-200">
+              <CheckCircle2 className="w-3 h-3 mr-1" />
+              Default ON
+            </Badge>
+          </div>
+        </div>
+        <div className="divide-y dark:divide-border">
+          {features.map((f) => (
+            <div key={f.label} className="p-3 flex items-center justify-between">
+              <div>
+                <span className="font-medium text-sm text-gray-900 dark:text-foreground">{f.label}</span>
+                <span className="text-sm text-gray-500 dark:text-muted-foreground ml-2">— {f.value}</span>
+              </div>
+              <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">
+                <CheckCircle2 className="w-3 h-3 mr-1" />
+                Active
+              </Badge>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="border dark:border-border rounded-lg overflow-hidden">
+        <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-800/30">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-amber-700 dark:text-amber-400" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-amber-800 dark:text-amber-300">HITL Friction Points</h3>
+              <p className="text-sm text-amber-600 dark:text-amber-500">Intentional friction for conscious automation decisions</p>
+            </div>
+            <Badge className="ml-auto bg-amber-100 text-amber-700 border-amber-200">{frictionPoints.length} Points</Badge>
+          </div>
+        </div>
+        <div className="divide-y dark:divide-border">
+          {frictionPoints.map((fp) => (
+            <div key={fp.feature} className="p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-semibold text-gray-900 dark:text-foreground">{fp.feature}</span>
+                <Badge variant="outline" className="text-[10px] h-4">{fp.type}</Badge>
+                <span className="text-xs text-muted-foreground ml-auto">{fp.block}</span>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-muted-foreground">{fp.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PrototypeMetaPage() {
   return (
     <AppLayout 
@@ -681,6 +766,7 @@ export default function PrototypeMetaPage() {
             <TabsTrigger value="navigation" data-testid="tab-navigation">Navigation</TabsTrigger>
             <TabsTrigger value="reporting" data-testid="tab-reporting">Reporting</TabsTrigger>
             <TabsTrigger value="architecture" data-testid="tab-architecture">Architecture</TabsTrigger>
+            <TabsTrigger value="agent-hub" data-testid="tab-agent-hub">Agent Hub</TabsTrigger>
           </TabsList>
 
           <TabsContent value="readiness">
@@ -709,6 +795,10 @@ export default function PrototypeMetaPage() {
 
           <TabsContent value="architecture">
             <DataArchitecture />
+          </TabsContent>
+
+          <TabsContent value="agent-hub">
+            <AgentHubOverview />
           </TabsContent>
         </Tabs>
 
