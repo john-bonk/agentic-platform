@@ -52,7 +52,12 @@ function loadSettings(): SettingsState {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      return { ...defaultSettings, ...JSON.parse(stored) };
+      const parsed = JSON.parse(stored);
+      const merged = { ...defaultSettings, ...parsed };
+      if (merged.agentHubViewMode !== "simple" && merged.agentHubViewMode !== "complex") {
+        merged.agentHubViewMode = "simple";
+      }
+      return merged;
     }
   } catch (e) {
     console.error("Failed to load settings:", e);

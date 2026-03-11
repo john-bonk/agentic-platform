@@ -669,7 +669,7 @@ const workflowRowToSession: Record<string, string> = {
 
 export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps) {
   const settings = useSettings();
-  const isSimple = settings.agentHubViewMode === "simple";
+  const isSimple = settings.agentHubViewMode !== "complex";
 
   if (isSimple) {
     return <SimpleAgentHub welcomeMessage={welcomeMessage} />;
