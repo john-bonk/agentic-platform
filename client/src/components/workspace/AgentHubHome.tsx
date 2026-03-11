@@ -29,6 +29,8 @@ import {
   AlertCircle,
   Play,
   Shield,
+  MoreVertical,
+  FastForward,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
