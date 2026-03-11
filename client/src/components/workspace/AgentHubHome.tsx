@@ -13,6 +13,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
   ChevronDown,
   Zap,
   Activity,
@@ -381,6 +387,43 @@ const blockLabels: Record<string, string> = {
 function WorkflowTracker({ sessionId }: { sessionId: string }) {
   const runtime = useWorkflowSessionStore((s) => s.runtimeStates[sessionId]);
   const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
+  const setRuntime = useWorkflowSessionStore((s) => s.setRuntime);
+  const setBlockState = useWorkflowSessionStore((s) => s.setBlockState);
+
+  const fastForwardDemo = useCallback(() => {
+    const defaultRecipientNames = [
+      { name: "New York HQ", entity: "North America Holdings", assignee: "Sarah Chen" },
+      { name: "Chicago Regional", entity: "North America Holdings", assignee: "James Park" },
+      { name: "San Francisco Tech", entity: "North America Holdings", assignee: "Priya Sharma" },
+      { name: "Toronto Office", entity: "North America Holdings", assignee: "Alex Morrison" },
+      { name: "Vancouver Hub", entity: "North America Holdings", assignee: "Nina Patel" },
+      { name: "London HQ", entity: "EMEA Group", assignee: "Oliver Wright" },
+      { name: "Dublin Center", entity: "EMEA Group", assignee: "Ciara O'Brien" },
+      { name: "Frankfurt Office", entity: "EMEA Group", assignee: "Hans Mueller" },
+      { name: "Paris Branch", entity: "EMEA Group", assignee: "Claire Dubois" },
+      { name: "Shanghai Office", entity: "APAC Region", assignee: "Wei Zhang" },
+      { name: "Hong Kong Hub", entity: "APAC Region", assignee: "Amy Lau" },
+      { name: "Singapore Center", entity: "APAC Region", assignee: "Raj Anand" },
+    ];
+    const trackingRecipients = (runtime?.blockStates?.["tracking"]?.recipients as TrackerRecipient[] | undefined);
+    const baseRecipients = trackingRecipients && trackingRecipients.length > 0
+      ? trackingRecipients
+      : defaultRecipientNames.map((r) => ({ ...r, status: "pending" as const, progress: 0, lastActivity: "" }));
+    const completedRecipients = baseRecipients.map((r) => ({
+      ...r,
+      status: "completed" as const,
+      progress: 100,
+      lastActivity: "Completed",
+    }));
+    setBlockState(sessionId, "tracking", "recipients", completedRecipients);
+    setBlockState(sessionId, "tracking", "autoProgress", 42);
+    setBlockState(sessionId, "tracking", "phase", "complete");
+    setBlockState(sessionId, "tracking", "sentCount", completedRecipients.length);
+    setRuntime(sessionId, {
+      activeIndex: 5,
+      completedIndices: [0, 1, 2, 3, 4],
+    });
+  }, [sessionId, runtime, setRuntime, setBlockState]);
 
   if (!runtime) return null;
 
@@ -450,6 +493,19 @@ function WorkflowTracker({ sessionId }: { sessionId: string }) {
               Open
               <ArrowRight className="w-3 h-3 ml-1" />
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" data-testid="button-tracker-menu">
+                  <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={fastForwardDemo} data-testid="menu-item-fast-forward">
+                  <FastForward className="w-4 h-4 mr-2" />
+                  Fast-forward demo
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
