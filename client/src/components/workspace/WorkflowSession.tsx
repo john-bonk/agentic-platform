@@ -463,11 +463,11 @@ function BenchmarkDetailView() {
 function ControlCoverageDetailView() {
   return (
     <div className="px-8 py-6 max-w-4xl mx-auto space-y-6">
-      <div className="flex items-start gap-4 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30">
-        <Shield className="w-5 h-5 text-amber-600 mt-0.5" />
+      <div className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 dark:bg-muted/20 border border-slate-200 dark:border-border">
+        <Shield className="w-5 h-5 text-slate-500 dark:text-slate-400 mt-0.5" />
         <div>
-          <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">34 controls have gaps in test coverage</p>
-          <p className="text-xs text-amber-600/80 dark:text-amber-500/70 mt-1">Of 89 total controls in scope, 34 lack recent test results. 12 of these are classified as high-priority based on risk impact scoring and regulatory requirements.</p>
+          <p className="text-sm font-semibold text-foreground">34 controls have gaps in test coverage</p>
+          <p className="text-xs text-muted-foreground mt-1">Of 89 total controls in scope, 34 lack recent test results. 12 of these are classified as high-priority based on risk impact scoring and regulatory requirements.</p>
         </div>
       </div>
       <div className="grid grid-cols-4 gap-3">
@@ -533,7 +533,7 @@ function EmergingRisksDetailView() {
               <div className="flex items-center gap-2 mb-1">
                 <Globe className="w-4 h-4 text-[#266C92]" />
                 <span className="text-sm font-semibold text-foreground">{reg.title}</span>
-                <Badge className={`text-[10px] h-4 ml-auto ${reg.impact === "Critical" ? "bg-red-100 text-red-700" : reg.impact === "High" ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700"}`}>{reg.impact}</Badge>
+                <Badge className={`text-[10px] h-4 ml-auto ${reg.impact === "Critical" ? "bg-red-100 text-red-700" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"}`}>{reg.impact}</Badge>
               </div>
               <p className="text-[11px] text-muted-foreground mb-1">{reg.date}</p>
               <p className="text-xs text-foreground leading-relaxed">{reg.desc}</p>
@@ -551,7 +551,7 @@ function EmergingRisksDetailView() {
               <div className="flex items-center gap-2 mb-1">
                 <AlertCircle className="w-4 h-4 text-red-500" />
                 <span className="text-sm font-semibold text-foreground">{v.vendor}</span>
-                <Badge className={`text-[10px] h-4 ml-auto ${v.severity === "Critical" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>{v.severity}</Badge>
+                <Badge className={`text-[10px] h-4 ml-auto ${v.severity === "Critical" ? "bg-red-100 text-red-700" : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"}`}>{v.severity}</Badge>
               </div>
               <p className="text-xs text-foreground mb-1">{v.alert}</p>
               <p className="text-[11px] text-muted-foreground">Affected: {v.affected}</p>
@@ -1705,8 +1705,8 @@ function ControlSelectionBlock({ onComplete, sessionId, isReviewMode }: { onComp
                 <span className="text-muted-foreground ml-1.5">{c.name}</span>
               </div>
               <span className="text-muted-foreground truncate">{c.category}</span>
-              <Badge className={`text-[9px] h-4 ${c.riskLevel === "Critical" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : c.riskLevel === "High" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"}`}>{c.riskLevel}</Badge>
-              <span className={`text-[10px] ${c.dataSource === "connected" ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500"}`}>
+              <Badge className={`text-[9px] h-4 ${c.riskLevel === "Critical" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : c.riskLevel === "High" ? "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"}`}>{c.riskLevel}</Badge>
+              <span className={`text-[10px] ${c.dataSource === "connected" ? "text-[#266C92]" : "text-slate-500"}`}>
                 {c.dataSource === "connected" ? "⚡ Auto" : "📋 Manual"}
               </span>
             </div>
@@ -1719,12 +1719,12 @@ function ControlSelectionBlock({ onComplete, sessionId, isReviewMode }: { onComp
           <p className="text-lg font-bold text-[#266C92]">{selectedIds.length}</p>
           <p className="text-[10px] text-muted-foreground">Controls selected</p>
         </div>
-        <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/30">
-          <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{connectedCount}</p>
+        <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-muted/20 border border-slate-200 dark:border-border">
+          <p className="text-lg font-bold text-foreground">{connectedCount}</p>
           <p className="text-[10px] text-muted-foreground">Fully automated</p>
         </div>
-        <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
-          <p className="text-lg font-bold text-amber-600 dark:text-amber-400">{manualCount}</p>
+        <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-muted/20 border border-slate-200 dark:border-border">
+          <p className="text-lg font-bold text-foreground">{manualCount}</p>
           <p className="text-[10px] text-muted-foreground">PBC required</p>
         </div>
       </div>
@@ -1768,8 +1768,8 @@ function DataSourceConfigBlock({ onComplete, sessionId, isReviewMode }: { onComp
           data-testid="button-toggle-systems"
         >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
-              <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-muted/30 flex items-center justify-center">
+              <Globe className="w-4 h-4 text-slate-500 dark:text-slate-400" />
             </div>
             <div className="text-left">
               <p className="text-xs font-semibold text-foreground">
@@ -1782,7 +1782,7 @@ function DataSourceConfigBlock({ onComplete, sessionId, isReviewMode }: { onComp
           </div>
           <div className="flex items-center gap-2">
             {allAcknowledged && (
-              <Badge className="text-[9px] bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">All Active</Badge>
+              <Badge className="text-[9px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">All Active</Badge>
             )}
             <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${systemsExpanded ? "rotate-180" : ""}`} />
           </div>
@@ -1795,7 +1795,7 @@ function DataSourceConfigBlock({ onComplete, sessionId, isReviewMode }: { onComp
               return (
                 <div key={sys.id} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-border hover:border-[#266C92]/30 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <div className="w-2 h-2 rounded-full bg-[#266C92]" />
                     <div>
                       <p className="text-xs font-medium">{sys.name}</p>
                       <p className="text-[10px] text-muted-foreground">{sys.type} · {sys.coverage} control{sys.coverage !== 1 ? "s" : ""}</p>
@@ -1803,7 +1803,7 @@ function DataSourceConfigBlock({ onComplete, sessionId, isReviewMode }: { onComp
                   </div>
                   <button
                     onClick={() => setAcknowledgedSystems(prev => isAcked ? prev.filter(id => id !== sys.id) : [...prev, sys.id])}
-                    className={`px-2.5 py-1 rounded text-[10px] font-medium transition-all ${isAcked ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 dark:bg-muted/30 text-muted-foreground hover:bg-[#266C92]/10 hover:text-[#266C92]"}`}
+                    className={`px-2.5 py-1 rounded text-[10px] font-medium transition-all ${isAcked ? "bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]" : "bg-slate-100 dark:bg-muted/30 text-muted-foreground hover:bg-[#266C92]/10 hover:text-[#266C92]"}`}
                     data-testid={`button-ack-system-${sys.id}`}
                   >
                     {isAcked ? "✓ Enabled" : "Enable"}
@@ -1871,10 +1871,10 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
 
   return (
     <div className="space-y-4">
-      <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
+      <div className="p-3 rounded-lg bg-slate-50 dark:bg-muted/20 border border-slate-200 dark:border-border">
         <div className="flex items-center gap-2 mb-1">
-          <Users className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-          <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">PBC Distribution Required</span>
+          <Users className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+          <span className="text-xs font-semibold text-foreground">PBC Distribution Required</span>
         </div>
         <p className="text-[11px] text-muted-foreground leading-relaxed">
           {manualControls.length} control{manualControls.length !== 1 ? "s" : ""} require manual evidence collection via PBC requests.
@@ -1885,13 +1885,13 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
       <div className="space-y-2">
         <button
           onClick={() => setPbcExpanded(!pbcExpanded)}
-          className="w-full flex items-center justify-between p-2.5 rounded-lg border border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/5 hover:border-amber-300 dark:hover:border-amber-700/50 transition-colors"
+          className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10 hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
           data-testid="button-toggle-pbc-controls"
         >
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
             <span className="text-xs font-semibold text-foreground">PBC Request Recipients</span>
-            <Badge className="text-[9px] bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">{manualControls.length} requests</Badge>
+            <Badge className="text-[9px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">{manualControls.length} requests</Badge>
           </div>
           <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${pbcExpanded ? "" : "-rotate-90"}`} />
         </button>
@@ -1904,7 +1904,7 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
               <div key={c.id} className="grid grid-cols-[1fr_6rem_6rem] gap-2 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50">
                 <span><span className="font-medium text-[#266C92]">{c.id}</span> <span className="text-muted-foreground">{c.name}</span></span>
                 <span className="text-[10px] truncate">{c.owner}</span>
-                <span className="text-[10px] truncate text-amber-600 dark:text-amber-400">{c.pbcOwner}</span>
+                <span className="text-[10px] truncate text-muted-foreground">{c.pbcOwner}</span>
               </div>
             ))}
           </div>
@@ -1914,13 +1914,13 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
       <div className="space-y-2">
         <button
           onClick={() => setAutoExpanded(!autoExpanded)}
-          className="w-full flex items-center justify-between p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800/30 bg-emerald-50/50 dark:bg-emerald-900/5 hover:border-emerald-300 dark:hover:border-emerald-700/50 transition-colors"
+          className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10 hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
           data-testid="button-toggle-auto-controls"
         >
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
             <span className="text-xs font-semibold text-foreground">Automated (No PBC needed)</span>
-            <Badge className="text-[9px] bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">{autoControls.length} automated</Badge>
+            <Badge className="text-[9px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">{autoControls.length} automated</Badge>
           </div>
           <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${autoExpanded ? "" : "-rotate-90"}`} />
         </button>
@@ -1928,8 +1928,8 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
           <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden max-h-36 overflow-y-auto animate-in slide-in-from-top-2 fade-in duration-200">
             {autoControls.map(c => (
               <div key={c.id} className="flex items-center justify-between px-3 py-1.5 text-xs border-t first:border-t-0 border-slate-100 dark:border-border/50">
-                <span><span className="font-medium text-emerald-600 dark:text-emerald-400">{c.id}</span> <span className="text-muted-foreground">{c.name}</span></span>
-                <span className="text-[10px] text-emerald-600 dark:text-emerald-400">⚡ {c.system}</span>
+                <span><span className="font-medium text-foreground">{c.id}</span> <span className="text-muted-foreground">{c.name}</span></span>
+                <span className="text-[10px] text-muted-foreground">⚡ {c.system}</span>
               </div>
             ))}
           </div>
@@ -2113,9 +2113,9 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
 
   const stepIcon = (status: string) => {
     switch (status) {
-      case "complete": return <CheckCircle2 className="w-3 h-3 text-emerald-500" />;
+      case "complete": return <CheckCircle2 className="w-3 h-3 text-[#266C92]" />;
       case "running": return <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />;
-      case "waiting": return <Clock className="w-3 h-3 text-amber-500" />;
+      case "waiting": return <Clock className="w-3 h-3 text-slate-400" />;
       case "blocked": return <AlertCircle className="w-3 h-3 text-red-500" />;
       default: return <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600" />;
     }
@@ -2136,12 +2136,12 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
               <p className="text-lg font-bold text-foreground">{completedControls}/{statuses.length}</p>
               <p className="text-[10px] text-muted-foreground">Controls Complete</p>
             </div>
-            <div className="p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800/30 bg-emerald-50/50 dark:bg-emerald-900/10 text-center">
-              <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{autoComplete}/{autoControls.length}</p>
+            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10 text-center">
+              <p className="text-lg font-bold text-foreground">{autoComplete}/{autoControls.length}</p>
               <p className="text-[10px] text-muted-foreground">Automated</p>
             </div>
-            <div className="p-2.5 rounded-lg border border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/10 text-center">
-              <p className="text-lg font-bold text-amber-600 dark:text-amber-400">{manualComplete}/{manualControls.length}</p>
+            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10 text-center">
+              <p className="text-lg font-bold text-foreground">{manualComplete}/{manualControls.length}</p>
               <p className="text-[10px] text-muted-foreground">PBC Workflow</p>
             </div>
           </div>
@@ -2154,14 +2154,14 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
               {statuses.map(ctrl => (
                 <div key={ctrl.controlId} className="grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/10">
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <span className={`text-[10px] font-mono font-medium ${ctrl.dataSource === "connected" ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>{ctrl.controlId}</span>
+                    <span className="text-[10px] font-mono font-medium text-foreground">{ctrl.controlId}</span>
                     <span className="text-[10px] text-muted-foreground truncate">{ctrl.name}</span>
                   </div>
                   {fieldworkStepOrder.map(step => (
                     <div key={step} className="flex justify-center">{stepIcon(ctrl.steps[step])}</div>
                   ))}
                   <div className="flex items-center justify-center">
-                    <span className={`text-[9px] font-medium ${ctrl.overallProgress === 100 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>{ctrl.overallProgress}%</span>
+                    <span className={`text-[9px] font-medium ${ctrl.overallProgress === 100 ? "text-[#266C92]" : "text-muted-foreground"}`}>{ctrl.overallProgress}%</span>
                   </div>
                 </div>
               ))}
@@ -2171,9 +2171,9 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
           <div className="flex items-center gap-2 text-[10px] text-muted-foreground px-1">
             <div className="flex items-center gap-1"><Loader2 className="w-2.5 h-2.5 text-[#266C92] animate-spin" /><span>Agent running</span></div>
             <span>·</span>
-            <div className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-amber-500" /><span>Waiting on PBC</span></div>
+            <div className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-slate-400" /><span>Waiting on PBC</span></div>
             <span>·</span>
-            <div className="flex items-center gap-1"><CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" /><span>Complete</span></div>
+            <div className="flex items-center gap-1"><CheckCircle2 className="w-2.5 h-2.5 text-[#266C92]" /><span>Complete</span></div>
           </div>
         </>
       )}

@@ -482,7 +482,7 @@ function WorkflowTracker({ sessionId }: { sessionId: string }) {
           </div>
           <div className="flex items-center gap-3">
             {isComplete ? (
-              <Badge className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+              <Badge className="text-xs bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]">
                 <CheckCircle2 className="w-3 h-3 mr-1" />
                 Complete
               </Badge>
@@ -520,7 +520,7 @@ function WorkflowTracker({ sessionId }: { sessionId: string }) {
 
         <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
           <div
-            className={`h-full rounded-full transition-all duration-700 ${isComplete ? "bg-emerald-500" : "bg-[#266C92]"}`}
+            className="h-full rounded-full transition-all duration-700 bg-[#266C92]"
             style={{ width: `${overallProgress}%` }}
           />
         </div>
@@ -595,7 +595,7 @@ function WorkflowTracker({ sessionId }: { sessionId: string }) {
                 {completedSurveys === totalSurveys && totalSurveys > 0 && <CheckCircle2 className="w-3 h-3 text-emerald-500 ml-auto" />}
               </div>
               <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
-                <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${totalSurveys > 0 ? (completedSurveys / totalSurveys) * 100 : 0}%` }} />
+                <div className="h-full rounded-full bg-[#266C92] transition-all duration-500" style={{ width: `${totalSurveys > 0 ? (completedSurveys / totalSurveys) * 100 : 0}%` }} />
               </div>
               <p className="text-[10px] text-muted-foreground">{completedSurveys}/{totalSurveys} responses</p>
             </div>
@@ -616,7 +616,7 @@ function WorkflowTracker({ sessionId }: { sessionId: string }) {
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="flex-1 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full transition-all duration-500 ${r.status === "completed" ? "bg-emerald-500" : "bg-[#266C92]"}`} style={{ width: `${r.progress}%` }} />
+                    <div className={`h-full rounded-full transition-all duration-500 ${r.status === "completed" ? "bg-[#266C92]" : "bg-[#266C92]"}`} style={{ width: `${r.progress}%` }} />
                   </div>
                   <span className="text-[9px] text-muted-foreground w-5 text-right">{r.progress}%</span>
                 </div>
@@ -712,9 +712,9 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
 
   const stepIcon = (status: string) => {
     switch (status) {
-      case "complete": return <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />;
+      case "complete": return <CheckCircle2 className="w-2.5 h-2.5 text-[#266C92]" />;
       case "running": return <Loader2 className="w-2.5 h-2.5 text-[#266C92] animate-spin" />;
-      case "waiting": return <Clock className="w-2.5 h-2.5 text-amber-500" />;
+      case "waiting": return <Clock className="w-2.5 h-2.5 text-slate-400" />;
       case "blocked": return <AlertCircle className="w-2.5 h-2.5 text-red-500" />;
       default: return <div className="w-2.5 h-2.5 rounded-full border border-slate-300 dark:border-slate-600" />;
     }
@@ -737,7 +737,7 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
           </div>
           <div className="flex items-center gap-3">
             {isComplete ? (
-              <Badge className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+              <Badge className="text-xs bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]">
                 <CheckCircle2 className="w-3 h-3 mr-1" />
                 Complete
               </Badge>
@@ -767,7 +767,7 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
           </div>
         </div>
         <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
-          <div className={`h-full rounded-full transition-all duration-700 ${isComplete ? "bg-emerald-500" : "bg-[#266C92]"}`} style={{ width: `${overallProgress}%` }} />
+          <div className="h-full rounded-full transition-all duration-700 bg-[#266C92]" style={{ width: `${overallProgress}%` }} />
         </div>
         <p className="text-[11px] text-muted-foreground text-right">{overallProgress}% complete</p>
       </div>
@@ -794,7 +794,7 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
           <div className="flex items-center gap-2 mb-3">
             <Workflow className="w-3.5 h-3.5 text-[#266C92]" />
             <span className="text-xs font-semibold text-foreground">Control Testing — Live Pipeline</span>
-            {executionPhase === "complete" && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 ml-auto" />}
+            {executionPhase === "complete" && <CheckCircle2 className="w-3.5 h-3.5 text-[#266C92] ml-auto" />}
           </div>
 
           <div className="grid grid-cols-3 gap-3 mb-3">
@@ -802,12 +802,12 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
               <p className="text-sm font-bold text-foreground">{completedControls}/{totalControls}</p>
               <p className="text-[9px] text-muted-foreground">Controls Done</p>
             </div>
-            <div className="p-2 rounded-lg border border-emerald-200 dark:border-emerald-800/30 bg-emerald-50/50 dark:bg-emerald-900/10 text-center">
-              <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{autoComplete}/{autoControls.length}</p>
+            <div className="p-2 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10 text-center">
+              <p className="text-sm font-bold text-foreground">{autoComplete}/{autoControls.length}</p>
               <p className="text-[9px] text-muted-foreground">Automated</p>
             </div>
-            <div className="p-2 rounded-lg border border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/10 text-center">
-              <p className="text-sm font-bold text-amber-600 dark:text-amber-400">{manualComplete}/{manualControls.length}</p>
+            <div className="p-2 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10 text-center">
+              <p className="text-sm font-bold text-foreground">{manualComplete}/{manualControls.length}</p>
               <p className="text-[9px] text-muted-foreground">PBC Workflow</p>
             </div>
           </div>
@@ -819,14 +819,14 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
             {controlStatuses.map(ctrl => (
               <div key={ctrl.controlId} className="grid grid-cols-[1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem] gap-1 px-2 py-1 rounded text-xs items-center hover:bg-slate-50 dark:hover:bg-muted/20">
                 <div className="flex items-center gap-1 min-w-0">
-                  <span className={`text-[9px] font-mono font-medium ${ctrl.dataSource === "connected" ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>{ctrl.controlId}</span>
+                  <span className="text-[9px] font-mono font-medium text-foreground">{ctrl.controlId}</span>
                   <span className="text-[9px] text-muted-foreground truncate">{ctrl.name}</span>
                 </div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.population)}</div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.sampling)}</div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.evidence)}</div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.testing)}</div>
-                <span className={`text-[8px] text-center font-medium ${ctrl.overallProgress === 100 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>{ctrl.overallProgress}%</span>
+                <span className={`text-[8px] text-center font-medium ${ctrl.overallProgress === 100 ? "text-[#266C92]" : "text-muted-foreground"}`}>{ctrl.overallProgress}%</span>
               </div>
             ))}
           </div>
@@ -834,9 +834,9 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
           <div className="flex items-center gap-2 text-[9px] text-muted-foreground px-1 mt-2 pt-2 border-t border-slate-100 dark:border-border">
             <div className="flex items-center gap-0.5"><Loader2 className="w-2 h-2 text-[#266C92] animate-spin" /><span>Running</span></div>
             <span>·</span>
-            <div className="flex items-center gap-0.5"><Clock className="w-2 h-2 text-amber-500" /><span>Waiting</span></div>
+            <div className="flex items-center gap-0.5"><Clock className="w-2 h-2 text-slate-400" /><span>Waiting</span></div>
             <span>·</span>
-            <div className="flex items-center gap-0.5"><CheckCircle2 className="w-2 h-2 text-emerald-500" /><span>Done</span></div>
+            <div className="flex items-center gap-0.5"><CheckCircle2 className="w-2 h-2 text-[#266C92]" /><span>Done</span></div>
           </div>
         </div>
       )}
@@ -869,11 +869,13 @@ const fieldworkSystemStatus = [
 function OptroHome() {
   const addProject = useWorkflowSessionStore((s) => s.addProject);
   const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
+  const setPendingCanvasView = useWorkflowSessionStore((s) => s.setPendingCanvasView);
   const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
 
   const launchControlTesting = useCallback(() => {
     const meta = workflowSessionConfigs["control-testing"];
     if (meta) {
+      setPendingCanvasView(true);
       const existing = activeProjects.find((p) => p.sessionId === "control-testing");
       if (existing) {
         setCurrentSession("control-testing");
@@ -882,7 +884,7 @@ function OptroHome() {
         addProject({ sessionId: "control-testing", label: meta.label, icon: meta.icon }, config);
       }
     }
-  }, [addProject, setCurrentSession, activeProjects]);
+  }, [addProject, setCurrentSession, setPendingCanvasView, activeProjects]);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -910,8 +912,8 @@ function OptroHome() {
       title: "Review Open Exceptions",
       description: "3 control exceptions from prior testing cycle awaiting management response and remediation plans.",
       icon: AlertTriangle,
-      iconColor: "text-amber-500",
-      iconBg: "bg-amber-50 dark:bg-amber-900/10",
+      iconColor: "text-slate-500",
+      iconBg: "bg-slate-100 dark:bg-slate-800/30",
       priority: "medium" as const,
     },
     {
@@ -919,8 +921,8 @@ function OptroHome() {
       title: "Follow Up on Evidence Requests",
       description: "5 PBC evidence requests are pending — 2 overdue by more than 3 business days.",
       icon: FileText,
-      iconColor: "text-orange-500",
-      iconBg: "bg-orange-50 dark:bg-orange-900/10",
+      iconColor: "text-slate-500",
+      iconBg: "bg-slate-100 dark:bg-slate-800/30",
       priority: "medium" as const,
     },
     {
@@ -1016,6 +1018,8 @@ function FieldworkComplexHub() {
   const addProject = useWorkflowSessionStore((s) => s.addProject);
   const setRuntime = useWorkflowSessionStore((s) => s.setRuntime);
   const setBlockState = useWorkflowSessionStore((s) => s.setBlockState);
+  const pendingCanvasView = useWorkflowSessionStore((s) => s.pendingCanvasView);
+  const setPendingCanvasView = useWorkflowSessionStore((s) => s.setPendingCanvasView);
 
   const fieldworkProject = activeProjects.find((p) => p.sessionId === "control-testing");
   const fieldworkRuntime = useWorkflowSessionStore((s) =>
@@ -1025,7 +1029,13 @@ function FieldworkComplexHub() {
     fieldworkProject ? (s.sessionConfigs[fieldworkProject.sessionId] as WorkflowSessionConfig | null) ?? null : null
   );
 
-  const [showCanvas, setShowCanvas] = useState(false);
+  const [showCanvas, setShowCanvas] = useState(() => {
+    if (pendingCanvasView) {
+      setPendingCanvasView(false);
+      return true;
+    }
+    return false;
+  });
 
   const launchWorkflow = useCallback((id: string) => {
     const sessionId = workflowRowToSession[id] || id;
@@ -1160,9 +1170,9 @@ function FieldworkComplexHub() {
 
   const stepDot = (status: string) => {
     switch (status) {
-      case "complete": return <CheckCircle2 className="w-3 h-3 text-emerald-500" />;
+      case "complete": return <CheckCircle2 className="w-3 h-3 text-[#266C92]" />;
       case "running": return <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />;
-      case "waiting": return <Clock className="w-3 h-3 text-amber-500" />;
+      case "waiting": return <Clock className="w-3 h-3 text-slate-400" />;
       case "blocked": return <AlertCircle className="w-3 h-3 text-red-500" />;
       default: return <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600" />;
     }
@@ -1284,7 +1294,7 @@ function FieldworkComplexHub() {
                       {fieldworkSystemStatus.map((sys) => (
                         <div key={sys.name} className="flex items-center justify-between py-1">
                           <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#266C92]" />
                             <span className="text-xs text-foreground">{sys.name}</span>
                           </div>
                           <span className="text-[10px] text-muted-foreground">{sys.type}</span>
@@ -1326,7 +1336,7 @@ function FieldworkComplexHub() {
               </div>
               <div className="flex items-center gap-2">
                 {isComplete && (
-                  <Badge className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  <Badge className="text-xs bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]">
                     <CheckCircle2 className="w-3 h-3 mr-1" />
                     Complete
                   </Badge>
@@ -1385,7 +1395,7 @@ function FieldworkComplexHub() {
               <Card className="border border-slate-200 dark:border-border">
                 <CardContent className="p-3">
                   <div className="flex items-center gap-2 mb-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#266C92]" />
                     <span className="text-[11px] text-muted-foreground font-medium">Controls Tested</span>
                   </div>
                   <div className="flex items-baseline gap-1.5">
@@ -1397,7 +1407,7 @@ function FieldworkComplexHub() {
               <Card className="border border-slate-200 dark:border-border">
                 <CardContent className="p-3">
                   <div className="flex items-center gap-2 mb-1">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                    <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
                     <span className="text-[11px] text-muted-foreground font-medium">Exceptions</span>
                   </div>
                   <div className="flex items-baseline gap-1.5">
@@ -1409,40 +1419,32 @@ function FieldworkComplexHub() {
             </div>
 
             {blockedActions.length > 0 && (
-              <Card className="border border-amber-200 dark:border-amber-800/30" data-testid="fieldwork-actions-card">
+              <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-actions-card">
                 <button
                   onClick={() => setActionsExpanded(!actionsExpanded)}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-amber-50/50 dark:hover:bg-amber-900/5 transition-colors"
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-muted/10 transition-colors"
                   data-testid="button-toggle-actions"
                 >
                   <div className="flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-amber-500" />
+                    <AlertCircle className="w-4 h-4 text-red-500" />
                     <span className="text-sm font-semibold text-foreground">Actions Required</span>
                     <Badge className="text-[10px] h-4 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">{blockedActions.length} blocking</Badge>
                   </div>
                   <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${actionsExpanded ? "" : "-rotate-90"}`} />
                 </button>
                 {actionsExpanded && (
-                  <CardContent className="px-4 pb-4 pt-0 space-y-2 border-t border-amber-100 dark:border-amber-800/20">
+                  <CardContent className="px-4 pb-4 pt-0 space-y-2 border-t border-slate-100 dark:border-border">
                     {blockedActions.map((action) => (
                       <div
                         key={action.controlId}
-                        className={`p-3 rounded-lg border transition-colors ${
-                          action.severity === "high"
-                            ? "border-red-200 dark:border-red-900/30 bg-red-50/40 dark:bg-red-900/5"
-                            : "border-amber-200 dark:border-amber-900/30 bg-amber-50/40 dark:bg-amber-900/5"
-                        }`}
+                        className="p-3 rounded-lg border border-slate-200 dark:border-border bg-slate-50/40 dark:bg-muted/10 transition-colors"
                         data-testid={`action-item-${action.controlId}`}
                       >
                         <div className="flex items-center gap-2 mb-1.5">
-                          <AlertCircle className={`w-3.5 h-3.5 shrink-0 ${action.severity === "high" ? "text-red-500" : "text-amber-500"}`} />
+                          <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-500" />
                           <span className="text-[10px] font-mono font-semibold text-[#266C92]">{action.controlId}</span>
                           <span className="text-xs font-medium text-foreground">{action.title}</span>
-                          <Badge className={`text-[9px] h-4 ml-auto shrink-0 ${
-                            action.severity === "high"
-                              ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                              : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                          }`}>
+                          <Badge className="text-[9px] h-4 ml-auto shrink-0 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
                             Blocked at {action.blockAtStep}
                           </Badge>
                         </div>
@@ -1486,8 +1488,8 @@ function FieldworkComplexHub() {
                       {manualControls.length > 0 && (
                         <div className="mb-2">
                           <div className="flex items-center gap-2 px-2 py-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                            <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                               PBC Workflow ({manualComplete}/{manualControls.length})
                             </span>
                           </div>
@@ -1500,10 +1502,10 @@ function FieldworkComplexHub() {
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">
-                                  <span className={`text-[10px] font-mono font-semibold ${isBlocked ? "text-red-500" : "text-amber-600 dark:text-amber-400"}`}>{ctrl.controlId}</span>
+                                  <span className={`text-[10px] font-mono font-semibold ${isBlocked ? "text-red-500" : "text-foreground"}`}>{ctrl.controlId}</span>
                                   <span className="text-xs text-foreground truncate">{ctrl.name}</span>
                                 </div>
-                                <span className={`text-[10px] font-medium truncate ${isBlocked ? "text-red-500" : "text-amber-600 dark:text-amber-400"}`}>{isBlocked ? "Blocked" : "PBC"}</span>
+                                <span className={`text-[10px] font-medium truncate ${isBlocked ? "text-red-500" : "text-muted-foreground"}`}>{isBlocked ? "Blocked" : "PBC"}</span>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
@@ -1517,8 +1519,8 @@ function FieldworkComplexHub() {
                       {autoControls.length > 0 && (
                         <div>
                           <div className="flex items-center gap-2 px-2 py-1.5 border-t border-slate-100 dark:border-border">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                               Automated ({autoComplete}/{autoControls.length})
                             </span>
                           </div>
@@ -1532,7 +1534,7 @@ function FieldworkComplexHub() {
                                 <span className="text-[10px] font-mono font-semibold text-[#266C92]">{ctrl.controlId}</span>
                                 <span className="text-xs text-foreground truncate">{ctrl.name}</span>
                               </div>
-                              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium truncate">Connected</span>
+                              <span className="text-[10px] text-muted-foreground font-medium truncate">Connected</span>
                               <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
                               <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
                               <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
@@ -1543,9 +1545,9 @@ function FieldworkComplexHub() {
                       )}
 
                       <div className="flex items-center gap-3 text-[9px] text-muted-foreground px-2 mt-3 pt-2 border-t border-slate-100 dark:border-border">
-                        <div className="flex items-center gap-1"><CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" /><span>Complete</span></div>
+                        <div className="flex items-center gap-1"><CheckCircle2 className="w-2.5 h-2.5 text-[#266C92]" /><span>Complete</span></div>
                         <div className="flex items-center gap-1"><Loader2 className="w-2.5 h-2.5 text-[#266C92] animate-spin" /><span>Running</span></div>
-                        <div className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-amber-500" /><span>Waiting</span></div>
+                        <div className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-slate-400" /><span>Waiting</span></div>
                         <div className="flex items-center gap-1"><AlertCircle className="w-2.5 h-2.5 text-red-500" /><span>Blocked</span></div>
                         <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full border border-slate-300 dark:border-slate-600" /><span>Pending</span></div>
                       </div>
@@ -1589,7 +1591,7 @@ function FieldworkComplexHub() {
                     <div className="flex items-center gap-2">
                       <Server className="w-4 h-4 text-[#266C92]" />
                       <span className="text-sm font-semibold text-foreground">Connected Systems</span>
-                      <Badge className="text-[9px] h-4 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">{fieldworkSystemStatus.length}</Badge>
+                      <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]">{fieldworkSystemStatus.length}</Badge>
                     </div>
                     <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${systemsExpanded ? "" : "-rotate-90"}`} />
                   </button>
@@ -1598,7 +1600,7 @@ function FieldworkComplexHub() {
                       <div className="space-y-1">
                         {fieldworkSystemStatus.map((sys) => (
                           <div key={sys.name} className="flex items-center gap-2 py-1.5 px-2 rounded hover:bg-slate-50 dark:hover:bg-muted/20" data-testid={`system-row-${sys.name}`}>
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#266C92] shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-xs font-medium text-foreground truncate">{sys.name}</p>
                               <p className="text-[9px] text-muted-foreground">{sys.type} · {sys.controls} controls</p>
@@ -1624,11 +1626,11 @@ function FieldworkComplexHub() {
                         key={entry.id}
                         className={`px-4 py-2.5 border-l-2 ${
                           entry.type === "action-needed"
-                            ? "border-l-amber-400"
+                            ? "border-l-red-400"
                             : entry.type === "warning"
                               ? "border-l-red-400"
                               : entry.type === "success"
-                                ? "border-l-emerald-400"
+                                ? "border-l-[#266C92]"
                                 : "border-l-slate-200 dark:border-l-slate-700"
                         }`}
                         data-testid={`activity-${entry.id}`}
