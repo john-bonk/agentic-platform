@@ -304,7 +304,7 @@ export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionPr
           data-testid="button-workflow-back"
         >
           <ChevronLeft className="w-4 h-4" />
-          <span>Back</span>
+          <span>Overview</span>
         </button>
         <div className="w-px h-5 bg-slate-200 dark:bg-border" />
         <div className="flex items-center gap-2">

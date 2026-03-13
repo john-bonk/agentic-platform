@@ -866,21 +866,166 @@ const fieldworkSystemStatus = [
 ];
 
 
+function OptroHome() {
+  const addProject = useWorkflowSessionStore((s) => s.addProject);
+  const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
+  const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
+
+  const launchControlTesting = useCallback(() => {
+    const meta = workflowSessionConfigs["control-testing"];
+    if (meta) {
+      const existing = activeProjects.find((p) => p.sessionId === "control-testing");
+      if (existing) {
+        setCurrentSession("control-testing");
+      } else {
+        const config = meta.create();
+        addProject({ sessionId: "control-testing", label: meta.label, icon: meta.icon }, config);
+      }
+    }
+  }, [addProject, setCurrentSession, activeProjects]);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.workflowId === "control-testing") launchControlTesting();
+    };
+    window.addEventListener("agent-hub:launch-workflow", handler);
+    return () => window.removeEventListener("agent-hub:launch-workflow", handler);
+  }, [launchControlTesting]);
+
+  const taskItems = [
+    {
+      id: "task-control-testing",
+      title: "Test Controls for SOX Audit",
+      description: "Launch automated control testing across connected systems and PBC workflows for the current audit period.",
+      icon: Shield,
+      iconColor: "text-[#266C92]",
+      iconBg: "bg-[#266C92]/10",
+      action: launchControlTesting,
+      actionLabel: "Start Testing",
+      priority: "high" as const,
+    },
+    {
+      id: "task-review-exceptions",
+      title: "Review Open Exceptions",
+      description: "3 control exceptions from prior testing cycle awaiting management response and remediation plans.",
+      icon: AlertTriangle,
+      iconColor: "text-amber-500",
+      iconBg: "bg-amber-50 dark:bg-amber-900/10",
+      priority: "medium" as const,
+    },
+    {
+      id: "task-evidence-requests",
+      title: "Follow Up on Evidence Requests",
+      description: "5 PBC evidence requests are pending — 2 overdue by more than 3 business days.",
+      icon: FileText,
+      iconColor: "text-orange-500",
+      iconBg: "bg-orange-50 dark:bg-orange-900/10",
+      priority: "medium" as const,
+    },
+    {
+      id: "task-risk-assessment",
+      title: "Complete Risk Assessment Updates",
+      description: "Quarterly risk assessment scoring due for 4 process areas. Last updated 87 days ago.",
+      icon: BarChart3,
+      iconColor: "text-violet-500",
+      iconBg: "bg-violet-50 dark:bg-violet-900/10",
+      priority: "low" as const,
+    },
+    {
+      id: "task-walkthrough-scheduling",
+      title: "Schedule Control Walkthroughs",
+      description: "Annual walkthrough cycle begins next month — 12 control owners need scheduling confirmation.",
+      icon: Users,
+      iconColor: "text-blue-500",
+      iconBg: "bg-blue-50 dark:bg-blue-900/10",
+      priority: "low" as const,
+    },
+    {
+      id: "task-report-preparation",
+      title: "Prepare Committee Report",
+      description: "Audit committee meeting in 3 weeks — draft testing status report and exception summary.",
+      icon: ListChecks,
+      iconColor: "text-slate-500",
+      iconBg: "bg-slate-100 dark:bg-slate-800/30",
+      priority: "low" as const,
+    },
+  ];
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden" data-testid="optro-home">
+      <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background">
+        <div className="max-w-3xl mx-auto px-6 py-8">
+          <div className="mb-8">
+            <h1 className="text-xl font-semibold text-foreground mb-1" data-testid="text-optro-welcome">Welcome back</h1>
+            <p className="text-sm text-muted-foreground">Here's what needs your attention today.</p>
+          </div>
+
+          <div className="space-y-2" data-testid="optro-task-list">
+            {taskItems.map((task) => {
+              const IconComp = task.icon;
+              return (
+                <div
+                  key={task.id}
+                  className={`group flex items-start gap-4 p-4 rounded-lg border bg-white dark:bg-card transition-all ${
+                    task.action
+                      ? "border-[#266C92]/30 hover:border-[#266C92] hover:shadow-sm cursor-pointer"
+                      : "border-slate-200 dark:border-border hover:bg-slate-50 dark:hover:bg-muted/10"
+                  }`}
+                  onClick={task.action}
+                  data-testid={task.id}
+                >
+                  <div className={`w-9 h-9 rounded-lg ${task.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
+                    <IconComp className={`w-4.5 h-4.5 ${task.iconColor}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <h3 className="text-sm font-medium text-foreground">{task.title}</h3>
+                      {task.priority === "high" && (
+                        <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] border-0">Priority</Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{task.description}</p>
+                  </div>
+                  {task.action && (
+                    <Button
+                      size="sm"
+                      className="h-7 text-xs bg-[#266C92] hover:bg-[#1e5a7a] text-white shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => { e.stopPropagation(); task.action!(); }}
+                      data-testid={`button-${task.id}`}
+                    >
+                      <Play className="w-3 h-3 mr-1" />
+                      {task.actionLabel}
+                    </Button>
+                  )}
+                  {!task.action && (
+                    <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 mt-2 opacity-0 group-hover:opacity-50 transition-opacity" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FieldworkComplexHub() {
   const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
-  const currentSessionId = useWorkflowSessionStore((s) => s.currentSessionId);
-  const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
   const addProject = useWorkflowSessionStore((s) => s.addProject);
   const setRuntime = useWorkflowSessionStore((s) => s.setRuntime);
   const setBlockState = useWorkflowSessionStore((s) => s.setBlockState);
-  const activeSession = useWorkflowSessionStore((s) =>
-    s.currentSessionId ? (s.sessionConfigs[s.currentSessionId] as WorkflowSessionConfig | null) ?? null : null
-  );
 
   const fieldworkProject = activeProjects.find((p) => p.sessionId === "control-testing");
   const fieldworkRuntime = useWorkflowSessionStore((s) =>
     fieldworkProject ? s.runtimeStates[fieldworkProject.sessionId] : null
   );
+  const fieldworkConfig = useWorkflowSessionStore((s) =>
+    fieldworkProject ? (s.sessionConfigs[fieldworkProject.sessionId] as WorkflowSessionConfig | null) ?? null : null
+  );
+
+  const [showCanvas, setShowCanvas] = useState(false);
 
   const launchWorkflow = useCallback((id: string) => {
     const sessionId = workflowRowToSession[id] || id;
@@ -890,15 +1035,6 @@ function FieldworkComplexHub() {
       addProject({ sessionId, label: meta.label, icon: meta.icon }, config);
     }
   }, [addProject]);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      if (detail?.workflowId) launchWorkflow(detail.workflowId);
-    };
-    window.addEventListener("agent-hub:launch-workflow", handler);
-    return () => window.removeEventListener("agent-hub:launch-workflow", handler);
-  }, [launchWorkflow]);
 
   const fastForwardDemo = useCallback(() => {
     if (!fieldworkProject) return;
@@ -944,7 +1080,7 @@ function FieldworkComplexHub() {
   }, [fieldworkProject, fieldworkRuntime, setRuntime, setBlockState]);
 
   const executionPhaseForTimer = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.phase as string) ?? null;
-  const isHubVisible = !(activeSession && currentSessionId);
+  const isHubVisible = !showCanvas;
 
   const [actionsExpanded, setActionsExpanded] = useState(true);
   const [systemsExpanded, setSystemsExpanded] = useState(false);
@@ -995,12 +1131,12 @@ function FieldworkComplexHub() {
     return () => clearInterval(timer);
   }, [isHubVisible, fieldworkProject, executionPhaseForTimer]);
 
-  if (activeSession && currentSessionId) {
+  if (showCanvas && fieldworkConfig && fieldworkProject) {
     return (
       <WorkflowSession
-        config={activeSession}
-        sessionId={currentSessionId}
-        onBack={() => setCurrentSession(null)}
+        config={fieldworkConfig}
+        sessionId={fieldworkProject.sessionId}
+        onBack={() => setShowCanvas(false)}
       />
     );
   }
@@ -1199,7 +1335,7 @@ function FieldworkComplexHub() {
                   variant="outline"
                   size="sm"
                   className="text-xs h-7"
-                  onClick={() => setCurrentSession(fieldworkProject.sessionId)}
+                  onClick={() => setShowCanvas(true)}
                   data-testid="button-open-fieldwork-session"
                 >
                   Open Workflow
@@ -1636,13 +1772,17 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
   const settings = useSettings();
   const isSimple = settings.agentHubViewMode !== "complex";
   const scenario = settings.agentHubScenario || "fieldwork-automation";
+  const currentSessionId = useWorkflowSessionStore((s) => s.currentSessionId);
 
   if (isSimple) {
     return <SimpleAgentHub welcomeMessage={welcomeMessage} scenario={scenario} />;
   }
 
   if (scenario === "fieldwork-automation") {
-    return <FieldworkComplexHub />;
+    if (currentSessionId === "control-testing") {
+      return <FieldworkComplexHub />;
+    }
+    return <OptroHome />;
   }
 
   return <ComplexAgentHub workspaceId={workspaceId} welcomeMessage={welcomeMessage} scenario={scenario} />;

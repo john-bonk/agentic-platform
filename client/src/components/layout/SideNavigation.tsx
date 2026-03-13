@@ -480,7 +480,7 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
-  const { currentSessionId } = useWorkflowSessionStore();
+  const { currentSessionId, setCurrentSession } = useWorkflowSessionStore();
 
   const isActive = (path: string) => {
     if (path.includes("#")) {
@@ -605,11 +605,12 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
             <div className="flex flex-col items-center gap-0.5 pt-2 px-1">
               <Link href={currentWorkspace.isCustom ? "/custom-workspace" : "/"}>
                 <button
-                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${isHomeActive ? "bg-teal-50 dark:bg-primary/10" : ""}`}
+                  className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${isHomeActive && !currentSessionId ? "bg-teal-50 dark:bg-primary/10" : ""}`}
                   data-testid="nav-collapsed-home"
                   title="Home"
+                  onClick={() => setCurrentSession(null)}
                 >
-                  <Home className={`w-3 h-3 ${isHomeActive ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
+                  <Home className={`w-3 h-3 ${isHomeActive && !currentSessionId ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
                 </button>
               </Link>
               <Link href="/recent">
@@ -764,7 +765,8 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
                 icon={Home} 
                 label="Home" 
                 path={currentWorkspace.isCustom ? "/custom-workspace" : "/"} 
-                isActive={isHomeActive}
+                isActive={isHomeActive && !currentSessionId}
+                onClick={() => setCurrentSession(null)}
               />
               <QuickAccessItem 
                 icon={Clock} 
