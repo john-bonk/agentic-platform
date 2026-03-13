@@ -120,7 +120,7 @@ export function AppLayout({
           sections={sideNavSections} 
           moduleGroups={sideNavModuleGroups}
           title={sideNavTitle}
-          hideQuickAccess={isSpecialNewTab || isAgentHub}
+          hideQuickAccess={isSpecialNewTab}
           staticTitle={isSpecialNewTab || isAgentHub}
         />
       )}

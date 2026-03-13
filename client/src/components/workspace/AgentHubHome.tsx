@@ -868,7 +868,7 @@ const fieldworkActionItems = [
   { id: "a-3", controlId: "CTL-003", title: "Manual Evidence Required", description: "SoD matrix needs manual upload for 3 departments", severity: "medium" as const },
 ];
 
-function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
+function FieldworkComplexHub() {
   const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
   const currentSessionId = useWorkflowSessionStore((s) => s.currentSessionId);
   const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
@@ -907,31 +907,31 @@ function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
     const sid = fieldworkProject.sessionId;
     const currentStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
     const defaultSeedControls: ControlWorkflowStatus[] = [
-      { controlId: "CTL-001", name: "Access Provisioning", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-002", name: "Change Management", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-003", name: "Segregation of Duties", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-004", name: "Backup & Recovery", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-005", name: "Journal Entry Approval", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-006", name: "Bank Reconciliation", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-007", name: "Revenue Recognition", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-008", name: "Vendor Payment Authorization", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-009", name: "Physical Access Controls", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-010", name: "Incident Response", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-011", name: "Data Classification", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-012", name: "Procurement Approval", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-013", name: "User Access Review", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-014", name: "Financial Close Process", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-015", name: "Third-Party Risk Assessment", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-016", name: "Privilege Escalation Monitoring", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-017", name: "Inventory Valuation", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-018", name: "Accounts Receivable Aging", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-019", name: "Payroll Processing Controls", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-020", name: "Fixed Asset Capitalization", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-021", name: "Database Administrator Access", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-022", name: "Network Security Monitoring", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-023", name: "Business Continuity Planning", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-024", name: "Whistleblower & Ethics Hotline", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-025", name: "Intercompany Eliminations", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-001", name: "Access Provisioning", dataSource: "connected", system: "Okta IAM", owner: "IT Security", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-002", name: "Change Management", dataSource: "connected", system: "ServiceNow", owner: "IT Operations", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-003", name: "Segregation of Duties", dataSource: "manual", system: null, owner: "Internal Audit", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-004", name: "Backup & Recovery", dataSource: "connected", system: "AWS", owner: "IT Infrastructure", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-005", name: "Journal Entry Approval", dataSource: "connected", system: "SAP ERP", owner: "Controller", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-006", name: "Bank Reconciliation", dataSource: "connected", system: "SAP ERP", owner: "Treasury", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-007", name: "Revenue Recognition", dataSource: "manual", system: null, owner: "Revenue Accounting", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-008", name: "Vendor Payment Authorization", dataSource: "connected", system: "Coupa", owner: "AP Manager", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-009", name: "Physical Access Controls", dataSource: "connected", system: "Genetec", owner: "Facilities", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-010", name: "Incident Response", dataSource: "manual", system: null, owner: "CISO Office", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-011", name: "Data Classification", dataSource: "manual", system: null, owner: "Data Governance", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-012", name: "Procurement Approval", dataSource: "connected", system: "Coupa", owner: "Procurement", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-013", name: "User Access Review", dataSource: "connected", system: "Okta IAM", owner: "IT Security", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-014", name: "Financial Close Process", dataSource: "manual", system: null, owner: "Controller", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-015", name: "Third-Party Risk Assessment", dataSource: "manual", system: null, owner: "Vendor Management", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-016", name: "Privilege Escalation Monitoring", dataSource: "connected", system: "CrowdStrike", owner: "SOC Team", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-017", name: "Inventory Valuation", dataSource: "connected", system: "SAP ERP", owner: "Cost Accounting", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-018", name: "Accounts Receivable Aging", dataSource: "connected", system: "SAP ERP", owner: "AR Manager", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-019", name: "Payroll Processing Controls", dataSource: "manual", system: null, owner: "HR / Payroll", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-020", name: "Fixed Asset Capitalization", dataSource: "connected", system: "SAP ERP", owner: "Fixed Assets", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-021", name: "Database Administrator Access", dataSource: "connected", system: "CrowdStrike", owner: "IT Security", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-022", name: "Network Security Monitoring", dataSource: "connected", system: "CrowdStrike", owner: "SOC Team", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-023", name: "Business Continuity Planning", dataSource: "manual", system: null, owner: "Risk Management", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-024", name: "Whistleblower & Ethics Hotline", dataSource: "manual", system: null, owner: "Compliance", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-025", name: "Intercompany Eliminations", dataSource: "connected", system: "SAP ERP", owner: "Consolidation", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
     ];
     const baseStatuses = currentStatuses.length > 0 ? currentStatuses : defaultSeedControls;
     const completedStatuses = baseStatuses.map((s) => ({
@@ -1015,54 +1015,135 @@ function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
 
   return (
     <div className="flex flex-col h-full overflow-hidden" data-testid="fieldwork-complex-hub">
-      <div
-        className="text-white px-8 py-3 bg-cover bg-center bg-no-repeat relative shrink-0"
-        style={{ backgroundImage: `url(${headerBgImage})` }}
-      >
-        <div className="w-full relative z-10 flex items-center justify-between gap-4">
-          <h1 className="text-lg font-semibold truncate min-w-0" data-testid="fieldwork-hub-welcome">
-            {welcomeMessage}
-          </h1>
-          {hasWorkflow && (
-            <div className="flex items-center gap-3 text-sm text-white/70 shrink-0">
-              {totalControls > 0 ? (
-                <>
-                  <span>{totalControls} controls in scope</span>
-                  <span className="text-white/30">·</span>
-                  <span>{totalControls - completedControls > 0 ? `${totalControls - completedControls} in progress` : "All complete"}</span>
-                  {totalControls > 0 && fieldworkActionItems.length > 0 && (
-                    <>
-                      <span className="text-white/30">·</span>
-                      <span className="text-amber-300">{fieldworkActionItems.length} need attention</span>
-                    </>
-                  )}
-                </>
-              ) : (
-                <span>Configuring workflow</span>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
       <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background px-8 py-5">
         {!hasWorkflow ? (
-          <div className="max-w-2xl mx-auto flex flex-col items-center justify-center py-20 text-center" data-testid="fieldwork-hub-empty">
-            <div className="w-16 h-16 rounded-2xl bg-[#266C92]/10 flex items-center justify-center mb-5">
-              <Shield className="w-8 h-8 text-[#266C92]/60" />
+          <div className="max-w-6xl mx-auto space-y-5" data-testid="fieldwork-hub-empty">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Shield className="w-5 h-5 text-[#266C92]" />
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">Automated Control Testing</h2>
+                  <p className="text-xs text-muted-foreground">No active workflow — launch to begin</p>
+                </div>
+              </div>
+              <Button
+                className="bg-[#266C92] hover:bg-[#1e5a7a] text-white text-xs h-8"
+                onClick={() => launchWorkflow("control-testing")}
+                data-testid="button-launch-fieldwork"
+              >
+                <Play className="w-3.5 h-3.5 mr-1.5" />
+                Start Control Testing
+              </Button>
             </div>
-            <h2 className="text-base font-semibold text-foreground mb-2">Automated Control Testing</h2>
-            <p className="text-sm text-muted-foreground max-w-sm mb-6 leading-relaxed">
-              Configure and launch an automated control testing workflow. The platform will orchestrate population extraction, sampling, evidence collection, and testing across your connected systems.
-            </p>
-            <Button
-              className="bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-              onClick={() => launchWorkflow("control-testing")}
-              data-testid="button-launch-fieldwork"
-            >
-              <Play className="w-4 h-4 mr-2" />
-              Start Control Testing
-            </Button>
+
+            <div className="grid grid-cols-4 gap-3" data-testid="fieldwork-stats-bar-empty">
+              <Card className="border border-slate-200 dark:border-border">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Target className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="text-[11px] text-muted-foreground font-medium">Controls in Scope</span>
+                  </div>
+                  <span className="text-xl font-bold text-muted-foreground/40">—</span>
+                </CardContent>
+              </Card>
+              <Card className="border border-slate-200 dark:border-border">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <BarChart3 className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="text-[11px] text-muted-foreground font-medium">Automated Coverage</span>
+                  </div>
+                  <span className="text-xl font-bold text-muted-foreground/40">—</span>
+                </CardContent>
+              </Card>
+              <Card className="border border-slate-200 dark:border-border">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="text-[11px] text-muted-foreground font-medium">Controls Tested</span>
+                  </div>
+                  <span className="text-xl font-bold text-muted-foreground/40">—</span>
+                </CardContent>
+              </Card>
+              <Card className="border border-slate-200 dark:border-border">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="text-[11px] text-muted-foreground font-medium">Exceptions</span>
+                  </div>
+                  <span className="text-xl font-bold text-muted-foreground/40">—</span>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-5">
+              <div className="lg:col-span-2 space-y-4">
+                <Card className="border border-slate-200 dark:border-border">
+                  <CardHeader className="pb-2 pt-3 px-4">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
+                      <Workflow className="w-4 h-4" />
+                      Control Pipeline
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4">
+                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                      <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-muted/20 flex items-center justify-center mb-3">
+                        <Shield className="w-6 h-6 text-muted-foreground/40" />
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-1">No active control pipeline</p>
+                      <p className="text-xs text-muted-foreground/60">Launch a workflow to begin automated control testing</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border border-slate-200 dark:border-border">
+                  <CardHeader className="pb-2 pt-3 px-4">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
+                      <AlertTriangle className="w-4 h-4" />
+                      Actions Required
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4">
+                    <p className="text-xs text-muted-foreground/60 py-4 text-center">No actions pending</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-4">
+                <Card className="border border-slate-200 dark:border-border">
+                  <CardHeader className="pb-2 pt-3 px-4">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
+                      <Database className="w-4 h-4" />
+                      Connected Systems
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4">
+                    <div className="space-y-2">
+                      {fieldworkSystemStatus.map((sys) => (
+                        <div key={sys.name} className="flex items-center justify-between py-1">
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            <span className="text-xs text-foreground">{sys.name}</span>
+                          </div>
+                          <span className="text-[10px] text-muted-foreground">{sys.type}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border border-slate-200 dark:border-border">
+                  <CardHeader className="pb-2 pt-3 px-4">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
+                      <Activity className="w-4 h-4" />
+                      Agent Activity
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4">
+                    <p className="text-xs text-muted-foreground/60 py-4 text-center">No agent activity yet</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="max-w-6xl mx-auto space-y-5">
@@ -1189,37 +1270,9 @@ function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
                         <span className="text-center" title="Testing">Test</span>
                       </div>
 
-                      {autoControls.length > 0 && (
+                      {manualControls.length > 0 && (
                         <div className="mb-2">
                           <div className="flex items-center gap-2 px-2 py-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
-                              Automated ({autoComplete}/{autoControls.length})
-                            </span>
-                          </div>
-                          {autoControls.map((ctrl) => (
-                            <div
-                              key={ctrl.controlId}
-                              className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors"
-                              data-testid={`pipeline-row-${ctrl.controlId}`}
-                            >
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <span className="text-[10px] font-mono font-semibold text-[#266C92]">{ctrl.controlId}</span>
-                                <span className="text-xs text-foreground truncate">{ctrl.name}</span>
-                              </div>
-                              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium truncate">Connected</span>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {manualControls.length > 0 && (
-                        <div>
-                          <div className="flex items-center gap-2 px-2 py-1.5 border-t border-slate-100 dark:border-border">
                             <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                             <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
                               PBC Workflow ({manualComplete}/{manualControls.length})
@@ -1236,6 +1289,34 @@ function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
                                 <span className="text-xs text-foreground truncate">{ctrl.name}</span>
                               </div>
                               <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium truncate">PBC</span>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {autoControls.length > 0 && (
+                        <div>
+                          <div className="flex items-center gap-2 px-2 py-1.5 border-t border-slate-100 dark:border-border">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
+                              Automated ({autoComplete}/{autoControls.length})
+                            </span>
+                          </div>
+                          {autoControls.map((ctrl) => (
+                            <div
+                              key={ctrl.controlId}
+                              className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors"
+                              data-testid={`pipeline-row-${ctrl.controlId}`}
+                            >
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <span className="text-[10px] font-mono font-semibold text-[#266C92]">{ctrl.controlId}</span>
+                                <span className="text-xs text-foreground truncate">{ctrl.name}</span>
+                              </div>
+                              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium truncate">Connected</span>
                               <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
                               <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
                               <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
@@ -1508,7 +1589,7 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
   }
 
   if (scenario === "fieldwork-automation") {
-    return <FieldworkComplexHub welcomeMessage={welcomeMessage} />;
+    return <FieldworkComplexHub />;
   }
 
   return <ComplexAgentHub workspaceId={workspaceId} welcomeMessage={welcomeMessage} scenario={scenario} />;

@@ -1014,21 +1014,10 @@ function SynthesisBlock({ onComplete, sessionId, isReviewMode }: { onComplete: (
 
 function TemplateSelectionBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
   const [selected, setSelected] = usePersistedBlockState<string | null>(sessionId, "template-selection", "selected", null);
-  const [automationAcknowledged, setAutomationAcknowledged] = usePersistedBlockState<boolean>(sessionId, "template-selection", "automationAcknowledged", false);
-  const [acknowledgedForTemplate, setAcknowledgedForTemplate] = usePersistedBlockState<string | null>(sessionId, "template-selection", "acknowledgedForTemplate", null);
 
   const handleSelectTemplate = (id: string) => {
     if (isReviewMode) return;
     setSelected(id);
-    if (id !== acknowledgedForTemplate) {
-      setAutomationAcknowledged(false);
-      setAcknowledgedForTemplate(null);
-    }
-  };
-
-  const handleAcknowledge = (checked: boolean) => {
-    setAutomationAcknowledged(checked);
-    setAcknowledgedForTemplate(checked ? selected : null);
   };
 
   const selectedTemplate = templateOptions.find((t) => t.id === selected);
@@ -1102,23 +1091,9 @@ function TemplateSelectionBlock({ onComplete, sessionId, isReviewMode }: { onCom
             </div>
           </div>
 
-          <label className="flex items-start gap-2 cursor-pointer group" data-testid="automation-acknowledge-label">
-            <input
-              type="checkbox"
-              checked={automationAcknowledged}
-              onChange={(e) => handleAcknowledge(e.target.checked)}
-              className="mt-0.5 w-4 h-4 rounded border-slate-300 dark:border-border text-[#266C92] focus:ring-[#266C92] cursor-pointer"
-              data-testid="checkbox-automation-acknowledge"
-            />
-            <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-              I understand the automation scope for this assessment
-            </span>
-          </label>
-
           <Button
-            className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white"
             onClick={onComplete}
-            disabled={!automationAcknowledged}
             data-testid="button-proceed-assessment"
           >
             <ArrowRight className="w-4 h-4 mr-1.5" />
@@ -1350,7 +1325,6 @@ function DistributionBlock({ onComplete, sessionId, isReviewMode }: { onComplete
   const totalRecipients = orgHierarchy.reduce((sum, e) => sum + e.units.reduce((s, u) => s + u.locations.length, 0), 0);
   const totalLocationsCount = orgHierarchy.reduce((sum, e) => sum + e.units.reduce((s, u) => s + u.locations.length, 0), 0);
   const uniqueAssignees = new Set(orgHierarchy.flatMap(e => e.units.flatMap(u => u.locations.map(l => l.assignee)))).size;
-  const [scopeConfirmed, setScopeConfirmed] = usePersistedBlockState<boolean>(sessionId, "distribution", "scopeConfirmed", false);
 
   return (
     <div className="space-y-3">
@@ -1388,25 +1362,12 @@ function DistributionBlock({ onComplete, sessionId, isReviewMode }: { onComplete
               <p className="text-[11px] text-muted-foreground">
                 Expected completion: ~18 business days based on your Comprehensive Assessment selection
               </p>
-              <label className="flex items-center gap-2 cursor-pointer group pt-1" data-testid="scope-confirm-label">
-                <input
-                  type="checkbox"
-                  checked={scopeConfirmed}
-                  onChange={(e) => setScopeConfirmed(e.target.checked)}
-                  className="w-4 h-4 rounded border-amber-300 dark:border-amber-700 text-[#266C92] focus:ring-[#266C92] cursor-pointer"
-                  data-testid="checkbox-scope-confirm"
-                />
-                <span className="text-xs text-amber-800 dark:text-amber-400 font-medium group-hover:text-foreground transition-colors">
-                  I confirm this distribution scope
-                </span>
-              </label>
             </div>
           </div>
 
           <Button
-            className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white"
             onClick={onComplete}
-            disabled={!scopeConfirmed}
             data-testid="button-distribute"
           >
             <Send className="w-4 h-4 mr-1.5" />
@@ -1898,7 +1859,6 @@ function DataSourceConfigBlock({ onComplete, sessionId, isReviewMode }: { onComp
 }
 
 function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
-  const [confirmed, setConfirmed] = usePersistedBlockState<boolean>(sessionId, "pbc-mapping", "confirmed", false);
   const selectedIds = useWorkflowSessionStore(s => {
     const bs = s.runtimeStates[sessionId]?.blockStates?.["control-selection"];
     return (bs?.selectedIds as string[] | undefined) ?? masterControlsList.map(c => c.id);
@@ -1906,6 +1866,8 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
 
   const manualControls = masterControlsList.filter(c => selectedIds.includes(c.id) && c.dataSource === "manual");
   const autoControls = masterControlsList.filter(c => selectedIds.includes(c.id) && c.dataSource === "connected");
+  const [pbcExpanded, setPbcExpanded] = useState(true);
+  const [autoExpanded, setAutoExpanded] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -1921,60 +1883,70 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-foreground">PBC Request Recipients</span>
-          <Badge className="text-[9px] bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">{manualControls.length} requests</Badge>
-        </div>
-        <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden max-h-40 overflow-y-auto">
-          <div className="grid grid-cols-[1fr_6rem_6rem] gap-2 px-3 py-1.5 bg-slate-50 dark:bg-muted/20 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider sticky top-0">
-            <span>Control</span><span>Owner</span><span>PBC Owner</span>
+        <button
+          onClick={() => setPbcExpanded(!pbcExpanded)}
+          className="w-full flex items-center justify-between p-2.5 rounded-lg border border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/5 hover:border-amber-300 dark:hover:border-amber-700/50 transition-colors"
+          data-testid="button-toggle-pbc-controls"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span className="text-xs font-semibold text-foreground">PBC Request Recipients</span>
+            <Badge className="text-[9px] bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">{manualControls.length} requests</Badge>
           </div>
-          {manualControls.map(c => (
-            <div key={c.id} className="grid grid-cols-[1fr_6rem_6rem] gap-2 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50">
-              <span><span className="font-medium text-[#266C92]">{c.id}</span> <span className="text-muted-foreground">{c.name}</span></span>
-              <span className="text-[10px] truncate">{c.owner}</span>
-              <span className="text-[10px] truncate text-amber-600 dark:text-amber-400">{c.pbcOwner}</span>
+          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${pbcExpanded ? "" : "-rotate-90"}`} />
+        </button>
+        {pbcExpanded && (
+          <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden max-h-44 overflow-y-auto animate-in slide-in-from-top-2 fade-in duration-200">
+            <div className="grid grid-cols-[1fr_6rem_6rem] gap-2 px-3 py-1.5 bg-slate-50 dark:bg-muted/20 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider sticky top-0">
+              <span>Control</span><span>Owner</span><span>PBC Owner</span>
             </div>
-          ))}
-        </div>
+            {manualControls.map(c => (
+              <div key={c.id} className="grid grid-cols-[1fr_6rem_6rem] gap-2 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50">
+                <span><span className="font-medium text-[#266C92]">{c.id}</span> <span className="text-muted-foreground">{c.name}</span></span>
+                <span className="text-[10px] truncate">{c.owner}</span>
+                <span className="text-[10px] truncate text-amber-600 dark:text-amber-400">{c.pbcOwner}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-foreground">Automated (No PBC needed)</span>
-          <Badge className="text-[9px] bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">{autoControls.length} automated</Badge>
-        </div>
-        <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden max-h-28 overflow-y-auto">
-          {autoControls.map(c => (
-            <div key={c.id} className="flex items-center justify-between px-3 py-1.5 text-xs border-t first:border-t-0 border-slate-100 dark:border-border/50">
-              <span><span className="font-medium text-emerald-600 dark:text-emerald-400">{c.id}</span> <span className="text-muted-foreground">{c.name}</span></span>
-              <span className="text-[10px] text-emerald-600 dark:text-emerald-400">⚡ {c.system}</span>
-            </div>
-          ))}
-        </div>
+        <button
+          onClick={() => setAutoExpanded(!autoExpanded)}
+          className="w-full flex items-center justify-between p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800/30 bg-emerald-50/50 dark:bg-emerald-900/5 hover:border-emerald-300 dark:hover:border-emerald-700/50 transition-colors"
+          data-testid="button-toggle-auto-controls"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="text-xs font-semibold text-foreground">Automated (No PBC needed)</span>
+            <Badge className="text-[9px] bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">{autoControls.length} automated</Badge>
+          </div>
+          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${autoExpanded ? "" : "-rotate-90"}`} />
+        </button>
+        {autoExpanded && (
+          <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden max-h-36 overflow-y-auto animate-in slide-in-from-top-2 fade-in duration-200">
+            {autoControls.map(c => (
+              <div key={c.id} className="flex items-center justify-between px-3 py-1.5 text-xs border-t first:border-t-0 border-slate-100 dark:border-border/50">
+                <span><span className="font-medium text-emerald-600 dark:text-emerald-400">{c.id}</span> <span className="text-muted-foreground">{c.name}</span></span>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400">⚡ {c.system}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10">
-        <label className="flex items-start gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={confirmed}
-            onChange={(e) => setConfirmed(e.target.checked)}
-            className="mt-0.5 w-3.5 h-3.5 rounded border-slate-300 text-[#266C92] focus:ring-[#266C92]"
-            data-testid="checkbox-confirm-pbc-mapping"
-          />
-          <span className="text-[11px] text-muted-foreground leading-relaxed">
-            I confirm the PBC owner mapping is correct. {manualControls.length} PBC requests will be distributed to the mapped owners
-            and {autoControls.length} controls will be tested automatically via system connections.
-          </span>
-        </label>
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
+          {manualControls.length} PBC requests will be distributed to the mapped owners
+          and {autoControls.length} controls will be tested automatically via system connections.
+        </p>
       </div>
 
       {!isReviewMode && (
         <Button
           onClick={onComplete}
-          disabled={!confirmed}
-          className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white disabled:opacity-50"
+          className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white"
           data-testid="button-confirm-pbc-mapping"
         >
           <Send className="w-4 h-4 mr-2" />
@@ -2018,7 +1990,7 @@ export function tickFieldworkStatuses(prev: ControlWorkflowStatus[]): ControlWor
         break;
       }
       if (steps[step] === "running" || steps[step] === "waiting") {
-        const speed = isAuto ? 0.7 : (steps[step] === "waiting" ? 0.25 : 0.4);
+        const speed = isAuto ? 0.7 : (steps[step] === "waiting" ? 0.08 : 0.15);
         if (Math.random() < speed) {
           steps[step] = "complete";
           anyChange = true;
@@ -2048,9 +2020,10 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
       dataSource: c.dataSource as "connected" | "manual",
       system: c.system,
       owner: c.owner,
-      steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" },
+      steps: { population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const },
       overallProgress: 0,
-    }));
+    }))
+    .sort((a, b) => (a.dataSource === "manual" ? 0 : 1) - (b.dataSource === "manual" ? 0 : 1));
 
   const [statuses, setStatuses] = usePersistedBlockState<ControlWorkflowStatus[]>(sessionId, "fieldwork-execution", "statuses", defaultStatuses);
   const [phase, setPhase] = usePersistedBlockState<"initializing" | "running" | "complete">(sessionId, "fieldwork-execution", "phase", "initializing");

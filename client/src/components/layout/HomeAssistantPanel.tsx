@@ -665,6 +665,38 @@ export function HomeAssistantPanel() {
           delay: 500,
           content: "All done. **89 total risk items** have been assessed:\n- **42** auto-scored from existing data sources (control tests, KRI feeds, incident logs)\n- **47** collected via survey responses across 12 locations\n\nI've consolidated everything into a unified view. You can now generate the risk register, run trend analysis, create heat maps, or draft the board report. What would you like to do next?",
         },
+        "control-selection": {
+          delay: 800,
+          content: "I've loaded the **master controls register** with all SOX controls in scope. You can select which controls to include in this testing cycle — or keep them all selected for a full-scope run.\n\nI've pre-checked all 25 controls. Uncheck any you want to exclude.",
+        },
+        "control-selection-complete": {
+          delay: 500,
+          content: "Control selection locked in. Now let's configure the data source connections — I'll map each control to its source system and identify which ones can be tested automatically vs. those needing PBC requests.",
+        },
+        "data-sources": {
+          delay: 600,
+          content: "I'm mapping your **7 connected systems** to the selected controls. Each system connection determines whether a control can be tested automatically or needs manual evidence via PBC.\n\nReview the coverage — you can toggle individual systems on or off.",
+        },
+        "data-sources-complete": {
+          delay: 500,
+          content: "Data sources confirmed. I've identified the split:\n\n- **Automated:** Controls connected to SAP ERP, Okta, ServiceNow, AWS, Genetec, Coupa, and CrowdStrike will be tested automatically\n- **PBC Workflow:** Remaining controls need manual evidence collection from control owners\n\nLet's map the PBC owners for the manual controls.",
+        },
+        "pbc-mapping": {
+          delay: 600,
+          content: "I've auto-mapped **PBC owners** based on the master controls register. Each manual control has a designated Control Owner and PBC Owner who will receive evidence requests.\n\nReview the mapping — you can expand each section to verify assignments before confirming.",
+        },
+        "pbc-mapping-complete": {
+          delay: 500,
+          content: "PBC mapping confirmed. I'm now initializing **parallel agentic workflows** for all selected controls. Automated controls will begin extracting populations immediately. PBC requests are being distributed to mapped owners.\n\nYou can monitor progress on the hub dashboard — I'll work in the background.",
+        },
+        "fieldwork-execution": {
+          delay: 800,
+          content: "All control workflows are now **running in parallel**. Here's what's happening:\n\n- **Automated controls:** Agents are extracting populations, applying sampling methodologies, collecting evidence, and executing test procedures\n- **PBC controls:** Evidence requests have been sent — I'm tracking responses and will process each as it arrives\n\nI'll surface any exceptions or findings that need your attention.",
+        },
+        "fieldwork-execution-complete": {
+          delay: 600,
+          content: "All control testing workflows are **complete**. Every control has been through the full pipeline — population extraction, sampling, evidence collection, and testing.\n\nCheck the hub dashboard for a summary of findings, exceptions, and next steps. You can generate workpapers or export results from the actions panel.",
+        },
       };
 
       const msg = sidecarMessages[blockId];
