@@ -1107,6 +1107,7 @@ function FieldworkComplexHub() {
   }, [fieldworkProject, fieldworkRuntime]);
 
   const resolvedSet = useMemo(() => new Set(resolvedBlocksList), [resolvedBlocksList]);
+  const exceptionControlIds = useMemo(() => new Set(fieldworkExceptions.map(e => e.controlId)), []);
 
   const handleResolveAction = useCallback((controlId: string) => {
     if (!fieldworkProject) return;
@@ -1173,7 +1174,6 @@ function FieldworkComplexHub() {
   const automatedPct = totalControls > 0 ? Math.round((autoControls.length / totalControls) * 100) : 0;
 
   const hasWorkflow = !!fieldworkProject && !!fieldworkRuntime;
-  const exceptionControlIds = useMemo(() => new Set(fieldworkExceptions.map(e => e.controlId)), []);
 
   const stepDot = (status: string, controlId?: string, step?: string) => {
     if (step === "testing" && status === "complete" && isComplete && exceptionControlIds.has(controlId ?? "")) {
