@@ -853,13 +853,13 @@ const fieldworkActivityFeed = [
 ];
 
 const fieldworkSystemStatus = [
-  { name: "SAP ERP", type: "ERP", controls: 4, lastSync: "2 min ago" },
+  { name: "SAP ERP", type: "ERP", controls: 7, lastSync: "2 min ago" },
   { name: "Okta IAM", type: "Identity", controls: 2, lastSync: "Just now" },
   { name: "ServiceNow", type: "ITSM", controls: 1, lastSync: "5 min ago" },
   { name: "AWS CloudTrail", type: "Cloud", controls: 1, lastSync: "1 min ago" },
   { name: "Genetec Security", type: "Physical", controls: 1, lastSync: "8 min ago" },
   { name: "Coupa", type: "Procurement", controls: 1, lastSync: "3 min ago" },
-  { name: "CrowdStrike", type: "Endpoint", controls: 1, lastSync: "Just now" },
+  { name: "CrowdStrike", type: "Endpoint", controls: 3, lastSync: "Just now" },
 ];
 
 const fieldworkActionItems = [
@@ -906,19 +906,34 @@ function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
     if (!fieldworkProject) return;
     const sid = fieldworkProject.sessionId;
     const currentStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
-    const baseStatuses = currentStatuses.length > 0 ? currentStatuses : [
-      { controlId: "CTL-001", name: "Access Provisioning", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-002", name: "Change Management", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-003", name: "Segregation of Duties", dataSource: "manual" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-005", name: "Journal Entry Approval", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-006", name: "Bank Reconciliation", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-007", name: "Revenue Recognition", dataSource: "manual" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-008", name: "Vendor Payment Authorization", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-009", name: "Physical Access Controls", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-012", name: "Procurement Approval", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-013", name: "User Access Review", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-016", name: "Privilege Escalation Monitoring", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+    const defaultSeedControls: ControlWorkflowStatus[] = [
+      { controlId: "CTL-001", name: "Access Provisioning", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-002", name: "Change Management", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-003", name: "Segregation of Duties", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-004", name: "Backup & Recovery", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-005", name: "Journal Entry Approval", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-006", name: "Bank Reconciliation", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-007", name: "Revenue Recognition", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-008", name: "Vendor Payment Authorization", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-009", name: "Physical Access Controls", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-010", name: "Incident Response", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-011", name: "Data Classification", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-012", name: "Procurement Approval", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-013", name: "User Access Review", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-014", name: "Financial Close Process", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-015", name: "Third-Party Risk Assessment", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-016", name: "Privilege Escalation Monitoring", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-017", name: "Inventory Valuation", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-018", name: "Accounts Receivable Aging", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-019", name: "Payroll Processing Controls", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-020", name: "Fixed Asset Capitalization", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-021", name: "Database Administrator Access", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-022", name: "Network Security Monitoring", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-023", name: "Business Continuity Planning", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-024", name: "Whistleblower & Ethics Hotline", dataSource: "manual", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-025", name: "Intercompany Eliminations", dataSource: "connected", steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
     ];
+    const baseStatuses = currentStatuses.length > 0 ? currentStatuses : defaultSeedControls;
     const completedStatuses = baseStatuses.map((s) => ({
       ...s,
       steps: { population: "complete", sampling: "complete", evidence: "complete", testing: "complete" },
@@ -991,10 +1006,10 @@ function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
 
   const stepDot = (status: string) => {
     switch (status) {
-      case "complete": return <div className="w-2 h-2 rounded-full bg-emerald-500" />;
-      case "running": return <div className="w-2 h-2 rounded-full bg-[#266C92] animate-pulse" />;
-      case "waiting": return <div className="w-2 h-2 rounded-full bg-amber-400" />;
-      default: return <div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700" />;
+      case "complete": return <CheckCircle2 className="w-3 h-3 text-emerald-500" />;
+      case "running": return <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />;
+      case "waiting": return <Clock className="w-3 h-3 text-amber-500" />;
+      default: return <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600" />;
     }
   };
 
@@ -1231,10 +1246,10 @@ function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
                       )}
 
                       <div className="flex items-center gap-3 text-[9px] text-muted-foreground px-2 mt-3 pt-2 border-t border-slate-100 dark:border-border">
-                        <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span>Complete</span></div>
-                        <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#266C92] animate-pulse" /><span>Running</span></div>
-                        <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-400" /><span>Waiting</span></div>
-                        <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700" /><span>Pending</span></div>
+                        <div className="flex items-center gap-1"><CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" /><span>Complete</span></div>
+                        <div className="flex items-center gap-1"><Loader2 className="w-2.5 h-2.5 text-[#266C92] animate-spin" /><span>Running</span></div>
+                        <div className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-amber-500" /><span>Waiting</span></div>
+                        <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full border border-slate-300 dark:border-slate-600" /><span>Pending</span></div>
                       </div>
                     </CardContent>
                   </Card>

@@ -333,7 +333,7 @@ export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionPr
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           {config.blocks.map((block, index) => (
             <BlockWrapper
               key={block.id}
@@ -1657,16 +1657,25 @@ const masterControlsList = [
   { id: "CTL-014", name: "Financial Close Process", category: "Financial Controls", riskLevel: "Critical", owner: "Emma Scott", pbcOwner: "Oliver Wright", dataSource: "manual", system: null },
   { id: "CTL-015", name: "Third-Party Risk Assessment", category: "Entity Level Controls", riskLevel: "High", owner: "Jun Li", pbcOwner: "Wei Zhang", dataSource: "manual", system: null },
   { id: "CTL-016", name: "Privilege Escalation Monitoring", category: "IT General Controls", riskLevel: "Critical", owner: "Raj Anand", pbcOwner: "Amy Lau", dataSource: "connected", system: "CrowdStrike" },
+  { id: "CTL-017", name: "Inventory Valuation", category: "Financial Controls", riskLevel: "High", owner: "Claire Dubois", pbcOwner: "Hans Mueller", dataSource: "connected", system: "SAP ERP" },
+  { id: "CTL-018", name: "Accounts Receivable Aging", category: "Financial Controls", riskLevel: "High", owner: "Oliver Wright", pbcOwner: "Emma Scott", dataSource: "connected", system: "SAP ERP" },
+  { id: "CTL-019", name: "Payroll Processing Controls", category: "Financial Controls", riskLevel: "Critical", owner: "Amy Lau", pbcOwner: "Raj Anand", dataSource: "manual", system: null },
+  { id: "CTL-020", name: "Fixed Asset Capitalization", category: "Financial Controls", riskLevel: "Medium", owner: "Wei Zhang", pbcOwner: "Jun Li", dataSource: "connected", system: "SAP ERP" },
+  { id: "CTL-021", name: "Database Administrator Access", category: "IT General Controls", riskLevel: "Critical", owner: "Michael Torres", pbcOwner: "David Kim", dataSource: "connected", system: "CrowdStrike" },
+  { id: "CTL-022", name: "Network Security Monitoring", category: "IT General Controls", riskLevel: "High", owner: "Nina Patel", pbcOwner: "Priya Sharma", dataSource: "connected", system: "CrowdStrike" },
+  { id: "CTL-023", name: "Business Continuity Planning", category: "Entity Level Controls", riskLevel: "High", owner: "Ciara O'Brien", pbcOwner: "Alex Morrison", dataSource: "manual", system: null },
+  { id: "CTL-024", name: "Whistleblower & Ethics Hotline", category: "Entity Level Controls", riskLevel: "Medium", owner: "Alex Morrison", pbcOwner: "Ciara O'Brien", dataSource: "manual", system: null },
+  { id: "CTL-025", name: "Intercompany Eliminations", category: "Financial Controls", riskLevel: "Critical", owner: "Emma Scott", pbcOwner: "Claire Dubois", dataSource: "connected", system: "SAP ERP" },
 ];
 
 const connectedSystems = [
-  { id: "sys-1", name: "SAP ERP", type: "ERP", status: "connected", coverage: 4 },
+  { id: "sys-1", name: "SAP ERP", type: "ERP", status: "connected", coverage: 7 },
   { id: "sys-2", name: "Okta IAM", type: "Identity", status: "connected", coverage: 2 },
   { id: "sys-3", name: "ServiceNow", type: "ITSM", status: "connected", coverage: 1 },
   { id: "sys-4", name: "AWS CloudTrail", type: "Cloud", status: "connected", coverage: 1 },
   { id: "sys-5", name: "Genetec Security", type: "Physical Security", status: "connected", coverage: 1 },
   { id: "sys-6", name: "Coupa", type: "Procurement", status: "connected", coverage: 1 },
-  { id: "sys-7", name: "CrowdStrike", type: "Endpoint Security", status: "connected", coverage: 1 },
+  { id: "sys-7", name: "CrowdStrike", type: "Endpoint Security", status: "connected", coverage: 3 },
 ];
 
 function ControlSelectionBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
@@ -1770,11 +1779,14 @@ function ControlSelectionBlock({ onComplete, sessionId, isReviewMode }: { onComp
 }
 
 function DataSourceConfigBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
-  const [acknowledgedSystems, setAcknowledgedSystems] = usePersistedBlockState<string[]>(sessionId, "data-sources", "acknowledged", []);
+  const [acknowledgedSystems, setAcknowledgedSystems] = usePersistedBlockState<string[]>(sessionId, "data-sources", "acknowledged", connectedSystems.map(s => s.id));
   const [autoPopulation, setAutoPopulation] = usePersistedBlockState<boolean>(sessionId, "data-sources", "autoPopulation", true);
   const [autoSampling, setAutoSampling] = usePersistedBlockState<boolean>(sessionId, "data-sources", "autoSampling", true);
+  const [systemsExpanded, setSystemsExpanded] = useState(false);
 
   const allAcknowledged = acknowledgedSystems.length === connectedSystems.length;
+  const enabledCount = acknowledgedSystems.length;
+  const totalCoverage = connectedSystems.filter(s => acknowledgedSystems.includes(s.id)).reduce((sum, s) => sum + s.coverage, 0);
 
   return (
     <div className="space-y-4">
@@ -1789,30 +1801,57 @@ function DataSourceConfigBlock({ onComplete, sessionId, isReviewMode }: { onComp
       </div>
 
       <div className="space-y-2">
-        <span className="text-xs font-semibold text-foreground">Connected Systems</span>
-        <div className="space-y-1.5">
-          {connectedSystems.map(sys => {
-            const isAcked = acknowledgedSystems.includes(sys.id);
-            return (
-              <div key={sys.id} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-border hover:border-[#266C92]/30 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <div>
-                    <p className="text-xs font-medium">{sys.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{sys.type} · {sys.coverage} control{sys.coverage !== 1 ? "s" : ""}</p>
+        <button
+          onClick={() => setSystemsExpanded(!systemsExpanded)}
+          className="w-full flex items-center justify-between p-3 rounded-lg border border-slate-200 dark:border-border hover:border-[#266C92]/30 transition-colors bg-white dark:bg-card"
+          data-testid="button-toggle-systems"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
+              <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="text-left">
+              <p className="text-xs font-semibold text-foreground">
+                {enabledCount} of {connectedSystems.length} Systems Enabled
+              </p>
+              <p className="text-[10px] text-muted-foreground">
+                {connectedSystems.filter(s => acknowledgedSystems.includes(s.id)).map(s => s.name).join(" · ")} — covering {totalCoverage} controls
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {allAcknowledged && (
+              <Badge className="text-[9px] bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">All Active</Badge>
+            )}
+            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${systemsExpanded ? "rotate-180" : ""}`} />
+          </div>
+        </button>
+
+        {systemsExpanded && (
+          <div className="space-y-1.5 pl-2 animate-in slide-in-from-top-2 fade-in duration-200">
+            {connectedSystems.map(sys => {
+              const isAcked = acknowledgedSystems.includes(sys.id);
+              return (
+                <div key={sys.id} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-border hover:border-[#266C92]/30 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <div>
+                      <p className="text-xs font-medium">{sys.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{sys.type} · {sys.coverage} control{sys.coverage !== 1 ? "s" : ""}</p>
+                    </div>
                   </div>
+                  <button
+                    onClick={() => setAcknowledgedSystems(prev => isAcked ? prev.filter(id => id !== sys.id) : [...prev, sys.id])}
+                    className={`px-2.5 py-1 rounded text-[10px] font-medium transition-all ${isAcked ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 dark:bg-muted/30 text-muted-foreground hover:bg-[#266C92]/10 hover:text-[#266C92]"}`}
+                    data-testid={`button-ack-system-${sys.id}`}
+                  >
+                    {isAcked ? "✓ Enabled" : "Enable"}
+                  </button>
                 </div>
-                <button
-                  onClick={() => setAcknowledgedSystems(prev => isAcked ? prev.filter(id => id !== sys.id) : [...prev, sys.id])}
-                  className={`px-2.5 py-1 rounded text-[10px] font-medium transition-all ${isAcked ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 dark:bg-muted/30 text-muted-foreground hover:bg-[#266C92]/10 hover:text-[#266C92]"}`}
-                  data-testid={`button-ack-system-${sys.id}`}
-                >
-                  {isAcked ? "✓ Enabled" : "Enable"}
-                </button>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-border">
@@ -1851,7 +1890,7 @@ function DataSourceConfigBlock({ onComplete, sessionId, isReviewMode }: { onComp
           data-testid="button-confirm-datasources"
         >
           <Zap className="w-4 h-4 mr-2" />
-          {allAcknowledged ? "Confirm Data Sources" : `Enable all systems to continue (${acknowledgedSystems.length}/${connectedSystems.length})`}
+          {allAcknowledged ? "Confirm Data Sources" : `Enable all systems to continue (${enabledCount}/${connectedSystems.length})`}
         </Button>
       )}
     </div>
