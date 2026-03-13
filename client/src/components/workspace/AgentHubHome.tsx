@@ -37,6 +37,10 @@ import {
   Shield,
   MoreVertical,
   FastForward,
+  Loader2,
+  ListChecks,
+  Database,
+  Workflow,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -47,7 +51,7 @@ import {
   type AgentActivityEntry,
   type AgentCategorySummary,
 } from "@/config/agentHubConfig";
-import { WorkflowSession, getRiskAssessmentConfig, type WorkflowSessionConfig } from "./WorkflowSession";
+import { WorkflowSession, getRiskAssessmentConfig, getFieldworkAutomationConfig, type WorkflowSessionConfig } from "./WorkflowSession";
 import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
@@ -620,7 +624,197 @@ function WorkflowTracker({ sessionId }: { sessionId: string }) {
   );
 }
 
-function SimpleAgentHub({ welcomeMessage }: { welcomeMessage: string }) {
+interface FieldworkControlStatus {
+  controlId: string;
+  name: string;
+  dataSource: "connected" | "manual";
+  steps: { population: string; sampling: string; evidence: string; testing: string };
+  overallProgress: number;
+}
+
+function FieldworkTracker({ sessionId }: { sessionId: string }) {
+  const runtime = useWorkflowSessionStore((s) => s.runtimeStates[sessionId]);
+  const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
+  const setRuntime = useWorkflowSessionStore((s) => s.setRuntime);
+  const setBlockState = useWorkflowSessionStore((s) => s.setBlockState);
+
+  const fastForwardDemo = useCallback(() => {
+    const currentStatuses = (runtime?.blockStates?.["fieldwork-execution"]?.statuses as FieldworkControlStatus[] | undefined) ?? [];
+    const completedStatuses = currentStatuses.map(s => ({
+      ...s,
+      steps: { population: "complete", sampling: "complete", evidence: "complete", testing: "complete" },
+      overallProgress: 100,
+    }));
+    if (completedStatuses.length > 0) {
+      setBlockState(sessionId, "fieldwork-execution", "statuses", completedStatuses);
+    }
+    setBlockState(sessionId, "fieldwork-execution", "phase", "complete");
+    setRuntime(sessionId, { activeIndex: 4, completedIndices: [0, 1, 2, 3] });
+  }, [sessionId, runtime, setRuntime, setBlockState]);
+
+  if (!runtime) return null;
+
+  const totalBlocks = 5;
+  const activeIndex = runtime.activeIndex;
+  const completedIndices = new Set(runtime.completedIndices);
+  const blockIds = ["control-selection", "data-sources", "pbc-mapping", "fieldwork-execution", "fieldwork-next-steps"];
+  const blockLabelsMap: Record<string, string> = {
+    "control-selection": "Controls",
+    "data-sources": "Data Sources",
+    "pbc-mapping": "PBC Mapping",
+    "fieldwork-execution": "Execution",
+    "fieldwork-next-steps": "Next Steps",
+  };
+  const overallProgress = Math.round((completedIndices.size / totalBlocks) * 100);
+  const isComplete = completedIndices.size === totalBlocks;
+  const currentBlockLabel = blockLabelsMap[blockIds[Math.min(activeIndex, blockIds.length - 1)]] || "";
+
+  const executionState = runtime.blockStates?.["fieldwork-execution"];
+  const controlStatuses = (executionState?.statuses as FieldworkControlStatus[] | undefined) ?? [];
+  const executionPhase = (executionState?.phase as string) ?? null;
+  const isInExecution = activeIndex >= 3 || completedIndices.has(3);
+
+  const completedControls = controlStatuses.filter(s => s.overallProgress === 100).length;
+  const totalControls = controlStatuses.length;
+  const autoControls = controlStatuses.filter(s => s.dataSource === "connected");
+  const manualControls = controlStatuses.filter(s => s.dataSource === "manual");
+  const autoComplete = autoControls.filter(s => s.overallProgress === 100).length;
+  const manualComplete = manualControls.filter(s => s.overallProgress === 100).length;
+
+  const stepIcon = (status: string) => {
+    switch (status) {
+      case "complete": return <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />;
+      case "running": return <Loader2 className="w-2.5 h-2.5 text-[#266C92] animate-spin" />;
+      case "waiting": return <Clock className="w-2.5 h-2.5 text-amber-500" />;
+      default: return <div className="w-2.5 h-2.5 rounded-full border border-slate-300 dark:border-slate-600" />;
+    }
+  };
+
+  return (
+    <Card className="border border-slate-200 dark:border-border overflow-hidden" data-testid="fieldwork-tracker">
+      <div className="px-5 py-4 border-b border-slate-100 dark:border-border bg-white dark:bg-card">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-[#266C92]/10 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-[#266C92]" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground" data-testid="text-fieldwork-title">Automated Control Testing</h3>
+              <p className="text-xs text-muted-foreground">
+                {isComplete ? "Testing complete" : `Step ${activeIndex + 1} of ${totalBlocks} — ${currentBlockLabel}`}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {isComplete ? (
+              <Badge className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                <CheckCircle2 className="w-3 h-3 mr-1" />
+                Complete
+              </Badge>
+            ) : (
+              <Badge className="text-xs bg-[#266C92] text-white">
+                <Activity className="w-3 h-3 mr-1" />
+                In Progress
+              </Badge>
+            )}
+            <Button variant="outline" size="sm" className="text-xs h-7" onClick={() => setCurrentSession(sessionId)} data-testid="button-open-fieldwork">
+              Open
+              <ArrowRight className="w-3 h-3 ml-1" />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" data-testid="button-fieldwork-menu">
+                  <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={fastForwardDemo} data-testid="menu-item-fieldwork-fast-forward">
+                  <FastForward className="w-4 h-4 mr-2" />
+                  Fast-forward demo
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1">
+          <div className={`h-full rounded-full transition-all duration-700 ${isComplete ? "bg-emerald-500" : "bg-[#266C92]"}`} style={{ width: `${overallProgress}%` }} />
+        </div>
+        <p className="text-[11px] text-muted-foreground text-right">{overallProgress}% complete</p>
+      </div>
+
+      <div className="px-5 py-3 bg-slate-50/50 dark:bg-muted/5">
+        <div className="flex gap-1">
+          {blockIds.map((id, i) => {
+            const done = completedIndices.has(i);
+            const active = i === activeIndex;
+            return (
+              <div key={id} className="flex-1 flex flex-col items-center gap-1" data-testid={`fieldwork-step-${id}`}>
+                <div className={`w-full h-1 rounded-full transition-all ${done ? "bg-[#266C92]" : active ? "bg-[#266C92]/40" : "bg-slate-200 dark:bg-slate-700"}`} />
+                <span className={`text-[9px] truncate max-w-full px-0.5 ${done ? "text-[#266C92] font-medium" : active ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+                  {blockLabelsMap[id]}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {isInExecution && totalControls > 0 && (
+        <div className="px-5 py-4 border-t border-slate-100 dark:border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <Workflow className="w-3.5 h-3.5 text-[#266C92]" />
+            <span className="text-xs font-semibold text-foreground">Control Testing — Live Pipeline</span>
+            {executionPhase === "complete" && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 ml-auto" />}
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 mb-3">
+            <div className="p-2 rounded-lg border border-slate-200 dark:border-border text-center">
+              <p className="text-sm font-bold text-foreground">{completedControls}/{totalControls}</p>
+              <p className="text-[9px] text-muted-foreground">Controls Done</p>
+            </div>
+            <div className="p-2 rounded-lg border border-emerald-200 dark:border-emerald-800/30 bg-emerald-50/50 dark:bg-emerald-900/10 text-center">
+              <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{autoComplete}/{autoControls.length}</p>
+              <p className="text-[9px] text-muted-foreground">Automated</p>
+            </div>
+            <div className="p-2 rounded-lg border border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/10 text-center">
+              <p className="text-sm font-bold text-amber-600 dark:text-amber-400">{manualComplete}/{manualControls.length}</p>
+              <p className="text-[9px] text-muted-foreground">PBC Workflow</p>
+            </div>
+          </div>
+
+          <div className="space-y-0.5 max-h-48 overflow-y-auto pr-1">
+            <div className="grid grid-cols-[1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem] gap-1 px-2 py-1 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Control</span><span className="text-center">Pop</span><span className="text-center">Smp</span><span className="text-center">Evd</span><span className="text-center">Test</span><span className="text-center">%</span>
+            </div>
+            {controlStatuses.map(ctrl => (
+              <div key={ctrl.controlId} className="grid grid-cols-[1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem] gap-1 px-2 py-1 rounded text-xs items-center hover:bg-slate-50 dark:hover:bg-muted/20">
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className={`text-[9px] font-mono font-medium ${ctrl.dataSource === "connected" ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>{ctrl.controlId}</span>
+                  <span className="text-[9px] text-muted-foreground truncate">{ctrl.name}</span>
+                </div>
+                <div className="flex justify-center">{stepIcon(ctrl.steps.population)}</div>
+                <div className="flex justify-center">{stepIcon(ctrl.steps.sampling)}</div>
+                <div className="flex justify-center">{stepIcon(ctrl.steps.evidence)}</div>
+                <div className="flex justify-center">{stepIcon(ctrl.steps.testing)}</div>
+                <span className={`text-[8px] text-center font-medium ${ctrl.overallProgress === 100 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>{ctrl.overallProgress}%</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2 text-[9px] text-muted-foreground px-1 mt-2 pt-2 border-t border-slate-100 dark:border-border">
+            <div className="flex items-center gap-0.5"><Loader2 className="w-2 h-2 text-[#266C92] animate-spin" /><span>Running</span></div>
+            <span>·</span>
+            <div className="flex items-center gap-0.5"><Clock className="w-2 h-2 text-amber-500" /><span>Waiting</span></div>
+            <span>·</span>
+            <div className="flex items-center gap-0.5"><CheckCircle2 className="w-2 h-2 text-emerald-500" /><span>Done</span></div>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function SimpleAgentHub({ welcomeMessage, scenario }: { welcomeMessage: string; scenario: string }) {
   const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
   const currentSessionId = useWorkflowSessionStore((s) => s.currentSessionId);
   const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
@@ -687,22 +881,31 @@ function SimpleAgentHub({ welcomeMessage }: { welcomeMessage: string }) {
                 <Activity className="w-4 h-4 text-[#266C92]" />
                 <h2 className="text-sm font-semibold text-foreground">Active Workflows</h2>
               </div>
-              {activeProjects.map((project) => (
-                <WorkflowTracker key={project.sessionId} sessionId={project.sessionId} />
-              ))}
+              {activeProjects.map((project) => {
+                const isFieldwork = project.sessionId === "control-testing";
+                return isFieldwork
+                  ? <FieldworkTracker key={project.sessionId} sessionId={project.sessionId} />
+                  : <WorkflowTracker key={project.sessionId} sessionId={project.sessionId} />;
+              })}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center" data-testid="simple-hub-empty">
               <div className="w-16 h-16 rounded-2xl bg-[#266C92]/10 flex items-center justify-center mb-5">
-                <Bot className="w-8 h-8 text-[#266C92]/60" />
+                {scenario === "fieldwork-automation" ? (
+                  <Shield className="w-8 h-8 text-[#266C92]/60" />
+                ) : (
+                  <Bot className="w-8 h-8 text-[#266C92]/60" />
+                )}
               </div>
               <h2 className="text-base font-semibold text-foreground mb-2">No active workflows</h2>
               <p className="text-sm text-muted-foreground max-w-sm mb-6 leading-relaxed">
-                Use the Optro Assistant to start a workflow. Ask it to run a risk assessment, generate a scenario analysis, or propose a mitigation plan.
+                {scenario === "fieldwork-automation"
+                  ? "Use the Optro Assistant to configure and launch automated control testing workflows across your organization."
+                  : "Use the Optro Assistant to start a workflow. Ask it to run a risk assessment, generate a scenario analysis, or propose a mitigation plan."}
               </p>
               <div className="flex items-center gap-2 text-xs text-muted-foreground/60 bg-slate-100 dark:bg-muted/20 rounded-full px-4 py-2">
                 <Bot className="w-3.5 h-3.5" />
-                <span>Try: "Start a risk assessment"</span>
+                <span>{scenario === "fieldwork-automation" ? 'Try: "Start automated control testing"' : 'Try: "Start a risk assessment"'}</span>
               </div>
             </div>
           )}
@@ -719,6 +922,7 @@ interface AgentHubHomeProps {
 
 export const workflowSessionConfigs: Record<string, { create: () => WorkflowSessionConfig; label: string; icon: string }> = {
   "risk-assessment": { create: getRiskAssessmentConfig, label: "Risk Assessment", icon: "trending-up" },
+  "control-testing": { create: getFieldworkAutomationConfig, label: "Automated Control Testing", icon: "shield" },
 };
 
 const workflowRowToSession: Record<string, string> = {
@@ -728,15 +932,16 @@ const workflowRowToSession: Record<string, string> = {
 export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps) {
   const settings = useSettings();
   const isSimple = settings.agentHubViewMode !== "complex";
+  const scenario = settings.agentHubScenario || "fieldwork-automation";
 
   if (isSimple) {
-    return <SimpleAgentHub welcomeMessage={welcomeMessage} />;
+    return <SimpleAgentHub welcomeMessage={welcomeMessage} scenario={scenario} />;
   }
 
-  return <ComplexAgentHub workspaceId={workspaceId} welcomeMessage={welcomeMessage} />;
+  return <ComplexAgentHub workspaceId={workspaceId} welcomeMessage={welcomeMessage} scenario={scenario} />;
 }
 
-function ComplexAgentHub({ workspaceId, welcomeMessage }: AgentHubHomeProps) {
+function ComplexAgentHub({ workspaceId, welcomeMessage, scenario }: AgentHubHomeProps & { scenario: string }) {
   const hubData = useMemo(() => getAgentHubData(workspaceId), [workspaceId]);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);

@@ -325,8 +325,8 @@ function QuickActionsSection({ quickActions, isAgentHub, onExecute }: { quickAct
     );
   }
 
-  const primary = quickActions.find((a) => a.id === "risk-assessment");
-  const secondary = quickActions.filter((a) => a.id !== "risk-assessment");
+  const primary = quickActions.find((a) => a.id === "risk-assessment" || a.id === "control-testing");
+  const secondary = quickActions.filter((a) => a.id !== "risk-assessment" && a.id !== "control-testing");
 
   return (
     <div className="space-y-2">
@@ -539,7 +539,9 @@ export function HomeAssistantPanel() {
 
   const quickActions = currentWorkspace.isCustom 
     ? genericQuickActions 
-    : (workspaceQuickActions[currentWorkspace.id] || workspaceQuickActions["enterprise-risk"]);
+    : settings.agentHubEnabled && settings.agentHubScenario === "fieldwork-automation" && currentWorkspace.id === "enterprise-risk"
+      ? (workspaceQuickActions["enterprise-risk-fieldwork"] || workspaceQuickActions["enterprise-risk"])
+      : (workspaceQuickActions[currentWorkspace.id] || workspaceQuickActions["enterprise-risk"]);
 
   const isReportRequest = (text: string): boolean => {
     const lower = text.toLowerCase();
@@ -698,6 +700,18 @@ export function HomeAssistantPanel() {
       });
       setOpen(true);
       window.dispatchEvent(new CustomEvent("agent-hub:launch-workflow", { detail: { workflowId: "risk-assessment" } }));
+      return;
+    }
+    if (settings.agentHubEnabled && action.id === "control-testing") {
+      clearChat();
+      addMessage({
+        id: `msg-sidecar-init-${Date.now()}`,
+        role: "assistant",
+        content: "Launching **Automated Control Testing** workflow. I'll guide you through selecting controls, configuring data sources, mapping PBC owners, and then orchestrate parallel agentic workflows across all selected controls.\n\nLet's start by selecting which controls from the master register to include in this testing cycle.",
+        timestamp: new Date().toISOString(),
+      });
+      setOpen(true);
+      window.dispatchEvent(new CustomEvent("agent-hub:launch-workflow", { detail: { workflowId: "control-testing" } }));
       return;
     }
     if (action.type === "workflow") {

@@ -29,6 +29,7 @@ interface SettingsState {
   agentTone: string;
   showBrowser: boolean;
   agentHubEnabled: boolean;
+  agentHubScenario: "risk-assessment" | "fieldwork-automation";
   agentHubViewMode: "simple" | "complex";
 }
 
@@ -40,6 +41,7 @@ const defaultSettings: SettingsState = {
   agentTone: "professional",
   showBrowser: false,
   agentHubEnabled: true,
+  agentHubScenario: "fieldwork-automation",
   agentHubViewMode: "simple",
 };
 
@@ -56,6 +58,9 @@ function loadSettings(): SettingsState {
       const merged = { ...defaultSettings, ...parsed };
       if (merged.agentHubViewMode !== "simple" && merged.agentHubViewMode !== "complex") {
         merged.agentHubViewMode = "simple";
+      }
+      if (merged.agentHubScenario !== "risk-assessment" && merged.agentHubScenario !== "fieldwork-automation") {
+        merged.agentHubScenario = "fieldwork-automation";
       }
       return merged;
     }
@@ -189,6 +194,28 @@ export function SettingsPanel() {
                 data-testid="switch-agent-hub"
               />
             </div>
+            {settings.agentHubEnabled && (
+              <div className="mt-3 ml-1 space-y-2">
+                <Label className="text-xs text-muted-foreground">Scenario</Label>
+                <Select
+                  value={settings.agentHubScenario}
+                  onValueChange={(val) => updateSetting("agentHubScenario", val as "risk-assessment" | "fieldwork-automation")}
+                >
+                  <SelectTrigger className="h-8 text-xs" data-testid="select-hub-scenario">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fieldwork-automation">Fieldwork Automation</SelectItem>
+                    <SelectItem value="risk-assessment">Risk Assessment</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-[10px] text-muted-foreground/60">
+                  {settings.agentHubScenario === "fieldwork-automation"
+                    ? "Automated control testing with parallel agentic PBC workflows"
+                    : "Enterprise risk assessment with survey distribution"}
+                </p>
+              </div>
+            )}
             {settings.agentHubEnabled && (
               <div className="mt-3 ml-1 space-y-2">
                 <Label className="text-xs text-muted-foreground">Hub Home View</Label>

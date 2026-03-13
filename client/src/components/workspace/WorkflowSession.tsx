@@ -1640,6 +1640,557 @@ function NextStepsBlock() {
   );
 }
 
+const masterControlsList = [
+  { id: "CTL-001", name: "Access Provisioning", category: "IT General Controls", riskLevel: "High", owner: "Sarah Chen", pbcOwner: "James Park", dataSource: "connected", system: "Okta IAM" },
+  { id: "CTL-002", name: "Change Management", category: "IT General Controls", riskLevel: "High", owner: "Michael Torres", pbcOwner: "Lisa Wang", dataSource: "connected", system: "ServiceNow" },
+  { id: "CTL-003", name: "Segregation of Duties", category: "IT General Controls", riskLevel: "Critical", owner: "Sarah Chen", pbcOwner: "David Kim", dataSource: "manual", system: null },
+  { id: "CTL-004", name: "Backup & Recovery", category: "IT General Controls", riskLevel: "Medium", owner: "Priya Sharma", pbcOwner: "Alex Morrison", dataSource: "connected", system: "AWS CloudTrail" },
+  { id: "CTL-005", name: "Journal Entry Approval", category: "Financial Controls", riskLevel: "Critical", owner: "Oliver Wright", pbcOwner: "Emma Scott", dataSource: "connected", system: "SAP ERP" },
+  { id: "CTL-006", name: "Bank Reconciliation", category: "Financial Controls", riskLevel: "High", owner: "Claire Dubois", pbcOwner: "Hans Mueller", dataSource: "connected", system: "SAP ERP" },
+  { id: "CTL-007", name: "Revenue Recognition", category: "Financial Controls", riskLevel: "Critical", owner: "Wei Zhang", pbcOwner: "Jun Li", dataSource: "manual", system: null },
+  { id: "CTL-008", name: "Vendor Payment Authorization", category: "Financial Controls", riskLevel: "High", owner: "Amy Lau", pbcOwner: "Raj Anand", dataSource: "connected", system: "SAP ERP" },
+  { id: "CTL-009", name: "Physical Access Controls", category: "Entity Level Controls", riskLevel: "Medium", owner: "Ciara O'Brien", pbcOwner: "Oliver Wright", dataSource: "connected", system: "Genetec Security" },
+  { id: "CTL-010", name: "Incident Response", category: "IT General Controls", riskLevel: "High", owner: "Nina Patel", pbcOwner: "Michael Torres", dataSource: "manual", system: null },
+  { id: "CTL-011", name: "Data Classification", category: "Entity Level Controls", riskLevel: "Medium", owner: "Alex Morrison", pbcOwner: "Sarah Chen", dataSource: "manual", system: null },
+  { id: "CTL-012", name: "Procurement Approval", category: "Financial Controls", riskLevel: "High", owner: "Hans Mueller", pbcOwner: "Claire Dubois", dataSource: "connected", system: "Coupa" },
+  { id: "CTL-013", name: "User Access Review", category: "IT General Controls", riskLevel: "High", owner: "David Kim", pbcOwner: "Priya Sharma", dataSource: "connected", system: "Okta IAM" },
+  { id: "CTL-014", name: "Financial Close Process", category: "Financial Controls", riskLevel: "Critical", owner: "Emma Scott", pbcOwner: "Oliver Wright", dataSource: "manual", system: null },
+  { id: "CTL-015", name: "Third-Party Risk Assessment", category: "Entity Level Controls", riskLevel: "High", owner: "Jun Li", pbcOwner: "Wei Zhang", dataSource: "manual", system: null },
+  { id: "CTL-016", name: "Privilege Escalation Monitoring", category: "IT General Controls", riskLevel: "Critical", owner: "Raj Anand", pbcOwner: "Amy Lau", dataSource: "connected", system: "CrowdStrike" },
+];
+
+const connectedSystems = [
+  { id: "sys-1", name: "SAP ERP", type: "ERP", status: "connected", coverage: 4 },
+  { id: "sys-2", name: "Okta IAM", type: "Identity", status: "connected", coverage: 2 },
+  { id: "sys-3", name: "ServiceNow", type: "ITSM", status: "connected", coverage: 1 },
+  { id: "sys-4", name: "AWS CloudTrail", type: "Cloud", status: "connected", coverage: 1 },
+  { id: "sys-5", name: "Genetec Security", type: "Physical Security", status: "connected", coverage: 1 },
+  { id: "sys-6", name: "Coupa", type: "Procurement", status: "connected", coverage: 1 },
+  { id: "sys-7", name: "CrowdStrike", type: "Endpoint Security", status: "connected", coverage: 1 },
+];
+
+function ControlSelectionBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
+  const [selection, setSelection] = usePersistedBlockState<"all" | "subset">(sessionId, "control-selection", "mode", "all");
+  const [selectedIds, setSelectedIds] = usePersistedBlockState<string[]>(sessionId, "control-selection", "selectedIds", masterControlsList.map(c => c.id));
+  const [filterCat, setFilterCat] = useState<string>("all");
+
+  const categories = Array.from(new Set(masterControlsList.map(c => c.category)));
+  const filtered = filterCat === "all" ? masterControlsList : masterControlsList.filter(c => c.category === filterCat);
+  const connectedCount = masterControlsList.filter(c => selectedIds.includes(c.id) && c.dataSource === "connected").length;
+  const manualCount = masterControlsList.filter(c => selectedIds.includes(c.id) && c.dataSource === "manual").length;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <button
+          className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${selection === "all" ? "border-[#266C92] bg-[#266C92]/10 text-[#266C92]" : "border-slate-200 dark:border-border text-muted-foreground"}`}
+          onClick={() => { setSelection("all"); setSelectedIds(masterControlsList.map(c => c.id)); }}
+          data-testid="button-select-all-controls"
+        >
+          All Controls ({masterControlsList.length})
+        </button>
+        <button
+          className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${selection === "subset" ? "border-[#266C92] bg-[#266C92]/10 text-[#266C92]" : "border-slate-200 dark:border-border text-muted-foreground"}`}
+          onClick={() => setSelection("subset")}
+          data-testid="button-select-subset-controls"
+        >
+          Select Subset
+        </button>
+      </div>
+
+      {selection === "subset" && (
+        <div className="flex gap-2 items-center">
+          <Select value={filterCat} onValueChange={setFilterCat}>
+            <SelectTrigger className="h-7 text-xs w-48">
+              <SelectValue placeholder="Filter by category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden max-h-56 overflow-y-auto">
+        <div className="grid grid-cols-[2rem_1fr_8rem_5rem_5rem] gap-2 px-3 py-1.5 bg-slate-50 dark:bg-muted/20 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider sticky top-0">
+          <span></span><span>Control</span><span>Category</span><span>Risk</span><span>Source</span>
+        </div>
+        {filtered.map(c => {
+          const isSelected = selectedIds.includes(c.id);
+          return (
+            <div key={c.id} className={`grid grid-cols-[2rem_1fr_8rem_5rem_5rem] gap-2 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/10 ${!isSelected ? "opacity-40" : ""}`}>
+              <input
+                type="checkbox"
+                checked={isSelected}
+                disabled={selection === "all"}
+                onChange={() => {
+                  setSelectedIds(prev => isSelected ? prev.filter(id => id !== c.id) : [...prev, c.id]);
+                }}
+                className="w-3.5 h-3.5 rounded border-slate-300 text-[#266C92] focus:ring-[#266C92]"
+                data-testid={`checkbox-control-${c.id}`}
+              />
+              <div>
+                <span className="font-medium">{c.id}</span>
+                <span className="text-muted-foreground ml-1.5">{c.name}</span>
+              </div>
+              <span className="text-muted-foreground truncate">{c.category}</span>
+              <Badge className={`text-[9px] h-4 ${c.riskLevel === "Critical" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : c.riskLevel === "High" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"}`}>{c.riskLevel}</Badge>
+              <span className={`text-[10px] ${c.dataSource === "connected" ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500"}`}>
+                {c.dataSource === "connected" ? "⚡ Auto" : "📋 Manual"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <div className="p-2.5 rounded-lg bg-[#266C92]/5 border border-[#266C92]/20">
+          <p className="text-lg font-bold text-[#266C92]">{selectedIds.length}</p>
+          <p className="text-[10px] text-muted-foreground">Controls selected</p>
+        </div>
+        <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/30">
+          <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{connectedCount}</p>
+          <p className="text-[10px] text-muted-foreground">Fully automated</p>
+        </div>
+        <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
+          <p className="text-lg font-bold text-amber-600 dark:text-amber-400">{manualCount}</p>
+          <p className="text-[10px] text-muted-foreground">PBC required</p>
+        </div>
+      </div>
+
+      {!isReviewMode && (
+        <Button onClick={onComplete} disabled={selectedIds.length === 0} className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white disabled:opacity-50" data-testid="button-confirm-controls">
+          <ListChecks className="w-4 h-4 mr-2" />
+          {selectedIds.length === 0 ? "Select at least one control" : `Confirm ${selectedIds.length} Controls`}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function DataSourceConfigBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
+  const [acknowledgedSystems, setAcknowledgedSystems] = usePersistedBlockState<string[]>(sessionId, "data-sources", "acknowledged", []);
+  const [autoPopulation, setAutoPopulation] = usePersistedBlockState<boolean>(sessionId, "data-sources", "autoPopulation", true);
+  const [autoSampling, setAutoSampling] = usePersistedBlockState<boolean>(sessionId, "data-sources", "autoSampling", true);
+
+  const allAcknowledged = acknowledgedSystems.length === connectedSystems.length;
+
+  return (
+    <div className="space-y-4">
+      <div className="p-3 rounded-lg bg-[#266C92]/5 border border-[#266C92]/20">
+        <div className="flex items-center gap-2 mb-2">
+          <Bot className="w-4 h-4 text-[#266C92]" />
+          <span className="text-xs font-semibold text-[#266C92]">Agent Capability Assessment</span>
+        </div>
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
+          Connected systems allow the agent to automatically query populations, extract samples, and collect evidence. Controls without system connections will follow the manual PBC request/response workflow.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <span className="text-xs font-semibold text-foreground">Connected Systems</span>
+        <div className="space-y-1.5">
+          {connectedSystems.map(sys => {
+            const isAcked = acknowledgedSystems.includes(sys.id);
+            return (
+              <div key={sys.id} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-border hover:border-[#266C92]/30 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <div>
+                    <p className="text-xs font-medium">{sys.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{sys.type} · {sys.coverage} control{sys.coverage !== 1 ? "s" : ""}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setAcknowledgedSystems(prev => isAcked ? prev.filter(id => id !== sys.id) : [...prev, sys.id])}
+                  className={`px-2.5 py-1 rounded text-[10px] font-medium transition-all ${isAcked ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 dark:bg-muted/30 text-muted-foreground hover:bg-[#266C92]/10 hover:text-[#266C92]"}`}
+                  data-testid={`button-ack-system-${sys.id}`}
+                >
+                  {isAcked ? "✓ Enabled" : "Enable"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-border">
+        <span className="text-xs font-semibold text-foreground">Automation Preferences</span>
+        <div className="flex items-center justify-between p-2 rounded-lg border border-slate-200 dark:border-border">
+          <div>
+            <p className="text-xs font-medium">Auto-populate populations</p>
+            <p className="text-[10px] text-muted-foreground">Agent queries systems to build population sets automatically</p>
+          </div>
+          <button
+            onClick={() => setAutoPopulation(!autoPopulation)}
+            className={`w-8 h-4 rounded-full transition-colors ${autoPopulation ? "bg-[#266C92]" : "bg-slate-300 dark:bg-slate-600"}`}
+          >
+            <div className={`w-3 h-3 rounded-full bg-white transition-transform ${autoPopulation ? "translate-x-4" : "translate-x-0.5"}`} />
+          </button>
+        </div>
+        <div className="flex items-center justify-between p-2 rounded-lg border border-slate-200 dark:border-border">
+          <div>
+            <p className="text-xs font-medium">Automated sampling</p>
+            <p className="text-[10px] text-muted-foreground">Agent applies statistical sampling methodology to population data</p>
+          </div>
+          <button
+            onClick={() => setAutoSampling(!autoSampling)}
+            className={`w-8 h-4 rounded-full transition-colors ${autoSampling ? "bg-[#266C92]" : "bg-slate-300 dark:bg-slate-600"}`}
+          >
+            <div className={`w-3 h-3 rounded-full bg-white transition-transform ${autoSampling ? "translate-x-4" : "translate-x-0.5"}`} />
+          </button>
+        </div>
+      </div>
+
+      {!isReviewMode && (
+        <Button
+          onClick={onComplete}
+          disabled={!allAcknowledged}
+          className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white disabled:opacity-50"
+          data-testid="button-confirm-datasources"
+        >
+          <Zap className="w-4 h-4 mr-2" />
+          {allAcknowledged ? "Confirm Data Sources" : `Enable all systems to continue (${acknowledgedSystems.length}/${connectedSystems.length})`}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
+  const [confirmed, setConfirmed] = usePersistedBlockState<boolean>(sessionId, "pbc-mapping", "confirmed", false);
+  const selectedIds = useWorkflowSessionStore(s => {
+    const bs = s.runtimeStates[sessionId]?.blockStates?.["control-selection"];
+    return (bs?.selectedIds as string[] | undefined) ?? masterControlsList.map(c => c.id);
+  });
+
+  const manualControls = masterControlsList.filter(c => selectedIds.includes(c.id) && c.dataSource === "manual");
+  const autoControls = masterControlsList.filter(c => selectedIds.includes(c.id) && c.dataSource === "connected");
+
+  return (
+    <div className="space-y-4">
+      <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
+        <div className="flex items-center gap-2 mb-1">
+          <Users className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+          <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">PBC Distribution Required</span>
+        </div>
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
+          {manualControls.length} control{manualControls.length !== 1 ? "s" : ""} require manual evidence collection via PBC requests.
+          The system has auto-mapped Control Owners and PBC Owners as recipients based on the master controls register.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-foreground">PBC Request Recipients</span>
+          <Badge className="text-[9px] bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">{manualControls.length} requests</Badge>
+        </div>
+        <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden max-h-40 overflow-y-auto">
+          <div className="grid grid-cols-[1fr_6rem_6rem] gap-2 px-3 py-1.5 bg-slate-50 dark:bg-muted/20 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider sticky top-0">
+            <span>Control</span><span>Owner</span><span>PBC Owner</span>
+          </div>
+          {manualControls.map(c => (
+            <div key={c.id} className="grid grid-cols-[1fr_6rem_6rem] gap-2 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50">
+              <span><span className="font-medium text-[#266C92]">{c.id}</span> <span className="text-muted-foreground">{c.name}</span></span>
+              <span className="text-[10px] truncate">{c.owner}</span>
+              <span className="text-[10px] truncate text-amber-600 dark:text-amber-400">{c.pbcOwner}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-foreground">Automated (No PBC needed)</span>
+          <Badge className="text-[9px] bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">{autoControls.length} automated</Badge>
+        </div>
+        <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden max-h-28 overflow-y-auto">
+          {autoControls.map(c => (
+            <div key={c.id} className="flex items-center justify-between px-3 py-1.5 text-xs border-t first:border-t-0 border-slate-100 dark:border-border/50">
+              <span><span className="font-medium text-emerald-600 dark:text-emerald-400">{c.id}</span> <span className="text-muted-foreground">{c.name}</span></span>
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400">⚡ {c.system}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10">
+        <label className="flex items-start gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={confirmed}
+            onChange={(e) => setConfirmed(e.target.checked)}
+            className="mt-0.5 w-3.5 h-3.5 rounded border-slate-300 text-[#266C92] focus:ring-[#266C92]"
+            data-testid="checkbox-confirm-pbc-mapping"
+          />
+          <span className="text-[11px] text-muted-foreground leading-relaxed">
+            I confirm the PBC owner mapping is correct. {manualControls.length} PBC requests will be distributed to the mapped owners
+            and {autoControls.length} controls will be tested automatically via system connections.
+          </span>
+        </label>
+      </div>
+
+      {!isReviewMode && (
+        <Button
+          onClick={onComplete}
+          disabled={!confirmed}
+          className="w-full bg-[#266C92] hover:bg-[#1e5a7a] text-white disabled:opacity-50"
+          data-testid="button-confirm-pbc-mapping"
+        >
+          <Send className="w-4 h-4 mr-2" />
+          Confirm Mapping & Initiate Workflow
+        </Button>
+      )}
+    </div>
+  );
+}
+
+interface ControlWorkflowStatus {
+  controlId: string;
+  name: string;
+  dataSource: "connected" | "manual";
+  system: string | null;
+  owner: string;
+  steps: {
+    population: "pending" | "running" | "waiting" | "complete";
+    sampling: "pending" | "running" | "complete";
+    evidence: "pending" | "running" | "waiting" | "complete";
+    testing: "pending" | "running" | "complete";
+  };
+  overallProgress: number;
+}
+
+function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => void; sessionId: string }) {
+  const selectedIds = useWorkflowSessionStore(s => {
+    const bs = s.runtimeStates[sessionId]?.blockStates?.["control-selection"];
+    return (bs?.selectedIds as string[] | undefined) ?? masterControlsList.map(c => c.id);
+  });
+
+  const defaultStatuses: ControlWorkflowStatus[] = masterControlsList
+    .filter(c => selectedIds.includes(c.id))
+    .map(c => ({
+      controlId: c.id,
+      name: c.name,
+      dataSource: c.dataSource as "connected" | "manual",
+      system: c.system,
+      owner: c.owner,
+      steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" },
+      overallProgress: 0,
+    }));
+
+  const [statuses, setStatuses] = usePersistedBlockState<ControlWorkflowStatus[]>(sessionId, "fieldwork-execution", "statuses", defaultStatuses);
+  const [phase, setPhase] = usePersistedBlockState<"initializing" | "running" | "complete">(sessionId, "fieldwork-execution", "phase", "initializing");
+
+  const stepOrder: (keyof ControlWorkflowStatus["steps"])[] = ["population", "sampling", "evidence", "testing"];
+
+  useEffect(() => {
+    if (phase === "initializing") {
+      const timer = setTimeout(() => setPhase("running"), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "running") return;
+    const timer = setInterval(() => {
+      setStatuses((prev: ControlWorkflowStatus[]) => {
+        let anyChange = false;
+        const next = prev.map(ctrl => {
+          const steps = { ...ctrl.steps };
+          const isAuto = ctrl.dataSource === "connected";
+          for (const step of stepOrder) {
+            if (steps[step] === "complete") continue;
+            const prevStep = stepOrder.indexOf(step) > 0 ? stepOrder[stepOrder.indexOf(step) - 1] : null;
+            if (prevStep && steps[prevStep] !== "complete") break;
+            if (steps[step] === "pending") {
+              steps[step] = isAuto ? "running" : (step === "population" || step === "evidence" ? "waiting" : "running");
+              anyChange = true;
+              break;
+            }
+            if (steps[step] === "running" || steps[step] === "waiting") {
+              const speed = isAuto ? 0.7 : (steps[step] === "waiting" ? 0.25 : 0.4);
+              if (Math.random() < speed) {
+                steps[step] = "complete";
+                anyChange = true;
+              }
+              break;
+            }
+          }
+          const completedSteps = stepOrder.filter(s => steps[s] === "complete").length;
+          const runningSteps = stepOrder.filter(s => steps[s] === "running" || steps[s] === "waiting").length;
+          const overallProgress = Math.round(((completedSteps * 100) + (runningSteps * 40)) / 4);
+          return { ...ctrl, steps, overallProgress };
+        });
+        if (!anyChange) return prev;
+        return next;
+      });
+    }, 800);
+    return () => clearInterval(timer);
+  }, [phase]);
+
+  const allComplete = statuses.every(s => stepOrder.every(step => s.steps[step] === "complete"));
+
+  useEffect(() => {
+    if (allComplete && phase === "running") {
+      const timer = setTimeout(() => { setPhase("complete"); onComplete(); }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [allComplete, phase, onComplete]);
+
+  const completedControls = statuses.filter(s => s.overallProgress === 100).length;
+  const autoControls = statuses.filter(s => s.dataSource === "connected");
+  const manualControls = statuses.filter(s => s.dataSource === "manual");
+  const autoComplete = autoControls.filter(s => s.overallProgress === 100).length;
+  const manualComplete = manualControls.filter(s => s.overallProgress === 100).length;
+
+  const stepIcon = (status: string) => {
+    switch (status) {
+      case "complete": return <CheckCircle2 className="w-3 h-3 text-emerald-500" />;
+      case "running": return <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />;
+      case "waiting": return <Clock className="w-3 h-3 text-amber-500" />;
+      default: return <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600" />;
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {phase === "initializing" ? (
+        <div className="flex flex-col items-center py-8 gap-3">
+          <Loader2 className="w-8 h-8 text-[#266C92] animate-spin" />
+          <p className="text-sm font-medium text-foreground">Initializing {statuses.length} parallel control workflows...</p>
+          <p className="text-xs text-muted-foreground">Provisioning agents and connecting to data sources</p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border text-center">
+              <p className="text-lg font-bold text-foreground">{completedControls}/{statuses.length}</p>
+              <p className="text-[10px] text-muted-foreground">Controls Complete</p>
+            </div>
+            <div className="p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800/30 bg-emerald-50/50 dark:bg-emerald-900/10 text-center">
+              <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{autoComplete}/{autoControls.length}</p>
+              <p className="text-[10px] text-muted-foreground">Automated</p>
+            </div>
+            <div className="p-2.5 rounded-lg border border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/10 text-center">
+              <p className="text-lg font-bold text-amber-600 dark:text-amber-400">{manualComplete}/{manualControls.length}</p>
+              <p className="text-[10px] text-muted-foreground">PBC Workflow</p>
+            </div>
+          </div>
+
+          <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
+            <div className="grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 bg-slate-50 dark:bg-muted/20 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Control</span><span className="text-center">Pop.</span><span className="text-center">Samp.</span><span className="text-center">Evid.</span><span className="text-center">Test</span><span className="text-center">%</span>
+            </div>
+            <div className="max-h-64 overflow-y-auto">
+              {statuses.map(ctrl => (
+                <div key={ctrl.controlId} className="grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/10">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className={`text-[10px] font-mono font-medium ${ctrl.dataSource === "connected" ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>{ctrl.controlId}</span>
+                    <span className="text-[10px] text-muted-foreground truncate">{ctrl.name}</span>
+                  </div>
+                  {stepOrder.map(step => (
+                    <div key={step} className="flex justify-center">{stepIcon(ctrl.steps[step])}</div>
+                  ))}
+                  <div className="flex items-center justify-center">
+                    <span className={`text-[9px] font-medium ${ctrl.overallProgress === 100 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>{ctrl.overallProgress}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-[10px] text-muted-foreground px-1">
+            <div className="flex items-center gap-1"><Loader2 className="w-2.5 h-2.5 text-[#266C92] animate-spin" /><span>Agent running</span></div>
+            <span>·</span>
+            <div className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-amber-500" /><span>Waiting on PBC</span></div>
+            <span>·</span>
+            <div className="flex items-center gap-1"><CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" /><span>Complete</span></div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function FieldworkNextStepsBlock() {
+  const actions = [
+    { icon: FileText, label: "Review Testing Results", desc: "Examine agent-annotated workpapers and testing conclusions" },
+    { icon: AlertTriangle, label: "Triage Exceptions", desc: "Review controls flagged with testing exceptions" },
+    { icon: BarChart3, label: "Generate Fieldwork Report", desc: "Create summary of testing coverage and results" },
+    { icon: Target, label: "Remediation Tracking", desc: "Assign and track remediation actions for failed controls" },
+    { icon: Users, label: "Share with Audit Committee", desc: "Prepare executive summary for committee review" },
+    { icon: RefreshCcw, label: "Schedule Re-test", desc: "Plan follow-up testing for remediated controls" },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {actions.map((a, i) => {
+        const Icon = a.icon;
+        return (
+          <button
+            key={i}
+            className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 dark:border-border hover:border-[#266C92]/30 hover:bg-[#266C92]/5 transition-all text-left group"
+            data-testid={`fieldwork-next-step-${i}`}
+          >
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-muted/30 flex items-center justify-center shrink-0 group-hover:bg-[#266C92]/10">
+              <Icon className="w-4 h-4 text-muted-foreground group-hover:text-[#266C92]" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-foreground group-hover:text-[#266C92]">{a.label}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">{a.desc}</p>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function getFieldworkAutomationConfig(): WorkflowSessionConfig {
+  return {
+    id: "control-testing",
+    title: "Automated Control Testing",
+    blocks: [
+      {
+        id: "control-selection",
+        title: "Control Selection",
+        description: "Select which controls from the master list to include in this testing cycle",
+        type: "human-input",
+        render: ({ onComplete, sessionId, isReviewMode }) => <ControlSelectionBlock onComplete={onComplete} sessionId={sessionId} isReviewMode={isReviewMode} />,
+      },
+      {
+        id: "data-sources",
+        title: "Data Source Configuration",
+        description: "Configure connected systems for automated population, sampling, and evidence collection",
+        type: "human-input",
+        render: ({ onComplete, sessionId, isReviewMode }) => <DataSourceConfigBlock onComplete={onComplete} sessionId={sessionId} isReviewMode={isReviewMode} />,
+      },
+      {
+        id: "pbc-mapping",
+        title: "PBC Owner Mapping",
+        description: "Review auto-mapped Control Owners and PBC Owners for manual evidence collection requests",
+        type: "human-input",
+        render: ({ onComplete, sessionId, isReviewMode }) => <PBCMappingBlock onComplete={onComplete} sessionId={sessionId} isReviewMode={isReviewMode} />,
+      },
+      {
+        id: "fieldwork-execution",
+        title: "Fieldwork Execution",
+        description: "Parallel agentic workflows executing the 4-step PBC pipeline across all selected controls",
+        type: "automated",
+        render: ({ onComplete, sessionId }) => <FieldworkExecutionBlock onComplete={onComplete} sessionId={sessionId} />,
+      },
+      {
+        id: "fieldwork-next-steps",
+        title: "Next Steps",
+        description: "Fieldwork complete — review results and plan follow-up actions",
+        type: "next-steps",
+        render: () => <FieldworkNextStepsBlock />,
+      },
+    ],
+  };
+}
+
 export function getRiskAssessmentConfig(): WorkflowSessionConfig {
   return {
     id: "risk-assessment",

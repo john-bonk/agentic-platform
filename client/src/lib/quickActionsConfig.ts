@@ -91,6 +91,7 @@ export const workspaceQuickActions: Record<string, QuickActionConfig[]> = {
       color: "#8b5cf6",
     },
   ],
+
   "enterprise-risk": [
     {
       id: "open-tariff-workflow",
@@ -122,6 +123,48 @@ export const workspaceQuickActions: Record<string, QuickActionConfig[]> = {
       id: "board-report",
       label: "Generate Board Report",
       description: "Auto-generate executive summary of tariff risks for board presentation",
+      iconName: "BarChart3",
+      type: "report",
+      color: "#8b5cf6",
+    },
+  ],
+  "enterprise-risk-fieldwork": [
+    {
+      id: "control-testing",
+      label: "Automated Control Testing",
+      description: "Configure and launch parallel agentic workflows to test controls across the organization",
+      iconName: "Shield",
+      type: "create",
+      color: "#266C92",
+    },
+    {
+      id: "pbc-status",
+      label: "View PBC Request Status",
+      description: "Monitor outstanding Prepared by Client requests and collection progress",
+      iconName: "FileText",
+      type: "analyze",
+      color: "#f59e0b",
+    },
+    {
+      id: "evidence-review",
+      label: "Review Collected Evidence",
+      description: "Inspect and validate evidence gathered by agents from connected systems",
+      iconName: "Search",
+      type: "analyze",
+      color: "#10b981",
+    },
+    {
+      id: "exception-triage",
+      label: "Triage Testing Exceptions",
+      description: "Review controls flagged with exceptions or annotation issues by the agent",
+      iconName: "AlertTriangle",
+      type: "analyze",
+      color: "#ef4444",
+    },
+    {
+      id: "fieldwork-report",
+      label: "Generate Fieldwork Summary",
+      description: "Create a fieldwork completion report with testing results and coverage metrics",
       iconName: "BarChart3",
       type: "report",
       color: "#8b5cf6",
