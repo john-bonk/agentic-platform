@@ -77,6 +77,32 @@ interface WorkflowSessionProps {
   onBack: () => void;
 }
 
+function AssistantWelcomeMessage({ configId }: { configId: string }) {
+  const [visible, setVisible] = useState(false);
+  const message = configId === "control-testing"
+    ? "I've set up the Automated Control Testing workflow for you. We'll walk through control selection, data source configuration, and PBC owner mapping before kicking off parallel fieldwork execution across all selected controls. Let's start by choosing which controls to include in this testing cycle."
+    : "Welcome — let's get started with your workflow.";
+
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div className="flex items-start gap-3 mb-6 animate-in fade-in slide-in-from-bottom-2 duration-500" data-testid="assistant-welcome-message">
+      <div className="w-7 h-7 rounded-full bg-[#266C92] flex items-center justify-center shrink-0 mt-0.5">
+        <Bot className="w-3.5 h-3.5 text-white" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[11px] font-medium text-[#266C92] mb-1">Optro Assistant</p>
+        <p className="text-sm text-foreground leading-relaxed">{message}</p>
+      </div>
+    </div>
+  );
+}
+
 function BlockWrapper({
   block,
   index,
@@ -246,6 +272,14 @@ export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionPr
   }, [setFullScreenView]);
 
   useEffect(() => {
+    const pending = useWorkflowSessionStore.getState().pendingDetailView;
+    if (pending && fullScreenDetailViews[pending]) {
+      setFullScreenView(pending);
+      useWorkflowSessionStore.getState().setPendingDetailView(null);
+    }
+  }, [setFullScreenView]);
+
+  useEffect(() => {
     if (lastFiredBlockRef.current === activeIndex) return;
     lastFiredBlockRef.current = activeIndex;
     const block = config.blocks[activeIndex];
@@ -334,6 +368,9 @@ export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionPr
 
       <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6">
         <div className="max-w-3xl mx-auto">
+          {config.id === "control-testing" && activeIndex === 0 && completedIndices.size === 0 && (
+            <AssistantWelcomeMessage configId={config.id} />
+          )}
           {config.blocks.map((block, index) => (
             <BlockWrapper
               key={block.id}
@@ -884,6 +921,143 @@ function ReassessmentView() {
   );
 }
 
+function ExecutiveReportView() {
+  const totalControls = masterControlsList.length;
+  const autoControls = masterControlsList.filter(c => c.dataSource === "connected").length;
+  const manualControls = masterControlsList.filter(c => c.dataSource === "manual").length;
+  const highExceptions = fieldworkExceptions.filter(e => e.severity === "high").length;
+  const mediumExceptions = fieldworkExceptions.filter(e => e.severity === "medium").length;
+  const passedControls = totalControls - fieldworkExceptions.length;
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <div className="border-b border-slate-200 dark:border-border pb-4">
+        <h1 className="text-lg font-bold text-foreground" data-testid="report-title">Automated Control Testing — Executive Summary Report</h1>
+        <p className="text-xs text-muted-foreground mt-1">SOX Compliance · FY2026 Q1 Testing Cycle · Generated March 13, 2026</p>
+      </div>
+
+      <div className="grid grid-cols-4 gap-3">
+        <div className="p-3 rounded-lg border border-slate-200 dark:border-border text-center">
+          <p className="text-2xl font-bold text-foreground">{totalControls}</p>
+          <p className="text-[10px] text-muted-foreground">Controls Tested</p>
+        </div>
+        <div className="p-3 rounded-lg border border-slate-200 dark:border-border text-center">
+          <p className="text-2xl font-bold text-[#266C92]">{passedControls}</p>
+          <p className="text-[10px] text-muted-foreground">Passed</p>
+        </div>
+        <div className="p-3 rounded-lg border border-red-200 dark:border-red-800/30 bg-red-50/30 dark:bg-red-900/10 text-center">
+          <p className="text-2xl font-bold text-red-600 dark:text-red-400">{fieldworkExceptions.length}</p>
+          <p className="text-[10px] text-muted-foreground">Exceptions</p>
+        </div>
+        <div className="p-3 rounded-lg border border-slate-200 dark:border-border text-center">
+          <p className="text-2xl font-bold text-foreground">{Math.round((passedControls / totalControls) * 100)}%</p>
+          <p className="text-[10px] text-muted-foreground">Pass Rate</p>
+        </div>
+      </div>
+
+      <DetailSection title="Testing Scope & Coverage">
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div>
+              <p className="text-muted-foreground mb-1">Testing Methodology</p>
+              <p className="text-foreground font-medium">4-stage pipeline: Population → Sampling → Evidence → Testing</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground mb-1">Automation Coverage</p>
+              <p className="text-foreground font-medium">{autoControls} automated ({Math.round((autoControls / totalControls) * 100)}%) · {manualControls} PBC manual ({Math.round((manualControls / totalControls) * 100)}%)</p>
+            </div>
+          </div>
+          <DataTable
+            headers={["Category", "Controls", "Method", "Status"]}
+            rows={[
+              ["IT General Controls", `${masterControlsList.filter(c => ["CTL-001","CTL-002","CTL-009","CTL-013","CTL-016","CTL-021","CTL-022"].includes(c.id)).length}`, "Connected Systems", "Complete"],
+              ["Financial Controls", `${masterControlsList.filter(c => ["CTL-005","CTL-006","CTL-014","CTL-017","CTL-018","CTL-020","CTL-025"].includes(c.id)).length}`, "Connected + PBC", "Complete"],
+              ["Compliance Controls", `${masterControlsList.filter(c => ["CTL-003","CTL-004","CTL-008","CTL-010","CTL-011","CTL-012","CTL-015","CTL-019","CTL-023","CTL-024"].includes(c.id)).length}`, "PBC + Connected", "Complete"],
+            ]}
+          />
+        </div>
+      </DetailSection>
+
+      <DetailSection title="Connected Systems Used">
+        <DataTable
+          headers={["System", "Type", "Controls", "Data Retrieved"]}
+          rows={[
+            ["Okta IAM", "Identity & Access", "CTL-001, CTL-013", "Provisioning logs, access reviews"],
+            ["SAP ERP", "Financial System", "CTL-005, CTL-006, CTL-017, CTL-018, CTL-020, CTL-025", "Journal entries, reconciliations, asset records"],
+            ["ServiceNow", "ITSM", "CTL-002", "Change tickets, approval workflows"],
+            ["CrowdStrike", "Security", "CTL-016, CTL-021, CTL-022", "Privilege escalations, admin access, network alerts"],
+            ["Coupa", "Procurement", "CTL-008, CTL-012", "Payment authorizations, PO approvals"],
+            ["AWS", "Cloud Infrastructure", "CTL-004", "Backup configurations, recovery tests"],
+            ["Genetec", "Physical Security", "CTL-009", "Access logs, badge events"],
+          ]}
+        />
+      </DetailSection>
+
+      <DetailSection title={`Exceptions Summary (${fieldworkExceptions.length})`}>
+        <div className="space-y-3">
+          <div className="flex gap-3 mb-2">
+            <Badge className="text-[10px] bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">{highExceptions} High</Badge>
+            <Badge className="text-[10px] bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">{mediumExceptions} Medium</Badge>
+          </div>
+          {fieldworkExceptions.map(exc => (
+            <div key={exc.id} className="p-3 rounded-lg border border-slate-200 dark:border-border">
+              <div className="flex items-center gap-2 mb-1">
+                <Badge className={`text-[9px] h-4 ${exc.severity === "high" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"}`}>{exc.severity}</Badge>
+                <span className="text-[10px] font-mono font-semibold text-[#266C92]">{exc.controlId}</span>
+                <span className="text-xs font-medium text-foreground">{exc.title}</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">{exc.summary}</p>
+              <div className="flex gap-4 text-[10px]">
+                <span className="text-muted-foreground">Samples: {exc.samplesTested} tested, <span className="text-red-500 font-medium">{exc.samplesFailed} failed</span></span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </DetailSection>
+
+      <DetailSection title="Root Cause Analysis">
+        <DataTable
+          headers={["Exception", "Control", "Root Cause", "Recommendation"]}
+          rows={fieldworkExceptions.map(exc => [
+            exc.id,
+            `${exc.controlId} — ${exc.controlName}`,
+            exc.rootCause.length > 80 ? exc.rootCause.slice(0, 80) + "…" : exc.rootCause,
+            exc.recommendation.length > 80 ? exc.recommendation.slice(0, 80) + "…" : exc.recommendation,
+          ])}
+        />
+      </DetailSection>
+
+      <DetailSection title="Remediation Timeline">
+        <DataTable
+          headers={["Exception", "Control", "Severity", "Response Due", "Re-Test Target"]}
+          rows={fieldworkExceptions.map(exc => [
+            exc.id,
+            exc.controlId,
+            exc.severity === "high" ? "High" : "Medium",
+            exc.severity === "high" ? "10 business days" : "15 business days",
+            exc.severity === "high" ? "Apr 15, 2026" : "May 1, 2026",
+          ])}
+        />
+      </DetailSection>
+
+      <DetailSection title="Conclusion & Recommendations">
+        <div className="space-y-3 text-xs text-foreground leading-relaxed">
+          <p>The Q1 FY2026 automated control testing cycle covered {totalControls} controls across IT General Controls, Financial Controls, and Compliance Controls. {autoControls} controls ({Math.round((autoControls / totalControls) * 100)}%) were tested via automated system connections, while {manualControls} controls ({Math.round((manualControls / totalControls) * 100)}%) required PBC-based evidence collection.</p>
+          <p>{passedControls} controls ({Math.round((passedControls / totalControls) * 100)}%) passed all testing procedures. {fieldworkExceptions.length} exceptions were identified — {highExceptions} high severity and {mediumExceptions} medium severity. The high-severity exceptions involve unauthorized access provisioning, journal entry segregation failures, and vendor payment structuring — all requiring immediate management attention and formal remediation plans.</p>
+          <p className="font-medium">Key Recommendations:</p>
+          <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
+            <li>Escalate the 3 high-severity exceptions to the Audit Committee at the next scheduled meeting</li>
+            <li>Request formal management responses within the prescribed timelines</li>
+            <li>Schedule targeted re-testing for Q2 to validate remediation effectiveness</li>
+            <li>Review automation rules in Okta and SAP that enable approval bypass</li>
+            <li>Implement cumulative vendor spend monitoring to detect future structuring</li>
+          </ul>
+        </div>
+      </DetailSection>
+    </div>
+  );
+}
+
 const fullScreenDetailViews: Record<string, { title: string; headerIcon: JSX.Element; render: () => JSX.Element }> = {
   "signal-benchmark": { title: "Industry Benchmark Analysis", headerIcon: <TrendingUp className="w-4 h-4 text-[#266C92]" />, render: () => <BenchmarkDetailView /> },
   "signal-controls": { title: "Control Coverage Analysis", headerIcon: <Shield className="w-4 h-4 text-[#266C92]" />, render: () => <ControlCoverageDetailView /> },
@@ -897,6 +1071,7 @@ const fullScreenDetailViews: Record<string, { title: string; headerIcon: JSX.Ele
   "ns-action-plans": { title: "Mitigation Action Plans", headerIcon: <Zap className="w-4 h-4 text-[#266C92]" />, render: () => <ActionPlansView /> },
   "ns-board-report": { title: "Board Report Draft", headerIcon: <FileText className="w-4 h-4 text-[#266C92]" />, render: () => <BoardReportView /> },
   "ns-reassess": { title: "Re-Assessment Schedule", headerIcon: <RefreshCcw className="w-4 h-4 text-[#266C92]" />, render: () => <ReassessmentView /> },
+  "executive-report": { title: "Executive Testing Report", headerIcon: <FileText className="w-4 h-4 text-[#266C92]" />, render: () => <ExecutiveReportView /> },
 };
 
 function SynthesisBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
@@ -1982,6 +2157,94 @@ export interface FieldworkBlockRule {
   severity: "high" | "medium";
 }
 
+export interface FieldworkException {
+  id: string;
+  controlId: string;
+  controlName: string;
+  severity: "high" | "medium";
+  title: string;
+  summary: string;
+  detail: string;
+  samplesTested: number;
+  samplesFailed: number;
+  rootCause: string;
+  recommendation: string;
+  nextSteps: string[];
+}
+
+export const fieldworkExceptions: FieldworkException[] = [
+  {
+    id: "EXC-001",
+    controlId: "CTL-001",
+    controlName: "Access Provisioning",
+    severity: "high",
+    title: "Unauthorized Access Grants Without Approval",
+    summary: "3 of 25 sampled provisioning events lacked documented manager approval before access was granted in Okta IAM.",
+    detail: "During testing of the Access Provisioning control, the agent identified 3 instances where user accounts were provisioned with elevated privileges (Admin or Power User roles) without the required two-level approval chain. The affected grants occurred between Jan 15–Feb 2 and involved the Finance and IT departments. System logs confirm the approval workflow was bypassed via a direct API call, suggesting either a misconfigured automation rule or intentional circumvention.",
+    samplesTested: 25,
+    samplesFailed: 3,
+    rootCause: "Automated provisioning script in the HR onboarding pipeline bypasses the standard Okta approval workflow for bulk provisioning requests exceeding 5 users.",
+    recommendation: "Restrict bulk provisioning API access to require explicit approval tokens. Add detective control to flag any provisioning events that bypass the standard workflow.",
+    nextSteps: ["Create formal issue in audit management system", "Assign remediation owner (IT Security Lead)", "Request management response within 15 business days", "Schedule re-test after remediation"],
+  },
+  {
+    id: "EXC-002",
+    controlId: "CTL-005",
+    controlName: "Journal Entry Approval",
+    severity: "high",
+    title: "Post-Close Journal Entries Missing Segregation Review",
+    summary: "5 of 40 sampled post-close journal entries were prepared and approved by the same individual, violating the segregation of duties requirement.",
+    detail: "The testing agent flagged 5 manual journal entries posted during the Q3 and Q4 close periods where the preparer and approver were the same individual (Controller — M. Chen). These entries ranged from $45K to $1.2M and involved intercompany reclass and accrual adjustments. The SAP workflow shows the entries were approved via mobile, suggesting the dual-approval step was auto-bypassed due to a delegation rule active during the close window.",
+    samplesTested: 40,
+    samplesFailed: 5,
+    rootCause: "Temporary delegation rule granted during quarter-end close periods allows the Controller to self-approve entries under $2M, overriding the standard dual-approval requirement.",
+    recommendation: "Remove or restrict the delegation rule. Implement a hard block preventing self-approval regardless of delegation status for all entries above materiality threshold.",
+    nextSteps: ["Create formal issue in audit management system", "Escalate to Audit Committee given financial reporting impact", "Request management action plan within 10 business days", "Assess impact on financial statement assertions"],
+  },
+  {
+    id: "EXC-003",
+    controlId: "CTL-013",
+    controlName: "User Access Review",
+    severity: "medium",
+    title: "Stale Privileged Accounts Not Revoked During Quarterly Review",
+    summary: "8 of 60 privileged accounts flagged as inactive (>90 days) were certified as 'appropriate' without investigation during the Q4 access review.",
+    detail: "The quarterly User Access Review for Q4 revealed that 8 privileged accounts in Okta IAM had no login activity for over 90 days but were still certified as active and appropriate by their respective managers. The accounts span 3 departments (IT, Finance, HR) and include 2 accounts with Domain Admin privileges. Reviewer timestamps show all 8 certifications were completed within a 4-minute window, suggesting bulk approval without individual review.",
+    samplesTested: 60,
+    samplesFailed: 8,
+    rootCause: "Access review tool allows bulk 'certify all' action without forcing individual account review. Reviewers are not presented with last-login data during the certification flow.",
+    recommendation: "Disable bulk certification for privileged accounts. Surface last-login timestamps and risk indicators in the review interface. Require attestation comments for any account inactive >60 days.",
+    nextSteps: ["Create formal issue in audit management system", "Assign remediation to IT Security team", "Request management response within 15 business days", "Verify revocation of the 8 flagged accounts"],
+  },
+  {
+    id: "EXC-004",
+    controlId: "CTL-008",
+    controlName: "Vendor Payment Authorization",
+    severity: "high",
+    title: "Payments Executed Below Dual-Authorization Threshold Without Review",
+    summary: "4 of 30 sampled vendor payments between $9,000–$9,900 appeared to be structured to avoid the $10,000 dual-authorization threshold.",
+    detail: "During testing of the Vendor Payment Authorization control, the agent detected a pattern of payments to 2 vendors (TechServ Solutions and Global Consulting Partners) where invoices were consistently submitted just below the $10,000 dual-authorization threshold. 4 payments across Q3–Q4 showed identical timing patterns — submitted within 48 hours of each other to the same vendor. Coupa workflow logs confirm these payments only required single-signer approval, bypassing the dual-authorization requirement.",
+    samplesTested: 30,
+    samplesFailed: 4,
+    rootCause: "No detective control exists to identify potential invoice splitting or structuring patterns. The $10,000 threshold is a hard cutoff with no lookback window for cumulative vendor spend.",
+    recommendation: "Implement a rolling 30-day cumulative vendor spend check. Flag any vendor with 3+ payments within 10% of the dual-authorization threshold for mandatory secondary review.",
+    nextSteps: ["Create formal issue in audit management system", "Refer to Fraud Risk team for preliminary assessment", "Request management response within 10 business days", "Expand sample to full population for the 2 flagged vendors"],
+  },
+  {
+    id: "EXC-005",
+    controlId: "CTL-016",
+    controlName: "Privilege Escalation Monitoring",
+    severity: "medium",
+    title: "Temporary Privilege Escalations Not Reverted Within SLA",
+    summary: "6 of 20 sampled temporary privilege escalations exceeded the 24-hour auto-revert SLA by an average of 5 days.",
+    detail: "Testing of the Privilege Escalation Monitoring control identified 6 instances where temporary admin privileges were granted for production troubleshooting but were not reverted within the 24-hour policy window. The CrowdStrike monitoring agent detected the escalations but the auto-revert mechanism failed to trigger due to an exception list maintained by the SOC team. The longest escalation remained active for 12 days before manual intervention. None of the 6 cases had documented extension approvals.",
+    samplesTested: 20,
+    samplesFailed: 6,
+    rootCause: "SOC team maintains a manual exception list that suppresses auto-revert for accounts flagged as 'active investigation.' No expiry or review cadence exists for the exception list entries.",
+    recommendation: "Implement a maximum 72-hour cap on the SOC exception list with mandatory re-approval. Add automated alerting for any escalation exceeding SLA regardless of exception status.",
+    nextSteps: ["Create formal issue in audit management system", "Assign remediation to SOC Team Lead", "Request management response within 15 business days", "Verify exception list has been purged of stale entries"],
+  },
+];
+
 export const fieldworkBlockRules: FieldworkBlockRule[] = [
   {
     controlId: "CTL-003",
@@ -2111,7 +2374,13 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
   const autoComplete = autoControls.filter(s => s.overallProgress === 100).length;
   const manualComplete = manualControls.filter(s => s.overallProgress === 100).length;
 
-  const stepIcon = (status: string) => {
+  const exceptionControlIds = useMemo(() => new Set(fieldworkExceptions.map(e => e.controlId)), []);
+  const exceptionsForControl = useCallback((controlId: string) => fieldworkExceptions.filter(e => e.controlId === controlId), []);
+
+  const stepIcon = (status: string, controlId?: string, step?: string) => {
+    if (step === "testing" && status === "complete" && exceptionControlIds.has(controlId ?? "")) {
+      return <AlertTriangle className="w-3 h-3 text-red-500" />;
+    }
     switch (status) {
       case "complete": return <CheckCircle2 className="w-3 h-3 text-[#266C92]" />;
       case "running": return <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />;
@@ -2131,7 +2400,7 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-4 gap-3">
             <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border text-center">
               <p className="text-lg font-bold text-foreground">{completedControls}/{statuses.length}</p>
               <p className="text-[10px] text-muted-foreground">Controls Complete</p>
@@ -2144,6 +2413,12 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
               <p className="text-lg font-bold text-foreground">{manualComplete}/{manualControls.length}</p>
               <p className="text-[10px] text-muted-foreground">PBC Workflow</p>
             </div>
+            {phase === "complete" && (
+              <div className="p-2.5 rounded-lg border border-red-200 dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/10 text-center">
+                <p className="text-lg font-bold text-red-600 dark:text-red-400">{fieldworkExceptions.length}</p>
+                <p className="text-[10px] text-muted-foreground">Exceptions</p>
+              </div>
+            )}
           </div>
 
           <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
@@ -2152,16 +2427,16 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
             </div>
             <div className="max-h-64 overflow-y-auto">
               {statuses.map(ctrl => (
-                <div key={ctrl.controlId} className="grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/10">
+                <div key={ctrl.controlId} className={`grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/10 ${phase === "complete" && exceptionControlIds.has(ctrl.controlId) ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}>
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="text-[10px] font-mono font-medium text-foreground">{ctrl.controlId}</span>
+                    <span className={`text-[10px] font-mono font-medium ${phase === "complete" && exceptionControlIds.has(ctrl.controlId) ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>{ctrl.controlId}</span>
                     <span className="text-[10px] text-muted-foreground truncate">{ctrl.name}</span>
                   </div>
                   {fieldworkStepOrder.map(step => (
-                    <div key={step} className="flex justify-center">{stepIcon(ctrl.steps[step])}</div>
+                    <div key={step} className="flex justify-center">{stepIcon(ctrl.steps[step], ctrl.controlId, step)}</div>
                   ))}
                   <div className="flex items-center justify-center">
-                    <span className={`text-[9px] font-medium ${ctrl.overallProgress === 100 ? "text-[#266C92]" : "text-muted-foreground"}`}>{ctrl.overallProgress}%</span>
+                    <span className={`text-[9px] font-medium ${ctrl.overallProgress === 100 ? (exceptionControlIds.has(ctrl.controlId) ? "text-red-500" : "text-[#266C92]") : "text-muted-foreground"}`}>{ctrl.overallProgress}%</span>
                   </div>
                 </div>
               ))}
@@ -2174,6 +2449,12 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
             <div className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-slate-400" /><span>Waiting on PBC</span></div>
             <span>·</span>
             <div className="flex items-center gap-1"><CheckCircle2 className="w-2.5 h-2.5 text-[#266C92]" /><span>Complete</span></div>
+            {phase === "complete" && (
+              <>
+                <span>·</span>
+                <div className="flex items-center gap-1"><AlertTriangle className="w-2.5 h-2.5 text-red-500" /><span>Exception</span></div>
+              </>
+            )}
           </div>
         </>
       )}
@@ -2181,25 +2462,34 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
   );
 }
 
+export const fieldworkNextStepActions = [
+  { icon: "FileText", label: "Generate Executive Report", desc: "Full summary report with testing coverage, exceptions, and recommendations for audit committee", actionId: "executive-report" },
+  { icon: "AlertTriangle", label: "Triage Exceptions", desc: `Review ${fieldworkExceptions.length} controls flagged with testing exceptions`, actionId: "triage-exceptions" },
+  { icon: "Target", label: "Remediation Tracking", desc: "Assign and track remediation actions for failed controls", actionId: "remediation" },
+  { icon: "FileText", label: "Review Testing Results", desc: "Examine agent-annotated workpapers and testing conclusions", actionId: "review-results" },
+  { icon: "Users", label: "Share with Audit Committee", desc: "Prepare executive summary for committee review", actionId: "share-committee" },
+  { icon: "RefreshCcw", label: "Schedule Re-test", desc: "Plan follow-up testing for remediated controls", actionId: "schedule-retest" },
+];
+
+const nextStepIconMap: Record<string, typeof FileText> = { FileText, AlertTriangle, Target, Users, RefreshCcw, BarChart3 };
+
 function FieldworkNextStepsBlock() {
-  const actions = [
-    { icon: FileText, label: "Review Testing Results", desc: "Examine agent-annotated workpapers and testing conclusions" },
-    { icon: AlertTriangle, label: "Triage Exceptions", desc: "Review controls flagged with testing exceptions" },
-    { icon: BarChart3, label: "Generate Fieldwork Report", desc: "Create summary of testing coverage and results" },
-    { icon: Target, label: "Remediation Tracking", desc: "Assign and track remediation actions for failed controls" },
-    { icon: Users, label: "Share with Audit Committee", desc: "Prepare executive summary for committee review" },
-    { icon: RefreshCcw, label: "Schedule Re-test", desc: "Plan follow-up testing for remediated controls" },
-  ];
+  const setFullScreenView = useWorkflowSessionStore((s) => s.setRuntime);
 
   return (
     <div className="grid grid-cols-2 gap-2">
-      {actions.map((a, i) => {
-        const Icon = a.icon;
+      {fieldworkNextStepActions.map((a, i) => {
+        const Icon = nextStepIconMap[a.icon] || FileText;
         return (
           <button
             key={i}
             className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 dark:border-border hover:border-[#266C92]/30 hover:bg-[#266C92]/5 transition-all text-left group"
             data-testid={`fieldwork-next-step-${i}`}
+            onClick={() => {
+              if (a.actionId === "executive-report") {
+                window.dispatchEvent(new CustomEvent("workflow-session:open-detail", { detail: { viewId: "executive-report" } }));
+              }
+            }}
           >
             <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-muted/30 flex items-center justify-center shrink-0 group-hover:bg-[#266C92]/10">
               <Icon className="w-4 h-4 text-muted-foreground group-hover:text-[#266C92]" />

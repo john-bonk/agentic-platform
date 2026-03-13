@@ -18,12 +18,14 @@ interface WorkflowSessionState {
   activeProjects: ActiveProject[];
   currentSessionId: string | null;
   pendingCanvasView: boolean;
+  pendingDetailView: string | null;
   sessionConfigs: Record<string, unknown>;
   runtimeStates: Record<string, WorkflowRuntimeState>;
   addProject: (project: ActiveProject, config: unknown) => void;
   removeProject: (sessionId: string) => void;
   setCurrentSession: (sessionId: string | null) => void;
   setPendingCanvasView: (val: boolean) => void;
+  setPendingDetailView: (viewId: string | null) => void;
   getSessionConfig: (sessionId: string) => unknown | null;
   getRuntime: (sessionId: string) => WorkflowRuntimeState | null;
   setRuntime: (sessionId: string, runtime: Partial<WorkflowRuntimeState>) => void;
@@ -41,6 +43,7 @@ export const useWorkflowSessionStore = create<WorkflowSessionState>((set, get) =
   activeProjects: [],
   currentSessionId: null,
   pendingCanvasView: false,
+  pendingDetailView: null,
   sessionConfigs: {},
   runtimeStates: {},
   addProject: (project, config) =>
@@ -68,6 +71,7 @@ export const useWorkflowSessionStore = create<WorkflowSessionState>((set, get) =
     }),
   setCurrentSession: (sessionId) => set({ currentSessionId: sessionId }),
   setPendingCanvasView: (val) => set({ pendingCanvasView: val }),
+  setPendingDetailView: (viewId) => set({ pendingDetailView: viewId }),
   getSessionConfig: (sessionId) => get().sessionConfigs[sessionId] || null,
   getRuntime: (sessionId) => get().runtimeStates[sessionId] || null,
   setRuntime: (sessionId, partial) =>

@@ -46,6 +46,9 @@ import {
   Target,
   ExternalLink,
   Users,
+  ChevronLeft,
+  RefreshCcw,
+  ArrowUpRight,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -56,7 +59,7 @@ import {
   type AgentActivityEntry,
   type AgentCategorySummary,
 } from "@/config/agentHubConfig";
-import { WorkflowSession, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, type WorkflowSessionConfig, type ControlWorkflowStatus } from "./WorkflowSession";
+import { WorkflowSession, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, fieldworkExceptions, fieldworkNextStepActions, type WorkflowSessionConfig, type ControlWorkflowStatus, type FieldworkException } from "./WorkflowSession";
 import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
@@ -1092,8 +1095,11 @@ function FieldworkComplexHub() {
   const executionPhaseForTimer = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.phase as string) ?? null;
   const isHubVisible = !showCanvas;
 
-  const [actionsExpanded, setActionsExpanded] = useState(true);
+  const [actionsExpanded, setActionsExpanded] = useState(false);
   const [systemsExpanded, setSystemsExpanded] = useState(false);
+  const [exceptionsModalOpen, setExceptionsModalOpen] = useState(false);
+  const [selectedExceptionId, setSelectedExceptionId] = useState<string | null>(null);
+  const [nextStepsExpanded, setNextStepsExpanded] = useState(true);
 
   const resolvedBlocksList = useMemo(() => {
     if (!fieldworkProject) return [] as string[];
@@ -1167,8 +1173,12 @@ function FieldworkComplexHub() {
   const automatedPct = totalControls > 0 ? Math.round((autoControls.length / totalControls) * 100) : 0;
 
   const hasWorkflow = !!fieldworkProject && !!fieldworkRuntime;
+  const exceptionControlIds = useMemo(() => new Set(fieldworkExceptions.map(e => e.controlId)), []);
 
-  const stepDot = (status: string) => {
+  const stepDot = (status: string, controlId?: string, step?: string) => {
+    if (step === "testing" && status === "complete" && isComplete && exceptionControlIds.has(controlId ?? "")) {
+      return <AlertTriangle className="w-3 h-3 text-red-500" />;
+    }
     switch (status) {
       case "complete": return <CheckCircle2 className="w-3 h-3 text-[#266C92]" />;
       case "running": return <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />;
@@ -1404,15 +1414,19 @@ function FieldworkComplexHub() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border border-slate-200 dark:border-border">
+              <Card
+                className={`border ${isComplete ? "border-red-200 dark:border-red-800/30 cursor-pointer hover:shadow-sm transition-shadow" : "border-slate-200 dark:border-border"}`}
+                onClick={isComplete ? () => setExceptionsModalOpen(true) : undefined}
+                data-testid="fieldwork-exceptions-card"
+              >
                 <CardContent className="p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
                     <span className="text-[11px] text-muted-foreground font-medium">Exceptions</span>
                   </div>
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-xl font-bold text-foreground">{blockedActions.length}</span>
-                    <span className="text-[10px] text-muted-foreground">{blockedActions.length > 0 ? `${blockedActions.length} blocking` : "none"}</span>
+                    <span className={`text-xl font-bold ${isComplete ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>{isComplete ? fieldworkExceptions.length : blockedActions.length}</span>
+                    <span className="text-[10px] text-muted-foreground">{isComplete ? `${fieldworkExceptions.filter(e => e.severity === "high").length} high severity` : blockedActions.length > 0 ? `${blockedActions.length} blocking` : "none"}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -1468,15 +1482,15 @@ function FieldworkComplexHub() {
             <div className="grid lg:grid-cols-3 gap-5">
               <div className="lg:col-span-2 space-y-4">
                 {controlStatuses.length > 0 && (
-                  <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-pipeline-card">
-                    <CardHeader className="pb-2 pt-3 px-4">
+                  <Card className="border border-slate-200 dark:border-border flex flex-col min-h-0" data-testid="fieldwork-pipeline-card">
+                    <CardHeader className="pb-2 pt-3 px-4 shrink-0">
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Workflow className="w-4 h-4 text-[#266C92]" />
                         Control Pipeline
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="px-4 pb-4">
-                      <div className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
+                    <CardContent className="px-4 pb-4 flex flex-col min-h-0 flex-1">
+                      <div className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1 shrink-0">
                         <span>Control</span>
                         <span>Source</span>
                         <span className="text-center" title="Population">Pop</span>
@@ -1485,6 +1499,7 @@ function FieldworkComplexHub() {
                         <span className="text-center" title="Testing">Test</span>
                       </div>
 
+                      <div className="flex-1 min-h-0 overflow-y-auto">
                       {manualControls.length > 0 && (
                         <div className="mb-2">
                           <div className="flex items-center gap-2 px-2 py-1.5">
@@ -1495,21 +1510,22 @@ function FieldworkComplexHub() {
                           </div>
                           {manualControls.map((ctrl) => {
                             const isBlocked = Object.values(ctrl.steps).some(s => s === "blocked");
+                            const hasException = isComplete && exceptionControlIds.has(ctrl.controlId);
                             return (
                               <div
                                 key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors ${isBlocked ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors ${isBlocked || hasException ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">
-                                  <span className={`text-[10px] font-mono font-semibold ${isBlocked ? "text-red-500" : "text-foreground"}`}>{ctrl.controlId}</span>
+                                  <span className={`text-[10px] font-mono font-semibold ${isBlocked || hasException ? "text-red-500" : "text-foreground"}`}>{ctrl.controlId}</span>
                                   <span className="text-xs text-foreground truncate">{ctrl.name}</span>
                                 </div>
                                 <span className={`text-[10px] font-medium truncate ${isBlocked ? "text-red-500" : "text-muted-foreground"}`}>{isBlocked ? "Blocked" : "PBC"}</span>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.population, ctrl.controlId, "population")}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.sampling, ctrl.controlId, "sampling")}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.evidence, ctrl.controlId, "evidence")}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.testing, ctrl.controlId, "testing")}</div>
                               </div>
                             );
                           })}
@@ -1524,32 +1540,41 @@ function FieldworkComplexHub() {
                               Automated ({autoComplete}/{autoControls.length})
                             </span>
                           </div>
-                          {autoControls.map((ctrl) => (
-                            <div
-                              key={ctrl.controlId}
-                              className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors"
-                              data-testid={`pipeline-row-${ctrl.controlId}`}
-                            >
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <span className="text-[10px] font-mono font-semibold text-[#266C92]">{ctrl.controlId}</span>
-                                <span className="text-xs text-foreground truncate">{ctrl.name}</span>
+                          {autoControls.map((ctrl) => {
+                            const hasException = isComplete && exceptionControlIds.has(ctrl.controlId);
+                            return (
+                              <div
+                                key={ctrl.controlId}
+                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors ${hasException ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                                data-testid={`pipeline-row-${ctrl.controlId}`}
+                              >
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <span className={`text-[10px] font-mono font-semibold ${hasException ? "text-red-600 dark:text-red-400" : "text-[#266C92]"}`}>{ctrl.controlId}</span>
+                                  <span className="text-xs text-foreground truncate">{ctrl.name}</span>
+                                </div>
+                                <span className="text-[10px] text-muted-foreground font-medium truncate">Connected</span>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.population, ctrl.controlId, "population")}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.sampling, ctrl.controlId, "sampling")}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.evidence, ctrl.controlId, "evidence")}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.testing, ctrl.controlId, "testing")}</div>
                               </div>
-                              <span className="text-[10px] text-muted-foreground font-medium truncate">Connected</span>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
 
-                      <div className="flex items-center gap-3 text-[9px] text-muted-foreground px-2 mt-3 pt-2 border-t border-slate-100 dark:border-border">
+                      </div>
+                      <div className="flex items-center gap-3 text-[9px] text-muted-foreground px-2 mt-3 pt-2 border-t border-slate-100 dark:border-border shrink-0">
                         <div className="flex items-center gap-1"><CheckCircle2 className="w-2.5 h-2.5 text-[#266C92]" /><span>Complete</span></div>
                         <div className="flex items-center gap-1"><Loader2 className="w-2.5 h-2.5 text-[#266C92] animate-spin" /><span>Running</span></div>
                         <div className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-slate-400" /><span>Waiting</span></div>
                         <div className="flex items-center gap-1"><AlertCircle className="w-2.5 h-2.5 text-red-500" /><span>Blocked</span></div>
                         <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full border border-slate-300 dark:border-slate-600" /><span>Pending</span></div>
+                        {isComplete && (
+                          <>
+                            <div className="flex items-center gap-1"><AlertTriangle className="w-2.5 h-2.5 text-red-500" /><span>Exception</span></div>
+                          </>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -1648,9 +1673,176 @@ function FieldworkComplexHub() {
                 </Card>
               </div>
             </div>
+
+            {isComplete && (
+              <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-next-steps-card">
+                <button
+                  onClick={() => setNextStepsExpanded(!nextStepsExpanded)}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50/50 dark:hover:bg-muted/5 transition-colors"
+                  data-testid="button-toggle-next-steps"
+                >
+                  <div className="flex items-center gap-2">
+                    <ListChecks className="w-4 h-4 text-[#266C92]" />
+                    <span className="text-sm font-semibold text-foreground">Next Steps</span>
+                    <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]">{fieldworkNextStepActions.length}</Badge>
+                  </div>
+                  <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${nextStepsExpanded ? "" : "-rotate-90"}`} />
+                </button>
+                {nextStepsExpanded && (
+                  <CardContent className="px-4 pb-4 pt-0 border-t border-slate-100 dark:border-border">
+                    <div className="grid grid-cols-2 gap-2 mt-3">
+                      {fieldworkNextStepActions.map((a, i) => {
+                        const iconMap: Record<string, typeof FileText> = { FileText, AlertTriangle, Target, Users, RefreshCcw, BarChart3 };
+                        const Icon = iconMap[a.icon] || FileText;
+                        return (
+                          <button
+                            key={i}
+                            className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 dark:border-border hover:border-[#266C92]/30 hover:bg-[#266C92]/5 transition-all text-left group"
+                            data-testid={`tracker-next-step-${a.actionId}`}
+                            onClick={() => {
+                              if (a.actionId === "executive-report") {
+                                useWorkflowSessionStore.getState().setPendingDetailView("executive-report");
+                                setShowCanvas(true);
+                              }
+                              if (a.actionId === "triage-exceptions") {
+                                setExceptionsModalOpen(true);
+                              }
+                            }}
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-muted/30 flex items-center justify-center shrink-0 group-hover:bg-[#266C92]/10">
+                              <Icon className="w-4 h-4 text-muted-foreground group-hover:text-[#266C92]" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-medium text-foreground group-hover:text-[#266C92]">{a.label}</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">{a.desc}</p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                )}
+              </Card>
+            )}
           </div>
         )}
       </div>
+
+      <Dialog open={exceptionsModalOpen} onOpenChange={(open) => { setExceptionsModalOpen(open); if (!open) setSelectedExceptionId(null); }}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-500" />
+              Testing Exceptions ({fieldworkExceptions.length})
+            </DialogTitle>
+            <DialogDescription>
+              Controls flagged during automated testing that require review and remediation.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 overflow-y-auto -mx-6 px-6">
+            {selectedExceptionId ? (() => {
+              const exc = fieldworkExceptions.find(e => e.id === selectedExceptionId);
+              if (!exc) return null;
+              return (
+                <div className="space-y-4">
+                  <button
+                    onClick={() => setSelectedExceptionId(null)}
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    data-testid="button-exception-back"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                    Back to all exceptions
+                  </button>
+                  <div className="flex items-start gap-3">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${exc.severity === "high" ? "bg-red-100 dark:bg-red-900/20" : "bg-orange-100 dark:bg-orange-900/20"}`}>
+                      <AlertTriangle className={`w-4 h-4 ${exc.severity === "high" ? "text-red-600 dark:text-red-400" : "text-orange-600 dark:text-orange-400"}`} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-foreground">{exc.title}</h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge className={`text-[9px] ${exc.severity === "high" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"}`}>
+                          {exc.severity === "high" ? "High Severity" : "Medium Severity"}
+                        </Badge>
+                        <span className="text-[10px] font-mono text-muted-foreground">{exc.controlId}</span>
+                        <span className="text-[10px] text-muted-foreground">· {exc.controlName}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 dark:bg-muted/10 rounded-lg p-3 border border-slate-100 dark:border-border">
+                    <p className="text-xs text-foreground leading-relaxed">{exc.summary}</p>
+                    <div className="flex gap-4 mt-2">
+                      <span className="text-[10px] text-muted-foreground">Samples tested: <strong className="text-foreground">{exc.samplesTested}</strong></span>
+                      <span className="text-[10px] text-red-600 dark:text-red-400">Failed: <strong>{exc.samplesFailed}</strong></span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs font-semibold text-foreground mb-1.5">Detailed Findings</h4>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{exc.detail}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs font-semibold text-foreground mb-1.5">Root Cause</h4>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{exc.rootCause}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs font-semibold text-foreground mb-1.5">Recommendation</h4>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{exc.recommendation}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs font-semibold text-foreground mb-2">Recommended Next Steps</h4>
+                    <div className="space-y-1.5">
+                      {exc.nextSteps.map((step, si) => (
+                        <div key={si} className="flex items-start gap-2 p-2 rounded border border-slate-200 dark:border-border">
+                          <div className="w-4 h-4 rounded-full bg-slate-100 dark:bg-muted/30 flex items-center justify-center shrink-0 mt-0.5">
+                            <span className="text-[8px] font-bold text-muted-foreground">{si + 1}</span>
+                          </div>
+                          <p className="text-[11px] text-foreground">{step}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })() : (
+              <div className="space-y-2">
+                {fieldworkExceptions.map((exc) => (
+                  <button
+                    key={exc.id}
+                    onClick={() => setSelectedExceptionId(exc.id)}
+                    className="w-full text-left p-3 rounded-lg border border-slate-200 dark:border-border hover:border-red-200 dark:hover:border-red-800/30 hover:bg-red-50/30 dark:hover:bg-red-900/5 transition-all group"
+                    data-testid={`exception-card-${exc.id}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${exc.severity === "high" ? "bg-red-100 dark:bg-red-900/20" : "bg-orange-100 dark:bg-orange-900/20"}`}>
+                        <AlertTriangle className={`w-3.5 h-3.5 ${exc.severity === "high" ? "text-red-600 dark:text-red-400" : "text-orange-600 dark:text-orange-400"}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold text-foreground group-hover:text-red-700 dark:group-hover:text-red-400 truncate">{exc.title}</span>
+                          <Badge className={`text-[8px] shrink-0 ${exc.severity === "high" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"}`}>
+                            {exc.severity}
+                          </Badge>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{exc.summary}</p>
+                        <div className="flex items-center gap-3 mt-1.5">
+                          <span className="text-[9px] font-mono text-muted-foreground">{exc.controlId}</span>
+                          <span className="text-[9px] text-muted-foreground">{exc.controlName}</span>
+                          <span className="text-[9px] text-red-600 dark:text-red-400">{exc.samplesFailed}/{exc.samplesTested} failed</span>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-red-500 shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
