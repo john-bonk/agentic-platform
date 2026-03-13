@@ -56,7 +56,7 @@ import {
   type AgentActivityEntry,
   type AgentCategorySummary,
 } from "@/config/agentHubConfig";
-import { WorkflowSession, getRiskAssessmentConfig, getFieldworkAutomationConfig, type WorkflowSessionConfig } from "./WorkflowSession";
+import { WorkflowSession, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, type WorkflowSessionConfig, type ControlWorkflowStatus } from "./WorkflowSession";
 import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
@@ -629,14 +629,6 @@ function WorkflowTracker({ sessionId }: { sessionId: string }) {
   );
 }
 
-interface FieldworkControlStatus {
-  controlId: string;
-  name: string;
-  dataSource: "connected" | "manual";
-  steps: { population: string; sampling: string; evidence: string; testing: string };
-  overallProgress: number;
-}
-
 function FieldworkTracker({ sessionId }: { sessionId: string }) {
   const runtime = useWorkflowSessionStore((s) => s.runtimeStates[sessionId]);
   const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
@@ -644,7 +636,7 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
   const setBlockState = useWorkflowSessionStore((s) => s.setBlockState);
 
   const fastForwardDemo = useCallback(() => {
-    const currentStatuses = (runtime?.blockStates?.["fieldwork-execution"]?.statuses as FieldworkControlStatus[] | undefined) ?? [];
+    const currentStatuses = (runtime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
     const completedStatuses = currentStatuses.map(s => ({
       ...s,
       steps: { population: "complete", sampling: "complete", evidence: "complete", testing: "complete" },
@@ -656,6 +648,36 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
     setBlockState(sessionId, "fieldwork-execution", "phase", "complete");
     setRuntime(sessionId, { activeIndex: 4, completedIndices: [0, 1, 2, 3] });
   }, [sessionId, runtime, setRuntime, setBlockState]);
+
+  const trackerExecPhase = (runtime?.blockStates?.["fieldwork-execution"]?.phase as string) ?? null;
+
+  useEffect(() => {
+    if (trackerExecPhase !== "running") return;
+    const timer = setInterval(() => {
+      const store = useWorkflowSessionStore.getState();
+      const curr = (store.runtimeStates[sessionId]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
+      if (curr.length === 0) return;
+      const next = tickFieldworkStatuses(curr);
+      if (next) {
+        store.setBlockState(sessionId, "fieldwork-execution", "statuses", next);
+        const allDone = next.every((s) =>
+          s.steps.population === "complete" && s.steps.sampling === "complete" &&
+          s.steps.evidence === "complete" && s.steps.testing === "complete"
+        );
+        if (allDone) {
+          store.setBlockState(sessionId, "fieldwork-execution", "phase", "complete");
+          const rt = store.runtimeStates[sessionId];
+          if (rt && !rt.completedIndices.includes(3)) {
+            store.setRuntime(sessionId, {
+              activeIndex: 4,
+              completedIndices: [...rt.completedIndices.filter((i) => i !== 3), 3],
+            });
+          }
+        }
+      }
+    }, 800);
+    return () => clearInterval(timer);
+  }, [sessionId, trackerExecPhase]);
 
   if (!runtime) return null;
 
@@ -675,7 +697,7 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
   const currentBlockLabel = blockLabelsMap[blockIds[Math.min(activeIndex, blockIds.length - 1)]] || "";
 
   const executionState = runtime.blockStates?.["fieldwork-execution"];
-  const controlStatuses = (executionState?.statuses as FieldworkControlStatus[] | undefined) ?? [];
+  const controlStatuses = (executionState?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
   const executionPhase = (executionState?.phase as string) ?? null;
   const isInExecution = activeIndex >= 3 || completedIndices.has(3);
 
@@ -883,7 +905,7 @@ function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
   const fastForwardDemo = useCallback(() => {
     if (!fieldworkProject) return;
     const sid = fieldworkProject.sessionId;
-    const currentStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as FieldworkControlStatus[] | undefined) ?? [];
+    const currentStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
     const baseStatuses = currentStatuses.length > 0 ? currentStatuses : [
       { controlId: "CTL-001", name: "Access Provisioning", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
       { controlId: "CTL-002", name: "Change Management", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
@@ -907,6 +929,38 @@ function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
     setRuntime(sid, { activeIndex: 4, completedIndices: [0, 1, 2, 3] });
   }, [fieldworkProject, fieldworkRuntime, setRuntime, setBlockState]);
 
+  const executionPhaseForTimer = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.phase as string) ?? null;
+  const isHubVisible = !(activeSession && currentSessionId);
+
+  useEffect(() => {
+    if (!isHubVisible || !fieldworkProject || executionPhaseForTimer !== "running") return;
+    const sid = fieldworkProject.sessionId;
+    const timer = setInterval(() => {
+      const store = useWorkflowSessionStore.getState();
+      const currentStatuses = (store.runtimeStates[sid]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
+      if (currentStatuses.length === 0) return;
+      const next = tickFieldworkStatuses(currentStatuses);
+      if (next) {
+        store.setBlockState(sid, "fieldwork-execution", "statuses", next);
+        const allDone = next.every((s) =>
+          s.steps.population === "complete" && s.steps.sampling === "complete" &&
+          s.steps.evidence === "complete" && s.steps.testing === "complete"
+        );
+        if (allDone) {
+          store.setBlockState(sid, "fieldwork-execution", "phase", "complete");
+          const rt = store.runtimeStates[sid];
+          if (rt && !rt.completedIndices.includes(3)) {
+            store.setRuntime(sid, {
+              activeIndex: 4,
+              completedIndices: [...rt.completedIndices.filter((i) => i !== 3), 3],
+            });
+          }
+        }
+      }
+    }, 800);
+    return () => clearInterval(timer);
+  }, [isHubVisible, fieldworkProject, executionPhaseForTimer]);
+
   if (activeSession && currentSessionId) {
     return (
       <WorkflowSession
@@ -917,7 +971,7 @@ function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
     );
   }
 
-  const controlStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as FieldworkControlStatus[] | undefined) ?? [];
+  const controlStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
   const executionPhase = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.phase as string) ?? null;
   const completedIndices = new Set(fieldworkRuntime?.completedIndices ?? []);
   const activeIndex = fieldworkRuntime?.activeIndex ?? 0;

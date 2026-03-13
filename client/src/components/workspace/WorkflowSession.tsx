@@ -1946,7 +1946,7 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
   );
 }
 
-interface ControlWorkflowStatus {
+export interface ControlWorkflowStatus {
   controlId: string;
   name: string;
   dataSource: "connected" | "manual";
@@ -1959,6 +1959,40 @@ interface ControlWorkflowStatus {
     testing: "pending" | "running" | "waiting" | "complete";
   };
   overallProgress: number;
+}
+
+const fieldworkStepOrder: (keyof ControlWorkflowStatus["steps"])[] = ["population", "sampling", "evidence", "testing"];
+
+export function tickFieldworkStatuses(prev: ControlWorkflowStatus[]): ControlWorkflowStatus[] | null {
+  let anyChange = false;
+  const next = prev.map((ctrl) => {
+    const steps = { ...ctrl.steps };
+    const isAuto = ctrl.dataSource === "connected";
+    for (const step of fieldworkStepOrder) {
+      if (steps[step] === "complete") continue;
+      const prevIdx = fieldworkStepOrder.indexOf(step);
+      const prevStep = prevIdx > 0 ? fieldworkStepOrder[prevIdx - 1] : null;
+      if (prevStep && steps[prevStep] !== "complete") break;
+      if (steps[step] === "pending") {
+        steps[step] = isAuto ? "running" : (step === "population" || step === "evidence" ? "waiting" : "running");
+        anyChange = true;
+        break;
+      }
+      if (steps[step] === "running" || steps[step] === "waiting") {
+        const speed = isAuto ? 0.7 : (steps[step] === "waiting" ? 0.25 : 0.4);
+        if (Math.random() < speed) {
+          steps[step] = "complete";
+          anyChange = true;
+        }
+        break;
+      }
+    }
+    const completedSteps = fieldworkStepOrder.filter((s) => steps[s] === "complete").length;
+    const runningSteps = fieldworkStepOrder.filter((s) => steps[s] === "running" || steps[s] === "waiting").length;
+    const overallProgress = Math.round(((completedSteps * 100) + (runningSteps * 40)) / 4);
+    return { ...ctrl, steps, overallProgress };
+  });
+  return anyChange ? next : null;
 }
 
 function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => void; sessionId: string }) {
@@ -1982,8 +2016,6 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
   const [statuses, setStatuses] = usePersistedBlockState<ControlWorkflowStatus[]>(sessionId, "fieldwork-execution", "statuses", defaultStatuses);
   const [phase, setPhase] = usePersistedBlockState<"initializing" | "running" | "complete">(sessionId, "fieldwork-execution", "phase", "initializing");
 
-  const stepOrder: (keyof ControlWorkflowStatus["steps"])[] = ["population", "sampling", "evidence", "testing"];
-
   useEffect(() => {
     if (phase === "initializing") {
       const timer = setTimeout(() => setPhase("running"), 1500);
@@ -1995,41 +2027,14 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
     if (phase !== "running") return;
     const timer = setInterval(() => {
       setStatuses((prev: ControlWorkflowStatus[]) => {
-        let anyChange = false;
-        const next = prev.map(ctrl => {
-          const steps = { ...ctrl.steps };
-          const isAuto = ctrl.dataSource === "connected";
-          for (const step of stepOrder) {
-            if (steps[step] === "complete") continue;
-            const prevStep = stepOrder.indexOf(step) > 0 ? stepOrder[stepOrder.indexOf(step) - 1] : null;
-            if (prevStep && steps[prevStep] !== "complete") break;
-            if (steps[step] === "pending") {
-              steps[step] = isAuto ? "running" : (step === "population" || step === "evidence" ? "waiting" : "running");
-              anyChange = true;
-              break;
-            }
-            if (steps[step] === "running" || steps[step] === "waiting") {
-              const speed = isAuto ? 0.7 : (steps[step] === "waiting" ? 0.25 : 0.4);
-              if (Math.random() < speed) {
-                steps[step] = "complete";
-                anyChange = true;
-              }
-              break;
-            }
-          }
-          const completedSteps = stepOrder.filter(s => steps[s] === "complete").length;
-          const runningSteps = stepOrder.filter(s => steps[s] === "running" || steps[s] === "waiting").length;
-          const overallProgress = Math.round(((completedSteps * 100) + (runningSteps * 40)) / 4);
-          return { ...ctrl, steps, overallProgress };
-        });
-        if (!anyChange) return prev;
-        return next;
+        const next = tickFieldworkStatuses(prev);
+        return next ?? prev;
       });
     }, 800);
     return () => clearInterval(timer);
   }, [phase]);
 
-  const allComplete = statuses.every(s => stepOrder.every(step => s.steps[step] === "complete"));
+  const allComplete = statuses.every(s => fieldworkStepOrder.every(step => s.steps[step] === "complete"));
 
   useEffect(() => {
     if (allComplete && phase === "running") {
@@ -2089,7 +2094,7 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
                     <span className={`text-[10px] font-mono font-medium ${ctrl.dataSource === "connected" ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>{ctrl.controlId}</span>
                     <span className="text-[10px] text-muted-foreground truncate">{ctrl.name}</span>
                   </div>
-                  {stepOrder.map(step => (
+                  {fieldworkStepOrder.map(step => (
                     <div key={step} className="flex justify-center">{stepIcon(ctrl.steps[step])}</div>
                   ))}
                   <div className="flex items-center justify-center">
