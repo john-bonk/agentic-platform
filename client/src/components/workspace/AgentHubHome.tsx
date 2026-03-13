@@ -56,7 +56,7 @@ import {
   type AgentActivityEntry,
   type AgentCategorySummary,
 } from "@/config/agentHubConfig";
-import { WorkflowSession, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, type WorkflowSessionConfig, type ControlWorkflowStatus } from "./WorkflowSession";
+import { WorkflowSession, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, type WorkflowSessionConfig, type ControlWorkflowStatus } from "./WorkflowSession";
 import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
@@ -646,6 +646,7 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
       setBlockState(sessionId, "fieldwork-execution", "statuses", completedStatuses);
     }
     setBlockState(sessionId, "fieldwork-execution", "phase", "complete");
+    setBlockState(sessionId, "fieldwork-execution", "resolvedBlocks", fieldworkBlockRules.map(r => r.controlId));
     setRuntime(sessionId, { activeIndex: 4, completedIndices: [0, 1, 2, 3] });
   }, [sessionId, runtime, setRuntime, setBlockState]);
 
@@ -657,7 +658,8 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
       const store = useWorkflowSessionStore.getState();
       const curr = (store.runtimeStates[sessionId]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
       if (curr.length === 0) return;
-      const next = tickFieldworkStatuses(curr);
+      const currentResolved = new Set((store.runtimeStates[sessionId]?.blockStates?.["fieldwork-execution"]?.resolvedBlocks as string[] | undefined) ?? []);
+      const next = tickFieldworkStatuses(curr, currentResolved);
       if (next) {
         store.setBlockState(sessionId, "fieldwork-execution", "statuses", next);
         const allDone = next.every((s) =>
@@ -713,6 +715,7 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
       case "complete": return <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />;
       case "running": return <Loader2 className="w-2.5 h-2.5 text-[#266C92] animate-spin" />;
       case "waiting": return <Clock className="w-2.5 h-2.5 text-amber-500" />;
+      case "blocked": return <AlertCircle className="w-2.5 h-2.5 text-red-500" />;
       default: return <div className="w-2.5 h-2.5 rounded-full border border-slate-300 dark:border-slate-600" />;
     }
   };
@@ -862,11 +865,6 @@ const fieldworkSystemStatus = [
   { name: "CrowdStrike", type: "Endpoint", controls: 3, lastSync: "Just now" },
 ];
 
-const fieldworkActionItems = [
-  { id: "a-1", controlId: "CTL-005", title: "Missing Dual Approval", description: "2 journal entries in Q4 batch lack required dual approval signatures", severity: "high" as const },
-  { id: "a-2", controlId: "CTL-007", title: "PBC Response Overdue", description: "Revenue Recognition evidence request — no response from Jun Li (3 days)", severity: "medium" as const },
-  { id: "a-3", controlId: "CTL-003", title: "Manual Evidence Required", description: "SoD matrix needs manual upload for 3 departments", severity: "medium" as const },
-];
 
 function FieldworkComplexHub() {
   const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
@@ -941,11 +939,31 @@ function FieldworkComplexHub() {
     }));
     setBlockState(sid, "fieldwork-execution", "statuses", completedStatuses);
     setBlockState(sid, "fieldwork-execution", "phase", "complete");
+    setBlockState(sid, "fieldwork-execution", "resolvedBlocks", fieldworkBlockRules.map(r => r.controlId));
     setRuntime(sid, { activeIndex: 4, completedIndices: [0, 1, 2, 3] });
   }, [fieldworkProject, fieldworkRuntime, setRuntime, setBlockState]);
 
   const executionPhaseForTimer = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.phase as string) ?? null;
   const isHubVisible = !(activeSession && currentSessionId);
+
+  const [actionsExpanded, setActionsExpanded] = useState(true);
+  const [systemsExpanded, setSystemsExpanded] = useState(false);
+
+  const resolvedBlocksList = useMemo(() => {
+    if (!fieldworkProject) return [] as string[];
+    return (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.resolvedBlocks as string[] | undefined) ?? [];
+  }, [fieldworkProject, fieldworkRuntime]);
+
+  const resolvedSet = useMemo(() => new Set(resolvedBlocksList), [resolvedBlocksList]);
+
+  const handleResolveAction = useCallback((controlId: string) => {
+    if (!fieldworkProject) return;
+    const sid = fieldworkProject.sessionId;
+    const prev = (useWorkflowSessionStore.getState().runtimeStates[sid]?.blockStates?.["fieldwork-execution"]?.resolvedBlocks as string[] | undefined) ?? [];
+    if (!prev.includes(controlId)) {
+      setBlockState(sid, "fieldwork-execution", "resolvedBlocks", [...prev, controlId]);
+    }
+  }, [fieldworkProject, setBlockState]);
 
   useEffect(() => {
     if (!isHubVisible || !fieldworkProject || executionPhaseForTimer !== "running") return;
@@ -954,7 +972,8 @@ function FieldworkComplexHub() {
       const store = useWorkflowSessionStore.getState();
       const currentStatuses = (store.runtimeStates[sid]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
       if (currentStatuses.length === 0) return;
-      const next = tickFieldworkStatuses(currentStatuses);
+      const currentResolved = new Set((store.runtimeStates[sid]?.blockStates?.["fieldwork-execution"]?.resolvedBlocks as string[] | undefined) ?? []);
+      const next = tickFieldworkStatuses(currentStatuses, currentResolved);
       if (next) {
         store.setBlockState(sid, "fieldwork-execution", "statuses", next);
         const allDone = next.every((s) =>
@@ -991,7 +1010,6 @@ function FieldworkComplexHub() {
   const completedIndices = new Set(fieldworkRuntime?.completedIndices ?? []);
   const activeIndex = fieldworkRuntime?.activeIndex ?? 0;
   const totalBlocks = 5;
-  const overallProgress = Math.round((completedIndices.size / totalBlocks) * 100);
   const isComplete = completedIndices.size === totalBlocks;
 
   const totalControls = controlStatuses.length;
@@ -1009,9 +1027,18 @@ function FieldworkComplexHub() {
       case "complete": return <CheckCircle2 className="w-3 h-3 text-emerald-500" />;
       case "running": return <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />;
       case "waiting": return <Clock className="w-3 h-3 text-amber-500" />;
+      case "blocked": return <AlertCircle className="w-3 h-3 text-red-500" />;
       default: return <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600" />;
     }
   };
+
+  const blockedActions = fieldworkBlockRules
+    .filter(rule => {
+      if (resolvedSet.has(rule.controlId)) return false;
+      const ctrl = controlStatuses.find(c => c.controlId === rule.controlId);
+      if (!ctrl) return false;
+      return Object.values(ctrl.steps).some(s => s === "blocked");
+    });
 
   return (
     <div className="flex flex-col h-full overflow-hidden" data-testid="fieldwork-complex-hub">
@@ -1162,15 +1189,10 @@ function FieldworkComplexHub() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {isComplete ? (
+                {isComplete && (
                   <Badge className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
                     <CheckCircle2 className="w-3 h-3 mr-1" />
                     Complete
-                  </Badge>
-                ) : (
-                  <Badge className="text-xs bg-[#266C92] text-white">
-                    <Activity className="w-3 h-3 mr-1" />
-                    {overallProgress}%
                   </Badge>
                 )}
                 <Button
@@ -1243,12 +1265,67 @@ function FieldworkComplexHub() {
                     <span className="text-[11px] text-muted-foreground font-medium">Exceptions</span>
                   </div>
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-xl font-bold text-foreground">{fieldworkActionItems.filter((a) => a.severity === "high").length}</span>
-                    <span className="text-[10px] text-muted-foreground">{fieldworkActionItems.length} total findings</span>
+                    <span className="text-xl font-bold text-foreground">{blockedActions.length}</span>
+                    <span className="text-[10px] text-muted-foreground">{blockedActions.length > 0 ? `${blockedActions.length} blocking` : "none"}</span>
                   </div>
                 </CardContent>
               </Card>
             </div>
+
+            {blockedActions.length > 0 && (
+              <Card className="border border-amber-200 dark:border-amber-800/30" data-testid="fieldwork-actions-card">
+                <button
+                  onClick={() => setActionsExpanded(!actionsExpanded)}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-amber-50/50 dark:hover:bg-amber-900/5 transition-colors"
+                  data-testid="button-toggle-actions"
+                >
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-500" />
+                    <span className="text-sm font-semibold text-foreground">Actions Required</span>
+                    <Badge className="text-[10px] h-4 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">{blockedActions.length} blocking</Badge>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${actionsExpanded ? "" : "-rotate-90"}`} />
+                </button>
+                {actionsExpanded && (
+                  <CardContent className="px-4 pb-4 pt-0 space-y-2 border-t border-amber-100 dark:border-amber-800/20">
+                    {blockedActions.map((action) => (
+                      <div
+                        key={action.controlId}
+                        className={`p-3 rounded-lg border transition-colors ${
+                          action.severity === "high"
+                            ? "border-red-200 dark:border-red-900/30 bg-red-50/40 dark:bg-red-900/5"
+                            : "border-amber-200 dark:border-amber-900/30 bg-amber-50/40 dark:bg-amber-900/5"
+                        }`}
+                        data-testid={`action-item-${action.controlId}`}
+                      >
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <AlertCircle className={`w-3.5 h-3.5 shrink-0 ${action.severity === "high" ? "text-red-500" : "text-amber-500"}`} />
+                          <span className="text-[10px] font-mono font-semibold text-[#266C92]">{action.controlId}</span>
+                          <span className="text-xs font-medium text-foreground">{action.title}</span>
+                          <Badge className={`text-[9px] h-4 ml-auto shrink-0 ${
+                            action.severity === "high"
+                              ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                              : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                          }`}>
+                            Blocked at {action.blockAtStep}
+                          </Badge>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">{action.description}</p>
+                        <Button
+                          size="sm"
+                          className="h-6 text-[10px] bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                          onClick={() => handleResolveAction(action.controlId)}
+                          data-testid={`button-resolve-${action.controlId}`}
+                        >
+                          <CheckCircle2 className="w-3 h-3 mr-1" />
+                          Resolve & Resume
+                        </Button>
+                      </div>
+                    ))}
+                  </CardContent>
+                )}
+              </Card>
+            )}
 
             <div className="grid lg:grid-cols-3 gap-5">
               <div className="lg:col-span-2 space-y-4">
@@ -1278,23 +1355,26 @@ function FieldworkComplexHub() {
                               PBC Workflow ({manualComplete}/{manualControls.length})
                             </span>
                           </div>
-                          {manualControls.map((ctrl) => (
-                            <div
-                              key={ctrl.controlId}
-                              className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors"
-                              data-testid={`pipeline-row-${ctrl.controlId}`}
-                            >
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <span className="text-[10px] font-mono font-semibold text-amber-600 dark:text-amber-400">{ctrl.controlId}</span>
-                                <span className="text-xs text-foreground truncate">{ctrl.name}</span>
+                          {manualControls.map((ctrl) => {
+                            const isBlocked = Object.values(ctrl.steps).some(s => s === "blocked");
+                            return (
+                              <div
+                                key={ctrl.controlId}
+                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors ${isBlocked ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                                data-testid={`pipeline-row-${ctrl.controlId}`}
+                              >
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <span className={`text-[10px] font-mono font-semibold ${isBlocked ? "text-red-500" : "text-amber-600 dark:text-amber-400"}`}>{ctrl.controlId}</span>
+                                  <span className="text-xs text-foreground truncate">{ctrl.name}</span>
+                                </div>
+                                <span className={`text-[10px] font-medium truncate ${isBlocked ? "text-red-500" : "text-amber-600 dark:text-amber-400"}`}>{isBlocked ? "Blocked" : "PBC"}</span>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
                               </div>
-                              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium truncate">PBC</span>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
-                              <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
 
@@ -1330,6 +1410,7 @@ function FieldworkComplexHub() {
                         <div className="flex items-center gap-1"><CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" /><span>Complete</span></div>
                         <div className="flex items-center gap-1"><Loader2 className="w-2.5 h-2.5 text-[#266C92] animate-spin" /><span>Running</span></div>
                         <div className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-amber-500" /><span>Waiting</span></div>
+                        <div className="flex items-center gap-1"><AlertCircle className="w-2.5 h-2.5 text-red-500" /><span>Blocked</span></div>
                         <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full border border-slate-300 dark:border-slate-600" /><span>Pending</span></div>
                       </div>
                     </CardContent>
@@ -1360,66 +1441,38 @@ function FieldworkComplexHub() {
                     </CardContent>
                   </Card>
                 )}
-
-                <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-actions-card">
-                  <CardHeader className="pb-2 pt-3 px-4">
-                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                      <Eye className="w-4 h-4 text-amber-500" />
-                      Actions Required
-                      <Badge className="text-[10px] h-4 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 ml-auto">{fieldworkActionItems.length}</Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-4 pb-3 space-y-2">
-                    {fieldworkActionItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className={`p-3 rounded-lg border transition-colors cursor-pointer hover:bg-slate-50 dark:hover:bg-muted/20 ${
-                          item.severity === "high"
-                            ? "border-red-200 dark:border-red-900/30 bg-red-50/40 dark:bg-red-900/5"
-                            : "border-amber-200 dark:border-amber-900/30 bg-amber-50/40 dark:bg-amber-900/5"
-                        }`}
-                        data-testid={`action-item-${item.id}`}
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-mono font-semibold text-[#266C92]">{item.controlId}</span>
-                          <span className="text-xs font-medium text-foreground">{item.title}</span>
-                          <Badge className={`text-[9px] h-4 ml-auto ${
-                            item.severity === "high"
-                              ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                              : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                          }`}>
-                            {item.severity}
-                          </Badge>
-                        </div>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed">{item.description}</p>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
               </div>
 
               <div className="space-y-4">
                 <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-systems-card">
-                  <CardHeader className="pb-2 pt-3 px-4">
-                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <button
+                    onClick={() => setSystemsExpanded(!systemsExpanded)}
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50/50 dark:hover:bg-muted/5 transition-colors"
+                    data-testid="button-toggle-systems"
+                  >
+                    <div className="flex items-center gap-2">
                       <Server className="w-4 h-4 text-[#266C92]" />
-                      Connected Systems
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-4 pb-3">
-                    <div className="space-y-1">
-                      {fieldworkSystemStatus.map((sys) => (
-                        <div key={sys.name} className="flex items-center gap-2 py-1.5 px-2 rounded hover:bg-slate-50 dark:hover:bg-muted/20" data-testid={`system-row-${sys.name}`}>
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-foreground truncate">{sys.name}</p>
-                            <p className="text-[9px] text-muted-foreground">{sys.type} · {sys.controls} controls</p>
-                          </div>
-                          <span className="text-[9px] text-muted-foreground shrink-0">{sys.lastSync}</span>
-                        </div>
-                      ))}
+                      <span className="text-sm font-semibold text-foreground">Connected Systems</span>
+                      <Badge className="text-[9px] h-4 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">{fieldworkSystemStatus.length}</Badge>
                     </div>
-                  </CardContent>
+                    <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${systemsExpanded ? "" : "-rotate-90"}`} />
+                  </button>
+                  {systemsExpanded && (
+                    <CardContent className="px-4 pb-3 pt-0 border-t border-slate-100 dark:border-border">
+                      <div className="space-y-1">
+                        {fieldworkSystemStatus.map((sys) => (
+                          <div key={sys.name} className="flex items-center gap-2 py-1.5 px-2 rounded hover:bg-slate-50 dark:hover:bg-muted/20" data-testid={`system-row-${sys.name}`}>
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium text-foreground truncate">{sys.name}</p>
+                              <p className="text-[9px] text-muted-foreground">{sys.type} · {sys.controls} controls</p>
+                            </div>
+                            <span className="text-[9px] text-muted-foreground shrink-0">{sys.lastSync}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  )}
                 </Card>
 
                 <Card className="border border-slate-200 dark:border-border overflow-hidden" data-testid="fieldwork-activity-card">

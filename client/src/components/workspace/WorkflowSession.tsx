@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -1957,6 +1957,8 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
   );
 }
 
+export type FieldworkStepStatus = "pending" | "running" | "waiting" | "complete" | "blocked";
+
 export interface ControlWorkflowStatus {
   controlId: string;
   name: string;
@@ -1964,27 +1966,73 @@ export interface ControlWorkflowStatus {
   system: string | null;
   owner: string;
   steps: {
-    population: "pending" | "running" | "waiting" | "complete";
-    sampling: "pending" | "running" | "waiting" | "complete";
-    evidence: "pending" | "running" | "waiting" | "complete";
-    testing: "pending" | "running" | "waiting" | "complete";
+    population: FieldworkStepStatus;
+    sampling: FieldworkStepStatus;
+    evidence: FieldworkStepStatus;
+    testing: FieldworkStepStatus;
   };
   overallProgress: number;
 }
 
+export interface FieldworkBlockRule {
+  controlId: string;
+  blockAtStep: keyof ControlWorkflowStatus["steps"];
+  title: string;
+  description: string;
+  severity: "high" | "medium";
+}
+
+export const fieldworkBlockRules: FieldworkBlockRule[] = [
+  {
+    controlId: "CTL-003",
+    blockAtStep: "evidence",
+    title: "SoD Matrix Upload Required",
+    description: "Segregation of Duties evidence collection paused — manual SoD matrix upload needed for 3 departments. Control owner must provide the current access conflict report.",
+    severity: "high",
+  },
+  {
+    controlId: "CTL-007",
+    blockAtStep: "population",
+    title: "PBC Response Overdue",
+    description: "Revenue Recognition population extraction paused — PBC request to Jun Li has been pending for 3 business days. Escalation or manual data submission required to proceed.",
+    severity: "high",
+  },
+  {
+    controlId: "CTL-019",
+    blockAtStep: "sampling",
+    title: "Payroll Data Access Pending",
+    description: "Payroll Processing sampling paused — HR payroll system requires additional authorization grant before sample selection can proceed. Approve access request to continue.",
+    severity: "medium",
+  },
+];
+
 const fieldworkStepOrder: (keyof ControlWorkflowStatus["steps"])[] = ["population", "sampling", "evidence", "testing"];
 
-export function tickFieldworkStatuses(prev: ControlWorkflowStatus[]): ControlWorkflowStatus[] | null {
+export function tickFieldworkStatuses(prev: ControlWorkflowStatus[], resolvedBlockIds?: Set<string>): ControlWorkflowStatus[] | null {
   let anyChange = false;
+  const resolved = resolvedBlockIds ?? new Set<string>();
   const next = prev.map((ctrl) => {
     const steps = { ...ctrl.steps };
     const isAuto = ctrl.dataSource === "connected";
+    const blockRule = fieldworkBlockRules.find(r => r.controlId === ctrl.controlId);
     for (const step of fieldworkStepOrder) {
       if (steps[step] === "complete") continue;
+      if (steps[step] === "blocked") {
+        if (resolved.has(ctrl.controlId)) {
+          steps[step] = isAuto ? "running" : (step === "population" || step === "evidence" ? "waiting" : "running");
+          anyChange = true;
+        }
+        break;
+      }
       const prevIdx = fieldworkStepOrder.indexOf(step);
       const prevStep = prevIdx > 0 ? fieldworkStepOrder[prevIdx - 1] : null;
       if (prevStep && steps[prevStep] !== "complete") break;
       if (steps[step] === "pending") {
+        if (blockRule && blockRule.blockAtStep === step && !resolved.has(ctrl.controlId)) {
+          steps[step] = "blocked";
+          anyChange = true;
+          break;
+        }
         steps[step] = isAuto ? "running" : (step === "population" || step === "evidence" ? "waiting" : "running");
         anyChange = true;
         break;
@@ -2027,6 +2075,8 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
 
   const [statuses, setStatuses] = usePersistedBlockState<ControlWorkflowStatus[]>(sessionId, "fieldwork-execution", "statuses", defaultStatuses);
   const [phase, setPhase] = usePersistedBlockState<"initializing" | "running" | "complete">(sessionId, "fieldwork-execution", "phase", "initializing");
+  const [resolvedBlocks, setResolvedBlocks] = usePersistedBlockState<string[]>(sessionId, "fieldwork-execution", "resolvedBlocks", []);
+  const resolvedSet = useMemo(() => new Set(resolvedBlocks), [resolvedBlocks]);
 
   useEffect(() => {
     if (phase === "initializing") {
@@ -2039,12 +2089,12 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
     if (phase !== "running") return;
     const timer = setInterval(() => {
       setStatuses((prev: ControlWorkflowStatus[]) => {
-        const next = tickFieldworkStatuses(prev);
+        const next = tickFieldworkStatuses(prev, resolvedSet);
         return next ?? prev;
       });
     }, 800);
     return () => clearInterval(timer);
-  }, [phase]);
+  }, [phase, resolvedSet]);
 
   const allComplete = statuses.every(s => fieldworkStepOrder.every(step => s.steps[step] === "complete"));
 
@@ -2066,6 +2116,7 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
       case "complete": return <CheckCircle2 className="w-3 h-3 text-emerald-500" />;
       case "running": return <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />;
       case "waiting": return <Clock className="w-3 h-3 text-amber-500" />;
+      case "blocked": return <AlertCircle className="w-3 h-3 text-red-500" />;
       default: return <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600" />;
     }
   };

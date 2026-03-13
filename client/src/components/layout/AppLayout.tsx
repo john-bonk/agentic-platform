@@ -78,7 +78,7 @@ export function AppLayout({
       label: p.label,
       path: `/#project-${p.sessionId}`,
       icon: p.icon,
-      badge: currentSessionId === p.sessionId ? "Active" : undefined,
+      badge: undefined,
     }));
     return agentHubNavSections.map((section) => {
       if (section.id === "agent-hub-projects" && projectItems.length > 0) {
