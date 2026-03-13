@@ -1954,9 +1954,9 @@ interface ControlWorkflowStatus {
   owner: string;
   steps: {
     population: "pending" | "running" | "waiting" | "complete";
-    sampling: "pending" | "running" | "complete";
+    sampling: "pending" | "running" | "waiting" | "complete";
     evidence: "pending" | "running" | "waiting" | "complete";
-    testing: "pending" | "running" | "complete";
+    testing: "pending" | "running" | "waiting" | "complete";
   };
   overallProgress: number;
 }

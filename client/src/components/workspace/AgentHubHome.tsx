@@ -41,6 +41,11 @@ import {
   ListChecks,
   Database,
   Workflow,
+  Server,
+  BarChart3,
+  Target,
+  ExternalLink,
+  Users,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -814,6 +819,501 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
   );
 }
 
+const fieldworkActivityFeed = [
+  { id: "fw-1", timestamp: "Just now", agent: "Population Agent", message: "Extracted 2,847 journal entries from SAP ERP for Journal Entry Approval", type: "info" as const },
+  { id: "fw-2", timestamp: "1 min ago", agent: "Sampling Agent", message: "Statistical sample of 45 items selected for Access Provisioning (CTL-001)", type: "info" as const },
+  { id: "fw-3", timestamp: "3 min ago", agent: "Evidence Agent", message: "Collected 12 approval screenshots from Okta IAM for User Access Review", type: "success" as const },
+  { id: "fw-4", timestamp: "5 min ago", agent: "Testing Agent", message: "Exception: 2 journal entries missing dual approval — CTL-005 flagged", type: "warning" as const },
+  { id: "fw-5", timestamp: "8 min ago", agent: "PBC Coordinator", message: "PBC request sent to David Kim for Segregation of Duties evidence", type: "info" as const },
+  { id: "fw-6", timestamp: "12 min ago", agent: "Testing Agent", message: "CTL-012 Procurement Approval — all 30 samples passed. Effective.", type: "success" as const },
+  { id: "fw-7", timestamp: "15 min ago", agent: "Evidence Agent", message: "Awaiting PBC response from Jun Li — Revenue Recognition (CTL-007)", type: "action-needed" as const },
+  { id: "fw-8", timestamp: "20 min ago", agent: "Population Agent", message: "Identified 1,204 change requests from ServiceNow for Change Management", type: "info" as const },
+];
+
+const fieldworkSystemStatus = [
+  { name: "SAP ERP", type: "ERP", controls: 4, lastSync: "2 min ago" },
+  { name: "Okta IAM", type: "Identity", controls: 2, lastSync: "Just now" },
+  { name: "ServiceNow", type: "ITSM", controls: 1, lastSync: "5 min ago" },
+  { name: "AWS CloudTrail", type: "Cloud", controls: 1, lastSync: "1 min ago" },
+  { name: "Genetec Security", type: "Physical", controls: 1, lastSync: "8 min ago" },
+  { name: "Coupa", type: "Procurement", controls: 1, lastSync: "3 min ago" },
+  { name: "CrowdStrike", type: "Endpoint", controls: 1, lastSync: "Just now" },
+];
+
+const fieldworkActionItems = [
+  { id: "a-1", controlId: "CTL-005", title: "Missing Dual Approval", description: "2 journal entries in Q4 batch lack required dual approval signatures", severity: "high" as const },
+  { id: "a-2", controlId: "CTL-007", title: "PBC Response Overdue", description: "Revenue Recognition evidence request — no response from Jun Li (3 days)", severity: "medium" as const },
+  { id: "a-3", controlId: "CTL-003", title: "Manual Evidence Required", description: "SoD matrix needs manual upload for 3 departments", severity: "medium" as const },
+];
+
+function FieldworkComplexHub({ welcomeMessage }: { welcomeMessage: string }) {
+  const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
+  const currentSessionId = useWorkflowSessionStore((s) => s.currentSessionId);
+  const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
+  const addProject = useWorkflowSessionStore((s) => s.addProject);
+  const setRuntime = useWorkflowSessionStore((s) => s.setRuntime);
+  const setBlockState = useWorkflowSessionStore((s) => s.setBlockState);
+  const activeSession = useWorkflowSessionStore((s) =>
+    s.currentSessionId ? (s.sessionConfigs[s.currentSessionId] as WorkflowSessionConfig | null) ?? null : null
+  );
+
+  const fieldworkProject = activeProjects.find((p) => p.sessionId === "control-testing");
+  const fieldworkRuntime = useWorkflowSessionStore((s) =>
+    fieldworkProject ? s.runtimeStates[fieldworkProject.sessionId] : null
+  );
+
+  const launchWorkflow = useCallback((id: string) => {
+    const sessionId = workflowRowToSession[id] || id;
+    const meta = workflowSessionConfigs[sessionId];
+    if (meta) {
+      const config = meta.create();
+      addProject({ sessionId, label: meta.label, icon: meta.icon }, config);
+    }
+  }, [addProject]);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.workflowId) launchWorkflow(detail.workflowId);
+    };
+    window.addEventListener("agent-hub:launch-workflow", handler);
+    return () => window.removeEventListener("agent-hub:launch-workflow", handler);
+  }, [launchWorkflow]);
+
+  const fastForwardDemo = useCallback(() => {
+    if (!fieldworkProject) return;
+    const sid = fieldworkProject.sessionId;
+    const currentStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as FieldworkControlStatus[] | undefined) ?? [];
+    const baseStatuses = currentStatuses.length > 0 ? currentStatuses : [
+      { controlId: "CTL-001", name: "Access Provisioning", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-002", name: "Change Management", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-003", name: "Segregation of Duties", dataSource: "manual" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-005", name: "Journal Entry Approval", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-006", name: "Bank Reconciliation", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-007", name: "Revenue Recognition", dataSource: "manual" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-008", name: "Vendor Payment Authorization", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-009", name: "Physical Access Controls", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-012", name: "Procurement Approval", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-013", name: "User Access Review", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-016", name: "Privilege Escalation Monitoring", dataSource: "connected" as const, steps: { population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+    ];
+    const completedStatuses = baseStatuses.map((s) => ({
+      ...s,
+      steps: { population: "complete", sampling: "complete", evidence: "complete", testing: "complete" },
+      overallProgress: 100,
+    }));
+    setBlockState(sid, "fieldwork-execution", "statuses", completedStatuses);
+    setBlockState(sid, "fieldwork-execution", "phase", "complete");
+    setRuntime(sid, { activeIndex: 4, completedIndices: [0, 1, 2, 3] });
+  }, [fieldworkProject, fieldworkRuntime, setRuntime, setBlockState]);
+
+  if (activeSession && currentSessionId) {
+    return (
+      <WorkflowSession
+        config={activeSession}
+        sessionId={currentSessionId}
+        onBack={() => setCurrentSession(null)}
+      />
+    );
+  }
+
+  const controlStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as FieldworkControlStatus[] | undefined) ?? [];
+  const executionPhase = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.phase as string) ?? null;
+  const completedIndices = new Set(fieldworkRuntime?.completedIndices ?? []);
+  const activeIndex = fieldworkRuntime?.activeIndex ?? 0;
+  const totalBlocks = 5;
+  const overallProgress = Math.round((completedIndices.size / totalBlocks) * 100);
+  const isComplete = completedIndices.size === totalBlocks;
+
+  const totalControls = controlStatuses.length;
+  const completedControls = controlStatuses.filter((s) => s.overallProgress === 100).length;
+  const autoControls = controlStatuses.filter((s) => s.dataSource === "connected");
+  const manualControls = controlStatuses.filter((s) => s.dataSource === "manual");
+  const autoComplete = autoControls.filter((s) => s.overallProgress === 100).length;
+  const manualComplete = manualControls.filter((s) => s.overallProgress === 100).length;
+  const automatedPct = totalControls > 0 ? Math.round((autoControls.length / totalControls) * 100) : 0;
+
+  const hasWorkflow = !!fieldworkProject && !!fieldworkRuntime;
+
+  const stepDot = (status: string) => {
+    switch (status) {
+      case "complete": return <div className="w-2 h-2 rounded-full bg-emerald-500" />;
+      case "running": return <div className="w-2 h-2 rounded-full bg-[#266C92] animate-pulse" />;
+      case "waiting": return <div className="w-2 h-2 rounded-full bg-amber-400" />;
+      default: return <div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700" />;
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden" data-testid="fieldwork-complex-hub">
+      <div
+        className="text-white px-8 py-3 bg-cover bg-center bg-no-repeat relative shrink-0"
+        style={{ backgroundImage: `url(${headerBgImage})` }}
+      >
+        <div className="w-full relative z-10 flex items-center justify-between gap-4">
+          <h1 className="text-lg font-semibold truncate min-w-0" data-testid="fieldwork-hub-welcome">
+            {welcomeMessage}
+          </h1>
+          {hasWorkflow && (
+            <div className="flex items-center gap-3 text-sm text-white/70 shrink-0">
+              {totalControls > 0 ? (
+                <>
+                  <span>{totalControls} controls in scope</span>
+                  <span className="text-white/30">·</span>
+                  <span>{totalControls - completedControls > 0 ? `${totalControls - completedControls} in progress` : "All complete"}</span>
+                  {totalControls > 0 && fieldworkActionItems.length > 0 && (
+                    <>
+                      <span className="text-white/30">·</span>
+                      <span className="text-amber-300">{fieldworkActionItems.length} need attention</span>
+                    </>
+                  )}
+                </>
+              ) : (
+                <span>Configuring workflow</span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background px-8 py-5">
+        {!hasWorkflow ? (
+          <div className="max-w-2xl mx-auto flex flex-col items-center justify-center py-20 text-center" data-testid="fieldwork-hub-empty">
+            <div className="w-16 h-16 rounded-2xl bg-[#266C92]/10 flex items-center justify-center mb-5">
+              <Shield className="w-8 h-8 text-[#266C92]/60" />
+            </div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Automated Control Testing</h2>
+            <p className="text-sm text-muted-foreground max-w-sm mb-6 leading-relaxed">
+              Configure and launch an automated control testing workflow. The platform will orchestrate population extraction, sampling, evidence collection, and testing across your connected systems.
+            </p>
+            <Button
+              className="bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+              onClick={() => launchWorkflow("control-testing")}
+              data-testid="button-launch-fieldwork"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              Start Control Testing
+            </Button>
+          </div>
+        ) : (
+          <div className="max-w-6xl mx-auto space-y-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Shield className="w-5 h-5 text-[#266C92]" />
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">Automated Control Testing</h2>
+                  <p className="text-xs text-muted-foreground">
+                    {isComplete
+                      ? "All controls tested"
+                      : executionPhase
+                        ? `Fieldwork execution — ${completedControls}/${totalControls} controls complete`
+                        : `Step ${activeIndex + 1} of ${totalBlocks} — Configuration`}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {isComplete ? (
+                  <Badge className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                    <CheckCircle2 className="w-3 h-3 mr-1" />
+                    Complete
+                  </Badge>
+                ) : (
+                  <Badge className="text-xs bg-[#266C92] text-white">
+                    <Activity className="w-3 h-3 mr-1" />
+                    {overallProgress}%
+                  </Badge>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-7"
+                  onClick={() => setCurrentSession(fieldworkProject.sessionId)}
+                  data-testid="button-open-fieldwork-session"
+                >
+                  Open Workflow
+                  <ExternalLink className="w-3 h-3 ml-1" />
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" data-testid="button-fieldwork-hub-menu">
+                      <MoreVertical className="w-4 h-4 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={fastForwardDemo} data-testid="menu-item-hub-fast-forward">
+                      <FastForward className="w-4 h-4 mr-2" />
+                      Fast-forward demo
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-3" data-testid="fieldwork-stats-bar">
+              <Card className="border border-slate-200 dark:border-border">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Target className="w-3.5 h-3.5 text-[#266C92]" />
+                    <span className="text-[11px] text-muted-foreground font-medium">Controls in Scope</span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xl font-bold text-foreground">{totalControls}</span>
+                    <span className="text-[10px] text-muted-foreground">{autoControls.length} auto · {manualControls.length} manual</span>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border border-slate-200 dark:border-border">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <BarChart3 className="w-3.5 h-3.5 text-[#266C92]" />
+                    <span className="text-[11px] text-muted-foreground font-medium">Automated Coverage</span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xl font-bold text-foreground">{automatedPct}%</span>
+                    <span className="text-[10px] text-muted-foreground">{autoControls.length} connected systems</span>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border border-slate-200 dark:border-border">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                    <span className="text-[11px] text-muted-foreground font-medium">Controls Tested</span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xl font-bold text-foreground">{completedControls}</span>
+                    <span className="text-[10px] text-muted-foreground">of {totalControls}{totalControls > 0 ? ` (${Math.round((completedControls / totalControls) * 100)}%)` : ""}</span>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border border-slate-200 dark:border-border">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                    <span className="text-[11px] text-muted-foreground font-medium">Exceptions</span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xl font-bold text-foreground">{fieldworkActionItems.filter((a) => a.severity === "high").length}</span>
+                    <span className="text-[10px] text-muted-foreground">{fieldworkActionItems.length} total findings</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-5">
+              <div className="lg:col-span-2 space-y-4">
+                {controlStatuses.length > 0 && (
+                  <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-pipeline-card">
+                    <CardHeader className="pb-2 pt-3 px-4">
+                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                        <Workflow className="w-4 h-4 text-[#266C92]" />
+                        Control Pipeline
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-4 pb-4">
+                      <div className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
+                        <span>Control</span>
+                        <span>Source</span>
+                        <span className="text-center" title="Population">Pop</span>
+                        <span className="text-center" title="Sampling">Smp</span>
+                        <span className="text-center" title="Evidence">Evd</span>
+                        <span className="text-center" title="Testing">Test</span>
+                      </div>
+
+                      {autoControls.length > 0 && (
+                        <div className="mb-2">
+                          <div className="flex items-center gap-2 px-2 py-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
+                              Automated ({autoComplete}/{autoControls.length})
+                            </span>
+                          </div>
+                          {autoControls.map((ctrl) => (
+                            <div
+                              key={ctrl.controlId}
+                              className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors"
+                              data-testid={`pipeline-row-${ctrl.controlId}`}
+                            >
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <span className="text-[10px] font-mono font-semibold text-[#266C92]">{ctrl.controlId}</span>
+                                <span className="text-xs text-foreground truncate">{ctrl.name}</span>
+                              </div>
+                              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium truncate">Connected</span>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {manualControls.length > 0 && (
+                        <div>
+                          <div className="flex items-center gap-2 px-2 py-1.5 border-t border-slate-100 dark:border-border">
+                            <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                            <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
+                              PBC Workflow ({manualComplete}/{manualControls.length})
+                            </span>
+                          </div>
+                          {manualControls.map((ctrl) => (
+                            <div
+                              key={ctrl.controlId}
+                              className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors"
+                              data-testid={`pipeline-row-${ctrl.controlId}`}
+                            >
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <span className="text-[10px] font-mono font-semibold text-amber-600 dark:text-amber-400">{ctrl.controlId}</span>
+                                <span className="text-xs text-foreground truncate">{ctrl.name}</span>
+                              </div>
+                              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium truncate">PBC</span>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-3 text-[9px] text-muted-foreground px-2 mt-3 pt-2 border-t border-slate-100 dark:border-border">
+                        <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500" /><span>Complete</span></div>
+                        <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#266C92] animate-pulse" /><span>Running</span></div>
+                        <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-400" /><span>Waiting</span></div>
+                        <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700" /><span>Pending</span></div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {controlStatuses.length === 0 && (
+                  <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-config-status">
+                    <CardContent className="p-5">
+                      <div className="flex items-center gap-3 mb-4">
+                        <Workflow className="w-4 h-4 text-[#266C92]" />
+                        <span className="text-sm font-semibold text-foreground">Workflow Configuration</span>
+                        <Badge className="text-xs bg-[#266C92] text-white ml-auto">
+                          Step {activeIndex + 1} of {totalBlocks}
+                        </Badge>
+                      </div>
+                      <div className="flex gap-1 mb-3">
+                        {["Controls", "Data Sources", "PBC Mapping", "Execution", "Next Steps"].map((label, i) => (
+                          <div key={label} className="flex-1 flex flex-col items-center gap-1">
+                            <div className={`w-full h-1 rounded-full transition-all ${completedIndices.has(i) ? "bg-[#266C92]" : i === activeIndex ? "bg-[#266C92]/40" : "bg-slate-200 dark:bg-slate-700"}`} />
+                            <span className={`text-[9px] ${completedIndices.has(i) ? "text-[#266C92] font-medium" : i === activeIndex ? "text-foreground font-medium" : "text-muted-foreground"}`}>{label}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Open the workflow to continue configuring control selection, data sources, and PBC owner mapping before execution begins.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-actions-card">
+                  <CardHeader className="pb-2 pt-3 px-4">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-amber-500" />
+                      Actions Required
+                      <Badge className="text-[10px] h-4 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 ml-auto">{fieldworkActionItems.length}</Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-3 space-y-2">
+                    {fieldworkActionItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`p-3 rounded-lg border transition-colors cursor-pointer hover:bg-slate-50 dark:hover:bg-muted/20 ${
+                          item.severity === "high"
+                            ? "border-red-200 dark:border-red-900/30 bg-red-50/40 dark:bg-red-900/5"
+                            : "border-amber-200 dark:border-amber-900/30 bg-amber-50/40 dark:bg-amber-900/5"
+                        }`}
+                        data-testid={`action-item-${item.id}`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[10px] font-mono font-semibold text-[#266C92]">{item.controlId}</span>
+                          <span className="text-xs font-medium text-foreground">{item.title}</span>
+                          <Badge className={`text-[9px] h-4 ml-auto ${
+                            item.severity === "high"
+                              ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                              : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                          }`}>
+                            {item.severity}
+                          </Badge>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">{item.description}</p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-4">
+                <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-systems-card">
+                  <CardHeader className="pb-2 pt-3 px-4">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                      <Server className="w-4 h-4 text-[#266C92]" />
+                      Connected Systems
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-3">
+                    <div className="space-y-1">
+                      {fieldworkSystemStatus.map((sys) => (
+                        <div key={sys.name} className="flex items-center gap-2 py-1.5 px-2 rounded hover:bg-slate-50 dark:hover:bg-muted/20" data-testid={`system-row-${sys.name}`}>
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium text-foreground truncate">{sys.name}</p>
+                            <p className="text-[9px] text-muted-foreground">{sys.type} · {sys.controls} controls</p>
+                          </div>
+                          <span className="text-[9px] text-muted-foreground shrink-0">{sys.lastSync}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border border-slate-200 dark:border-border overflow-hidden" data-testid="fieldwork-activity-card">
+                  <CardHeader className="pb-2 pt-3 px-4 border-b border-slate-100 dark:border-border">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                      <Bot className="w-4 h-4 text-muted-foreground" />
+                      Agent Activity
+                    </CardTitle>
+                  </CardHeader>
+                  <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-border">
+                    {fieldworkActivityFeed.map((entry) => (
+                      <div
+                        key={entry.id}
+                        className={`px-4 py-2.5 border-l-2 ${
+                          entry.type === "action-needed"
+                            ? "border-l-amber-400"
+                            : entry.type === "warning"
+                              ? "border-l-red-400"
+                              : entry.type === "success"
+                                ? "border-l-emerald-400"
+                                : "border-l-slate-200 dark:border-l-slate-700"
+                        }`}
+                        data-testid={`activity-${entry.id}`}
+                      >
+                        <p className="text-[11px] text-foreground leading-relaxed">{entry.message}</p>
+                        <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
+                          <Bot className="w-2.5 h-2.5" />
+                          <span>{entry.agent}</span>
+                          <span>·</span>
+                          <span>{entry.timestamp}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function SimpleAgentHub({ welcomeMessage, scenario }: { welcomeMessage: string; scenario: string }) {
   const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
   const currentSessionId = useWorkflowSessionStore((s) => s.currentSessionId);
@@ -936,6 +1436,10 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
 
   if (isSimple) {
     return <SimpleAgentHub welcomeMessage={welcomeMessage} scenario={scenario} />;
+  }
+
+  if (scenario === "fieldwork-automation") {
+    return <FieldworkComplexHub welcomeMessage={welcomeMessage} />;
   }
 
   return <ComplexAgentHub workspaceId={workspaceId} welcomeMessage={welcomeMessage} scenario={scenario} />;
