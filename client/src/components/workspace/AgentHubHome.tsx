@@ -1203,7 +1203,7 @@ function FieldworkComplexHub() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden" data-testid="fieldwork-complex-hub">
-      <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background px-8 py-5">
+      <div className={`flex-1 min-h-0 bg-slate-50 dark:bg-background px-8 py-5 ${hasWorkflow ? "flex flex-col overflow-hidden" : "overflow-y-auto"}`}>
         {!hasWorkflow ? (
           <div className="max-w-6xl mx-auto space-y-5" data-testid="fieldwork-hub-empty">
             <div className="flex items-center justify-between">
@@ -1319,23 +1319,33 @@ function FieldworkComplexHub() {
                   </CardContent>
                 </Card>
 
-                <Card className="border border-slate-200 dark:border-border">
-                  <CardHeader className="pb-2 pt-3 px-4">
+                <Card className="border border-slate-200 dark:border-border overflow-hidden">
+                  <CardHeader className="pb-2 pt-3 px-4 border-b border-slate-100 dark:border-border">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
-                      <Activity className="w-4 h-4" />
-                      Agent Activity
+                      <Bot className="w-4 h-4" />
+                      Optro Assistant
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="px-4 pb-4">
-                    <p className="text-xs text-muted-foreground/60 py-4 text-center">No agent activity yet</p>
-                  </CardContent>
+                  <div className="px-4 py-3 bg-[#266C92]/5 dark:bg-[#266C92]/10" data-testid="assistant-welcome-bubble-empty">
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-full bg-[#266C92] flex items-center justify-center shrink-0 mt-0.5">
+                        <Bot className="w-3 h-3 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-semibold text-[#266C92] dark:text-[#4da3c9] mb-0.5">Optro Assistant</p>
+                        <p className="text-[11px] text-foreground leading-relaxed">
+                          Welcome to Automated Control Testing. Launch a workflow to begin — I'll guide you through control selection, data source mapping, and parallel test execution.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </Card>
               </div>
             </div>
           </div>
         ) : (
-          <div className="max-w-6xl mx-auto space-y-5">
-            <div className="flex items-center justify-between">
+          <div className="max-w-6xl mx-auto flex flex-col gap-5 h-full min-h-0">
+            <div className="flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 <Shield className="w-5 h-5 text-[#266C92]" />
                 <div>
@@ -1382,7 +1392,7 @@ function FieldworkComplexHub() {
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-3" data-testid="fieldwork-stats-bar">
+            <div className="grid grid-cols-4 gap-3 shrink-0" data-testid="fieldwork-stats-bar">
               <Card className="border border-slate-200 dark:border-border">
                 <CardContent className="p-3">
                   <div className="flex items-center gap-2 mb-1">
@@ -1438,7 +1448,7 @@ function FieldworkComplexHub() {
             </div>
 
             {blockedActions.length > 0 && (
-              <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-actions-card">
+              <Card className="border border-slate-200 dark:border-border shrink-0" data-testid="fieldwork-actions-card">
                 <button
                   onClick={() => setActionsExpanded(!actionsExpanded)}
                   className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-muted/10 transition-colors"
@@ -1484,10 +1494,10 @@ function FieldworkComplexHub() {
               </Card>
             )}
 
-            <div className="grid lg:grid-cols-3 gap-5">
-              <div className="lg:col-span-2 space-y-4">
+            <div className="grid lg:grid-cols-3 gap-5 flex-1 min-h-0">
+              <div className="lg:col-span-2 flex flex-col min-h-0 gap-4">
                 {controlStatuses.length > 0 && (
-                  <Card className="border border-slate-200 dark:border-border flex flex-col min-h-0" data-testid="fieldwork-pipeline-card">
+                  <Card className="border border-slate-200 dark:border-border flex flex-col min-h-0 flex-1" data-testid="fieldwork-pipeline-card">
                     <CardHeader className="pb-2 pt-3 px-4 shrink-0">
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Workflow className="w-4 h-4 text-[#266C92]" />
@@ -1611,8 +1621,65 @@ function FieldworkComplexHub() {
                 )}
               </div>
 
-              <div className="space-y-4">
-                <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-systems-card">
+              <div className="flex flex-col min-h-0 gap-4 overflow-y-auto">
+                {isComplete && (
+                  <Card className="border border-slate-200 dark:border-border shrink-0" data-testid="fieldwork-next-steps-card">
+                    <button
+                      onClick={() => setNextStepsExpanded(!nextStepsExpanded)}
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50/50 dark:hover:bg-muted/10 transition-colors"
+                      data-testid="button-toggle-next-steps"
+                    >
+                      <div className="flex items-center gap-2">
+                        <ListChecks className="w-4 h-4 text-[#266C92]" />
+                        <span className="text-sm font-semibold text-foreground">Next Steps</span>
+                        <Badge className="text-[10px] h-4 bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]">{fieldworkNextStepActions.length} actions</Badge>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${nextStepsExpanded ? "" : "-rotate-90"}`} />
+                    </button>
+                    {nextStepsExpanded && (
+                      <CardContent className="px-4 pb-4 pt-0 space-y-2 border-t border-slate-100 dark:border-border">
+                        {fieldworkNextStepActions.map((a, i) => {
+                          const iconMap: Record<string, typeof FileText> = { FileText, AlertTriangle, Target, Users, RefreshCcw, BarChart3 };
+                          const Icon = iconMap[a.icon] || FileText;
+                          return (
+                            <div
+                              key={i}
+                              className="p-3 rounded-lg border border-slate-200 dark:border-border bg-slate-50/40 dark:bg-muted/10 transition-colors"
+                              data-testid={`tracker-next-step-${a.actionId}`}
+                            >
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <Icon className="w-3.5 h-3.5 shrink-0 text-[#266C92]" />
+                                <span className="text-xs font-medium text-foreground">{a.label}</span>
+                              </div>
+                              <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">
+                                {a.actionId === "triage-exceptions" ? `Review ${detectedExceptions.length} controls flagged with testing exceptions` : a.desc}
+                              </p>
+                              <Button
+                                size="sm"
+                                className="h-6 text-[10px] bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                                onClick={() => {
+                                  if (a.actionId === "executive-report") {
+                                    useWorkflowSessionStore.getState().setPendingDetailView("executive-report");
+                                    setShowCanvas(true);
+                                  }
+                                  if (a.actionId === "triage-exceptions") {
+                                    setExceptionsModalOpen(true);
+                                  }
+                                }}
+                                data-testid={`button-next-step-${a.actionId}`}
+                              >
+                                <ArrowRight className="w-3 h-3 mr-1" />
+                                {a.actionId === "executive-report" ? "Generate Report" : a.actionId === "triage-exceptions" ? "Review Exceptions" : "Open"}
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </CardContent>
+                    )}
+                  </Card>
+                )}
+
+                <Card className="border border-slate-200 dark:border-border shrink-0" data-testid="fieldwork-systems-card">
                   <button
                     onClick={() => setSystemsExpanded(!systemsExpanded)}
                     className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50/50 dark:hover:bg-muted/5 transition-colors"
@@ -1643,14 +1710,14 @@ function FieldworkComplexHub() {
                   )}
                 </Card>
 
-                <Card className="border border-slate-200 dark:border-border overflow-hidden" data-testid="fieldwork-activity-card">
+                <Card className="border border-slate-200 dark:border-border overflow-hidden shrink-0" data-testid="fieldwork-activity-card">
                   <CardHeader className="pb-2 pt-3 px-4 border-b border-slate-100 dark:border-border">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <Bot className="w-4 h-4 text-[#266C92]" />
                       Optro Assistant
                     </CardTitle>
                   </CardHeader>
-                  <div className="max-h-96 overflow-y-auto">
+                  <div>
                     <div className="px-4 py-3 bg-[#266C92]/5 dark:bg-[#266C92]/10 border-b border-slate-100 dark:border-border" data-testid="assistant-welcome-bubble">
                       <div className="flex items-start gap-2.5">
                         <div className="w-6 h-6 rounded-full bg-[#266C92] flex items-center justify-center shrink-0 mt-0.5">
@@ -1701,69 +1768,13 @@ function FieldworkComplexHub() {
               </div>
             </div>
 
-            {isComplete && (
-              <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-next-steps-card">
-                <button
-                  onClick={() => setNextStepsExpanded(!nextStepsExpanded)}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50/50 dark:hover:bg-muted/10 transition-colors"
-                  data-testid="button-toggle-next-steps"
-                >
-                  <div className="flex items-center gap-2">
-                    <ListChecks className="w-4 h-4 text-[#266C92]" />
-                    <span className="text-sm font-semibold text-foreground">Next Steps</span>
-                    <Badge className="text-[10px] h-4 bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]">{fieldworkNextStepActions.length} actions</Badge>
-                  </div>
-                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${nextStepsExpanded ? "" : "-rotate-90"}`} />
-                </button>
-                {nextStepsExpanded && (
-                  <CardContent className="px-4 pb-4 pt-0 space-y-2 border-t border-slate-100 dark:border-border">
-                    {fieldworkNextStepActions.map((a, i) => {
-                      const iconMap: Record<string, typeof FileText> = { FileText, AlertTriangle, Target, Users, RefreshCcw, BarChart3 };
-                      const Icon = iconMap[a.icon] || FileText;
-                      return (
-                        <div
-                          key={i}
-                          className="p-3 rounded-lg border border-slate-200 dark:border-border bg-slate-50/40 dark:bg-muted/10 transition-colors"
-                          data-testid={`tracker-next-step-${a.actionId}`}
-                        >
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <Icon className="w-3.5 h-3.5 shrink-0 text-[#266C92]" />
-                            <span className="text-xs font-medium text-foreground">{a.label}</span>
-                          </div>
-                          <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">
-                            {a.actionId === "triage-exceptions" ? `Review ${detectedExceptions.length} controls flagged with testing exceptions` : a.desc}
-                          </p>
-                          <Button
-                            size="sm"
-                            className="h-6 text-[10px] bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-                            onClick={() => {
-                              if (a.actionId === "executive-report") {
-                                useWorkflowSessionStore.getState().setPendingDetailView("executive-report");
-                                setShowCanvas(true);
-                              }
-                              if (a.actionId === "triage-exceptions") {
-                                setExceptionsModalOpen(true);
-                              }
-                            }}
-                            data-testid={`button-next-step-${a.actionId}`}
-                          >
-                            <ArrowRight className="w-3 h-3 mr-1" />
-                            {a.actionId === "executive-report" ? "Generate Report" : a.actionId === "triage-exceptions" ? "Review Exceptions" : "Open"}
-                          </Button>
-                        </div>
-                      );
-                    })}
-                  </CardContent>
-                )}
-              </Card>
-            )}
           </div>
         )}
       </div>
 
       <Dialog open={exceptionsModalOpen} onOpenChange={(open) => { setExceptionsModalOpen(open); if (!open) setSelectedExceptionId(null); }}>
         <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
-          <DialogHeader>
+          <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-red-500" />
               Testing Exceptions ({detectedExceptions.length})
@@ -1772,7 +1783,7 @@ function FieldworkComplexHub() {
               Controls flagged during automated testing that require review and remediation.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex-1 min-h-0 overflow-y-auto -mx-6 px-6">
+          <div className="flex-1 min-h-0 overflow-y-auto px-6 pb-6">
             {selectedExceptionId ? (() => {
               const exc = detectedExceptions.find(e => e.id === selectedExceptionId);
               if (!exc) return null;
