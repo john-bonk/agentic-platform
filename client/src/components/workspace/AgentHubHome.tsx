@@ -1175,8 +1175,13 @@ function FieldworkComplexHub() {
 
   const hasWorkflow = !!fieldworkProject && !!fieldworkRuntime;
 
+  const detectedExceptions = fieldworkExceptions.filter(exc => {
+    const ctrl = controlStatuses.find(c => c.controlId === exc.controlId);
+    return ctrl && ctrl.steps.testing === "complete";
+  });
+
   const stepDot = (status: string, controlId?: string, step?: string) => {
-    if (step === "testing" && status === "complete" && isComplete && exceptionControlIds.has(controlId ?? "")) {
+    if (step === "testing" && status === "complete" && controlId && exceptionControlIds.has(controlId)) {
       return <AlertTriangle className="w-3 h-3 text-red-500" />;
     }
     switch (status) {
@@ -1415,18 +1420,18 @@ function FieldworkComplexHub() {
                 </CardContent>
               </Card>
               <Card
-                className={`border ${isComplete ? "border-red-200 dark:border-red-800/30 cursor-pointer hover:shadow-sm transition-shadow" : "border-slate-200 dark:border-border"}`}
-                onClick={isComplete ? () => setExceptionsModalOpen(true) : undefined}
+                className={`border ${detectedExceptions.length > 0 ? "border-red-200 dark:border-red-800/30 cursor-pointer hover:shadow-sm transition-shadow" : "border-slate-200 dark:border-border"}`}
+                onClick={detectedExceptions.length > 0 ? () => setExceptionsModalOpen(true) : undefined}
                 data-testid="fieldwork-exceptions-card"
               >
                 <CardContent className="p-3">
                   <div className="flex items-center gap-2 mb-1">
-                    <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                    <AlertTriangle className={`w-3.5 h-3.5 ${detectedExceptions.length > 0 ? "text-red-500" : "text-slate-400"}`} />
                     <span className="text-[11px] text-muted-foreground font-medium">Exceptions</span>
                   </div>
                   <div className="flex items-baseline gap-1.5">
-                    <span className={`text-xl font-bold ${isComplete ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>{isComplete ? fieldworkExceptions.length : blockedActions.length}</span>
-                    <span className="text-[10px] text-muted-foreground">{isComplete ? `${fieldworkExceptions.filter(e => e.severity === "high").length} high severity` : blockedActions.length > 0 ? `${blockedActions.length} blocking` : "none"}</span>
+                    <span className={`text-xl font-bold ${detectedExceptions.length > 0 ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>{detectedExceptions.length}</span>
+                    <span className="text-[10px] text-muted-foreground">{detectedExceptions.length > 0 ? `${detectedExceptions.filter(e => e.severity === "high").length} high severity` : "from testing"}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -1510,7 +1515,7 @@ function FieldworkComplexHub() {
                           </div>
                           {manualControls.map((ctrl) => {
                             const isBlocked = Object.values(ctrl.steps).some(s => s === "blocked");
-                            const hasException = isComplete && exceptionControlIds.has(ctrl.controlId);
+                            const hasException = ctrl.steps.testing === "complete" && exceptionControlIds.has(ctrl.controlId);
                             return (
                               <div
                                 key={ctrl.controlId}
@@ -1541,7 +1546,7 @@ function FieldworkComplexHub() {
                             </span>
                           </div>
                           {autoControls.map((ctrl) => {
-                            const hasException = isComplete && exceptionControlIds.has(ctrl.controlId);
+                            const hasException = ctrl.steps.testing === "complete" && exceptionControlIds.has(ctrl.controlId);
                             return (
                               <div
                                 key={ctrl.controlId}
@@ -1641,34 +1646,56 @@ function FieldworkComplexHub() {
                 <Card className="border border-slate-200 dark:border-border overflow-hidden" data-testid="fieldwork-activity-card">
                   <CardHeader className="pb-2 pt-3 px-4 border-b border-slate-100 dark:border-border">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                      <Bot className="w-4 h-4 text-muted-foreground" />
-                      Agent Activity
+                      <Bot className="w-4 h-4 text-[#266C92]" />
+                      Optro Assistant
                     </CardTitle>
                   </CardHeader>
-                  <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-border">
-                    {fieldworkActivityFeed.map((entry) => (
-                      <div
-                        key={entry.id}
-                        className={`px-4 py-2.5 border-l-2 ${
-                          entry.type === "action-needed"
-                            ? "border-l-red-400"
-                            : entry.type === "warning"
-                              ? "border-l-red-400"
-                              : entry.type === "success"
-                                ? "border-l-[#266C92]"
-                                : "border-l-slate-200 dark:border-l-slate-700"
-                        }`}
-                        data-testid={`activity-${entry.id}`}
-                      >
-                        <p className="text-[11px] text-foreground leading-relaxed">{entry.message}</p>
-                        <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
-                          <Bot className="w-2.5 h-2.5" />
-                          <span>{entry.agent}</span>
-                          <span>·</span>
-                          <span>{entry.timestamp}</span>
+                  <div className="max-h-96 overflow-y-auto">
+                    <div className="px-4 py-3 bg-[#266C92]/5 dark:bg-[#266C92]/10 border-b border-slate-100 dark:border-border" data-testid="assistant-welcome-bubble">
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-6 h-6 rounded-full bg-[#266C92] flex items-center justify-center shrink-0 mt-0.5">
+                          <Bot className="w-3 h-3 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-semibold text-[#266C92] dark:text-[#4da3c9] mb-0.5">Optro Assistant</p>
+                          <p className="text-[11px] text-foreground leading-relaxed">
+                            {isComplete
+                              ? `Testing complete across all ${totalControls} controls. ${detectedExceptions.length} exception${detectedExceptions.length !== 1 ? "s" : ""} identified — review the findings and next steps below.`
+                              : executionPhase === "running"
+                                ? `Fieldwork execution is underway — ${completedControls} of ${totalControls} controls tested so far.${detectedExceptions.length > 0 ? ` ${detectedExceptions.length} exception${detectedExceptions.length !== 1 ? "s" : ""} detected from completed tests.` : ""} I'll continue running the remaining controls in parallel.`
+                                : executionPhase
+                                  ? `Execution is ${executionPhase}. Open the workflow to continue.`
+                                  : "I've set up the Automated Control Testing workflow. We'll walk through control selection, data sources, and PBC mapping before kicking off parallel execution across all selected controls."}
+                          </p>
                         </div>
                       </div>
-                    ))}
+                    </div>
+
+                    <div className="divide-y divide-slate-100 dark:divide-border">
+                      {fieldworkActivityFeed.map((entry) => (
+                        <div
+                          key={entry.id}
+                          className={`px-4 py-2.5 border-l-2 ${
+                            entry.type === "action-needed"
+                              ? "border-l-red-400"
+                              : entry.type === "warning"
+                                ? "border-l-red-400"
+                                : entry.type === "success"
+                                  ? "border-l-[#266C92]"
+                                  : "border-l-slate-200 dark:border-l-slate-700"
+                          }`}
+                          data-testid={`activity-${entry.id}`}
+                        >
+                          <p className="text-[11px] text-foreground leading-relaxed">{entry.message}</p>
+                          <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
+                            <Bot className="w-2.5 h-2.5" />
+                            <span>{entry.agent}</span>
+                            <span>·</span>
+                            <span>{entry.timestamp}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </Card>
               </div>
@@ -1678,27 +1705,37 @@ function FieldworkComplexHub() {
               <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-next-steps-card">
                 <button
                   onClick={() => setNextStepsExpanded(!nextStepsExpanded)}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50/50 dark:hover:bg-muted/5 transition-colors"
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50/50 dark:hover:bg-muted/10 transition-colors"
                   data-testid="button-toggle-next-steps"
                 >
                   <div className="flex items-center gap-2">
                     <ListChecks className="w-4 h-4 text-[#266C92]" />
                     <span className="text-sm font-semibold text-foreground">Next Steps</span>
-                    <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]">{fieldworkNextStepActions.length}</Badge>
+                    <Badge className="text-[10px] h-4 bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]">{fieldworkNextStepActions.length} actions</Badge>
                   </div>
-                  <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${nextStepsExpanded ? "" : "-rotate-90"}`} />
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${nextStepsExpanded ? "" : "-rotate-90"}`} />
                 </button>
                 {nextStepsExpanded && (
-                  <CardContent className="px-4 pb-4 pt-0 border-t border-slate-100 dark:border-border">
-                    <div className="grid grid-cols-2 gap-2 mt-3">
-                      {fieldworkNextStepActions.map((a, i) => {
-                        const iconMap: Record<string, typeof FileText> = { FileText, AlertTriangle, Target, Users, RefreshCcw, BarChart3 };
-                        const Icon = iconMap[a.icon] || FileText;
-                        return (
-                          <button
-                            key={i}
-                            className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 dark:border-border hover:border-[#266C92]/30 hover:bg-[#266C92]/5 transition-all text-left group"
-                            data-testid={`tracker-next-step-${a.actionId}`}
+                  <CardContent className="px-4 pb-4 pt-0 space-y-2 border-t border-slate-100 dark:border-border">
+                    {fieldworkNextStepActions.map((a, i) => {
+                      const iconMap: Record<string, typeof FileText> = { FileText, AlertTriangle, Target, Users, RefreshCcw, BarChart3 };
+                      const Icon = iconMap[a.icon] || FileText;
+                      return (
+                        <div
+                          key={i}
+                          className="p-3 rounded-lg border border-slate-200 dark:border-border bg-slate-50/40 dark:bg-muted/10 transition-colors"
+                          data-testid={`tracker-next-step-${a.actionId}`}
+                        >
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <Icon className="w-3.5 h-3.5 shrink-0 text-[#266C92]" />
+                            <span className="text-xs font-medium text-foreground">{a.label}</span>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">
+                            {a.actionId === "triage-exceptions" ? `Review ${detectedExceptions.length} controls flagged with testing exceptions` : a.desc}
+                          </p>
+                          <Button
+                            size="sm"
+                            className="h-6 text-[10px] bg-[#266C92] hover:bg-[#1e5a7a] text-white"
                             onClick={() => {
                               if (a.actionId === "executive-report") {
                                 useWorkflowSessionStore.getState().setPendingDetailView("executive-report");
@@ -1708,18 +1745,14 @@ function FieldworkComplexHub() {
                                 setExceptionsModalOpen(true);
                               }
                             }}
+                            data-testid={`button-next-step-${a.actionId}`}
                           >
-                            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-muted/30 flex items-center justify-center shrink-0 group-hover:bg-[#266C92]/10">
-                              <Icon className="w-4 h-4 text-muted-foreground group-hover:text-[#266C92]" />
-                            </div>
-                            <div>
-                              <p className="text-xs font-medium text-foreground group-hover:text-[#266C92]">{a.label}</p>
-                              <p className="text-[10px] text-muted-foreground mt-0.5">{a.desc}</p>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
+                            <ArrowRight className="w-3 h-3 mr-1" />
+                            {a.actionId === "executive-report" ? "Generate Report" : a.actionId === "triage-exceptions" ? "Review Exceptions" : "Open"}
+                          </Button>
+                        </div>
+                      );
+                    })}
                   </CardContent>
                 )}
               </Card>
@@ -1733,7 +1766,7 @@ function FieldworkComplexHub() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-red-500" />
-              Testing Exceptions ({fieldworkExceptions.length})
+              Testing Exceptions ({detectedExceptions.length})
             </DialogTitle>
             <DialogDescription>
               Controls flagged during automated testing that require review and remediation.
@@ -1741,7 +1774,7 @@ function FieldworkComplexHub() {
           </DialogHeader>
           <div className="flex-1 min-h-0 overflow-y-auto -mx-6 px-6">
             {selectedExceptionId ? (() => {
-              const exc = fieldworkExceptions.find(e => e.id === selectedExceptionId);
+              const exc = detectedExceptions.find(e => e.id === selectedExceptionId);
               if (!exc) return null;
               return (
                 <div className="space-y-4">
@@ -1809,7 +1842,7 @@ function FieldworkComplexHub() {
               );
             })() : (
               <div className="space-y-2">
-                {fieldworkExceptions.map((exc) => (
+                {detectedExceptions.map((exc) => (
                   <button
                     key={exc.id}
                     onClick={() => setSelectedExceptionId(exc.id)}
