@@ -77,10 +77,15 @@ interface WorkflowSessionProps {
   onBack: () => void;
 }
 
-function AssistantWelcomeMessage({ configId }: { configId: string }) {
+function AssistantWelcomeMessage({ configId, activeIndex, completedCount }: { configId: string; activeIndex: number; completedCount: number }) {
   const [visible, setVisible] = useState(false);
+
   const message = configId === "control-testing"
-    ? "I've set up the Automated Control Testing workflow for you. We'll walk through control selection, data source configuration, and PBC owner mapping before kicking off parallel fieldwork execution across all selected controls. Let's start by choosing which controls to include in this testing cycle."
+    ? completedCount === 0 && activeIndex === 0
+      ? "I've set up the Automated Control Testing workflow for you. We'll walk through control selection, data source configuration, and PBC owner mapping before kicking off parallel fieldwork execution across all selected controls. Let's start by choosing which controls to include in this testing cycle."
+      : completedCount >= 4
+        ? "All testing is complete. You can review the results below, triage any exceptions, or generate the executive report from the Next Steps panel."
+        : `Welcome back — you're on step ${activeIndex + 1}. Let's continue where you left off.`
     : "Welcome — let's get started with your workflow.";
 
   useEffect(() => {
@@ -368,8 +373,8 @@ export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionPr
 
       <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6">
         <div className="max-w-3xl mx-auto">
-          {config.id === "control-testing" && activeIndex === 0 && completedIndices.size === 0 && (
-            <AssistantWelcomeMessage configId={config.id} />
+          {config.id === "control-testing" && (
+            <AssistantWelcomeMessage configId={config.id} activeIndex={activeIndex} completedCount={completedIndices.size} />
           )}
           {config.blocks.map((block, index) => (
             <BlockWrapper
