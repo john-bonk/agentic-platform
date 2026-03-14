@@ -293,10 +293,9 @@ function QuickActionCard({ action, onExecute }: QuickActionCardProps) {
     >
       <div className="flex items-start gap-3">
         <div 
-          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: `${action.color}15` }}
+          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-slate-100 dark:bg-slate-800/30"
         >
-          <Icon className="w-4 h-4" style={{ color: action.color }} />
+          <Icon className="w-4 h-4 text-slate-500 dark:text-slate-400" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-gray-900 dark:text-foreground group-hover:text-[#266C92]">

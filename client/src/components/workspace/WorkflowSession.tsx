@@ -2043,6 +2043,58 @@ function DataSourceConfigBlock({ onComplete, sessionId, isReviewMode }: { onComp
   );
 }
 
+function PBCOrgEntityNode({ entity }: { entity: { entity: string; units: { name: string; locations: { name: string; pbcOwner: string; controlCount: number }[] }[] } }) {
+  const [expanded, setExpanded] = useState(false);
+  const totalLocations = entity.units.reduce((sum, u) => sum + u.locations.length, 0);
+  const totalControls = entity.units.reduce((sum, u) => sum + u.locations.reduce((s, l) => s + l.controlCount, 0), 0);
+  return (
+    <div className="border border-slate-200 dark:border-border rounded-lg" data-testid={`pbc-org-entity-${entity.entity}`}>
+      <button className="w-full px-3 py-2.5 flex items-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-muted/30 rounded-lg transition-colors" onClick={() => setExpanded(!expanded)}>
+        <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${expanded ? "" : "-rotate-90"}`} />
+        <Building2 className="w-4 h-4 text-[#266C92]" />
+        <span className="text-sm font-medium flex-1 text-left">{entity.entity}</span>
+        <span className="text-xs text-muted-foreground">{totalControls} PBC · {totalLocations} loc.</span>
+        <div className="w-4 h-4 rounded border-2 border-[#266C92] bg-[#266C92] flex items-center justify-center shrink-0">
+          <Check className="w-3 h-3 text-white" />
+        </div>
+      </button>
+      {expanded && (
+        <div className="px-3 pb-3 space-y-2 ml-6">
+          {entity.units.map((unit) => (
+            <PBCOrgUnitNode key={unit.name} unit={unit} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PBCOrgUnitNode({ unit }: { unit: { name: string; locations: { name: string; pbcOwner: string; controlCount: number }[] } }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div>
+      <button className="w-full px-2 py-1.5 flex items-center gap-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-muted/30 rounded transition-colors" onClick={() => setExpanded(!expanded)}>
+        <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform ${expanded ? "" : "-rotate-90"}`} />
+        <Users className="w-3.5 h-3.5 text-muted-foreground" />
+        <span className="text-xs font-medium flex-1 text-left">{unit.name}</span>
+        <span className="text-[11px] text-muted-foreground">{unit.locations.length} locations</span>
+      </button>
+      {expanded && (
+        <div className="ml-5 mt-1 space-y-1">
+          {unit.locations.map((loc) => (
+            <div key={loc.name} className="flex items-center gap-2 px-2 py-1.5 rounded bg-slate-50 dark:bg-muted/20 text-xs">
+              <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
+              <span className="font-medium min-w-0 truncate">{loc.name}</span>
+              <span className="text-muted-foreground ml-auto shrink-0">{loc.pbcOwner}</span>
+              <Badge className="text-[9px] bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 ml-1">{loc.controlCount} PBC</Badge>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: () => void; sessionId: string; isReviewMode?: boolean }) {
   const selectedIds = useWorkflowSessionStore(s => {
     const bs = s.runtimeStates[sessionId]?.blockStates?.["control-selection"];
@@ -2053,6 +2105,45 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
   const autoControls = masterControlsList.filter(c => selectedIds.includes(c.id) && c.dataSource === "connected");
   const [pbcExpanded, setPbcExpanded] = useState(true);
   const [autoExpanded, setAutoExpanded] = useState(false);
+  const [orgExpanded, setOrgExpanded] = useState(false);
+
+  const pbcOrgHierarchy = [
+    {
+      entity: "North America Holdings",
+      units: [
+        { name: "US Operations", locations: [
+          { name: "New York HQ", pbcOwner: "Sarah Chen", controlCount: 2 },
+          { name: "San Francisco Tech", pbcOwner: "Nina Patel", controlCount: 1 },
+        ]},
+        { name: "Canada Operations", locations: [
+          { name: "Toronto Office", pbcOwner: "Alex Morrison", controlCount: 1 },
+        ]},
+      ],
+    },
+    {
+      entity: "EMEA Group",
+      units: [
+        { name: "UK & Ireland", locations: [
+          { name: "London HQ", pbcOwner: "Emma Scott", controlCount: 1 },
+          { name: "Dublin Center", pbcOwner: "Ciara O'Brien", controlCount: 1 },
+        ]},
+      ],
+    },
+    {
+      entity: "APAC Region",
+      units: [
+        { name: "Greater China", locations: [
+          { name: "Shanghai Office", pbcOwner: "Wei Zhang", controlCount: 1 },
+          { name: "Hong Kong Hub", pbcOwner: "Amy Lau", controlCount: 1 },
+        ]},
+        { name: "Southeast Asia", locations: [
+          { name: "Singapore Center", pbcOwner: "Jun Li", controlCount: 1 },
+        ]},
+      ],
+    },
+  ];
+  const totalPbcLocations = pbcOrgHierarchy.reduce((sum, e) => sum + e.units.reduce((s, u) => s + u.locations.length, 0), 0);
+  const totalPbcRequests = manualControls.length;
 
   return (
     <div className="space-y-4">
@@ -2098,6 +2189,34 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
 
       <div className="space-y-2">
         <button
+          onClick={() => setOrgExpanded(!orgExpanded)}
+          className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10 hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
+          data-testid="button-toggle-pbc-org-hierarchy"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+            <span className="text-xs font-semibold text-foreground">Locational Org Breakdown</span>
+            <Badge className="text-[9px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">{pbcOrgHierarchy.length} entities · {totalPbcLocations} locations</Badge>
+          </div>
+          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${orgExpanded ? "" : "-rotate-90"}`} />
+        </button>
+        {orgExpanded && (
+          <div className="space-y-2 animate-in slide-in-from-top-2 fade-in duration-200">
+            <div className="flex items-center justify-between text-xs text-muted-foreground px-1 mb-1">
+              <span>{pbcOrgHierarchy.length} entities · {totalPbcRequests} PBC requests across {totalPbcLocations} locations</span>
+              <span className="text-[#266C92] dark:text-[#4da3c9] font-medium">All mapped</span>
+            </div>
+            <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+              {pbcOrgHierarchy.map((entity) => (
+                <PBCOrgEntityNode key={entity.entity} entity={entity} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <button
           onClick={() => setAutoExpanded(!autoExpanded)}
           className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10 hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
           data-testid="button-toggle-auto-controls"
@@ -2123,7 +2242,7 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
 
       <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10">
         <p className="text-[11px] text-muted-foreground leading-relaxed">
-          {manualControls.length} PBC requests will be distributed to the mapped owners
+          {manualControls.length} PBC requests will be distributed to the mapped owners across {totalPbcLocations} locations
           and {autoControls.length} controls will be tested automatically via system connections.
         </p>
       </div>
