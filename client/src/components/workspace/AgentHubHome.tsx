@@ -59,7 +59,7 @@ import {
   type AgentActivityEntry,
   type AgentCategorySummary,
 } from "@/config/agentHubConfig";
-import { WorkflowSession, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, fieldworkExceptions, fieldworkNextStepActions, type WorkflowSessionConfig, type ControlWorkflowStatus, type FieldworkException } from "./WorkflowSession";
+import { WorkflowSession, ExecutiveReportView, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, fieldworkExceptions, fieldworkNextStepActions, type WorkflowSessionConfig, type ControlWorkflowStatus, type FieldworkException } from "./WorkflowSession";
 import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
@@ -1103,7 +1103,8 @@ function FieldworkComplexHub() {
   const [systemsExpanded, setSystemsExpanded] = useState(false);
   const [exceptionsModalOpen, setExceptionsModalOpen] = useState(false);
   const [selectedExceptionId, setSelectedExceptionId] = useState<string | null>(null);
-  const [nextStepsExpanded, setNextStepsExpanded] = useState(true);
+  const [nextStepsExpanded, setNextStepsExpanded] = useState(false);
+  const [hubDetailView, setHubDetailView] = useState<string | null>(null);
 
   const resolvedBlocksList = useMemo(() => {
     if (!fieldworkProject) return [] as string[];
@@ -1165,6 +1166,31 @@ function FieldworkComplexHub() {
     );
   }
 
+  if (hubDetailView === "executive-report") {
+    return (
+      <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-background">
+        <div className="shrink-0 h-12 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
+          <button
+            onClick={() => setHubDetailView(null)}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            data-testid="button-hub-detail-back"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span>Overview</span>
+          </button>
+          <div className="w-px h-5 bg-slate-200 dark:bg-border" />
+          <div className="flex items-center gap-2">
+            <FileText className="w-4 h-4 text-[#266C92]" />
+            <h2 className="text-sm font-semibold text-foreground">Executive Testing Report</h2>
+          </div>
+        </div>
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <ExecutiveReportView />
+        </div>
+      </div>
+    );
+  }
+
   const controlStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
   const executionPhase = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.phase as string) ?? null;
   const completedIndices = new Set(fieldworkRuntime?.completedIndices ?? []);
@@ -1210,7 +1236,7 @@ function FieldworkComplexHub() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden" data-testid="fieldwork-complex-hub">
-      <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background px-8 py-5">
+      <div className={`flex-1 min-h-0 bg-slate-50 dark:bg-background px-8 py-5 ${hasWorkflow ? "flex flex-col overflow-hidden" : "overflow-y-auto"}`}>
         {!hasWorkflow ? (
           <div className="max-w-6xl mx-auto space-y-5" data-testid="fieldwork-hub-empty">
             <div className="flex items-center justify-between">
@@ -1351,7 +1377,7 @@ function FieldworkComplexHub() {
             </div>
           </div>
         ) : (
-          <div className="max-w-6xl mx-auto space-y-5" data-testid="fieldwork-tracker-view" data-is-complete={isComplete} data-execution-phase={executionPhase} data-control-count={controlStatuses.length}>
+          <div className="max-w-6xl mx-auto flex flex-col h-full gap-5" data-testid="fieldwork-tracker-view" data-is-complete={isComplete} data-execution-phase={executionPhase} data-control-count={controlStatuses.length}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Shield className="w-5 h-5 text-[#266C92]" />
@@ -1536,8 +1562,7 @@ function FieldworkComplexHub() {
                             className="h-5 px-2 text-[10px] text-[#266C92] hover:text-[#1e5a7a] hover:bg-[#266C92]/5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity shrink-0"
                             onClick={() => {
                               if (a.actionId === "executive-report") {
-                                useWorkflowSessionStore.getState().setPendingDetailView("executive-report");
-                                setShowCanvas(true);
+                                setHubDetailView("executive-report");
                               }
                               if (a.actionId === "triage-exceptions") {
                                 setExceptionsModalOpen(true);
@@ -1555,8 +1580,8 @@ function FieldworkComplexHub() {
               </Card>
             )}
 
-            <div className="grid lg:grid-cols-3 gap-5">
-              <div className="lg:col-span-2 space-y-4">
+            <div className="grid lg:grid-cols-3 gap-5 flex-1 min-h-0">
+              <div className="lg:col-span-2 overflow-y-auto space-y-4">
                 {controlStatuses.length > 0 && (
                   <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-pipeline-card">
                     <CardHeader className="pb-2 pt-3 px-4">
@@ -1682,7 +1707,7 @@ function FieldworkComplexHub() {
                 )}
               </div>
 
-              <div className="space-y-4">
+              <div className="overflow-y-auto space-y-4">
                 <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-systems-card">
                   <button
                     onClick={() => setSystemsExpanded(!systemsExpanded)}

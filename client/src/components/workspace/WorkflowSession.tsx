@@ -924,7 +924,7 @@ function ReassessmentView() {
   );
 }
 
-function ExecutiveReportView() {
+export function ExecutiveReportView() {
   const totalControls = masterControlsList.length;
   const autoControls = masterControlsList.filter(c => c.dataSource === "connected").length;
   const manualControls = masterControlsList.filter(c => c.dataSource === "manual").length;
