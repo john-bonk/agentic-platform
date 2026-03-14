@@ -2105,7 +2105,6 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
   const autoControls = masterControlsList.filter(c => selectedIds.includes(c.id) && c.dataSource === "connected");
   const [pbcExpanded, setPbcExpanded] = useState(true);
   const [autoExpanded, setAutoExpanded] = useState(false);
-  const [orgExpanded, setOrgExpanded] = useState(false);
 
   const pbcOrgHierarchy = [
     {
@@ -2167,40 +2166,11 @@ function PBCMappingBlock({ onComplete, sessionId, isReviewMode }: { onComplete: 
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
             <span className="text-xs font-semibold text-foreground">PBC Request Recipients</span>
-            <Badge className="text-[9px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">{manualControls.length} requests</Badge>
+            <Badge className="text-[9px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">{totalPbcRequests} requests · {totalPbcLocations} locations</Badge>
           </div>
           <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${pbcExpanded ? "" : "-rotate-90"}`} />
         </button>
         {pbcExpanded && (
-          <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden max-h-44 overflow-y-auto animate-in slide-in-from-top-2 fade-in duration-200">
-            <div className="grid grid-cols-[1fr_6rem_6rem] gap-2 px-3 py-1.5 bg-slate-50 dark:bg-muted/20 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider sticky top-0">
-              <span>Control</span><span>Owner</span><span>PBC Owner</span>
-            </div>
-            {manualControls.map(c => (
-              <div key={c.id} className="grid grid-cols-[1fr_6rem_6rem] gap-2 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50">
-                <span><span className="font-medium text-[#266C92]">{c.id}</span> <span className="text-muted-foreground">{c.name}</span></span>
-                <span className="text-[10px] truncate">{c.owner}</span>
-                <span className="text-[10px] truncate text-muted-foreground">{c.pbcOwner}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <button
-          onClick={() => setOrgExpanded(!orgExpanded)}
-          className="w-full flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10 hover:border-slate-300 dark:hover:border-slate-600 transition-colors"
-          data-testid="button-toggle-pbc-org-hierarchy"
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-            <span className="text-xs font-semibold text-foreground">Locational Org Breakdown</span>
-            <Badge className="text-[9px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">{pbcOrgHierarchy.length} entities · {totalPbcLocations} locations</Badge>
-          </div>
-          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${orgExpanded ? "" : "-rotate-90"}`} />
-        </button>
-        {orgExpanded && (
           <div className="space-y-2 animate-in slide-in-from-top-2 fade-in duration-200">
             <div className="flex items-center justify-between text-xs text-muted-foreground px-1 mb-1">
               <span>{pbcOrgHierarchy.length} entities · {totalPbcRequests} PBC requests across {totalPbcLocations} locations</span>
