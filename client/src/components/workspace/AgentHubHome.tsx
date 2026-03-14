@@ -1581,16 +1581,16 @@ function FieldworkComplexHub() {
             )}
 
             <div className="grid lg:grid-cols-3 gap-5 flex-1 min-h-0">
-              <div className="lg:col-span-2 overflow-y-auto space-y-4">
+              <div className="lg:col-span-2 min-h-0 flex flex-col">
                 {controlStatuses.length > 0 && (
-                  <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-pipeline-card">
-                    <CardHeader className="pb-2 pt-3 px-4">
+                  <Card className="border border-slate-200 dark:border-border flex flex-col min-h-0 flex-1" data-testid="fieldwork-pipeline-card">
+                    <CardHeader className="pb-2 pt-3 px-4 shrink-0">
                       <CardTitle className="text-sm font-semibold flex items-center gap-2">
                         <Workflow className="w-4 h-4 text-[#266C92]" />
                         Control Pipeline
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="px-4 pb-4">
+                    <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-y-auto">
                       <div className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
                         <span>Control</span>
                         <span>Source</span>
@@ -1707,8 +1707,8 @@ function FieldworkComplexHub() {
                 )}
               </div>
 
-              <div className="overflow-y-auto space-y-4">
-                <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-systems-card">
+              <div className="min-h-0 flex flex-col gap-4">
+                <Card className="border border-slate-200 dark:border-border shrink-0" data-testid="fieldwork-systems-card">
                   <button
                     onClick={() => setSystemsExpanded(!systemsExpanded)}
                     className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50/50 dark:hover:bg-muted/5 transition-colors"
@@ -1739,7 +1739,7 @@ function FieldworkComplexHub() {
                   )}
                 </Card>
 
-                <Card className="border border-slate-200 dark:border-border overflow-hidden flex flex-col" data-testid="fieldwork-activity-card">
+                <Card className="border border-slate-200 dark:border-border overflow-hidden flex flex-col flex-1 min-h-0" data-testid="fieldwork-activity-card">
                   <CardHeader className="pb-2 pt-3 px-4 border-b border-slate-100 dark:border-border shrink-0">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <Bot className="w-4 h-4 text-[#266C92]" />

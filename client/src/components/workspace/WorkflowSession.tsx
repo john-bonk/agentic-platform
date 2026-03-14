@@ -247,6 +247,7 @@ export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionPr
   const fullScreenView = useWorkflowSessionStore((s) => s.runtimeStates[sessionId]?.fullScreenView ?? null);
   const setRuntime = useWorkflowSessionStore((s) => s.setRuntime);
   const [reviewingBlock, setReviewingBlock] = useState<number | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const prevActiveRef = useRef(activeIndex);
   useEffect(() => {
     if (prevActiveRef.current !== activeIndex) {
@@ -254,6 +255,12 @@ export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionPr
       setReviewingBlock(null);
     }
   }, [activeIndex]);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, []);
 
   const setActiveIndex = useCallback((idx: number) => {
     setRuntime(sessionId, { activeIndex: idx });
@@ -371,7 +378,7 @@ export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionPr
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6">
+      <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto px-8 py-6">
         <div className="max-w-3xl mx-auto">
           
           {config.blocks.map((block, index) => (
