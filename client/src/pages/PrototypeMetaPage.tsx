@@ -664,15 +664,19 @@ function AgentHubOverview() {
   ];
 
   const features = [
-    { label: "Default Mode", value: "Agent Hub ON, Simple View", status: "active" },
+    { label: "Default Mode", value: "Agent Hub ON, Complex View (Fieldwork Automation)", status: "active" },
     { label: "Hub Views", value: "Simple (blank-start) / Complex (full dashboard)", status: "active" },
     { label: "Branding", value: "Optro Assistant (replaces AuditBoard Assistant)", status: "active" },
     { label: "Supported Workspace", value: "Enterprise Risk (CRO persona)", status: "active" },
-    { label: "Workflow Sessions", value: "Risk Assessment (6-block stepper)", status: "active" },
-    { label: "State Persistence", value: "Full session state via Zustand store + localStorage", status: "active" },
+    { label: "Workflow Sessions", value: "Risk Assessment (6-block) + Fieldwork Automation (5-block)", status: "active" },
+    { label: "State Persistence", value: "Zustand in-memory store; settings in localStorage", status: "active" },
     { label: "Stepper Review Mode", value: "Click completed steps to expand read-only view", status: "active" },
     { label: "Navigation Override", value: "Stripped-down Projects/Monitoring/Scheduled nav", status: "active" },
-    { label: "WorkflowTracker", value: "Real-time mirror card with engagement indicators", status: "active" },
+    { label: "Fieldwork Tracker", value: "3-col overview: Pipeline grid, Systems, Optro Assistant — scrollable viewport frames", status: "active" },
+    { label: "Next Steps", value: "Collapsible card above tracker grid (default collapsed), compact line items", status: "active" },
+    { label: "Exceptions Modal", value: "Detected from completed testing; triage detail with back-nav", status: "active" },
+    { label: "Executive Report", value: "Independent nav from Overview tracker with back-to-overview chevron", status: "active" },
+    { label: "Home Card Launch", value: "Start Testing button dispatches same event as Quick Action panel", status: "active" },
     { label: "Agentic Chat Sidecar", value: "Contextual agent messages for each workflow block", status: "active" },
   ];
 

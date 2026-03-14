@@ -42,7 +42,7 @@ const defaultSettings: SettingsState = {
   showBrowser: false,
   agentHubEnabled: true,
   agentHubScenario: "fieldwork-automation",
-  agentHubViewMode: "simple",
+  agentHubViewMode: "complex",
 };
 
 const STORAGE_KEY = "dashboard-settings";
@@ -57,7 +57,7 @@ function loadSettings(): SettingsState {
       const parsed = JSON.parse(stored);
       const merged = { ...defaultSettings, ...parsed };
       if (merged.agentHubViewMode !== "simple" && merged.agentHubViewMode !== "complex") {
-        merged.agentHubViewMode = "simple";
+        merged.agentHubViewMode = "complex";
       }
       if (merged.agentHubScenario !== "risk-assessment" && merged.agentHubScenario !== "fieldwork-automation") {
         merged.agentHubScenario = "fieldwork-automation";
