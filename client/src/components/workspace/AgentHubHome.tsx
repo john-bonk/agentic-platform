@@ -898,6 +898,10 @@ function OptroHome() {
     return () => window.removeEventListener("agent-hub:launch-workflow", handler);
   }, [launchControlTesting]);
 
+  const launchControlTestingFromCard = useCallback(() => {
+    window.dispatchEvent(new CustomEvent("agent-hub:launch-workflow", { detail: { workflowId: "control-testing" } }));
+  }, []);
+
   const taskItems = [
     {
       id: "task-control-testing",
@@ -906,7 +910,7 @@ function OptroHome() {
       icon: Shield,
       iconColor: "text-[#266C92]",
       iconBg: "bg-[#266C92]/10",
-      action: launchControlTesting,
+      action: launchControlTestingFromCard,
       actionLabel: "Start Testing",
       priority: "high" as const,
     },
@@ -1512,26 +1516,24 @@ function FieldworkComplexHub() {
                   <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${nextStepsExpanded ? "" : "-rotate-90"}`} />
                 </button>
                 {nextStepsExpanded && (
-                  <CardContent className="px-4 pb-4 pt-0 space-y-2 border-t border-[#266C92]/10 dark:border-[#266C92]/20">
+                  <CardContent className="px-4 pb-3 pt-0 border-t border-[#266C92]/10 dark:border-[#266C92]/20">
                     {fieldworkNextStepActions.map((a, i) => {
                       const iconMap: Record<string, typeof FileText> = { FileText, AlertTriangle, Target, Users, RefreshCcw, BarChart3 };
                       const Icon = iconMap[a.icon] || FileText;
                       return (
                         <div
                           key={i}
-                          className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-muted/10 transition-colors"
+                          className="flex items-center gap-2 py-1.5 px-1 group"
                           data-testid={`tracker-next-step-${a.actionId}`}
                         >
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <Icon className="w-3.5 h-3.5 shrink-0 text-[#266C92]" />
-                            <span className="text-xs font-medium text-foreground">{a.label}</span>
-                          </div>
-                          <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">
-                            {a.actionId === "triage-exceptions" ? `Review ${detectedExceptions.length} controls flagged with testing exceptions` : a.desc}
-                          </p>
+                          <Icon className="w-3 h-3 shrink-0 text-[#266C92]" />
+                          <span className="text-xs text-foreground flex-1 min-w-0 truncate">
+                            {a.actionId === "triage-exceptions" ? `Review ${detectedExceptions.length} testing exceptions` : a.label}
+                          </span>
                           <Button
+                            variant="ghost"
                             size="sm"
-                            className="h-6 text-[10px] bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                            className="h-5 px-2 text-[10px] text-[#266C92] hover:text-[#1e5a7a] hover:bg-[#266C92]/5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity shrink-0"
                             onClick={() => {
                               if (a.actionId === "executive-report") {
                                 useWorkflowSessionStore.getState().setPendingDetailView("executive-report");
@@ -1543,8 +1545,7 @@ function FieldworkComplexHub() {
                             }}
                             data-testid={`button-next-step-${a.actionId}`}
                           >
-                            <ArrowRight className="w-3 h-3 mr-1" />
-                            {a.actionId === "executive-report" ? "Generate Report" : a.actionId === "triage-exceptions" ? "Review Exceptions" : "Open"}
+                            <ArrowRight className="w-3 h-3" />
                           </Button>
                         </div>
                       );
@@ -1574,7 +1575,7 @@ function FieldworkComplexHub() {
                         <span className="text-center" title="Testing">Test</span>
                       </div>
 
-                      <div className="max-h-[45vh] overflow-y-auto">
+                      <div>
                       {manualControls.length > 0 && (
                         <div className="mb-2">
                           <div className="flex items-center gap-2 px-2 py-1.5">
@@ -1713,14 +1714,14 @@ function FieldworkComplexHub() {
                   )}
                 </Card>
 
-                <Card className="border border-slate-200 dark:border-border overflow-hidden" data-testid="fieldwork-activity-card">
-                  <CardHeader className="pb-2 pt-3 px-4 border-b border-slate-100 dark:border-border">
+                <Card className="border border-slate-200 dark:border-border overflow-hidden flex flex-col" data-testid="fieldwork-activity-card">
+                  <CardHeader className="pb-2 pt-3 px-4 border-b border-slate-100 dark:border-border shrink-0">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <Bot className="w-4 h-4 text-[#266C92]" />
                       Optro Assistant
                     </CardTitle>
                   </CardHeader>
-                  <div>
+                  <div className="flex-1 min-h-0 overflow-y-auto">
                     <div className="px-4 py-3 bg-[#266C92]/5 dark:bg-[#266C92]/10 border-b border-slate-100 dark:border-border" data-testid="assistant-welcome-bubble">
                       <div className="flex items-start gap-2.5">
                         <div className="w-6 h-6 rounded-full bg-[#266C92] flex items-center justify-center shrink-0 mt-0.5">

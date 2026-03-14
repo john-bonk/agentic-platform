@@ -721,29 +721,37 @@ export function HomeAssistantPanel() {
     };
   }, [settings.agentHubEnabled, addMessage]);
 
+  useEffect(() => {
+    if (!settings.agentHubEnabled) return;
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.workflowId === "control-testing") {
+        clearChat();
+        addMessage({
+          id: `msg-sidecar-init-${Date.now()}`,
+          role: "assistant",
+          content: "Launching **Automated Control Testing** workflow. I'll guide you through selecting controls, configuring data sources, mapping PBC owners, and then orchestrate parallel agentic workflows across all selected controls.\n\nLet's start by selecting which controls from the master register to include in this testing cycle.",
+          timestamp: new Date().toISOString(),
+        });
+        setOpen(true);
+      } else if (detail?.workflowId === "risk-assessment") {
+        clearChat();
+        addMessage({
+          id: `msg-sidecar-init-${Date.now()}`,
+          role: "assistant",
+          content: "Starting **Risk Assessment** workflow. I'll be working alongside you through each step — analyzing signals, recommending approaches, and handling the heavy lifting.\n\nLet me begin by synthesizing all available data points to inform our assessment strategy.",
+          timestamp: new Date().toISOString(),
+        });
+        setOpen(true);
+      }
+    };
+    window.addEventListener("agent-hub:launch-workflow", handler);
+    return () => window.removeEventListener("agent-hub:launch-workflow", handler);
+  }, [settings.agentHubEnabled, addMessage, clearChat, setOpen]);
+
   const handleQuickAction = async (action: QuickAction) => {
-    if (settings.agentHubEnabled && action.id === "risk-assessment") {
-      clearChat();
-      addMessage({
-        id: `msg-sidecar-init-${Date.now()}`,
-        role: "assistant",
-        content: "Starting **Risk Assessment** workflow. I'll be working alongside you through each step — analyzing signals, recommending approaches, and handling the heavy lifting.\n\nLet me begin by synthesizing all available data points to inform our assessment strategy.",
-        timestamp: new Date().toISOString(),
-      });
-      setOpen(true);
-      window.dispatchEvent(new CustomEvent("agent-hub:launch-workflow", { detail: { workflowId: "risk-assessment" } }));
-      return;
-    }
-    if (settings.agentHubEnabled && action.id === "control-testing") {
-      clearChat();
-      addMessage({
-        id: `msg-sidecar-init-${Date.now()}`,
-        role: "assistant",
-        content: "Launching **Automated Control Testing** workflow. I'll guide you through selecting controls, configuring data sources, mapping PBC owners, and then orchestrate parallel agentic workflows across all selected controls.\n\nLet's start by selecting which controls from the master register to include in this testing cycle.",
-        timestamp: new Date().toISOString(),
-      });
-      setOpen(true);
-      window.dispatchEvent(new CustomEvent("agent-hub:launch-workflow", { detail: { workflowId: "control-testing" } }));
+    if (settings.agentHubEnabled && (action.id === "control-testing" || action.id === "risk-assessment")) {
+      window.dispatchEvent(new CustomEvent("agent-hub:launch-workflow", { detail: { workflowId: action.id } }));
       return;
     }
     if (action.type === "workflow") {
