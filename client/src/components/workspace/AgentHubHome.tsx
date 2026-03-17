@@ -1451,10 +1451,7 @@ function FieldworkComplexHub() {
     return ctrl && ctrl.steps.testing === "complete";
   });
 
-  const stepDot = (status: string, controlId?: string, step?: string) => {
-    if (step === "testing" && status === "complete" && controlId && exceptionControlIds.has(controlId)) {
-      return <AlertTriangle className="w-3 h-3 text-red-500" />;
-    }
+  const stepDot = (status: string) => {
     switch (status) {
       case "complete": return <CheckCircle2 className="w-3 h-3 text-[#266C92]" />;
       case "running": return <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />;
@@ -1462,6 +1459,16 @@ function FieldworkComplexHub() {
       case "blocked": return <AlertCircle className="w-3 h-3 text-red-500" />;
       default: return <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600" />;
     }
+  };
+
+  const effectivenessDot = (ctrl: typeof controlStatuses[number]) => {
+    if (ctrl.steps.testing !== "complete") {
+      return <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600" />;
+    }
+    if (exceptionControlIds.has(ctrl.controlId)) {
+      return <AlertTriangle className="w-3 h-3 text-red-500" />;
+    }
+    return <ShieldCheck className="w-3 h-3 text-[#266C92]" />;
   };
 
   const blockedActions = fieldworkBlockRules
@@ -1829,13 +1836,14 @@ function FieldworkComplexHub() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-y-auto">
-                      <div className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
+                      <div className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
                         <span>Control</span>
                         <span>Source</span>
                         <span className="text-center" title="Population">Pop</span>
                         <span className="text-center" title="Sampling">Smp</span>
                         <span className="text-center" title="Evidence">Evd</span>
                         <span className="text-center" title="Testing">Test</span>
+                        <span className="text-center" title="Effectiveness">Eff</span>
                       </div>
 
                       <div>
@@ -1849,22 +1857,23 @@ function FieldworkComplexHub() {
                           </div>
                           {manualControls.map((ctrl) => {
                             const isBlocked = Object.values(ctrl.steps).some(s => s === "blocked");
-                            const hasException = ctrl.steps.testing === "complete" && exceptionControlIds.has(ctrl.controlId);
+                            const isIneffective = ctrl.steps.testing === "complete" && exceptionControlIds.has(ctrl.controlId);
                             return (
                               <div
                                 key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors ${isBlocked || hasException ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">
-                                  <span className={`text-[10px] font-mono font-semibold ${isBlocked || hasException ? "text-red-500" : "text-foreground"}`}>{ctrl.controlId}</span>
+                                  <span className={`text-[10px] font-mono font-semibold ${isBlocked || isIneffective ? "text-red-500" : "text-foreground"}`}>{ctrl.controlId}</span>
                                   <span className="text-xs text-foreground truncate">{ctrl.name}</span>
                                 </div>
                                 <span className={`text-[10px] font-medium truncate ${isBlocked ? "text-red-500" : "text-muted-foreground"}`}>{isBlocked ? "Blocked" : "PBC"}</span>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.population, ctrl.controlId, "population")}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.sampling, ctrl.controlId, "sampling")}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.evidence, ctrl.controlId, "evidence")}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.testing, ctrl.controlId, "testing")}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
+                                <div className="flex justify-center">{effectivenessDot(ctrl)}</div>
                               </div>
                             );
                           })}
@@ -1880,22 +1889,23 @@ function FieldworkComplexHub() {
                             </span>
                           </div>
                           {autoControls.map((ctrl) => {
-                            const hasException = ctrl.steps.testing === "complete" && exceptionControlIds.has(ctrl.controlId);
+                            const isIneffective = ctrl.steps.testing === "complete" && exceptionControlIds.has(ctrl.controlId);
                             return (
                               <div
                                 key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors ${hasException ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">
-                                  <span className={`text-[10px] font-mono font-semibold ${hasException ? "text-red-600 dark:text-red-400" : "text-[#266C92]"}`}>{ctrl.controlId}</span>
+                                  <span className={`text-[10px] font-mono font-semibold ${isIneffective ? "text-red-600 dark:text-red-400" : "text-[#266C92]"}`}>{ctrl.controlId}</span>
                                   <span className="text-xs text-foreground truncate">{ctrl.name}</span>
                                 </div>
                                 <span className="text-[10px] text-muted-foreground font-medium truncate">Connected</span>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.population, ctrl.controlId, "population")}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.sampling, ctrl.controlId, "sampling")}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.evidence, ctrl.controlId, "evidence")}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.testing, ctrl.controlId, "testing")}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
+                                <div className="flex justify-center">{effectivenessDot(ctrl)}</div>
                               </div>
                             );
                           })}
@@ -1911,7 +1921,10 @@ function FieldworkComplexHub() {
                       <div className="flex items-center gap-1"><AlertCircle className="w-2.5 h-2.5 text-red-500" /><span>Blocked</span></div>
                       <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full border border-slate-300 dark:border-slate-600" /><span>Pending</span></div>
                       {isComplete && (
-                        <div className="flex items-center gap-1"><AlertTriangle className="w-2.5 h-2.5 text-red-500" /><span>Exception</span></div>
+                        <>
+                          <div className="flex items-center gap-1"><ShieldCheck className="w-2.5 h-2.5 text-[#266C92]" /><span>Effective</span></div>
+                          <div className="flex items-center gap-1"><AlertTriangle className="w-2.5 h-2.5 text-red-500" /><span>Ineffective</span></div>
+                        </>
                       )}
                     </div>
                   </Card>

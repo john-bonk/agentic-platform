@@ -48,6 +48,7 @@ import {
   AlertCircle,
   ListChecks,
   PieChart,
+  ShieldCheck,
 } from "lucide-react";
 
 export interface WorkflowBlock {
@@ -2476,10 +2477,7 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
   const exceptionControlIds = useMemo(() => new Set(fieldworkExceptions.map(e => e.controlId)), []);
   const exceptionsForControl = useCallback((controlId: string) => fieldworkExceptions.filter(e => e.controlId === controlId), []);
 
-  const stepIcon = (status: string, controlId?: string, step?: string) => {
-    if (step === "testing" && status === "complete" && exceptionControlIds.has(controlId ?? "")) {
-      return <AlertTriangle className="w-3 h-3 text-red-500" />;
-    }
+  const stepIcon = (status: string) => {
     switch (status) {
       case "complete": return <CheckCircle2 className="w-3 h-3 text-[#266C92]" />;
       case "running": return <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />;
@@ -2487,6 +2485,16 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
       case "blocked": return <AlertCircle className="w-3 h-3 text-red-500" />;
       default: return <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600" />;
     }
+  };
+
+  const effectivenessIcon = (ctrl: typeof statuses[number]) => {
+    if (ctrl.steps.testing !== "complete") {
+      return <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600" />;
+    }
+    if (exceptionControlIds.has(ctrl.controlId)) {
+      return <AlertTriangle className="w-3 h-3 text-red-500" />;
+    }
+    return <ShieldCheck className="w-3 h-3 text-[#266C92]" />;
   };
 
   return (
@@ -2522,23 +2530,24 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
 
           <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
             <div className="grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 bg-slate-50 dark:bg-muted/20 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider">
-              <span>Control</span><span className="text-center">Pop.</span><span className="text-center">Samp.</span><span className="text-center">Evid.</span><span className="text-center">Test</span><span className="text-center">%</span>
+              <span>Control</span><span className="text-center">Pop.</span><span className="text-center">Samp.</span><span className="text-center">Evid.</span><span className="text-center">Test</span><span className="text-center">Eff</span>
             </div>
             <div className="max-h-64 overflow-y-auto">
-              {statuses.map(ctrl => (
-                <div key={ctrl.controlId} className={`grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/10 ${phase === "complete" && exceptionControlIds.has(ctrl.controlId) ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}>
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <span className={`text-[10px] font-mono font-medium ${phase === "complete" && exceptionControlIds.has(ctrl.controlId) ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>{ctrl.controlId}</span>
-                    <span className="text-[10px] text-muted-foreground truncate">{ctrl.name}</span>
+              {statuses.map(ctrl => {
+                const isIneffective = ctrl.steps.testing === "complete" && exceptionControlIds.has(ctrl.controlId);
+                return (
+                  <div key={ctrl.controlId} className={`grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/10 ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className={`text-[10px] font-mono font-medium ${isIneffective ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>{ctrl.controlId}</span>
+                      <span className="text-[10px] text-muted-foreground truncate">{ctrl.name}</span>
+                    </div>
+                    {fieldworkStepOrder.map(step => (
+                      <div key={step} className="flex justify-center">{stepIcon(ctrl.steps[step])}</div>
+                    ))}
+                    <div className="flex justify-center">{effectivenessIcon(ctrl)}</div>
                   </div>
-                  {fieldworkStepOrder.map(step => (
-                    <div key={step} className="flex justify-center">{stepIcon(ctrl.steps[step], ctrl.controlId, step)}</div>
-                  ))}
-                  <div className="flex items-center justify-center">
-                    <span className={`text-[9px] font-medium ${ctrl.overallProgress === 100 ? (exceptionControlIds.has(ctrl.controlId) ? "text-red-500" : "text-[#266C92]") : "text-muted-foreground"}`}>{ctrl.overallProgress}%</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -2551,7 +2560,9 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
             {phase === "complete" && (
               <>
                 <span>·</span>
-                <div className="flex items-center gap-1"><AlertTriangle className="w-2.5 h-2.5 text-red-500" /><span>Exception</span></div>
+                <div className="flex items-center gap-1"><ShieldCheck className="w-2.5 h-2.5 text-[#266C92]" /><span>Effective</span></div>
+                <span>·</span>
+                <div className="flex items-center gap-1"><AlertTriangle className="w-2.5 h-2.5 text-red-500" /><span>Ineffective</span></div>
               </>
             )}
           </div>
