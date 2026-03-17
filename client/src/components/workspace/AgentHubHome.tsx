@@ -49,6 +49,13 @@ import {
   ChevronLeft,
   RefreshCcw,
   ArrowUpRight,
+  History,
+  ClipboardCheck,
+  Fingerprint,
+  ShieldCheck,
+  GitBranch,
+  Layers,
+  Hash,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -869,11 +876,43 @@ const fieldworkSystemStatus = [
 ];
 
 
+const agentWorkflows = [
+  { id: "aw-1", name: "SOX Control Testing", agent: "Control Testing Agent", category: "direct-realtime" as AgentCategory, status: "active" as AgentStatus, progress: 0, lastActivity: "Ready to launch", humanAction: false },
+  { id: "aw-2", name: "Risk Score Monitoring", agent: "Risk Monitor", category: "continuous" as AgentCategory, status: "active" as AgentStatus, progress: 100, lastActivity: "Just now", humanAction: false },
+  { id: "aw-3", name: "Control Effectiveness Tracking", agent: "Effectiveness Agent", category: "continuous" as AgentCategory, status: "active" as AgentStatus, progress: 100, lastActivity: "5 min ago", humanAction: true },
+  { id: "aw-4", name: "Evidence Integrity Validation", agent: "Validation Agent", category: "continuous" as AgentCategory, status: "active" as AgentStatus, progress: 100, lastActivity: "2 min ago", humanAction: false },
+  { id: "aw-5", name: "Quarterly Control Review", agent: "Review Agent", category: "scheduled" as AgentCategory, status: "idle" as AgentStatus, progress: 0, lastActivity: "Scheduled: Apr 1", humanAction: false },
+  { id: "aw-6", name: "Monthly Testing Report", agent: "Reporting Agent", category: "scheduled" as AgentCategory, status: "completed" as AgentStatus, progress: 100, lastActivity: "2 days ago", humanAction: true },
+  { id: "aw-7", name: "PBC Evidence Collection", agent: "PBC Coordinator", category: "scheduled" as AgentCategory, status: "active" as AgentStatus, progress: 68, lastActivity: "12 min ago", humanAction: false },
+  { id: "aw-8", name: "Control Gap Detected — Access Mgmt", agent: "Gap Analysis Agent", category: "emergent" as AgentCategory, status: "active" as AgentStatus, progress: 45, lastActivity: "8 min ago", humanAction: false },
+  { id: "aw-9", name: "Policy Change — SOX Scope Update", agent: "Compliance Scanner", category: "emergent" as AgentCategory, status: "pending-review" as AgentStatus, progress: 100, lastActivity: "1 hr ago", humanAction: true },
+];
+
+const pendingApprovals = [
+  { id: "pa-1", title: "Approve Testing Exception — CTL-005", agent: "Testing Agent", type: "Exception Triage", timestamp: "5 min ago", severity: "high" as const },
+  { id: "pa-2", title: "Review Monthly Testing Report", agent: "Reporting Agent", type: "Report Review", timestamp: "2 days ago", severity: "medium" as const },
+  { id: "pa-3", title: "Confirm SOX Scope Change Impact", agent: "Compliance Scanner", type: "Policy Change", timestamp: "1 hr ago", severity: "high" as const },
+  { id: "pa-4", title: "Validate 3 Ineffective Controls", agent: "Effectiveness Agent", type: "Control Review", timestamp: "5 min ago", severity: "medium" as const },
+];
+
+const auditTrailEntries = [
+  { id: "at-1", timestamp: "Just now", agent: "Risk Monitor", action: "Updated 4 risk scores based on KRI feed changes", type: "auto" as const },
+  { id: "at-2", timestamp: "2 min ago", agent: "Validation Agent", action: "Verified evidence integrity for 12 samples — all passed hash check", type: "auto" as const },
+  { id: "at-3", timestamp: "5 min ago", agent: "Testing Agent", action: "Flagged CTL-005 exception — 2 journal entries missing dual approval", type: "escalation" as const },
+  { id: "at-4", timestamp: "8 min ago", agent: "Gap Analysis Agent", action: "Initiated control gap analysis for Access Management domain", type: "auto" as const },
+  { id: "at-5", timestamp: "12 min ago", agent: "PBC Coordinator", action: "Sent follow-up to David Kim — Segregation of Duties evidence overdue", type: "auto" as const },
+  { id: "at-6", timestamp: "30 min ago", agent: "Effectiveness Agent", action: "Completed effectiveness assessment for 28 controls — 3 flagged", type: "escalation" as const },
+  { id: "at-7", timestamp: "1 hr ago", agent: "Compliance Scanner", action: "SOX scope update detected — new controls identified for review", type: "escalation" as const },
+  { id: "at-8", timestamp: "2 hrs ago", agent: "Reporting Agent", action: "Generated monthly testing status report — pending human review", type: "approval" as const },
+];
+
 function OptroHome() {
   const addProject = useWorkflowSessionStore((s) => s.addProject);
   const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
   const setPendingCanvasView = useWorkflowSessionStore((s) => s.setPendingCanvasView);
   const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
+  const [agentSectionExpanded, setAgentSectionExpanded] = useState(false);
+  const [auditTrailExpanded, setAuditTrailExpanded] = useState(false);
 
   const launchControlTesting = useCallback(() => {
     const meta = workflowSessionConfigs["control-testing"];
@@ -961,16 +1000,67 @@ function OptroHome() {
     },
   ];
 
+  const activeAgentCount = agentWorkflows.filter(w => w.status === "active").length;
+  const pendingCount = pendingApprovals.length;
+  const continuousCount = agentWorkflows.filter(w => w.category === "continuous" && w.status === "active").length;
+  const escalationCount = auditTrailEntries.filter(e => e.type === "escalation").length;
+
+  const groupedWorkflows = [
+    { key: "direct-realtime" as AgentCategory, label: "Direct Action", icon: Zap, workflows: agentWorkflows.filter(w => w.category === "direct-realtime") },
+    { key: "continuous" as AgentCategory, label: "Continuous", icon: Activity, workflows: agentWorkflows.filter(w => w.category === "continuous") },
+    { key: "scheduled" as AgentCategory, label: "Scheduled", icon: CalendarClock, workflows: agentWorkflows.filter(w => w.category === "scheduled") },
+    { key: "emergent" as AgentCategory, label: "Emergent", icon: AlertTriangle, workflows: agentWorkflows.filter(w => w.category === "emergent") },
+  ];
+
   return (
     <div className="flex flex-col h-full overflow-hidden" data-testid="optro-home">
       <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background">
-        <div className="max-w-3xl mx-auto px-6 py-8">
-          <div className="mb-8">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="mb-6">
             <h1 className="text-xl font-semibold text-foreground mb-1" data-testid="text-optro-welcome">Welcome back</h1>
             <p className="text-sm text-muted-foreground">Here's what needs your attention today.</p>
           </div>
 
-          <div className="space-y-2" data-testid="optro-task-list">
+          <div className="grid grid-cols-4 gap-3 mb-6" data-testid="optro-stats-bar">
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Bot className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-[11px] text-muted-foreground font-medium">Active Agents</span>
+              </div>
+              <span className="text-xl font-bold text-foreground">{activeAgentCount}</span>
+              <span className="text-[10px] text-muted-foreground ml-1.5">of {agentWorkflows.length}</span>
+            </div>
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card">
+              <div className="flex items-center gap-2 mb-1.5">
+                <ClipboardCheck className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-[11px] text-muted-foreground font-medium">Pending Approvals</span>
+              </div>
+              <span className="text-xl font-bold text-foreground">{pendingCount}</span>
+              <span className="text-[10px] text-muted-foreground ml-1.5">awaiting review</span>
+            </div>
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Activity className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-[11px] text-muted-foreground font-medium">Continuous</span>
+              </div>
+              <span className="text-xl font-bold text-foreground">{continuousCount}</span>
+              <span className="text-[10px] text-muted-foreground ml-1.5">monitoring</span>
+            </div>
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Fingerprint className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-[11px] text-muted-foreground font-medium">Escalations</span>
+              </div>
+              <span className="text-xl font-bold text-foreground">{escalationCount}</span>
+              <span className="text-[10px] text-muted-foreground ml-1.5">in audit trail</span>
+            </div>
+          </div>
+
+          <div className="space-y-2 mb-6" data-testid="optro-task-list">
+            <div className="flex items-center gap-2 mb-1 px-1">
+              <Layers className="w-3.5 h-3.5 text-slate-400" />
+              <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Your Tasks</h2>
+            </div>
             {taskItems.map((task) => {
               const IconComp = task.icon;
               return (
@@ -1013,6 +1103,126 @@ function OptroHome() {
                 </div>
               );
             })}
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-5 mb-6">
+            <div className="space-y-3" data-testid="optro-pending-approvals">
+              <div className="flex items-center gap-2 px-1">
+                <ClipboardCheck className="w-3.5 h-3.5 text-slate-400" />
+                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pending Approvals</h2>
+                <Badge className="text-[9px] h-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-0 ml-auto">{pendingApprovals.length}</Badge>
+              </div>
+              <div className="border border-slate-200 dark:border-border rounded-lg bg-white dark:bg-card overflow-hidden divide-y divide-slate-100 dark:divide-border">
+                {pendingApprovals.map((item) => (
+                  <div key={item.id} className="px-4 py-3 flex items-start gap-3 hover:bg-slate-50 dark:hover:bg-muted/10 transition-colors cursor-pointer group" data-testid={`approval-${item.id}`}>
+                    <div className={`w-1.5 h-1.5 rounded-full mt-2 shrink-0 ${item.severity === "high" ? "bg-red-400" : "bg-slate-300 dark:bg-slate-600"}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground leading-snug">{item.title}</p>
+                      <div className="flex items-center gap-2 mt-1 text-[11px] text-muted-foreground">
+                        <Bot className="w-3 h-3" />
+                        <span>{item.agent}</span>
+                        <span>·</span>
+                        <span>{item.timestamp}</span>
+                      </div>
+                    </div>
+                    <Badge className="text-[9px] bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 shrink-0 mt-0.5">{item.type}</Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3" data-testid="optro-agent-workflows">
+              <button
+                onClick={() => setAgentSectionExpanded(!agentSectionExpanded)}
+                className="flex items-center gap-2 px-1 w-full"
+              >
+                <GitBranch className="w-3.5 h-3.5 text-slate-400" />
+                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Agent Workflows</h2>
+                <Badge className="text-[9px] h-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-0">{agentWorkflows.length}</Badge>
+                <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground ml-auto transition-transform ${agentSectionExpanded ? "" : "-rotate-90"}`} />
+              </button>
+              <div className="border border-slate-200 dark:border-border rounded-lg bg-white dark:bg-card overflow-hidden">
+                {groupedWorkflows.map((group) => {
+                  const GroupIcon = group.icon;
+                  const activeInGroup = group.workflows.filter(w => w.status === "active").length;
+                  const pendingInGroup = group.workflows.filter(w => w.humanAction).length;
+                  return (
+                    <div key={group.key} className="border-b last:border-b-0 border-slate-100 dark:border-border">
+                      <div className="px-4 py-2.5 flex items-center gap-3">
+                        <GroupIcon className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="text-sm font-medium text-foreground flex-1">{group.label}</span>
+                        <span className="text-[11px] text-muted-foreground">{activeInGroup} active</span>
+                        {pendingInGroup > 0 && (
+                          <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] border-0">{pendingInGroup} review</Badge>
+                        )}
+                      </div>
+                      {agentSectionExpanded && (
+                        <div className="pb-2 px-4 space-y-1">
+                          {group.workflows.map((wf) => (
+                            <div key={wf.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors" data-testid={`agent-wf-${wf.id}`}>
+                              {wf.status === "active" ? (
+                                <CircleDot className="w-2.5 h-2.5 text-[#266C92] shrink-0" />
+                              ) : wf.status === "pending-review" ? (
+                                <Eye className="w-2.5 h-2.5 text-[#266C92] shrink-0" />
+                              ) : wf.status === "completed" ? (
+                                <CheckCircle2 className="w-2.5 h-2.5 text-slate-400 shrink-0" />
+                              ) : (
+                                <Pause className="w-2.5 h-2.5 text-slate-300 shrink-0" />
+                              )}
+                              <span className="text-xs text-foreground flex-1 truncate">{wf.name}</span>
+                              {wf.progress > 0 && wf.progress < 100 && (
+                                <div className="flex items-center gap-1.5">
+                                  <div className="w-12 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                    <div className="h-full rounded-full bg-[#266C92]" style={{ width: `${wf.progress}%` }} />
+                                  </div>
+                                  <span className="text-[9px] text-muted-foreground w-5 text-right">{wf.progress}%</span>
+                                </div>
+                              )}
+                              <span className="text-[10px] text-muted-foreground shrink-0">{wf.lastActivity}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3" data-testid="optro-audit-trail">
+            <button
+              onClick={() => setAuditTrailExpanded(!auditTrailExpanded)}
+              className="flex items-center gap-2 px-1 w-full"
+            >
+              <History className="w-3.5 h-3.5 text-slate-400" />
+              <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Audit Trail</h2>
+              <Badge className="text-[9px] h-4 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-0">{auditTrailEntries.length} events</Badge>
+              <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground ml-auto transition-transform ${auditTrailExpanded ? "" : "-rotate-90"}`} />
+            </button>
+            {auditTrailExpanded && (
+              <div className="border border-slate-200 dark:border-border rounded-lg bg-white dark:bg-card overflow-hidden divide-y divide-slate-100 dark:divide-border animate-in slide-in-from-top-2 fade-in duration-200" data-testid="audit-trail-list">
+                {auditTrailEntries.map((entry) => (
+                  <div key={entry.id} className={`px-4 py-2.5 flex items-start gap-3 border-l-2 ${entry.type === "escalation" ? "border-l-red-300 dark:border-l-red-700" : entry.type === "approval" ? "border-l-[#266C92]" : "border-l-slate-200 dark:border-l-slate-700"}`} data-testid={`audit-entry-${entry.id}`}>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-foreground leading-relaxed">{entry.action}</p>
+                      <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
+                        <Bot className="w-2.5 h-2.5" />
+                        <span>{entry.agent}</span>
+                        <span>·</span>
+                        <span>{entry.timestamp}</span>
+                      </div>
+                    </div>
+                    {entry.type === "escalation" && (
+                      <Badge className="text-[9px] h-4 bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 border-0 shrink-0">Escalated</Badge>
+                    )}
+                    {entry.type === "approval" && (
+                      <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] border-0 shrink-0">Needs Review</Badge>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
