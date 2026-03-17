@@ -913,6 +913,7 @@ function OptroHome() {
   const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
   const [agentSectionExpanded, setAgentSectionExpanded] = useState(false);
   const [auditTrailExpanded, setAuditTrailExpanded] = useState(false);
+  const [moreTasksOpen, setMoreTasksOpen] = useState(false);
 
   const launchControlTesting = useCallback(() => {
     const meta = workflowSessionConfigs["control-testing"];
@@ -1061,48 +1062,75 @@ function OptroHome() {
               <Layers className="w-3.5 h-3.5 text-slate-400" />
               <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Your Tasks</h2>
             </div>
-            {taskItems.map((task) => {
-              const IconComp = task.icon;
-              return (
-                <div
-                  key={task.id}
-                  className={`group flex items-start gap-4 p-4 rounded-lg border bg-white dark:bg-card transition-all ${
-                    task.action
-                      ? "border-[#266C92]/30 hover:border-[#266C92] hover:shadow-sm cursor-pointer"
-                      : "border-slate-200 dark:border-border hover:bg-slate-50 dark:hover:bg-muted/10"
-                  }`}
-                  onClick={task.action}
-                  data-testid={task.id}
-                >
-                  <div className={`w-9 h-9 rounded-lg ${task.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
-                    <IconComp className={`w-4.5 h-4.5 ${task.iconColor}`} />
+            {(() => {
+              const primaryTask = taskItems.find((t) => t.priority === "high");
+              const secondaryTasks = taskItems.filter((t) => t.priority !== "high");
+              const renderTask = (task: typeof taskItems[number]) => {
+                const IconComp = task.icon;
+                return (
+                  <div
+                    key={task.id}
+                    className={`group flex items-start gap-4 p-4 rounded-lg border bg-white dark:bg-card transition-all ${
+                      task.action
+                        ? "border-[#266C92]/30 hover:border-[#266C92] hover:shadow-sm cursor-pointer"
+                        : "border-slate-200 dark:border-border hover:bg-slate-50 dark:hover:bg-muted/10"
+                    }`}
+                    onClick={task.action}
+                    data-testid={task.id}
+                  >
+                    <div className={`w-9 h-9 rounded-lg ${task.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
+                      <IconComp className={`w-4.5 h-4.5 ${task.iconColor}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h3 className="text-sm font-medium text-foreground">{task.title}</h3>
+                        {task.priority === "high" && (
+                          <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] border-0">Priority</Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{task.description}</p>
+                    </div>
+                    {task.action && (
+                      <Button
+                        size="sm"
+                        className="h-7 text-xs bg-[#266C92] hover:bg-[#1e5a7a] text-white shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => { e.stopPropagation(); task.action!(); }}
+                        data-testid={`button-${task.id}`}
+                      >
+                        <Play className="w-3 h-3 mr-1" />
+                        {task.actionLabel}
+                      </Button>
+                    )}
+                    {!task.action && (
+                      <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 mt-2 opacity-0 group-hover:opacity-50 transition-opacity" />
+                    )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <h3 className="text-sm font-medium text-foreground">{task.title}</h3>
-                      {task.priority === "high" && (
-                        <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] border-0">Priority</Badge>
+                );
+              };
+              return (
+                <>
+                  {primaryTask && renderTask(primaryTask)}
+                  {secondaryTasks.length > 0 && (
+                    <div>
+                      <button
+                        onClick={() => setMoreTasksOpen((v) => !v)}
+                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors py-1.5 px-1"
+                        data-testid="toggle-more-tasks"
+                      >
+                        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreTasksOpen ? "" : "-rotate-90"}`} />
+                        <span>More tasks</span>
+                        <span className="text-[10px] text-muted-foreground/60">({secondaryTasks.length})</span>
+                      </button>
+                      {moreTasksOpen && (
+                        <div className="space-y-2 mt-1">
+                          {secondaryTasks.map(renderTask)}
+                        </div>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{task.description}</p>
-                  </div>
-                  {task.action && (
-                    <Button
-                      size="sm"
-                      className="h-7 text-xs bg-[#266C92] hover:bg-[#1e5a7a] text-white shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
-                      onClick={(e) => { e.stopPropagation(); task.action!(); }}
-                      data-testid={`button-${task.id}`}
-                    >
-                      <Play className="w-3 h-3 mr-1" />
-                      {task.actionLabel}
-                    </Button>
                   )}
-                  {!task.action && (
-                    <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 mt-2 opacity-0 group-hover:opacity-50 transition-opacity" />
-                  )}
-                </div>
+                </>
               );
-            })}
+            })()}
           </div>
 
           <div className="grid lg:grid-cols-2 gap-5 mb-6">
