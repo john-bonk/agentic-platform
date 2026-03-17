@@ -2241,6 +2241,7 @@ export interface ControlWorkflowStatus {
   system: string | null;
   owner: string;
   steps: {
+    readiness: FieldworkStepStatus;
     population: FieldworkStepStatus;
     sampling: FieldworkStepStatus;
     evidence: FieldworkStepStatus;
@@ -2369,7 +2370,7 @@ export const fieldworkBlockRules: FieldworkBlockRule[] = [
   },
 ];
 
-const fieldworkStepOrder: (keyof ControlWorkflowStatus["steps"])[] = ["population", "sampling", "evidence", "testing"];
+const fieldworkStepOrder: (keyof ControlWorkflowStatus["steps"])[] = ["readiness", "population", "sampling", "evidence", "testing"];
 
 export function tickFieldworkStatuses(prev: ControlWorkflowStatus[], resolvedBlockIds?: Set<string>): ControlWorkflowStatus[] | null {
   let anyChange = false;
@@ -2396,12 +2397,16 @@ export function tickFieldworkStatuses(prev: ControlWorkflowStatus[], resolvedBlo
           anyChange = true;
           break;
         }
-        steps[step] = isAuto ? "running" : (step === "population" || step === "evidence" ? "waiting" : "running");
+        if (step === "readiness") {
+          steps[step] = "running";
+        } else {
+          steps[step] = isAuto ? "running" : (step === "population" || step === "evidence" ? "waiting" : "running");
+        }
         anyChange = true;
         break;
       }
       if (steps[step] === "running" || steps[step] === "waiting") {
-        const speed = isAuto ? 0.7 : (steps[step] === "waiting" ? 0.08 : 0.15);
+        const speed = step === "readiness" ? 0.85 : (isAuto ? 0.7 : (steps[step] === "waiting" ? 0.08 : 0.15));
         if (Math.random() < speed) {
           steps[step] = "complete";
           anyChange = true;
@@ -2411,7 +2416,7 @@ export function tickFieldworkStatuses(prev: ControlWorkflowStatus[], resolvedBlo
     }
     const completedSteps = fieldworkStepOrder.filter((s) => steps[s] === "complete").length;
     const runningSteps = fieldworkStepOrder.filter((s) => steps[s] === "running" || steps[s] === "waiting").length;
-    const overallProgress = Math.round(((completedSteps * 100) + (runningSteps * 40)) / 4);
+    const overallProgress = Math.round(((completedSteps * 100) + (runningSteps * 40)) / 5);
     return { ...ctrl, steps, overallProgress };
   });
   return anyChange ? next : null;
@@ -2431,7 +2436,7 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
       dataSource: c.dataSource as "connected" | "manual",
       system: c.system,
       owner: c.owner,
-      steps: { population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const },
+      steps: { readiness: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const },
       overallProgress: 0,
     }))
     .sort((a, b) => (a.dataSource === "manual" ? 0 : 1) - (b.dataSource === "manual" ? 0 : 1));
@@ -2529,14 +2534,14 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
           </div>
 
           <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
-            <div className="grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 bg-slate-50 dark:bg-muted/20 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider">
-              <span>Control</span><span className="text-center">Pop.</span><span className="text-center">Samp.</span><span className="text-center">Evid.</span><span className="text-center">Test</span><span className="text-center">Eff</span>
+            <div className="grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 bg-slate-50 dark:bg-muted/20 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Control</span><span className="text-center">Rdy.</span><span className="text-center">Pop.</span><span className="text-center">Samp.</span><span className="text-center">Evid.</span><span className="text-center">Test</span><span className="text-center">Eff</span>
             </div>
             <div className="max-h-64 overflow-y-auto">
               {statuses.map(ctrl => {
                 const isIneffective = ctrl.steps.testing === "complete" && exceptionControlIds.has(ctrl.controlId);
                 return (
-                  <div key={ctrl.controlId} className={`grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/10 ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}>
+                  <div key={ctrl.controlId} className={`grid grid-cols-[1fr_3rem_3rem_3rem_3rem_3rem_3rem] gap-1 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/10 ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}>
                     <div className="flex items-center gap-1.5 min-w-0">
                       <span className={`text-[10px] font-mono font-medium ${isIneffective ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>{ctrl.controlId}</span>
                       <span className="text-[10px] text-muted-foreground truncate">{ctrl.name}</span>
