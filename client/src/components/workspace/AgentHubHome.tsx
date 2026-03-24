@@ -2233,9 +2233,10 @@ type ControlFocusPageProps = {
   onResolve?: (controlId: string) => void;
   isResolved?: boolean;
   onAdvanceStep?: (currentStep: string) => void;
+  onViewReport?: () => void;
 };
 
-function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResolved, onAdvanceStep }: ControlFocusPageProps) {
+function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResolved, onAdvanceStep, onViewReport }: ControlFocusPageProps) {
   const master = masterControlsList.find(c => c.id === controlId);
   const exceptionControlIds = new Set(fieldworkExceptions.map(e => e.controlId));
   const exceptions = fieldworkExceptions.filter(e => e.controlId === controlId);
@@ -2675,6 +2676,19 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Button>
               )}
+
+              {isComplete && onViewReport && (
+                <Button
+                  size="sm"
+                  className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                  onClick={onViewReport}
+                  data-testid="button-view-control-report"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  View Control Summary
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -2688,6 +2702,169 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function ControlSummaryReport({ controlId, onBack }: { controlId: string; onBack: () => void }) {
+  const master = masterControlsList.find(c => c.id === controlId);
+  const exceptions = fieldworkExceptions.filter(e => e.controlId === controlId);
+  const hasException = exceptions.length > 0;
+  const passed = !hasException;
+  const totalSamples = exceptions.reduce((sum, e) => sum + e.samplesTested, 0) || 25;
+  const failedSamples = exceptions.reduce((sum, e) => sum + e.samplesFailed, 0);
+
+  const stepDetails = [
+    { step: "Control Setup", detail: "Control objective, risk classification, and testing parameters established" },
+    { step: "Population", detail: master?.dataSource === "connected" ? `Retrieved from ${master.system}` : "Population file uploaded via PBC request" },
+    { step: "Sampling", detail: `${totalSamples} items selected using statistical sampling methodology` },
+    { step: "Evidence Collection", detail: master?.dataSource === "connected" ? `Automated extraction from ${master.system}` : "Evidence collected via PBC owner submission" },
+    { step: "Understanding", detail: "Control design and implementation evaluated for operating effectiveness" },
+    { step: "Attribute Evaluation", detail: `${totalSamples} samples evaluated against ${exceptions.length > 0 ? exceptions.length + " testing attributes" : "all testing attributes"}` },
+    { step: "Test of Effectiveness", detail: passed ? "All attributes satisfied — control operating effectively" : `${failedSamples} of ${totalSamples} samples failed — exceptions identified` },
+  ];
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-background">
+      <div className="shrink-0 h-12 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          data-testid="button-control-report-back"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span>Back</span>
+        </button>
+        <div className="w-px h-5 bg-slate-200 dark:bg-border" />
+        <div className="flex items-center gap-2">
+          <FileText className="w-4 h-4 text-[#266C92]" />
+          <h2 className="text-sm font-semibold text-foreground">{controlId} — Control Testing Summary</h2>
+        </div>
+      </div>
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="p-6 max-w-4xl mx-auto space-y-6">
+          <div className="border-b border-slate-200 dark:border-border pb-4">
+            <h1 className="text-lg font-bold text-foreground" data-testid="control-report-title">{master?.name ?? controlId} — Testing Summary Report</h1>
+            <p className="text-xs text-muted-foreground mt-1">{master?.category} · FY2026 Q1 Testing Cycle · Generated March 13, 2026</p>
+          </div>
+
+          <div className="grid grid-cols-4 gap-3">
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-border text-center">
+              <p className="text-2xl font-bold text-foreground">{controlId}</p>
+              <p className="text-[10px] text-muted-foreground">Control ID</p>
+            </div>
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-border text-center">
+              <p className={`text-2xl font-bold ${master?.riskLevel === "Critical" ? "text-red-600 dark:text-red-400" : master?.riskLevel === "High" ? "text-orange-600 dark:text-orange-400" : "text-foreground"}`}>{master?.riskLevel ?? "—"}</p>
+              <p className="text-[10px] text-muted-foreground">Risk Level</p>
+            </div>
+            <div className={`p-3 rounded-lg border text-center ${passed ? "border-emerald-200 dark:border-emerald-800/30 bg-emerald-50/30 dark:bg-emerald-900/10" : "border-red-200 dark:border-red-800/30 bg-red-50/30 dark:bg-red-900/10"}`}>
+              <p className={`text-2xl font-bold ${passed ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>{passed ? "Effective" : "Exception"}</p>
+              <p className="text-[10px] text-muted-foreground">Result</p>
+            </div>
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-border text-center">
+              <p className="text-2xl font-bold text-foreground">{totalSamples}</p>
+              <p className="text-[10px] text-muted-foreground">Samples Tested</p>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
+            <div className="px-4 py-2.5 bg-slate-50 dark:bg-muted/20 border-b border-slate-200 dark:border-border">
+              <h3 className="text-xs font-semibold text-foreground">Control Details</h3>
+            </div>
+            <div className="divide-y divide-slate-100 dark:divide-border text-xs">
+              {[
+                ["Control Objective", master?.name ?? "—"],
+                ["Category", master?.category ?? "—"],
+                ["Risk Classification", master?.riskLevel ?? "—"],
+                ["Control Owner", master?.owner ?? "—"],
+                ["PBC Owner", master?.pbcOwner ?? "—"],
+                ["Data Source", master?.dataSource === "connected" ? `Connected — ${master.system}` : "Manual (PBC)"],
+              ].map(([label, value]) => (
+                <div key={label} className="flex px-4 py-2">
+                  <span className="w-40 shrink-0 text-muted-foreground">{label}</span>
+                  <span className="text-foreground font-medium">{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
+            <div className="px-4 py-2.5 bg-slate-50 dark:bg-muted/20 border-b border-slate-200 dark:border-border">
+              <h3 className="text-xs font-semibold text-foreground">Testing Pipeline Summary</h3>
+            </div>
+            <div className="divide-y divide-slate-100 dark:divide-border text-xs">
+              {stepDetails.map(({ step, detail }) => (
+                <div key={step} className="flex items-start px-4 py-2.5 gap-3">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-medium text-foreground">{step}</span>
+                    <p className="text-muted-foreground mt-0.5">{detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {passed && (
+            <div className="rounded-lg border border-emerald-200 dark:border-emerald-800/30 bg-emerald-50/30 dark:bg-emerald-900/10 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Control Operating Effectively</h3>
+              </div>
+              <p className="text-xs text-emerald-700/80 dark:text-emerald-400/80 leading-relaxed">
+                All {totalSamples} sampled items passed attribute testing. No exceptions were identified. The {master?.name} control is operating effectively for the FY2026 Q1 testing period. No further action is required.
+              </p>
+            </div>
+          )}
+
+          {!passed && exceptions.map(exc => (
+            <div key={exc.id} className="rounded-lg border border-red-200 dark:border-red-800/30 bg-red-50/20 dark:bg-red-900/5 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-500" />
+                <Badge className={`text-[9px] h-4 border-0 ${exc.severity === "high" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"}`}>{exc.severity}</Badge>
+                <h3 className="text-sm font-semibold text-foreground">{exc.title}</h3>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">{exc.detail}</p>
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <p className="text-muted-foreground mb-0.5 font-medium">Root Cause</p>
+                  <p className="text-foreground">{exc.rootCause}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-0.5 font-medium">Recommendation</p>
+                  <p className="text-foreground">{exc.recommendation}</p>
+                </div>
+              </div>
+              <div className="flex gap-4 text-[10px] text-muted-foreground pt-1 border-t border-red-100 dark:border-red-900/20">
+                <span>Samples tested: {exc.samplesTested}</span>
+                <span className="text-red-500 font-medium">Samples failed: {exc.samplesFailed}</span>
+                <span>Failure rate: {Math.round((exc.samplesFailed / exc.samplesTested) * 100)}%</span>
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground font-medium mb-1.5">Recommended Next Steps</p>
+                <ul className="space-y-1">
+                  {exc.nextSteps.map((ns, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs text-foreground">
+                      <span className="text-muted-foreground shrink-0">{i + 1}.</span>
+                      {ns}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+
+          <div className="rounded-lg border border-slate-200 dark:border-border p-4">
+            <h3 className="text-xs font-semibold text-foreground mb-2">Conclusion</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {passed
+                ? `The ${master?.name} control (${controlId}) was tested as part of the FY2026 Q1 automated control testing cycle. ${totalSamples} samples were selected and evaluated against all relevant testing attributes. All samples passed — the control is operating effectively with no exceptions or further action required.`
+                : `The ${master?.name} control (${controlId}) was tested as part of the FY2026 Q1 automated control testing cycle. ${totalSamples} samples were selected and evaluated. ${failedSamples} sample${failedSamples > 1 ? "s" : ""} failed testing, resulting in ${exceptions.length} exception${exceptions.length > 1 ? "s" : ""}. Management response and remediation plans are required within the prescribed timeline.`
+              }
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -2881,6 +3058,16 @@ function FieldworkComplexHub() {
     );
   }
 
+  if (hubDetailView?.startsWith("control-report:")) {
+    const reportControlId = hubDetailView.replace("control-report:", "");
+    return (
+      <ControlSummaryReport
+        controlId={reportControlId}
+        onBack={() => setHubDetailView(`control:${reportControlId}`)}
+      />
+    );
+  }
+
   if (hubDetailView?.startsWith("control:")) {
     const focusControlId = hubDetailView.replace("control:", "");
     const focusStatus = controlStatuses.find(s => s.controlId === focusControlId) ?? null;
@@ -2916,6 +3103,7 @@ function FieldworkComplexHub() {
         onResolve={handleResolveAction}
         isResolved={resolvedSet.has(focusControlId)}
         onAdvanceStep={focusControlId === DEMO_CONTROL_ID ? handleAdvanceDemoStep : undefined}
+        onViewReport={() => setHubDetailView(`control-report:${focusControlId}`)}
       />
     );
   }
