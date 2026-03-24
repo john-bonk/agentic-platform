@@ -649,7 +649,7 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
     const currentStatuses = (runtime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
     const completedStatuses = currentStatuses.map(s => ({
       ...s,
-      steps: { readiness: "complete", population: "complete", sampling: "complete", evidence: "complete", testing: "complete" },
+      steps: { readiness: "complete", controlSetup: "complete", population: "complete", sampling: "complete", evidence: "complete", evidenceUnderstanding: "complete", attributeEvaluation: "complete", testEffectiveness: "complete" },
       overallProgress: 100,
     }));
     if (completedStatuses.length > 0) {
@@ -673,8 +673,8 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
       if (next) {
         store.setBlockState(sessionId, "fieldwork-execution", "statuses", next);
         const allDone = next.every((s) =>
-          s.steps.population === "complete" && s.steps.sampling === "complete" &&
-          s.steps.evidence === "complete" && s.steps.testing === "complete"
+          s.steps.controlSetup === "complete" && s.steps.population === "complete" && s.steps.sampling === "complete" &&
+          s.steps.evidence === "complete" && s.steps.evidenceUnderstanding === "complete" && s.steps.attributeEvaluation === "complete" && s.steps.testEffectiveness === "complete"
         );
         if (allDone) {
           store.setBlockState(sessionId, "fieldwork-execution", "phase", "complete");
@@ -823,20 +823,23 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
           </div>
 
           <div className="space-y-0.5 max-h-48 overflow-y-auto pr-1">
-            <div className="grid grid-cols-[1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem] gap-1 px-2 py-1 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider">
-              <span>Control</span><span className="text-center">Rdy</span><span className="text-center">Pop</span><span className="text-center">Smp</span><span className="text-center">Evd</span><span className="text-center">Test</span><span className="text-center">%</span>
+            <div className="grid grid-cols-[1fr_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_2.5rem] gap-0.5 px-2 py-1 text-[7px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Control</span><span className="text-center">Rdy</span><span className="text-center">Set</span><span className="text-center">Pop</span><span className="text-center">Smp</span><span className="text-center">Evd</span><span className="text-center">Und</span><span className="text-center">Att</span><span className="text-center">Tst</span><span className="text-center">%</span>
             </div>
             {controlStatuses.map(ctrl => (
-              <div key={ctrl.controlId} className="grid grid-cols-[1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem] gap-1 px-2 py-1 rounded text-xs items-center hover:bg-slate-50 dark:hover:bg-muted/20">
+              <div key={ctrl.controlId} className="grid grid-cols-[1fr_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_2.5rem] gap-0.5 px-2 py-1 rounded text-xs items-center hover:bg-slate-50 dark:hover:bg-muted/20">
                 <div className="flex items-center gap-1 min-w-0">
                   <span className="text-[9px] font-mono font-medium text-foreground">{ctrl.controlId}</span>
                   <span className="text-[9px] text-muted-foreground truncate">{ctrl.name}</span>
                 </div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.readiness)}</div>
+                <div className="flex justify-center">{stepIcon(ctrl.steps.controlSetup)}</div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.population)}</div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.sampling)}</div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.evidence)}</div>
-                <div className="flex justify-center">{stepIcon(ctrl.steps.testing)}</div>
+                <div className="flex justify-center">{stepIcon(ctrl.steps.evidenceUnderstanding)}</div>
+                <div className="flex justify-center">{stepIcon(ctrl.steps.attributeEvaluation)}</div>
+                <div className="flex justify-center">{stepIcon(ctrl.steps.testEffectiveness)}</div>
                 <span className={`text-[8px] text-center font-medium ${ctrl.overallProgress === 100 ? "text-[#266C92]" : "text-muted-foreground"}`}>{ctrl.overallProgress}%</span>
               </div>
             ))}
@@ -1271,11 +1274,48 @@ const readinessAssessmentRows: ReadinessRow[] = [
   { category: "Sample Evidence", dataSource: "Uploaded / Requested", status: "red" },
 ];
 
-const stepStubDescriptions: Record<string, string> = {
-  population: "Population file ingestion, validation, and completeness checks against the control period.",
-  sampling: "AI-driven sample selection using risk-weighted stratification and statistical coverage targets.",
-  evidence: "Evidence collection, document matching, and completeness verification for each sample item.",
-  testing: "Automated attribute testing, exception identification, and control effectiveness determination.",
+type StepNodeInfo = {
+  nodeLabel: string;
+  aiDescription: string;
+  userTouchpoint: string;
+};
+
+const stepNodeInfo: Record<string, StepNodeInfo> = {
+  controlSetup: {
+    nodeLabel: "Node 1: Control Setup",
+    aiDescription: "AI translates descriptions/attributes into a structured test plan.",
+    userTouchpoint: "Review interpreted test plan pre-execution.",
+  },
+  population: {
+    nodeLabel: "Node 2: Population Acquisition",
+    aiDescription: "AI processes population file into a validated dataset, flagging gaps.",
+    userTouchpoint: "Review validation results and anomalies.",
+  },
+  sampling: {
+    nodeLabel: "Node 3: Sampling",
+    aiDescription: "AI applies sampling methodology to yield a reproducible sample subset.",
+    userTouchpoint: "Verify methodology, size, exclusions, and selections.",
+  },
+  evidence: {
+    nodeLabel: "Node 4: Evidence Collection",
+    aiDescription: "AI maps requirements to samples to organize sample-linked evidence.",
+    userTouchpoint: "Audit available files; upload or trigger PBC requests.",
+  },
+  evidenceUnderstanding: {
+    nodeLabel: "Node 5: Evidence Understanding",
+    aiDescription: "AI parses evidence files to extract structured, traceable data.",
+    userTouchpoint: "Review extracted key fields, values, and document classifications.",
+  },
+  attributeEvaluation: {
+    nodeLabel: "Node 6: Attribute Evaluation",
+    aiDescription: "AI tests samples against attributes yielding Pass/Fail + rationale.",
+    userTouchpoint: "Audit individual attribute reasoning and evidence references.",
+  },
+  testEffectiveness: {
+    nodeLabel: "Node 7: Test Effectiveness",
+    aiDescription: "AI cross-checks results, validates completeness, flags low-confidence.",
+    userTouchpoint: "Address flagged items requiring human judgment.",
+  },
 };
 
 function ReadinessAssessmentContent({ stepStatus }: { stepStatus: string }) {
@@ -1323,10 +1363,55 @@ function ReadinessAssessmentContent({ stepStatus }: { stepStatus: string }) {
   );
 }
 
-function StepStubContent({ step }: { step: string }) {
+function StepNodeContent({ step, stepStatus }: { step: string; stepStatus: string }) {
+  const info = stepNodeInfo[step];
+  if (!info) return null;
   return (
-    <div className="mt-3 p-4 rounded-lg border border-dashed border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10" data-testid={`step-stub-${step}`}>
-      <p className="text-xs text-muted-foreground">{stepStubDescriptions[step] ?? "Step details will appear here when available."}</p>
+    <div className="mt-3 space-y-3" data-testid={`step-node-${step}`}>
+      <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
+        <div className="px-4 py-2.5 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border">
+          <span className="text-xs font-semibold text-foreground">{info.nodeLabel}</span>
+        </div>
+        <div className="px-4 py-3 space-y-3">
+          <div>
+            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">AI Process</p>
+            <p className="text-sm text-foreground">{info.aiDescription}</p>
+          </div>
+          <div className="border-t border-slate-100 dark:border-border/50 pt-3">
+            <p className="text-[10px] font-medium uppercase tracking-wider mb-1 text-[#266C92]">User Touchpoint</p>
+            <p className="text-sm text-foreground">{info.userTouchpoint}</p>
+          </div>
+        </div>
+      </div>
+      {stepStatus === "complete" && (
+        <div className="p-3 rounded-lg bg-[#266C92]/5 border border-[#266C92]/15">
+          <p className="text-xs text-[#266C92] font-medium">Step completed successfully.</p>
+        </div>
+      )}
+      {stepStatus === "running" && (
+        <div className="p-3 rounded-lg bg-[#266C92]/5 border border-[#266C92]/15">
+          <div className="flex items-center gap-2">
+            <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />
+            <p className="text-xs text-[#266C92] font-medium">Agent processing…</p>
+          </div>
+        </div>
+      )}
+      {stepStatus === "waiting" && (
+        <div className="p-3 rounded-lg bg-amber-50/80 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-800/30">
+          <div className="flex items-center gap-2">
+            <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+            <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">Awaiting user action — {info.userTouchpoint.toLowerCase()}</p>
+          </div>
+        </div>
+      )}
+      {stepStatus === "blocked" && (
+        <div className="p-3 rounded-lg bg-red-50/80 border border-red-200 dark:bg-red-900/10 dark:border-red-800/30">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-3 h-3 text-red-500" />
+            <p className="text-xs text-red-600 dark:text-red-400 font-medium">Step blocked — requires resolution before proceeding.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1336,7 +1421,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: str
   const exceptionControlIds = new Set(fieldworkExceptions.map(e => e.controlId));
   const exceptions = fieldworkExceptions.filter(e => e.controlId === controlId);
   const hasException = exceptionControlIds.has(controlId);
-  const isComplete = controlStatus?.steps.testing === "complete";
+  const isComplete = controlStatus?.steps.testEffectiveness === "complete";
   const isEffective = isComplete && !hasException;
   const isIneffective = isComplete && hasException;
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set(["readiness"]));
@@ -1351,10 +1436,13 @@ function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: str
 
   const stepLabels: Record<string, string> = {
     readiness: "Readiness Assessment",
-    population: "Population",
+    controlSetup: "Control Setup",
+    population: "Population Acquisition",
     sampling: "Sampling",
     evidence: "Evidence Collection",
-    testing: "Testing",
+    evidenceUnderstanding: "Evidence Understanding",
+    attributeEvaluation: "Attribute Evaluation",
+    testEffectiveness: "Test Effectiveness",
   };
 
   return (
@@ -1431,7 +1519,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: str
                 <span className="text-xs text-muted-foreground ml-auto">{controlStatus.overallProgress}% complete</span>
               </div>
 
-              {(["readiness", "population", "sampling", "evidence", "testing"] as const).map((step) => {
+              {(["readiness", "controlSetup", "population", "sampling", "evidence", "evidenceUnderstanding", "attributeEvaluation", "testEffectiveness"] as const).map((step) => {
                 const status = controlStatus.steps[step];
                 const isExpanded = expandedSteps.has(step);
                 return (
@@ -1463,7 +1551,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: str
                         {step === "readiness" ? (
                           <ReadinessAssessmentContent stepStatus={status} />
                         ) : (
-                          <StepStubContent step={step} />
+                          <StepNodeContent step={step} stepStatus={status} />
                         )}
                       </div>
                     )}
@@ -1548,37 +1636,38 @@ function FieldworkComplexHub() {
     if (!fieldworkProject) return;
     const sid = fieldworkProject.sessionId;
     const currentStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
+    const pendingSteps = { readiness: "pending" as const, controlSetup: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, evidenceUnderstanding: "pending" as const, attributeEvaluation: "pending" as const, testEffectiveness: "pending" as const };
     const defaultSeedControls: ControlWorkflowStatus[] = [
-      { controlId: "CTL-001", name: "Access Provisioning", dataSource: "connected", system: "Okta IAM", owner: "IT Security", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-002", name: "Change Management", dataSource: "connected", system: "ServiceNow", owner: "IT Operations", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-003", name: "Segregation of Duties", dataSource: "manual", system: null, owner: "Internal Audit", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-004", name: "Backup & Recovery", dataSource: "connected", system: "AWS", owner: "IT Infrastructure", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-005", name: "Journal Entry Approval", dataSource: "connected", system: "SAP ERP", owner: "Controller", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-006", name: "Bank Reconciliation", dataSource: "connected", system: "SAP ERP", owner: "Treasury", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-007", name: "Revenue Recognition", dataSource: "manual", system: null, owner: "Revenue Accounting", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-008", name: "Vendor Payment Authorization", dataSource: "connected", system: "Coupa", owner: "AP Manager", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-009", name: "Physical Access Controls", dataSource: "connected", system: "Genetec", owner: "Facilities", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-010", name: "Incident Response", dataSource: "manual", system: null, owner: "CISO Office", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-011", name: "Data Classification", dataSource: "manual", system: null, owner: "Data Governance", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-012", name: "Procurement Approval", dataSource: "connected", system: "Coupa", owner: "Procurement", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-013", name: "User Access Review", dataSource: "connected", system: "Okta IAM", owner: "IT Security", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-014", name: "Financial Close Process", dataSource: "manual", system: null, owner: "Controller", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-015", name: "Third-Party Risk Assessment", dataSource: "manual", system: null, owner: "Vendor Management", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-016", name: "Privilege Escalation Monitoring", dataSource: "connected", system: "CrowdStrike", owner: "SOC Team", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-017", name: "Inventory Valuation", dataSource: "connected", system: "SAP ERP", owner: "Cost Accounting", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-018", name: "Accounts Receivable Aging", dataSource: "connected", system: "SAP ERP", owner: "AR Manager", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-019", name: "Payroll Processing Controls", dataSource: "manual", system: null, owner: "HR / Payroll", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-020", name: "Fixed Asset Capitalization", dataSource: "connected", system: "SAP ERP", owner: "Fixed Assets", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-021", name: "Database Administrator Access", dataSource: "connected", system: "CrowdStrike", owner: "IT Security", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-022", name: "Network Security Monitoring", dataSource: "connected", system: "CrowdStrike", owner: "SOC Team", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-023", name: "Business Continuity Planning", dataSource: "manual", system: null, owner: "Risk Management", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-024", name: "Whistleblower & Ethics Hotline", dataSource: "manual", system: null, owner: "Compliance", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
-      { controlId: "CTL-025", name: "Intercompany Eliminations", dataSource: "connected", system: "SAP ERP", owner: "Consolidation", steps: { readiness: "pending", population: "pending", sampling: "pending", evidence: "pending", testing: "pending" }, overallProgress: 0 },
+      { controlId: "CTL-001", name: "Access Provisioning", dataSource: "connected", system: "Okta IAM", owner: "IT Security", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-002", name: "Change Management", dataSource: "connected", system: "ServiceNow", owner: "IT Operations", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-003", name: "Segregation of Duties", dataSource: "manual", system: null, owner: "Internal Audit", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-004", name: "Backup & Recovery", dataSource: "connected", system: "AWS", owner: "IT Infrastructure", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-005", name: "Journal Entry Approval", dataSource: "connected", system: "SAP ERP", owner: "Controller", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-006", name: "Bank Reconciliation", dataSource: "connected", system: "SAP ERP", owner: "Treasury", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-007", name: "Revenue Recognition", dataSource: "manual", system: null, owner: "Revenue Accounting", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-008", name: "Vendor Payment Authorization", dataSource: "connected", system: "Coupa", owner: "AP Manager", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-009", name: "Physical Access Controls", dataSource: "connected", system: "Genetec", owner: "Facilities", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-010", name: "Incident Response", dataSource: "manual", system: null, owner: "CISO Office", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-011", name: "Data Classification", dataSource: "manual", system: null, owner: "Data Governance", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-012", name: "Procurement Approval", dataSource: "connected", system: "Coupa", owner: "Procurement", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-013", name: "User Access Review", dataSource: "connected", system: "Okta IAM", owner: "IT Security", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-014", name: "Financial Close Process", dataSource: "manual", system: null, owner: "Controller", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-015", name: "Third-Party Risk Assessment", dataSource: "manual", system: null, owner: "Vendor Management", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-016", name: "Privilege Escalation Monitoring", dataSource: "connected", system: "CrowdStrike", owner: "SOC Team", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-017", name: "Inventory Valuation", dataSource: "connected", system: "SAP ERP", owner: "Cost Accounting", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-018", name: "Accounts Receivable Aging", dataSource: "connected", system: "SAP ERP", owner: "AR Manager", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-019", name: "Payroll Processing Controls", dataSource: "manual", system: null, owner: "HR / Payroll", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-020", name: "Fixed Asset Capitalization", dataSource: "connected", system: "SAP ERP", owner: "Fixed Assets", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-021", name: "Database Administrator Access", dataSource: "connected", system: "CrowdStrike", owner: "IT Security", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-022", name: "Network Security Monitoring", dataSource: "connected", system: "CrowdStrike", owner: "SOC Team", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-023", name: "Business Continuity Planning", dataSource: "manual", system: null, owner: "Risk Management", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-024", name: "Whistleblower & Ethics Hotline", dataSource: "manual", system: null, owner: "Compliance", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-025", name: "Intercompany Eliminations", dataSource: "connected", system: "SAP ERP", owner: "Consolidation", steps: { ...pendingSteps }, overallProgress: 0 },
     ];
     const baseStatuses = currentStatuses.length > 0 ? currentStatuses : defaultSeedControls;
     const completedStatuses = baseStatuses.map((s) => ({
       ...s,
-      steps: { readiness: "complete", population: "complete", sampling: "complete", evidence: "complete", testing: "complete" },
+      steps: { readiness: "complete", controlSetup: "complete", population: "complete", sampling: "complete", evidence: "complete", evidenceUnderstanding: "complete", attributeEvaluation: "complete", testEffectiveness: "complete" },
       overallProgress: 100,
     }));
     setBlockState(sid, "fieldwork-execution", "statuses", completedStatuses);
@@ -1626,8 +1715,8 @@ function FieldworkComplexHub() {
       if (next) {
         store.setBlockState(sid, "fieldwork-execution", "statuses", next);
         const allDone = next.every((s) =>
-          s.steps.population === "complete" && s.steps.sampling === "complete" &&
-          s.steps.evidence === "complete" && s.steps.testing === "complete"
+          s.steps.controlSetup === "complete" && s.steps.population === "complete" && s.steps.sampling === "complete" &&
+          s.steps.evidence === "complete" && s.steps.evidenceUnderstanding === "complete" && s.steps.attributeEvaluation === "complete" && s.steps.testEffectiveness === "complete"
         );
         if (allDone) {
           store.setBlockState(sid, "fieldwork-execution", "phase", "complete");
@@ -1714,7 +1803,7 @@ function FieldworkComplexHub() {
 
   const detectedExceptions = fieldworkExceptions.filter(exc => {
     const ctrl = controlStatuses.find(c => c.controlId === exc.controlId);
-    return ctrl && ctrl.steps.testing === "complete";
+    return ctrl && ctrl.steps.testEffectiveness === "complete";
   });
 
   const stepDot = (status: string) => {
@@ -1728,7 +1817,7 @@ function FieldworkComplexHub() {
   };
 
   const effectivenessDot = (ctrl: typeof controlStatuses[number]) => {
-    if (ctrl.steps.testing !== "complete") {
+    if (ctrl.steps.testEffectiveness !== "complete") {
       return <div className="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-600" />;
     }
     if (exceptionControlIds.has(ctrl.controlId)) {
@@ -2102,15 +2191,18 @@ function FieldworkComplexHub() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-y-auto">
-                      <div className="grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
+                      <div className="grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
                         <span>Control</span>
                         <span>Source</span>
                         <span className="text-center" title="Readiness Assessment">Rdy</span>
-                        <span className="text-center" title="Population">Pop</span>
+                        <span className="text-center" title="Control Setup">Set</span>
+                        <span className="text-center" title="Population Acquisition">Pop</span>
                         <span className="text-center" title="Sampling">Smp</span>
-                        <span className="text-center" title="Evidence">Evd</span>
-                        <span className="text-center" title="Testing">Test</span>
-                        <span className="text-center" title="Effectiveness">Eff</span>
+                        <span className="text-center" title="Evidence Collection">Evd</span>
+                        <span className="text-center" title="Evidence Understanding">Und</span>
+                        <span className="text-center" title="Attribute Evaluation">Att</span>
+                        <span className="text-center" title="Test Effectiveness">Tst</span>
+                        <span className="text-center" title="Effectiveness Result">Eff</span>
                       </div>
 
                       <div>
@@ -2124,11 +2216,11 @@ function FieldworkComplexHub() {
                           </div>
                           {manualControls.map((ctrl) => {
                             const isBlocked = Object.values(ctrl.steps).some(s => s === "blocked");
-                            const isIneffective = ctrl.steps.testing === "complete" && exceptionControlIds.has(ctrl.controlId);
+                            const isIneffective = ctrl.steps.testEffectiveness === "complete" && exceptionControlIds.has(ctrl.controlId);
                             return (
                               <div
                                 key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
+                                className={`grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
                                 onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
@@ -2138,10 +2230,13 @@ function FieldworkComplexHub() {
                                 </div>
                                 <span className={`text-[10px] font-medium truncate ${isBlocked ? "text-red-500" : "text-muted-foreground"}`}>{isBlocked ? "Blocked" : "PBC"}</span>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.readiness)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.controlSetup)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.evidenceUnderstanding)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.attributeEvaluation)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.testEffectiveness)}</div>
                                 <div className="flex justify-center">{effectivenessDot(ctrl)}</div>
                               </div>
                             );
@@ -2158,11 +2253,11 @@ function FieldworkComplexHub() {
                             </span>
                           </div>
                           {autoControls.map((ctrl) => {
-                            const isIneffective = ctrl.steps.testing === "complete" && exceptionControlIds.has(ctrl.controlId);
+                            const isIneffective = ctrl.steps.testEffectiveness === "complete" && exceptionControlIds.has(ctrl.controlId);
                             return (
                               <div
                                 key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
+                                className={`grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
                                 onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
@@ -2172,10 +2267,13 @@ function FieldworkComplexHub() {
                                 </div>
                                 <span className="text-[10px] text-muted-foreground font-medium truncate">Connected</span>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.readiness)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.controlSetup)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.evidenceUnderstanding)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.attributeEvaluation)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.testEffectiveness)}</div>
                                 <div className="flex justify-center">{effectivenessDot(ctrl)}</div>
                               </div>
                             );
