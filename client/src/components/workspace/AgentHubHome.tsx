@@ -66,7 +66,7 @@ import {
   type AgentActivityEntry,
   type AgentCategorySummary,
 } from "@/config/agentHubConfig";
-import { WorkflowSession, ExecutiveReportView, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, fieldworkExceptions, fieldworkNextStepActions, type WorkflowSessionConfig, type ControlWorkflowStatus, type FieldworkException } from "./WorkflowSession";
+import { WorkflowSession, ExecutiveReportView, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, fieldworkExceptions, fieldworkNextStepActions, masterControlsList, type WorkflowSessionConfig, type ControlWorkflowStatus, type FieldworkException } from "./WorkflowSession";
 import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
@@ -1259,6 +1259,160 @@ function OptroHome() {
   );
 }
 
+function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: string; controlStatus: ControlWorkflowStatus | null; onBack: () => void }) {
+  const master = masterControlsList.find(c => c.id === controlId);
+  const exceptionControlIds = new Set(fieldworkExceptions.map(e => e.controlId));
+  const exceptions = fieldworkExceptions.filter(e => e.controlId === controlId);
+  const hasException = exceptionControlIds.has(controlId);
+  const isComplete = controlStatus?.steps.testing === "complete";
+  const isEffective = isComplete && !hasException;
+  const isIneffective = isComplete && hasException;
+
+  const stepLabels: Record<string, string> = {
+    readiness: "Readiness Assessment",
+    population: "Population",
+    sampling: "Sampling",
+    evidence: "Evidence Collection",
+    testing: "Testing",
+  };
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-background" data-testid={`control-focus-${controlId}`}>
+      <div className="shrink-0 h-12 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          data-testid="button-control-focus-back"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span>Overview</span>
+        </button>
+        <div className="w-px h-5 bg-slate-200 dark:bg-border" />
+        <div className="flex items-center gap-2">
+          <Shield className="w-4 h-4 text-[#266C92]" />
+          <h2 className="text-sm font-semibold text-foreground">{controlId}</h2>
+          <span className="text-sm text-muted-foreground">—</span>
+          <span className="text-sm text-foreground">{master?.name ?? controlId}</span>
+        </div>
+        {isEffective && <Badge className="ml-auto text-[10px] bg-[#266C92]/10 text-[#266C92] border-0">Effective</Badge>}
+        {isIneffective && <Badge className="ml-auto text-[10px] bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 border-0">Ineffective</Badge>}
+      </div>
+
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="max-w-4xl mx-auto px-6 py-6 space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-testid="control-focus-info-grid">
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-border">
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Category</p>
+              <p className="text-sm font-medium text-foreground">{master?.category ?? "—"}</p>
+            </div>
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-border">
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Risk Level</p>
+              <p className={`text-sm font-medium ${master?.riskLevel === "Critical" ? "text-red-600 dark:text-red-400" : master?.riskLevel === "High" ? "text-orange-600 dark:text-orange-400" : "text-foreground"}`}>{master?.riskLevel ?? "—"}</p>
+            </div>
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-border">
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Control Owner</p>
+              <p className="text-sm font-medium text-foreground">{master?.owner ?? "—"}</p>
+            </div>
+            <div className="p-3 rounded-lg border border-slate-200 dark:border-border">
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Data Source</p>
+              <p className="text-sm font-medium text-foreground">{controlStatus?.dataSource === "connected" ? master?.system ?? "Connected" : "PBC / Manual"}</p>
+            </div>
+          </div>
+
+          {master && (
+            <Card className="border border-slate-200 dark:border-border">
+              <CardHeader className="pb-2 pt-3 px-4">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <Users className="w-4 h-4 text-slate-400" />
+                  Ownership
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 pb-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Control Owner</p>
+                    <p className="text-sm text-foreground">{master.owner}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">PBC Owner</p>
+                    <p className="text-sm text-foreground">{master.pbcOwner}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {controlStatus && (
+            <Card className="border border-slate-200 dark:border-border">
+              <CardHeader className="pb-2 pt-3 px-4">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-[#266C92]" />
+                  Workflow Progress
+                  <span className="text-xs font-normal text-muted-foreground ml-auto">{controlStatus.overallProgress}% complete</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 pb-4">
+                <div className="space-y-2">
+                  {(["readiness", "population", "sampling", "evidence", "testing"] as const).map((step) => {
+                    const status = controlStatus.steps[step];
+                    return (
+                      <div key={step} className="flex items-center gap-3" data-testid={`control-step-${step}`}>
+                        <div className="w-5 flex justify-center">
+                          {status === "complete" ? <CheckCircle2 className="w-4 h-4 text-[#266C92]" /> :
+                           status === "running" ? <Loader2 className="w-4 h-4 text-[#266C92] animate-spin" /> :
+                           status === "waiting" ? <Clock className="w-4 h-4 text-slate-400" /> :
+                           status === "blocked" ? <AlertCircle className="w-4 h-4 text-red-500" /> :
+                           <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600" />}
+                        </div>
+                        <span className={`text-sm flex-1 ${status === "complete" ? "text-foreground" : status === "running" || status === "waiting" ? "text-foreground" : "text-muted-foreground"}`}>{stepLabels[step]}</span>
+                        <Badge className={`text-[9px] ${status === "complete" ? "bg-[#266C92]/10 text-[#266C92]" : status === "running" ? "bg-[#266C92]/10 text-[#266C92]" : status === "waiting" ? "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300" : status === "blocked" ? "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"} border-0`}>
+                          {status === "complete" ? "Complete" : status === "running" ? "Running" : status === "waiting" ? "Waiting" : status === "blocked" ? "Blocked" : "Pending"}
+                        </Badge>
+                      </div>
+                    );
+                  })}
+                </div>
+                {isComplete && (
+                  <div className={`mt-4 p-3 rounded-lg border ${isIneffective ? "border-red-200 dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/10" : "border-[#266C92]/20 bg-[#266C92]/5"}`}>
+                    <div className="flex items-center gap-2">
+                      {isIneffective ? <AlertTriangle className="w-4 h-4 text-red-500" /> : <ShieldCheck className="w-4 h-4 text-[#266C92]" />}
+                      <span className={`text-sm font-medium ${isIneffective ? "text-red-600 dark:text-red-400" : "text-[#266C92]"}`}>
+                        Control Effectiveness: {isIneffective ? "Ineffective" : "Effective"}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {exceptions.length > 0 && (
+            <Card className="border border-red-200 dark:border-red-800/30">
+              <CardHeader className="pb-2 pt-3 px-4">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-500" />
+                  Exceptions ({exceptions.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 pb-4 space-y-3">
+                {exceptions.map((exc) => (
+                  <div key={exc.id} className="p-3 rounded-lg border border-red-100 dark:border-red-900/20 bg-red-50/30 dark:bg-red-900/5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge className={`text-[9px] ${exc.severity === "high" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"} border-0`}>{exc.severity}</Badge>
+                      <span className="text-xs font-medium text-foreground">{exc.title}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{exc.description}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FieldworkComplexHub() {
   const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
   const addProject = useWorkflowSessionStore((s) => s.addProject);
@@ -1395,6 +1549,8 @@ function FieldworkComplexHub() {
     return () => clearInterval(timer);
   }, [isHubVisible, fieldworkProject, executionPhaseForTimer]);
 
+  const controlStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
+
   if (showCanvas && fieldworkConfig && fieldworkProject) {
     return (
       <WorkflowSession
@@ -1430,7 +1586,18 @@ function FieldworkComplexHub() {
     );
   }
 
-  const controlStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
+  if (hubDetailView?.startsWith("control:")) {
+    const focusControlId = hubDetailView.replace("control:", "");
+    const focusStatus = controlStatuses.find(s => s.controlId === focusControlId) ?? null;
+    return (
+      <ControlFocusPage
+        controlId={focusControlId}
+        controlStatus={focusStatus}
+        onBack={() => setHubDetailView(null)}
+      />
+    );
+  }
+
   const executionPhase = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.phase as string) ?? null;
   const completedIndices = new Set(fieldworkRuntime?.completedIndices ?? []);
   const activeIndex = fieldworkRuntime?.activeIndex ?? 0;
@@ -1863,7 +2030,8 @@ function FieldworkComplexHub() {
                             return (
                               <div
                                 key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors cursor-pointer ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                                onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">
@@ -1896,7 +2064,8 @@ function FieldworkComplexHub() {
                             return (
                               <div
                                 key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors cursor-pointer ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                                onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">

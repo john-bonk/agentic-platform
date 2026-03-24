@@ -1787,7 +1787,7 @@ function NextStepsBlock() {
   );
 }
 
-const masterControlsList = [
+export const masterControlsList = [
   { id: "CTL-001", name: "Access Provisioning", category: "IT General Controls", riskLevel: "High", owner: "Sarah Chen", pbcOwner: "James Park", dataSource: "connected", system: "Okta IAM" },
   { id: "CTL-002", name: "Change Management", category: "IT General Controls", riskLevel: "High", owner: "Michael Torres", pbcOwner: "Lisa Wang", dataSource: "connected", system: "ServiceNow" },
   { id: "CTL-003", name: "Segregation of Duties", category: "IT General Controls", riskLevel: "Critical", owner: "Sarah Chen", pbcOwner: "David Kim", dataSource: "manual", system: null },
