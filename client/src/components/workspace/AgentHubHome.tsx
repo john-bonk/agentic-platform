@@ -77,7 +77,7 @@ import {
   type AgentActivityEntry,
   type AgentCategorySummary,
 } from "@/config/agentHubConfig";
-import { WorkflowSession, ExecutiveReportView, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, fieldworkExceptions, fieldworkNextStepActions, masterControlsList, type WorkflowSessionConfig, type ControlWorkflowStatus, type FieldworkException } from "./WorkflowSession";
+import { WorkflowSession, ExecutiveReportView, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, fieldworkExceptions, fieldworkNextStepActions, masterControlsList, fieldworkStepOrder, DEMO_CONTROL_ID, type WorkflowSessionConfig, type ControlWorkflowStatus, type FieldworkException } from "./WorkflowSession";
 import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
@@ -1476,7 +1476,8 @@ const stepNodeInfo: Record<string, StepNodeInfo> = {
   },
 };
 
-function ReadinessAssessmentContent({ stepStatus }: { stepStatus: string }) {
+function ReadinessAssessmentContent({ stepStatus, rows }: { stepStatus: string; rows?: ReadinessRow[] }) {
+  const activeRows = rows ?? readinessAssessmentRows;
   const statusDot = (s: ReadinessRow["status"]) => {
     const colors = { green: "bg-emerald-400", amber: "bg-amber-400", red: "bg-red-500" };
     return <div className={`w-3 h-3 rounded-full ${colors[s]}`} />;
@@ -1490,7 +1491,7 @@ function ReadinessAssessmentContent({ stepStatus }: { stepStatus: string }) {
           <span className="text-xs font-semibold text-foreground">Data Source</span>
           <span className="text-xs font-semibold text-foreground text-center">AI Assessment Status</span>
         </div>
-        {readinessAssessmentRows.map((row) => (
+        {activeRows.map((row) => (
           <div key={row.category} className="grid grid-cols-[1fr_1fr_auto] gap-4 px-4 py-2.5 border-b border-slate-100 dark:border-border/50 last:border-b-0 items-center">
             <span className="text-sm text-foreground">{row.category}</span>
             <span className="text-sm text-muted-foreground">{row.dataSource}</span>
@@ -1499,11 +1500,11 @@ function ReadinessAssessmentContent({ stepStatus }: { stepStatus: string }) {
         ))}
       </div>
       {stepStatus === "complete" && (() => {
-        const hasBlockers = readinessAssessmentRows.some(r => r.status === "red");
-        const hasWarnings = readinessAssessmentRows.some(r => r.status === "amber");
+        const hasBlockers = activeRows.some(r => r.status === "red");
+        const hasWarnings = activeRows.some(r => r.status === "amber");
         if (hasBlockers) return (
           <div className="mt-3 p-3 rounded-lg bg-amber-50/80 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-800/30">
-            <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">Assessment complete. {readinessAssessmentRows.filter(r => r.status === "red").length} input(s) pending — workflow proceeds with available data; outstanding items tracked for follow-up.</p>
+            <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">Assessment complete. {activeRows.filter(r => r.status === "red").length} input(s) pending — workflow proceeds with available data; outstanding items tracked for follow-up.</p>
           </div>
         );
         if (hasWarnings) return (
@@ -1520,6 +1521,298 @@ function ReadinessAssessmentContent({ stepStatus }: { stepStatus: string }) {
     </div>
   );
 }
+
+const demoReadinessRows: ReadinessRow[] = [
+  { category: "Control Description", dataSource: "Engagement workpaper / RCM", status: "green" },
+  { category: "Control Attributes", dataSource: "RCM attribute mapping", status: "green" },
+  { category: "SoD Policy Documentation", dataSource: "Uploaded — Corporate Policy P-114", status: "green" },
+  { category: "SoD Conflict Matrix", dataSource: "PBC — pending from David Kim", status: "red" },
+  { category: "User Access Listing", dataSource: "PBC — pending from David Kim", status: "red" },
+  { category: "Role-Permission Mapping", dataSource: "PBC — IT Security Team", status: "amber" },
+  { category: "Organizational Chart", dataSource: "HR System Export", status: "green" },
+  { category: "Prior Period Findings", dataSource: "Audit Management System", status: "green" },
+];
+
+type DemoStepOutputData = {
+  title: string;
+  headers: string[];
+  rows: (string | { text: string; color?: string })[][];
+  summary?: string;
+};
+
+const demoStepOutputs: Record<string, DemoStepOutputData[]> = {
+  controlSetup: [
+    {
+      title: "Interpreted Control Objective",
+      headers: ["Field", "AI Interpretation"],
+      rows: [
+        ["Objective", "Ensure incompatible duties are segregated across financial close, AP, AR, and GL functions per Policy P-114"],
+        ["Frequency", "Continuous (preventive) with quarterly detective review"],
+        ["Assertion", "Completeness, Existence, Rights & Obligations"],
+        ["Control Type", "Preventive + Detective"],
+        ["Nature", "Manual with system-enforced role constraints"],
+      ],
+    },
+    {
+      title: "Extracted Test Attributes",
+      headers: ["#", "Attribute", "Test Criteria", "Evidence Required"],
+      rows: [
+        ["A1", "SoD Matrix Completeness", "Matrix covers all in-scope function pairs per P-114 §4.2", "Current SoD conflict matrix"],
+        ["A2", "Conflict Identification", "All actual user-role conflicts detected vs. matrix", "User access listing × role mapping"],
+        ["A3", "Remediation Timeliness", "Identified conflicts remediated within 5 business days", "Remediation log with timestamps"],
+        ["A4", "Quarterly Review Execution", "Formal quarterly review performed by control owner", "Signed review attestation + minutes"],
+        ["A5", "Exception Approval", "Any accepted SoD conflicts have documented risk acceptance", "Risk acceptance forms with sign-off"],
+      ],
+    },
+    {
+      title: "Generated Test Plan",
+      headers: ["Step", "Procedure", "Sample Basis"],
+      rows: [
+        ["1", "Obtain and inspect the current SoD conflict matrix for completeness against P-114 function pairs", "Full population"],
+        ["2", "Extract user access listing and cross-reference against role-permission mapping to identify actual conflicts", "Full population"],
+        ["3", "For identified conflicts, verify remediation was completed within SLA", "25 conflicts (risk-weighted)"],
+        ["4", "Inspect Q1–Q4 quarterly review packages for evidence of formal review and sign-off", "4 quarters"],
+        ["5", "For any accepted/waived conflicts, verify risk acceptance documentation exists", "All exceptions"],
+      ],
+    },
+  ],
+  population: [
+    {
+      title: "Population Ingestion Results",
+      headers: ["Metric", "Value", "Status"],
+      rows: [
+        ["Source File", "SoD_Conflict_Matrix_2025.xlsx", { text: "Loaded", color: "green" }],
+        ["Total Function Pairs Defined", "156", { text: "Complete", color: "green" }],
+        ["User Access Records", "3,421", { text: "Loaded", color: "green" }],
+        ["Role-Permission Mappings", "89 roles × 312 permissions", { text: "Loaded", color: "green" }],
+        ["Date Range Coverage", "Jan 1, 2025 – Dec 31, 2025", { text: "Full period", color: "green" }],
+      ],
+    },
+    {
+      title: "Validation Findings",
+      headers: ["Check", "Result", "Detail"],
+      rows: [
+        ["Schema Compliance", { text: "Pass", color: "green" }, "All required fields present"],
+        ["Duplicate Records", { text: "2 found", color: "amber" }, "UserID U-1147 and U-2903 appear twice — auto-deduplicated"],
+        ["Missing Department Codes", { text: "7 records", color: "amber" }, "7 user records lack department assignment — flagged for review"],
+        ["Date Gaps", { text: "None", color: "green" }, "Continuous coverage confirmed across audit period"],
+        ["Orphaned Roles", { text: "3 roles", color: "red" }, "Roles R-TEMP-1, R-TEMP-2, R-LEGACY not in official role registry"],
+      ],
+    },
+    {
+      title: "Anomaly Detection",
+      headers: ["Anomaly", "Count", "Severity", "Action"],
+      rows: [
+        ["Users with >5 conflicting role pairs", "12", { text: "High", color: "red" }, "Flagged for priority sampling"],
+        ["Roles assigned to >50 users", "4", { text: "Medium", color: "amber" }, "Included in stratification"],
+        ["Users in both AP-Create and AP-Approve", "23", { text: "Critical", color: "red" }, "Direct SoD violation — top priority"],
+        ["Terminated users with active access", "5", { text: "High", color: "red" }, "Cross-referenced with HR termination file"],
+      ],
+    },
+  ],
+  sampling: [
+    {
+      title: "Sampling Parameters",
+      headers: ["Parameter", "Value"],
+      rows: [
+        ["Methodology", "Risk-weighted stratified random (monetary unit sampling)"],
+        ["Confidence Level", "95%"],
+        ["Tolerable Deviation Rate", "5%"],
+        ["Expected Deviation Rate", "1%"],
+        ["Population Size", "156 function pairs × 3,421 users = identified conflicts"],
+        ["Computed Sample Size", "25 conflict instances"],
+        ["Random Seed", "0x7A3F (reproducible)"],
+      ],
+    },
+    {
+      title: "Stratification Breakdown",
+      headers: ["Stratum", "Risk Tier", "Population", "Sample", "Selection Rationale"],
+      rows: [
+        ["Financial Close + AP", { text: "Critical", color: "red" }, "23 conflicts", "8", "Direct financial statement impact"],
+        ["AP + AR Cross-Function", { text: "High", color: "red" }, "18 conflicts", "6", "Revenue/cash misstatement risk"],
+        ["IT Admin + Business Roles", { text: "High", color: "amber" }, "31 conflicts", "6", "Elevated privilege escalation risk"],
+        ["Operational Cross-Dept", { text: "Medium", color: "amber" }, "84 conflicts", "3", "Lower inherent risk — proportional"],
+        ["Master Data + Transaction", { text: "Medium", color: "amber" }, "12 conflicts", "2", "Vendor/customer master + transaction"],
+      ],
+    },
+    {
+      title: "Selected Sample Items",
+      headers: ["#", "User", "Conflicting Roles", "Function Pair", "Department"],
+      rows: [
+        ["S01", "U-1204 (M. Chen)", "AP-Create + AP-Approve", "Payables Create × Approve", "Finance"],
+        ["S02", "U-0887 (J. Park)", "GL-Post + GL-Review", "GL Posting × Review", "Accounting"],
+        ["S03", "U-2103 (L. Wang)", "AR-Invoice + AR-Receipt", "AR Invoice × Cash Receipt", "Revenue"],
+        ["S04", "U-0412 (S. Chen)", "UserAdmin + FinApprove", "User Mgmt × Financial Approval", "IT/Finance"],
+        ["S05", "U-1567 (K. Zhao)", "VendorMaster + AP-Create", "Vendor Master × AP Entry", "Procurement"],
+        ["...", "...", "...", "...", "..."],
+      ],
+    },
+  ],
+  evidence: [
+    {
+      title: "Evidence Requirements Matrix",
+      headers: ["Sample #", "Required Evidence", "Source", "Status"],
+      rows: [
+        ["S01–S25", "User access listing snapshot (per conflict date)", "PBC — David Kim", { text: "Received", color: "green" }],
+        ["S01–S25", "Role assignment change logs", "System extract — IT Security", { text: "Received", color: "green" }],
+        ["S01–S25", "SoD conflict resolution documentation", "PBC — Department heads", { text: "12/25 received", color: "amber" }],
+        ["All", "Q1–Q4 quarterly SoD review packages", "PBC — Sarah Chen", { text: "Q1-Q3 received", color: "amber" }],
+        ["All", "Risk acceptance forms (for waived conflicts)", "Audit Management System", { text: "3 forms received", color: "green" }],
+        ["S01, S04", "IT change management tickets for role changes", "ServiceNow export", { text: "Pending", color: "red" }],
+      ],
+    },
+    {
+      title: "Collection Progress",
+      headers: ["Category", "Required", "Collected", "Coverage"],
+      rows: [
+        ["Access snapshots", "25", "25", { text: "100%", color: "green" }],
+        ["Role change logs", "25", "25", { text: "100%", color: "green" }],
+        ["Conflict resolution docs", "25", "12", { text: "48%", color: "red" }],
+        ["Quarterly review packages", "4", "3", { text: "75%", color: "amber" }],
+        ["Risk acceptance forms", "3", "3", { text: "100%", color: "green" }],
+        ["Change management tickets", "2", "0", { text: "0%", color: "red" }],
+      ],
+    },
+  ],
+  evidenceUnderstanding: [
+    {
+      title: "Document Classification Results",
+      headers: ["Document", "Classified As", "Pages", "Confidence"],
+      rows: [
+        ["SoD_Matrix_2025.xlsx", "Control matrix — conflict definitions", "1 (156 pairs)", { text: "99%", color: "green" }],
+        ["UserAccess_Dec2025.csv", "User access listing — point-in-time", "3,421 records", { text: "98%", color: "green" }],
+        ["Q3_SoD_Review_Package.pdf", "Quarterly review — attestation + minutes", "12 pages", { text: "95%", color: "green" }],
+        ["RiskAcceptance_RF-2025-001.pdf", "Risk acceptance — Controller sign-off", "2 pages", { text: "97%", color: "green" }],
+        ["Resolution_S01_MChen.msg", "Email — conflict resolution evidence", "1 page", { text: "82%", color: "amber" }],
+      ],
+    },
+    {
+      title: "Extracted Key Fields",
+      headers: ["Sample", "Extracted Field", "Value", "Cross-Ref Match"],
+      rows: [
+        ["S01", "User: M. Chen — Roles at conflict date", "AP-Create + AP-Approve (assigned 2024-08-14)", { text: "Match", color: "green" }],
+        ["S01", "Conflict first detected", "2025-02-12 (SoD scan)", { text: "Match", color: "green" }],
+        ["S01", "Remediation date", "2025-02-28 (AP-Approve removed)", { text: "16 days — exceeds SLA", color: "red" }],
+        ["S02", "User: J. Park — Roles at conflict date", "GL-Post + GL-Review (assigned 2024-11-01)", { text: "Match", color: "green" }],
+        ["S02", "Remediation date", "2025-01-15 (GL-Review reassigned)", { text: "5 days — within SLA", color: "green" }],
+      ],
+    },
+    {
+      title: "Cross-Reference Validation",
+      headers: ["Check", "Population ↔ Evidence", "Result"],
+      rows: [
+        ["User IDs in sample vs access listing", "25/25 matched", { text: "Pass", color: "green" }],
+        ["Role assignments vs role registry", "23/25 matched", { text: "2 orphaned roles", color: "amber" }],
+        ["Conflict dates vs detection log", "24/25 aligned", { text: "1 date mismatch (S14)", color: "amber" }],
+        ["Remediation dates vs change logs", "12/12 aligned (received docs)", { text: "Pass (partial)", color: "amber" }],
+        ["Quarterly review dates vs calendar", "3/4 confirmed", { text: "Q4 pending", color: "red" }],
+      ],
+    },
+  ],
+  attributeEvaluation: [
+    {
+      title: "Attribute A1: SoD Matrix Completeness",
+      headers: ["Criteria", "Finding", "Result"],
+      rows: [
+        ["P-114 §4.2 function pairs covered", "156/160 pairs defined (4 missing: Treasury × IT Admin combinations)", { text: "Fail", color: "red" }],
+        ["All in-scope systems included", "SAP, Okta, Coupa covered; Workday HR not included", { text: "Fail", color: "red" }],
+        ["Matrix last updated date", "November 2025 — current", { text: "Pass", color: "green" }],
+      ],
+    },
+    {
+      title: "Attribute A2: Conflict Identification (Sample of 25)",
+      headers: ["Sample", "Conflict Detected?", "Resolution", "Result"],
+      rows: [
+        ["S01 (M. Chen)", "Yes — AP-Create + AP-Approve", "AP-Approve removed (16 days)", { text: "Pass (conflict found)", color: "green" }],
+        ["S02 (J. Park)", "Yes — GL-Post + GL-Review", "GL-Review reassigned (5 days)", { text: "Pass", color: "green" }],
+        ["S03 (L. Wang)", "Yes — AR-Invoice + AR-Receipt", "No resolution on file", { text: "Fail", color: "red" }],
+        ["S04 (S. Chen)", "Yes — UserAdmin + FinApprove", "Risk acceptance RF-2025-001", { text: "Pass (accepted risk)", color: "green" }],
+        ["...", "...", "...", "..."],
+      ],
+      summary: "22/25 conflicts properly identified and addressed. 3 failures: S03 (no resolution), S14 (date mismatch), S21 (orphaned role not detected).",
+    },
+    {
+      title: "Attribute A3: Remediation Timeliness",
+      headers: ["Sample", "SLA (5 bus. days)", "Actual Days", "Result"],
+      rows: [
+        ["S01", "5 days", "16 days", { text: "Fail — SLA exceeded", color: "red" }],
+        ["S02", "5 days", "5 days", { text: "Pass", color: "green" }],
+        ["S05", "5 days", "3 days", { text: "Pass", color: "green" }],
+        ["S08", "5 days", "8 days", { text: "Fail — SLA exceeded", color: "red" }],
+        ["S12", "5 days", "2 days", { text: "Pass", color: "green" }],
+        ["...", "...", "...", "..."],
+      ],
+      summary: "19/25 within SLA. 6 exceeded — avg overrun 7.3 days. Pattern: Finance dept remediations consistently slower.",
+    },
+    {
+      title: "Attribute A4: Quarterly Review Execution",
+      headers: ["Quarter", "Review Date", "Attendees", "Sign-off", "Result"],
+      rows: [
+        ["Q1 2025", "April 15, 2025", "S. Chen, D. Kim, M. Torres", "Signed", { text: "Pass", color: "green" }],
+        ["Q2 2025", "July 18, 2025", "S. Chen, D. Kim", "Signed", { text: "Pass", color: "green" }],
+        ["Q3 2025", "October 22, 2025", "S. Chen, D. Kim, P. Sharma", "Signed", { text: "Pass", color: "green" }],
+        ["Q4 2025", "—", "—", "—", { text: "Evidence not received", color: "red" }],
+      ],
+    },
+    {
+      title: "Overall Attribute Results",
+      headers: ["Attribute", "Pass", "Fail", "Rate", "Conclusion"],
+      rows: [
+        ["A1: Matrix Completeness", "1", "2", "33%", { text: "Fail", color: "red" }],
+        ["A2: Conflict Identification", "22", "3", "88%", { text: "Pass with exceptions", color: "amber" }],
+        ["A3: Remediation Timeliness", "19", "6", "76%", { text: "Fail — below threshold", color: "red" }],
+        ["A4: Quarterly Review", "3", "1", "75%", { text: "Fail — Q4 missing", color: "red" }],
+        ["A5: Exception Approval", "3", "0", "100%", { text: "Pass", color: "green" }],
+      ],
+      summary: "2 of 5 attributes passed. 3 attributes failed. Overall control assessment: Ineffective.",
+    },
+  ],
+  testEffectiveness: [
+    {
+      title: "Results Aggregation",
+      headers: ["Metric", "Value"],
+      rows: [
+        ["Total Attributes Tested", "5"],
+        ["Attributes Passed", "2 (A2 — with exceptions, A5)"],
+        ["Attributes Failed", "3 (A1, A3, A4)"],
+        ["Overall Pass Rate", { text: "40%", color: "red" }],
+        ["Samples Evaluated", "25 / 25 (100% coverage)"],
+        ["Individual Sample Pass Rate", "76% (19/25)"],
+      ],
+    },
+    {
+      title: "Confidence Assessment",
+      headers: ["Factor", "Assessment", "Score"],
+      rows: [
+        ["Evidence Completeness", "84% of required evidence collected (Q4 review + 13 resolution docs missing)", { text: "Medium", color: "amber" }],
+        ["Data Quality", "Population data validated; 2 dedup + 3 orphan roles resolved", { text: "High", color: "green" }],
+        ["AI Extraction Accuracy", "94% average classification confidence across 68 documents", { text: "High", color: "green" }],
+        ["Cross-Reference Integrity", "96% match rate across population-evidence joins", { text: "High", color: "green" }],
+        ["Overall Confidence", "Sufficient for conclusion — medium due to evidence gaps", { text: "Medium-High", color: "amber" }],
+      ],
+    },
+    {
+      title: "Effectiveness Conclusion",
+      headers: ["Component", "Determination"],
+      rows: [
+        ["Control Design", { text: "Effective — SoD framework and policy are well-designed", color: "green" }],
+        ["Operating Effectiveness", { text: "Ineffective — 3 of 5 attributes failed; remediation SLA routinely exceeded", color: "red" }],
+        ["Overall Conclusion", { text: "INEFFECTIVE", color: "red" }],
+        ["Exception Count", "3 reportable exceptions identified"],
+        ["Remediation Priority", { text: "High — financial close impact", color: "red" }],
+      ],
+    },
+    {
+      title: "Identified Exceptions",
+      headers: ["#", "Exception", "Severity", "Affected Samples"],
+      rows: [
+        ["EXC-A", "SoD matrix incomplete — 4 function pairs and 1 system missing from scope", { text: "High", color: "red" }, "A1 — all"],
+        ["EXC-B", "Remediation SLA exceeded in 24% of cases (6/25) — avg 7.3 days overrun", { text: "High", color: "red" }, "S01,S08,S09,S14,S17,S22"],
+        ["EXC-C", "Q4 quarterly review not performed or evidence not provided", { text: "Medium", color: "amber" }, "A4 — Q4"],
+      ],
+    },
+  ],
+};
 
 function computeSubstepStatuses(substeps: SubStepDef[], stepStatus: string): Map<string, string> {
   const map = new Map<string, string>();
@@ -1557,6 +1850,49 @@ function getStableSubstepStatuses(stepKey: string, substeps: SubStepDef[], stepS
   const result = computeSubstepStatuses(substeps, stepStatus);
   substepStatusCache.set(cacheKey, result);
   return result;
+}
+
+function DemoOutputTable({ data }: { data: DemoStepOutputData }) {
+  const cellContent = (cell: string | { text: string; color?: string }) => {
+    if (typeof cell === "string") return <span className="text-xs text-foreground">{cell}</span>;
+    const colorClass = cell.color === "green" ? "text-emerald-600 dark:text-emerald-400" :
+      cell.color === "red" ? "text-red-600 dark:text-red-400" :
+      cell.color === "amber" ? "text-amber-600 dark:text-amber-400" : "text-foreground";
+    return <span className={`text-xs font-medium ${colorClass}`}>{cell.text}</span>;
+  };
+
+  return (
+    <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
+      <div className="px-3 py-2 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border">
+        <span className="text-[10px] font-semibold text-foreground uppercase tracking-wider">{data.title}</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-slate-100 dark:border-border/50">
+              {data.headers.map((h, i) => (
+                <th key={i} className="px-3 py-1.5 text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50 dark:divide-border/30">
+            {data.rows.map((row, ri) => (
+              <tr key={ri} className="hover:bg-slate-50/50 dark:hover:bg-muted/5">
+                {row.map((cell, ci) => (
+                  <td key={ci} className="px-3 py-1.5">{cellContent(cell)}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {data.summary && (
+        <div className="px-3 py-2 border-t border-slate-100 dark:border-border/50 bg-slate-50/50 dark:bg-muted/10">
+          <p className="text-[11px] text-muted-foreground italic">{data.summary}</p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function SubStepIndicator({ status }: { status: string }) {
@@ -1640,7 +1976,15 @@ function StepNodeContent({ step, stepStatus, controlId, blockRule, onResolve, is
         </div>
       </div>
 
-      {showOutputs && info.outputRows.length > 0 && (
+      {showOutputs && controlId === DEMO_CONTROL_ID && demoStepOutputs[step] && (
+        <div className="space-y-3">
+          {demoStepOutputs[step].map((table, idx) => (
+            <DemoOutputTable key={idx} data={table} />
+          ))}
+        </div>
+      )}
+
+      {showOutputs && controlId !== DEMO_CONTROL_ID && info.outputRows.length > 0 && (
         <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
           <div className="px-4 py-2 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border">
             <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Output Summary</span>
@@ -1739,9 +2083,10 @@ type ControlFocusPageProps = {
   onBack: () => void;
   onResolve?: (controlId: string) => void;
   isResolved?: boolean;
+  onAdvanceStep?: (currentStep: string) => void;
 };
 
-function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResolved }: ControlFocusPageProps) {
+function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResolved, onAdvanceStep }: ControlFocusPageProps) {
   const master = masterControlsList.find(c => c.id === controlId);
   const exceptionControlIds = new Set(fieldworkExceptions.map(e => e.controlId));
   const exceptions = fieldworkExceptions.filter(e => e.controlId === controlId);
@@ -1750,24 +2095,49 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   const isEffective = isComplete && !hasException;
   const isIneffective = isComplete && hasException;
   const blockRule = fieldworkBlockRules.find(r => r.controlId === controlId) ?? null;
+  const isDemo = controlId === DEMO_CONTROL_ID;
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(() => {
-    if (blockRule && controlStatus) {
-      const blockedStep = Object.entries(controlStatus.steps).find(([, v]) => v === "blocked")?.[0];
-      if (blockedStep) return new Set(["readiness", blockedStep]);
+    if (isDemo) return new Set<string>();
+    if (!controlStatus) return new Set<string>();
+    const initial = new Set<string>();
+    for (const step of fieldworkStepOrder) {
+      const s = controlStatus.steps[step as keyof typeof controlStatus.steps];
+      if (s === "running" || s === "blocked" || s === "waiting") {
+        initial.add(step);
+        break;
+      }
     }
-    const activeStep = controlStatus
-      ? Object.entries(controlStatus.steps).find(([, v]) => v === "running" || v === "waiting")?.[0]
-      : undefined;
-    return new Set(activeStep ? ["readiness", activeStep] : ["readiness"]);
+    return initial;
   });
   const [actionToast, setActionToast] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleStepAction = useCallback((stepKey: string, actionId: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    setActionToast(`${actionId} triggered for ${stepKey}`);
-    toastTimerRef.current = setTimeout(() => setActionToast(null), 2500);
-  }, []);
+    const isPrimaryAdvance = actionId.startsWith("approve") || actionId.startsWith("confirm") || actionId.startsWith("finalize") || actionId.startsWith("accept") || actionId.startsWith("validate") || actionId.startsWith("run-") || actionId === "upload-evidence";
+    if (isDemo && onAdvanceStep && isPrimaryAdvance) {
+      const currentStepStatus = controlStatus?.steps[stepKey as keyof typeof controlStatus.steps];
+      if (currentStepStatus === "complete") return;
+      onAdvanceStep(stepKey);
+      setExpandedSteps(prev => {
+        const next = new Set(prev);
+        next.delete(stepKey);
+        const stepIdx = fieldworkStepOrder.indexOf(stepKey);
+        if (stepIdx < fieldworkStepOrder.length - 1) {
+          next.add(fieldworkStepOrder[stepIdx + 1]);
+        }
+        return next;
+      });
+      const stepIdx = fieldworkStepOrder.indexOf(stepKey);
+      const nextLabel = stepIdx < fieldworkStepOrder.length - 1
+        ? stepLabels[fieldworkStepOrder[stepIdx + 1]] ?? fieldworkStepOrder[stepIdx + 1]
+        : null;
+      setActionToast(nextLabel ? `Step complete — advancing to ${nextLabel}` : "All steps complete");
+    } else {
+      setActionToast(`${actionId} triggered for ${stepKey}`);
+    }
+    toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
+  }, [isDemo, onAdvanceStep]);
 
   const toggleStep = (step: string) => {
     setExpandedSteps(prev => {
@@ -1892,7 +2262,22 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
                     {isExpanded && (
                       <div className="px-4 pb-4">
                         {step === "readiness" ? (
-                          <ReadinessAssessmentContent stepStatus={status} />
+                          <div className="space-y-3">
+                            <ReadinessAssessmentContent stepStatus={status} rows={isDemo ? demoReadinessRows : undefined} />
+                            {isDemo && (status === "running" || status === "waiting") && (
+                              <div className="flex items-center gap-2 pt-1">
+                                <Button
+                                  size="sm"
+                                  className="h-7 text-xs bg-[#266C92] hover:bg-[#1e5a7a]"
+                                  onClick={() => handleStepAction("readiness", "confirm-readiness")}
+                                  data-testid="button-confirm-readiness"
+                                >
+                                  <ThumbsUp className="w-3 h-3 mr-1.5" />
+                                  Confirm Readiness
+                                </Button>
+                              </div>
+                            )}
+                          </div>
                         ) : (
                           <StepNodeContent
                             step={step}
@@ -2000,7 +2385,7 @@ function FieldworkComplexHub() {
     const defaultSeedControls: ControlWorkflowStatus[] = [
       { controlId: "CTL-001", name: "Access Provisioning", dataSource: "connected", system: "Okta IAM", owner: "IT Security", steps: { ...pendingSteps }, overallProgress: 0 },
       { controlId: "CTL-002", name: "Change Management", dataSource: "connected", system: "ServiceNow", owner: "IT Operations", steps: { ...pendingSteps }, overallProgress: 0 },
-      { controlId: "CTL-003", name: "Segregation of Duties", dataSource: "manual", system: null, owner: "Internal Audit", steps: { ...pendingSteps }, overallProgress: 0 },
+      { controlId: "CTL-003", name: "Segregation of Duties", dataSource: "manual", system: null, owner: "Internal Audit", steps: { ...pendingSteps, readiness: "running" }, overallProgress: 0 },
       { controlId: "CTL-004", name: "Backup & Recovery", dataSource: "connected", system: "AWS", owner: "IT Infrastructure", steps: { ...pendingSteps }, overallProgress: 0 },
       { controlId: "CTL-005", name: "Journal Entry Approval", dataSource: "connected", system: "SAP ERP", owner: "Controller", steps: { ...pendingSteps }, overallProgress: 0 },
       { controlId: "CTL-006", name: "Bank Reconciliation", dataSource: "connected", system: "SAP ERP", owner: "Treasury", steps: { ...pendingSteps }, overallProgress: 0 },
@@ -2136,6 +2521,29 @@ function FieldworkComplexHub() {
   if (hubDetailView?.startsWith("control:")) {
     const focusControlId = hubDetailView.replace("control:", "");
     const focusStatus = controlStatuses.find(s => s.controlId === focusControlId) ?? null;
+    const handleAdvanceDemoStep = (currentStep: string) => {
+      if (!fieldworkProject) return;
+      const sid = fieldworkProject.sessionId;
+      const currentStatuses = [...controlStatuses];
+      const idx = currentStatuses.findIndex(s => s.controlId === focusControlId);
+      if (idx === -1) return;
+      const ctrl = { ...currentStatuses[idx], steps: { ...currentStatuses[idx].steps } };
+      const currentStepStatus = ctrl.steps[currentStep as keyof typeof ctrl.steps];
+      if (currentStepStatus === "complete") return;
+      ctrl.steps[currentStep as keyof typeof ctrl.steps] = "complete";
+      const stepIdx = fieldworkStepOrder.indexOf(currentStep);
+      if (stepIdx < fieldworkStepOrder.length - 1) {
+        const nextStep = fieldworkStepOrder[stepIdx + 1];
+        const nextStatus = ctrl.steps[nextStep as keyof typeof ctrl.steps];
+        if (nextStatus !== "complete") {
+          ctrl.steps[nextStep as keyof typeof ctrl.steps] = "running";
+        }
+      }
+      const completedCount = fieldworkStepOrder.filter(s => ctrl.steps[s as keyof typeof ctrl.steps] === "complete").length;
+      ctrl.overallProgress = Math.round((completedCount / fieldworkStepOrder.length) * 100);
+      currentStatuses[idx] = ctrl;
+      setBlockState(sid, "fieldwork-execution", "statuses", currentStatuses);
+    };
     return (
       <ControlFocusPage
         controlId={focusControlId}
@@ -2143,6 +2551,7 @@ function FieldworkComplexHub() {
         onBack={() => setHubDetailView(null)}
         onResolve={handleResolveAction}
         isResolved={resolvedSet.has(focusControlId)}
+        onAdvanceStep={focusControlId === DEMO_CONTROL_ID ? handleAdvanceDemoStep : undefined}
       />
     );
   }

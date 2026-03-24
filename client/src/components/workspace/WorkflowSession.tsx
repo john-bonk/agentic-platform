@@ -380,7 +380,7 @@ export function WorkflowSession({ config, sessionId, onBack }: WorkflowSessionPr
       </div>
 
       <div ref={scrollContainerRef} className="flex-1 min-h-0 overflow-y-auto px-8 py-6">
-        <div className="max-w-3xl mx-auto">
+        <div className="w-[80%] max-w-6xl mx-auto">
           
           {config.blocks.map((block, index) => (
             <BlockWrapper
@@ -2373,12 +2373,15 @@ export const fieldworkBlockRules: FieldworkBlockRule[] = [
   },
 ];
 
-const fieldworkStepOrder: (keyof ControlWorkflowStatus["steps"])[] = ["readiness", "controlSetup", "population", "sampling", "evidence", "evidenceUnderstanding", "attributeEvaluation", "testEffectiveness"];
+export const DEMO_CONTROL_ID = "CTL-003";
+
+export const fieldworkStepOrder: (keyof ControlWorkflowStatus["steps"])[] = ["readiness", "controlSetup", "population", "sampling", "evidence", "evidenceUnderstanding", "attributeEvaluation", "testEffectiveness"];
 
 export function tickFieldworkStatuses(prev: ControlWorkflowStatus[], resolvedBlockIds?: Set<string>): ControlWorkflowStatus[] | null {
   let anyChange = false;
   const resolved = resolvedBlockIds ?? new Set<string>();
   const next = prev.map((ctrl) => {
+    if (ctrl.controlId === DEMO_CONTROL_ID) return ctrl;
     const steps = { ...ctrl.steps };
     const isAuto = ctrl.dataSource === "connected";
     const blockRule = fieldworkBlockRules.find(r => r.controlId === ctrl.controlId);
