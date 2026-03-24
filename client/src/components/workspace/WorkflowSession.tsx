@@ -2442,7 +2442,10 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
       dataSource: c.dataSource as "connected" | "manual",
       system: c.system,
       owner: c.owner,
-      steps: { readiness: "pending" as const, controlSetup: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, evidenceUnderstanding: "pending" as const, attributeEvaluation: "pending" as const, testEffectiveness: "pending" as const },
+      steps: {
+        readiness: (c.id === DEMO_CONTROL_ID ? "running" : "pending") as "running" | "pending",
+        controlSetup: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, evidenceUnderstanding: "pending" as const, attributeEvaluation: "pending" as const, testEffectiveness: "pending" as const,
+      },
       overallProgress: 0,
     }))
     .sort((a, b) => (a.dataSource === "manual" ? 0 : 1) - (b.dataSource === "manual" ? 0 : 1));

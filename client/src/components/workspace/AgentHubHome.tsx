@@ -1478,6 +1478,7 @@ const stepNodeInfo: Record<string, StepNodeInfo> = {
 
 function ReadinessAssessmentContent({ stepStatus, rows }: { stepStatus: string; rows?: ReadinessRow[] }) {
   const activeRows = rows ?? readinessAssessmentRows;
+  const isDemo = !!rows;
   const statusDot = (s: ReadinessRow["status"]) => {
     const colors = { green: "bg-emerald-400", amber: "bg-amber-400", red: "bg-red-500" };
     return <div className={`w-3 h-3 rounded-full ${colors[s]}`} />;
@@ -1495,7 +1496,7 @@ function ReadinessAssessmentContent({ stepStatus, rows }: { stepStatus: string; 
           <div key={row.category} className="grid grid-cols-[1fr_1fr_auto] gap-4 px-4 py-2.5 border-b border-slate-100 dark:border-border/50 last:border-b-0 items-center">
             <span className="text-sm text-foreground">{row.category}</span>
             <span className="text-sm text-muted-foreground">{row.dataSource}</span>
-            <div className="flex justify-center w-20">{statusDot(stepStatus === "complete" || stepStatus === "running" ? row.status : "red")}</div>
+            <div className="flex justify-center w-20">{statusDot(isDemo || stepStatus === "complete" || stepStatus === "running" ? row.status : "red")}</div>
           </div>
         ))}
       </div>
@@ -2043,7 +2044,7 @@ function StepNodeContent({ step, stepStatus, controlId, blockRule, onResolve, is
         </div>
       )}
 
-      {controlId === DEMO_CONTROL_ID && (stepStatus === "running" || stepStatus === "waiting") && (
+      {controlId === DEMO_CONTROL_ID && stepStatus !== "complete" && (
         <div className="flex items-center gap-2 flex-wrap pt-1" data-testid={`step-actions-${step}`}>
           <Button
             size="sm"
@@ -2279,7 +2280,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
                         {step === "readiness" ? (
                           <div className="space-y-3">
                             <ReadinessAssessmentContent stepStatus={status} rows={isDemo ? demoReadinessRows : undefined} />
-                            {isDemo && (status === "running" || status === "waiting") && (
+                            {isDemo && status !== "complete" && (
                               <div className="flex items-center gap-2 pt-1">
                                 <Button
                                   size="sm"
@@ -2464,21 +2465,6 @@ function FieldworkComplexHub() {
   }, [fieldworkProject, setBlockState]);
 
   useEffect(() => {
-    if (!fieldworkProject) return;
-    const sid = fieldworkProject.sessionId;
-    const store = useWorkflowSessionStore.getState();
-    const statuses = (store.runtimeStates[sid]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
-    const demoCtrl = statuses.find(s => s.controlId === DEMO_CONTROL_ID);
-    if (demoCtrl && demoCtrl.steps.readiness === "pending") {
-      const updated = statuses.map(s => {
-        if (s.controlId !== DEMO_CONTROL_ID) return s;
-        return { ...s, steps: { ...s.steps, readiness: "running" as const } };
-      });
-      store.setBlockState(sid, "fieldwork-execution", "statuses", updated);
-    }
-  }, [fieldworkProject]);
-
-  useEffect(() => {
     if (!isHubVisible || !fieldworkProject || executionPhaseForTimer !== "running") return;
     const sid = fieldworkProject.sessionId;
     const timer = setInterval(() => {
@@ -2511,7 +2497,22 @@ function FieldworkComplexHub() {
     return () => clearInterval(timer);
   }, [isHubVisible, fieldworkProject, executionPhaseForTimer]);
 
-  const controlStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
+  const rawControlStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
+  const demoNeedsFix = rawControlStatuses.some(s => s.controlId === DEMO_CONTROL_ID && s.steps.readiness === "pending");
+  const controlStatuses = useMemo(() => {
+    if (!demoNeedsFix) return rawControlStatuses;
+    return rawControlStatuses.map(s =>
+      s.controlId === DEMO_CONTROL_ID && s.steps.readiness === "pending"
+        ? { ...s, steps: { ...s.steps, readiness: "running" as const } }
+        : s
+    );
+  }, [rawControlStatuses, demoNeedsFix]);
+
+  useEffect(() => {
+    if (demoNeedsFix && fieldworkProject) {
+      setBlockState(fieldworkProject.sessionId, "fieldwork-execution", "statuses", controlStatuses);
+    }
+  }, [demoNeedsFix, fieldworkProject, controlStatuses, setBlockState]);
 
   if (showCanvas && fieldworkConfig && fieldworkProject) {
     return (
