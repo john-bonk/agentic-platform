@@ -1928,25 +1928,9 @@ function StepNodeContent({ step, stepStatus, controlId, blockRule, onResolve, is
   const substepStatuses = getStableSubstepStatuses(`${controlId}-${step}`, info.substeps, stepStatus);
   const showOutputs = stepStatus === "complete" || stepStatus === "running" || stepStatus === "waiting";
   const isBlockedAtThisStep = blockRule && blockRule.blockAtStep === step && stepStatus === "blocked";
-  const visibleActions = info.actions.filter(a => a.showWhen.includes(stepStatus));
 
   return (
     <div className="mt-3 space-y-4" data-testid={`step-node-${step}`}>
-      <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
-        <div className="px-4 py-2.5 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border flex items-center justify-between">
-          <span className="text-xs font-semibold text-foreground">{info.nodeLabel}</span>
-          {stepStatus === "running" && <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />}
-          {stepStatus === "complete" && <CheckCircle2 className="w-3 h-3 text-[#266C92]" />}
-        </div>
-        <div className="px-4 py-3 space-y-2">
-          <p className="text-xs text-muted-foreground leading-relaxed">{info.aiDescription}</p>
-          <div className="flex items-start gap-1.5 pt-1">
-            <Eye className="w-3 h-3 text-[#266C92] shrink-0 mt-0.5" />
-            <p className="text-xs text-[#266C92] font-medium">{info.userTouchpoint}</p>
-          </div>
-        </div>
-      </div>
-
       <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
         <div className="px-4 py-2 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border">
           <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Substeps</span>
@@ -2045,50 +2029,6 @@ function StepNodeContent({ step, stepStatus, controlId, blockRule, onResolve, is
         </div>
       )}
 
-      {controlId === DEMO_CONTROL_ID && stepStatus !== "complete" && (
-        <div className="flex items-center gap-2 flex-wrap pt-1" data-testid={`step-actions-${step}`}>
-          <Button
-            size="sm"
-            className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-            onClick={() => onAction?.(step, "approve-step")}
-            data-testid={`button-advance-${step}-${controlId}`}
-          >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            Approve & Continue
-          </Button>
-        </div>
-      )}
-
-      {controlId !== DEMO_CONTROL_ID && visibleActions.length > 0 && (
-        <div className="flex items-center gap-2 flex-wrap pt-1" data-testid={`step-actions-${step}`}>
-          {visibleActions.map((action) => {
-            const Icon = action.icon;
-            const handleClick = () => {
-              if (action.isResolve && onResolve) {
-                onResolve(controlId);
-                if (onAction) onAction(step, "Resolve & Resume");
-              } else if (onAction) {
-                onAction(step, action.id);
-              }
-            };
-            const isResolveDisabled = action.isResolve && isResolved;
-            return (
-              <Button
-                key={action.id}
-                size="sm"
-                variant={action.variant === "primary" ? "default" : action.variant === "outline" ? "outline" : action.variant === "destructive" ? "destructive" : "secondary"}
-                className={`h-7 text-[11px] gap-1.5 ${action.variant === "primary" ? "bg-[#266C92] hover:bg-[#1e5a7a] text-white" : ""}`}
-                onClick={handleClick}
-                disabled={!!isResolveDisabled}
-                data-testid={`button-action-${action.id}-${controlId}`}
-              >
-                <Icon className="w-3 h-3" />
-                {isResolveDisabled ? "Resolved" : action.label}
-              </Button>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }
@@ -2148,6 +2088,17 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
     testEffectiveness: "Effectiveness",
   };
 
+  const stepDescriptions: Record<string, string> = {
+    readiness: "AI evaluates required inputs and data sources to confirm the control is ready for automated testing.",
+    controlSetup: stepNodeInfo.controlSetup.aiDescription,
+    population: stepNodeInfo.population.aiDescription,
+    sampling: stepNodeInfo.sampling.aiDescription,
+    evidence: stepNodeInfo.evidence.aiDescription,
+    evidenceUnderstanding: stepNodeInfo.evidenceUnderstanding.aiDescription,
+    attributeEvaluation: stepNodeInfo.attributeEvaluation.aiDescription,
+    testEffectiveness: stepNodeInfo.testEffectiveness.aiDescription,
+  };
+
   const handleStepAction = useCallback((stepKey: string, actionId: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     const isPrimaryAdvance = actionId === "approve-step" || actionId.startsWith("approve") || actionId.startsWith("confirm") || actionId.startsWith("finalize") || actionId.startsWith("accept") || actionId.startsWith("validate") || actionId.startsWith("run-") || actionId === "upload-evidence";
@@ -2171,6 +2122,8 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
 
   const activeStep = fieldworkStepOrder[activeStepIdx];
   const activeStepStatus = controlStatus ? controlStatus.steps[activeStep as keyof typeof controlStatus.steps] : "pending";
+  const activeStepInfo = activeStep !== "readiness" ? stepNodeInfo[activeStep] : null;
+  const activeVisibleActions = activeStepInfo ? activeStepInfo.actions.filter(a => a.showWhen.includes(activeStepStatus)) : [];
 
   const canNavigateTo = (idx: number): boolean => {
     if (!controlStatus) return false;
@@ -2296,19 +2249,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
 
           {controlStatus && (
             <>
-              <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                  activeStepStatus === "complete" ? "bg-[#266C92]/10" :
-                  activeStepStatus === "running" ? "bg-[#266C92]/10" :
-                  activeStepStatus === "blocked" ? "bg-red-50 dark:bg-red-900/20" :
-                  "bg-slate-100 dark:bg-muted/30"
-                }`}>
-                  {activeStepStatus === "complete" ? <CheckCircle2 className="w-4 h-4 text-[#266C92]" /> :
-                   activeStepStatus === "running" ? <Loader2 className="w-4 h-4 text-[#266C92] animate-spin" /> :
-                   activeStepStatus === "waiting" ? <Clock className="w-4 h-4 text-slate-500" /> :
-                   activeStepStatus === "blocked" ? <AlertCircle className="w-4 h-4 text-red-500" /> :
-                   <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600" />}
-                </div>
+              <div className="flex items-center gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <h3 className="text-base font-semibold text-foreground">{stepLabels[activeStep]}</h3>
@@ -2322,7 +2263,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
                       {activeStepStatus === "complete" ? "Complete" : activeStepStatus === "running" ? "Running" : activeStepStatus === "waiting" ? "Waiting" : activeStepStatus === "blocked" ? "Blocked" : "Pending"}
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">Step {activeStepIdx + 1} of {fieldworkStepOrder.length}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Step {activeStepIdx + 1} of {fieldworkStepOrder.length}: {stepDescriptions[activeStep]}</p>
                 </div>
               </div>
 
@@ -2343,46 +2284,6 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
                       onAction={handleStepAction}
                     />
                   )}
-                </div>
-
-                <div className="px-5 py-3 border-t border-slate-100 dark:border-border/50 flex items-center justify-between bg-slate-50/50 dark:bg-muted/10 rounded-b-xl">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
-                    onClick={() => setActiveStepIdx(Math.max(0, activeStepIdx - 1))}
-                    disabled={activeStepIdx === 0}
-                    data-testid="button-step-prev"
-                  >
-                    <ChevronLeft className="w-3.5 h-3.5" />
-                    Previous
-                  </Button>
-
-                  <div className="flex items-center gap-2">
-                    {isDemo && activeStepStatus !== "complete" && (
-                      <Button
-                        size="sm"
-                        className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-                        onClick={() => handleStepAction(activeStep, "approve-step")}
-                        data-testid={`button-advance-${activeStep}-${controlId}`}
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        Approve & Continue
-                      </Button>
-                    )}
-
-                    {activeStepStatus === "complete" && activeStepIdx < fieldworkStepOrder.length - 1 && (
-                      <Button
-                        size="sm"
-                        className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-                        onClick={() => setActiveStepIdx(activeStepIdx + 1)}
-                        data-testid="button-step-next"
-                      >
-                        Next Step
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </Button>
-                    )}
-                  </div>
                 </div>
               </div>
 
@@ -2422,6 +2323,77 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
           )}
         </div>
       </div>
+
+      {controlStatus && (
+        <div className="shrink-0 px-6 py-3 border-t border-slate-200 dark:border-border bg-white dark:bg-card">
+          <div className="w-[80%] max-w-6xl mx-auto flex items-center justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
+              onClick={() => setActiveStepIdx(Math.max(0, activeStepIdx - 1))}
+              disabled={activeStepIdx === 0}
+              data-testid="button-step-prev"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              Previous Step
+            </Button>
+
+            <div className="flex items-center gap-2">
+              {isDemo && activeStepStatus !== "complete" && (
+                <Button
+                  size="sm"
+                  className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                  onClick={() => handleStepAction(activeStep, "approve-step")}
+                  data-testid={`button-advance-${activeStep}-${controlId}`}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Approve & Continue
+                </Button>
+              )}
+
+              {!isDemo && activeVisibleActions.length > 0 && activeVisibleActions.map((action) => {
+                const Icon = action.icon;
+                const handleClick = () => {
+                  if (action.isResolve && onResolve) {
+                    onResolve(controlId);
+                    handleStepAction(activeStep, "Resolve & Resume");
+                  } else {
+                    handleStepAction(activeStep, action.id);
+                  }
+                };
+                const isResolveDisabled = action.isResolve && isResolved;
+                return (
+                  <Button
+                    key={action.id}
+                    size="sm"
+                    variant={action.variant === "primary" ? "default" : action.variant === "outline" ? "outline" : action.variant === "destructive" ? "destructive" : "secondary"}
+                    className={`h-8 text-xs gap-1.5 ${action.variant === "primary" ? "bg-[#266C92] hover:bg-[#1e5a7a] text-white" : ""}`}
+                    onClick={handleClick}
+                    disabled={!!isResolveDisabled}
+                    data-testid={`button-action-${action.id}-${controlId}`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {isResolveDisabled ? "Resolved" : action.label}
+                  </Button>
+                );
+              })}
+
+              {activeStepStatus === "complete" && activeStepIdx < fieldworkStepOrder.length - 1 && (
+                <Button
+                  size="sm"
+                  className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                  onClick={() => setActiveStepIdx(activeStepIdx + 1)}
+                  data-testid="button-step-next"
+                >
+                  Next Step
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {actionToast && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
