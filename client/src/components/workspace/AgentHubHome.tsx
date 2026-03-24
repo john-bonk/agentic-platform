@@ -1322,7 +1322,6 @@ const stepNodeInfo: Record<string, StepNodeInfo> = {
       { id: "cs-interpret", label: "Control Description Interpretation", description: "AI parses narrative control description into structured fields", icon: Search },
       { id: "cs-extract", label: "Attribute Extraction", description: "Identify testable attributes from control documentation", icon: Table2 },
       { id: "cs-plan", label: "Test Plan Generation", description: "Compose step-by-step test plan aligned to extracted attributes", icon: ClipboardCheck },
-      { id: "cs-review", label: "User Review Gate", description: "Auditor reviews and approves the generated test plan", icon: Eye },
     ],
     actions: [
       { id: "approve-plan", label: "Approve Test Plan", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "running", "complete"] },
@@ -1391,7 +1390,6 @@ const stepNodeInfo: Record<string, StepNodeInfo> = {
       { id: "evd-map", label: "Requirement Mapping", description: "Map each sample item to its required evidence types", icon: Table2 },
       { id: "evd-source", label: "Source Identification", description: "Match required evidence to available connected systems or file uploads", icon: Search },
       { id: "evd-collect", label: "Collection & Upload", description: "Pull from connected sources or accept manual uploads", icon: Upload },
-      { id: "evd-verify", label: "Completeness Verification", description: "Confirm all sample items have minimum required evidence coverage", icon: FileCheck },
     ],
     actions: [
       { id: "upload-evidence", label: "Upload Evidence", variant: "primary", icon: Upload, showWhen: ["waiting", "running", "blocked"] },
@@ -1820,19 +1818,39 @@ const demoSubstepOutputs: Record<string, DemoStepOutputData[]> = {
   "cs-interpret": [demoStepOutputs.controlSetup[0]],
   "cs-extract": [demoStepOutputs.controlSetup[1]],
   "cs-plan": [demoStepOutputs.controlSetup[2]],
-  "cs-review": [],
   "pop-ingest": [demoStepOutputs.population[0]],
   "pop-validate": [demoStepOutputs.population[1]],
-  "pop-complete": [],
+  "pop-complete": [{
+    title: "Completeness Assessment",
+    headers: ["Dimension", "Expected", "Actual", "Coverage"],
+    rows: [
+      ["Control Period", "Jan – Dec 2025", "Jan – Dec 2025", { text: "100%", color: "green" }],
+      ["Entity Scope", "5 business units", "5 business units", { text: "100%", color: "green" }],
+      ["Function Pairs (P-114)", "160", "156 defined", { text: "97.5%", color: "amber" }],
+      ["User Population", "All active users", "3,421 (incl. 5 termed)", { text: "100%", color: "green" }],
+      ["Source Systems", "SAP, Okta, Coupa", "3 / 3 connected", { text: "100%", color: "green" }],
+    ],
+  }],
   "pop-anomaly": [demoStepOutputs.population[2]],
   "smp-method": [demoStepOutputs.sampling[0]],
   "smp-stratify": [demoStepOutputs.sampling[1]],
-  "smp-size": [],
+  "smp-size": [{
+    title: "Sample Size Calculation",
+    headers: ["Parameter", "Value"],
+    rows: [
+      ["Formula", "n = (Z² × p × (1−p)) / e²"],
+      ["Z-Score (95% confidence)", "1.96"],
+      ["Expected Deviation Rate (p)", "1%"],
+      ["Tolerable Deviation Rate (e)", "5%"],
+      ["Raw Computed Size", "16"],
+      ["Risk-Adjusted Final Size", { text: "25", color: "green" }],
+      ["Adjustment Rationale", "Upward adjustment for 3 critical-risk strata and prior-period findings"],
+    ],
+  }],
   "smp-select": [demoStepOutputs.sampling[2]],
   "evd-map": [demoStepOutputs.evidence[0]],
   "evd-source": [],
   "evd-collect": [demoStepOutputs.evidence[1]],
-  "evd-verify": [],
   "eu-classify": [demoStepOutputs.evidenceUnderstanding[0]],
   "eu-extract": [demoStepOutputs.evidenceUnderstanding[1]],
   "eu-parse": [],
@@ -1846,6 +1864,96 @@ const demoSubstepOutputs: Record<string, DemoStepOutputData[]> = {
   "te-confidence": [demoStepOutputs.testEffectiveness[1]],
   "te-conclude": [demoStepOutputs.testEffectiveness[2], demoStepOutputs.testEffectiveness[3]],
 };
+
+const demoStepBehavior: Record<string, { autoProgress: boolean; pauseAtSubstep?: number }> = {
+  controlSetup: { autoProgress: true },
+  population: { autoProgress: true, pauseAtSubstep: 0 },
+  sampling: { autoProgress: true },
+  evidence: { autoProgress: true, pauseAtSubstep: 2 },
+  evidenceUnderstanding: { autoProgress: true },
+  attributeEvaluation: { autoProgress: true },
+  testEffectiveness: { autoProgress: true },
+};
+
+const evidenceTrackerItems = [
+  { label: "User access listing snapshots", source: "PBC — David Kim", delay: 800 },
+  { label: "Role assignment change logs", source: "System extract — IT Security", delay: 700 },
+  { label: "SoD conflict resolution docs", source: "PBC — Department heads", delay: 1200 },
+  { label: "Quarterly SoD review packages", source: "PBC — Sarah Chen", delay: 900 },
+  { label: "Risk acceptance forms", source: "Audit Management System", delay: 600 },
+  { label: "IT change management tickets", source: "ServiceNow export", delay: 1000 },
+];
+
+function EvidenceCollectionTracker({ onComplete }: { onComplete: () => void }) {
+  const [receivedCount, setReceivedCount] = useState(0);
+  const completedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    if (receivedCount >= evidenceTrackerItems.length) {
+      if (!completedRef.current) {
+        completedRef.current = true;
+        const t = setTimeout(() => onCompleteRef.current(), 600);
+        return () => clearTimeout(t);
+      }
+      return;
+    }
+    const delay = evidenceTrackerItems[receivedCount].delay;
+    const t = setTimeout(() => setReceivedCount(prev => prev + 1), delay);
+    return () => clearTimeout(t);
+  }, [receivedCount]);
+
+  const allDone = receivedCount >= evidenceTrackerItems.length;
+
+  return (
+    <div className="space-y-2" data-testid="evidence-tracker">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Evidence Request Tracker</span>
+        <span className={`text-[10px] font-medium ${allDone ? "text-emerald-600 dark:text-emerald-400" : "text-[#266C92]"}`}>
+          {receivedCount} / {evidenceTrackerItems.length} received
+        </span>
+      </div>
+      <div className="w-full h-1.5 bg-slate-100 dark:bg-muted/30 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${allDone ? "bg-emerald-500" : "bg-[#266C92]"}`}
+          style={{ width: `${(receivedCount / evidenceTrackerItems.length) * 100}%` }}
+        />
+      </div>
+      <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
+        <div className="grid grid-cols-[1fr_1fr_auto] gap-3 px-3 py-1.5 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border">
+          <span className="text-[10px] font-semibold text-foreground">Evidence Request</span>
+          <span className="text-[10px] font-semibold text-foreground">Source</span>
+          <span className="text-[10px] font-semibold text-foreground text-center w-20">Status</span>
+        </div>
+        {evidenceTrackerItems.map((item, idx) => {
+          const status = idx < receivedCount ? "received" : idx === receivedCount ? "receiving" : "queued";
+          return (
+            <div key={idx} className={`grid grid-cols-[1fr_1fr_auto] gap-3 px-3 py-2 border-b last:border-b-0 border-slate-100 dark:border-border/50 ${
+              status === "receiving" ? "bg-[#266C92]/[0.03]" : ""
+            }`}>
+              <span className="text-xs text-foreground">{item.label}</span>
+              <span className="text-xs text-muted-foreground">{item.source}</span>
+              <div className="w-20 flex items-center justify-center">
+                {status === "received" ? (
+                  <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Received
+                  </span>
+                ) : status === "receiving" ? (
+                  <span className="text-[10px] font-medium text-[#266C92] flex items-center gap-1">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Receiving
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground">Queued</span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 function DemoOutputTable({ data }: { data: DemoStepOutputData }) {
   const cellContent = (cell: string | { text: string; color?: string }) => {
@@ -1907,15 +2015,24 @@ type StepNodeContentProps = {
   onResolve?: (controlId: string) => void;
   isResolved?: boolean;
   onAction?: (stepKey: string, actionId: string) => void;
+  onSubstepAction?: (substepId: string, action: string) => void;
+  autoExpandedSubs?: Set<string>;
 };
 
-function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule }: StepNodeContentProps) {
+function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule, onSubstepAction, autoExpandedSubs }: StepNodeContentProps) {
   const info = stepNodeInfo[step];
   if (!info) return null;
 
   const [expandedSubs, setExpandedSubs] = useState<Set<string>>(() => new Set());
   const isBlockedAtThisStep = blockRule && blockRule.blockAtStep === step && stepStatus === "blocked";
   const isDemo = controlId === DEMO_CONTROL_ID;
+  const allSubsDone = substepProgress >= info.substeps.length;
+
+  const mergedExpanded = useMemo(() => {
+    const s = new Set(expandedSubs);
+    if (autoExpandedSubs) autoExpandedSubs.forEach(id => s.add(id));
+    return s;
+  }, [expandedSubs, autoExpandedSubs]);
 
   const toggleSub = (id: string) => {
     setExpandedSubs(prev => {
@@ -1934,14 +2051,16 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
             ? "blocked"
             : idx === substepProgress && stepStatus === "waiting"
               ? "waiting"
-              : idx === substepProgress && stepStatus === "running"
+              : idx === substepProgress && (stepStatus === "running")
                 ? "running"
                 : "pending";
         const SubIcon = sub.icon;
         const isExpandable = subStatus === "complete";
-        const isExpanded = expandedSubs.has(sub.id);
+        const isExpanded = mergedExpanded.has(sub.id);
         const outputs = isDemo ? (demoSubstepOutputs[sub.id] ?? []) : [];
         const hasContent = outputs.length > 0;
+        const showInlineUpload = isDemo && sub.id === "pop-ingest" && subStatus === "running";
+        const showEvidenceTracker = isDemo && sub.id === "evd-collect" && subStatus === "running";
 
         return (
           <div
@@ -1977,6 +2096,38 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               )}
             </button>
 
+            {showInlineUpload && (
+              <div className="px-3.5 pb-3 pt-1 border-t border-slate-100 dark:border-border/50">
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-[11px] gap-1.5"
+                    onClick={() => onSubstepAction?.("pop-ingest", "request")}
+                    data-testid="button-population-request"
+                  >
+                    <Send className="w-3 h-3" />
+                    Request
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="h-7 text-[11px] gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                    onClick={() => onSubstepAction?.("pop-ingest", "upload")}
+                    data-testid="button-population-upload"
+                  >
+                    <Upload className="w-3 h-3" />
+                    Upload
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {showEvidenceTracker && (
+              <div className="px-3.5 pb-3 pt-2 border-t border-slate-100 dark:border-border/50">
+                <EvidenceCollectionTracker onComplete={() => onSubstepAction?.("evd-collect", "tracker-complete")} />
+              </div>
+            )}
+
             {isExpanded && hasContent && (
               <div className="px-3.5 pb-3 pt-1 border-t border-slate-100 dark:border-border/50 space-y-2">
                 {outputs.map((table, tIdx) => (
@@ -2010,11 +2161,20 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
         </div>
       )}
 
-      {stepStatus === "running" && (
+      {stepStatus === "running" && allSubsDone && (
+        <div className="p-2.5 rounded-lg bg-emerald-50/50 border border-emerald-200/50 dark:bg-emerald-900/10 dark:border-emerald-800/30">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">All substeps complete — awaiting your confirmation to proceed.</p>
+          </div>
+        </div>
+      )}
+
+      {stepStatus === "running" && !allSubsDone && (
         <div className="p-2.5 rounded-lg bg-[#266C92]/5 border border-[#266C92]/15">
           <div className="flex items-center gap-2">
             <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />
-            <p className="text-xs text-[#266C92] font-medium">Agent processing — substep {substepProgress + 1} of {info.substeps.length}</p>
+            <p className="text-xs text-[#266C92] font-medium">Agent processing — substep {Math.min(substepProgress + 1, info.substeps.length)} of {info.substeps.length}</p>
           </div>
         </div>
       )}
@@ -2054,6 +2214,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   const [activeStepIdx, setActiveStepIdx] = useState(initialStepIndex);
   const [actionToast, setActionToast] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [autoExpandedSubs, setAutoExpandedSubs] = useState<Set<string>>(() => new Set());
 
   const initSubstepProgress = useMemo(() => {
     const prog: Record<string, number> = {};
@@ -2066,6 +2227,35 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
     return prog;
   }, []);
   const [substepProgress, setSubstepProgress] = useState<Record<string, number>>(initSubstepProgress);
+
+  const activeStep = fieldworkStepOrder[activeStepIdx];
+
+  useEffect(() => {
+    if (!isDemo || !controlStatus) return;
+    const step = activeStep;
+    if (step === "readiness") return;
+    const stepStatus = controlStatus.steps[step as keyof typeof controlStatus.steps];
+    if (stepStatus !== "running") return;
+
+    const behavior = demoStepBehavior[step];
+    if (!behavior?.autoProgress) return;
+
+    const currentProg = substepProgress[step] ?? 0;
+    const info = stepNodeInfo[step];
+    const totalSubs = info?.substeps.length ?? 0;
+
+    if (currentProg >= totalSubs) return;
+    if (behavior.pauseAtSubstep !== undefined && currentProg === behavior.pauseAtSubstep) return;
+
+    const stepKey = step;
+    const timer = setTimeout(() => {
+      setSubstepProgress(prev => {
+        const cur = prev[stepKey] ?? 0;
+        return cur >= totalSubs ? prev : { ...prev, [stepKey]: cur + 1 };
+      });
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [isDemo, activeStep, controlStatus, substepProgress]);
 
   const stepLabels: Record<string, string> = {
     readiness: "Readiness Assessment",
@@ -2100,10 +2290,25 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
     testEffectiveness: stepNodeInfo.testEffectiveness.aiDescription,
   };
 
+  const handleSubstepAction = useCallback((substepId: string, action: string) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    if (substepId === "pop-ingest" && action === "upload") {
+      setSubstepProgress(prev => ({ ...prev, population: (prev.population ?? 0) + 1 }));
+      setAutoExpandedSubs(prev => new Set(prev).add("pop-ingest"));
+      setActionToast("Population data uploaded — validating...");
+    } else if (substepId === "pop-ingest" && action === "request") {
+      setActionToast("PBC request sent to data owner");
+    } else if (substepId === "evd-collect" && action === "tracker-complete") {
+      setSubstepProgress(prev => ({ ...prev, evidence: (prev.evidence ?? 0) + 1 }));
+      setActionToast("Evidence collection complete — ready for confirmation");
+    }
+    toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
+  }, []);
+
   const handleStepAction = useCallback((stepKey: string, actionId: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    const isPrimaryAdvance = actionId === "approve-step" || actionId.startsWith("approve") || actionId.startsWith("confirm") || actionId.startsWith("finalize") || actionId.startsWith("accept") || actionId.startsWith("validate") || actionId.startsWith("run-") || actionId === "upload-evidence";
-    if (isDemo && onAdvanceStep && isPrimaryAdvance) {
+
+    if (isDemo && onAdvanceStep) {
       const currentStepStatus = controlStatus?.steps[stepKey as keyof typeof controlStatus.steps];
       if (currentStepStatus === "complete") return;
 
@@ -2112,28 +2317,19 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
         const stepIdx = fieldworkStepOrder.indexOf(stepKey);
         if (stepIdx < fieldworkStepOrder.length - 1) setActiveStepIdx(stepIdx + 1);
         setActionToast(`Readiness complete — advancing to ${stepLabels[fieldworkStepOrder[fieldworkStepOrder.indexOf(stepKey) + 1]] ?? "next step"}`);
-      } else {
+      } else if (actionId === "confirm-step") {
         const info = stepNodeInfo[stepKey];
         const totalSubs = info?.substeps.length ?? 0;
-        const currentProg = substepProgress[stepKey] ?? 0;
-        const nextProg = currentProg + 1;
-
-        if (nextProg >= totalSubs) {
-          setSubstepProgress(prev => ({ ...prev, [stepKey]: totalSubs }));
-          onAdvanceStep(stepKey);
-          const stepIdx = fieldworkStepOrder.indexOf(stepKey);
-          if (stepIdx < fieldworkStepOrder.length - 1) {
-            setActiveStepIdx(stepIdx + 1);
-          }
-          const nextLabel = stepIdx < fieldworkStepOrder.length - 1
-            ? stepLabels[fieldworkStepOrder[stepIdx + 1]] ?? fieldworkStepOrder[stepIdx + 1]
-            : null;
-          setActionToast(nextLabel ? `Step complete — advancing to ${nextLabel}` : "All steps complete");
-        } else {
-          setSubstepProgress(prev => ({ ...prev, [stepKey]: nextProg }));
-          const nextSubLabel = info?.substeps[nextProg]?.label ?? "next substep";
-          setActionToast(`Substep complete — now running: ${nextSubLabel}`);
+        setSubstepProgress(prev => ({ ...prev, [stepKey]: totalSubs }));
+        onAdvanceStep(stepKey);
+        const stepIdx = fieldworkStepOrder.indexOf(stepKey);
+        if (stepIdx < fieldworkStepOrder.length - 1) {
+          setActiveStepIdx(stepIdx + 1);
         }
+        const nextLabel = stepIdx < fieldworkStepOrder.length - 1
+          ? stepLabels[fieldworkStepOrder[stepIdx + 1]] ?? fieldworkStepOrder[stepIdx + 1]
+          : null;
+        setActionToast(nextLabel ? `Step confirmed — advancing to ${nextLabel}` : "All steps complete");
       }
     } else {
       setActionToast(`${actionId} triggered for ${stepKey}`);
@@ -2141,7 +2337,6 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
     toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
   }, [isDemo, onAdvanceStep, controlStatus, substepProgress]);
 
-  const activeStep = fieldworkStepOrder[activeStepIdx];
   const activeStepStatus = controlStatus ? controlStatus.steps[activeStep as keyof typeof controlStatus.steps] : "pending";
   const activeStepInfo = activeStep !== "readiness" ? stepNodeInfo[activeStep] : null;
   const activeVisibleActions = activeStepInfo ? activeStepInfo.actions.filter(a => a.showWhen.includes(activeStepStatus)) : [];
@@ -2304,6 +2499,8 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
                       onResolve={onResolve}
                       isResolved={isResolved}
                       onAction={handleStepAction}
+                      onSubstepAction={handleSubstepAction}
+                      autoExpandedSubs={autoExpandedSubs}
                     />
                   )}
                 </div>
@@ -2362,28 +2559,38 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
             </Button>
 
             <div className="flex items-center gap-2">
-              {isDemo && activeStepStatus !== "complete" && (() => {
-                const stepInfo = activeStep !== "readiness" ? stepNodeInfo[activeStep] : null;
-                const currentSubIdx = substepProgress[activeStep] ?? 0;
-                const currentSubLabel = stepInfo?.substeps[currentSubIdx]?.label;
+              {isDemo && activeStepStatus === "running" && (() => {
+                if (activeStep === "readiness") {
+                  return (
+                    <Button
+                      size="sm"
+                      className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                      onClick={() => handleStepAction(activeStep, "approve-step")}
+                      data-testid={`button-advance-${activeStep}-${controlId}`}
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Approve & Continue
+                    </Button>
+                  );
+                }
+                const stepInfo = stepNodeInfo[activeStep];
                 const totalSubs = stepInfo?.substeps.length ?? 0;
-                const isLastSub = currentSubIdx >= totalSubs - 1;
-                const buttonLabel = activeStep === "readiness"
-                  ? "Approve & Continue"
-                  : isLastSub
-                    ? "Complete Step"
-                    : `Approve: ${currentSubLabel}`;
-                return (
-                  <Button
-                    size="sm"
-                    className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-                    onClick={() => handleStepAction(activeStep, "approve-step")}
-                    data-testid={`button-advance-${activeStep}-${controlId}`}
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    {buttonLabel}
-                  </Button>
-                );
+                const currentProg = substepProgress[activeStep] ?? 0;
+                const allSubsDone = currentProg >= totalSubs;
+                if (allSubsDone) {
+                  return (
+                    <Button
+                      size="sm"
+                      className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                      onClick={() => handleStepAction(activeStep, "confirm-step")}
+                      data-testid={`button-confirm-${activeStep}-${controlId}`}
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Confirm & Continue
+                    </Button>
+                  );
+                }
+                return null;
               })()}
 
               {!isDemo && activeVisibleActions.length > 0 && activeVisibleActions.map((action) => {
