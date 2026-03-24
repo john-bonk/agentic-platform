@@ -80,6 +80,7 @@ const navIconMap: Record<string, LucideIcon> = {
   "trending-up": TrendingUp,
   "flame": Flame,
   "target": Target,
+  "plus": Plus,
 };
 
 import { WorkspaceCreationWizard } from "@/components/workspace/WorkspaceCreationWizard";
@@ -138,13 +139,16 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInN
         <ul className="flex flex-col gap-0.5 pt-1">
           {section.items.map((item) => {
             const hasHash = item.path.includes("#");
+            const isNewProjectAction = item.id === "ah-new-project";
             const navButton = (
                   <Button
                     variant="ghost"
                     className={`h-[33px] w-full items-center gap-2 px-2 py-1.5 rounded flex justify-start ${
-                      isActive(item.path)
-                        ? "bg-teal-50 dark:bg-primary/10 hover:bg-teal-50 dark:hover:bg-primary/10" 
-                        : "hover:bg-gray-100 dark:hover:bg-accent"
+                      isNewProjectAction
+                        ? "border border-dashed border-slate-300 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/20 hover:border-slate-400 dark:hover:border-border mt-1"
+                        : isActive(item.path)
+                          ? "bg-teal-50 dark:bg-primary/10 hover:bg-teal-50 dark:hover:bg-primary/10" 
+                          : "hover:bg-gray-100 dark:hover:bg-accent"
                     } ${item.openInNewTab ? "pr-1" : ""}`}
                     data-testid={`nav-item-${item.id}`}
                     onClick={hasHash ? (e) => {
@@ -165,9 +169,11 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInN
                   >
                     <span
                       className={`flex-1 text-left text-sm whitespace-nowrap ${
-                        isActive(item.path)
-                          ? "font-semibold text-teal-600 dark:text-primary"
-                          : "font-normal text-gray-600 dark:text-foreground"
+                        isNewProjectAction
+                          ? "font-normal text-muted-foreground"
+                          : isActive(item.path)
+                            ? "font-semibold text-teal-600 dark:text-primary"
+                            : "font-normal text-gray-600 dark:text-foreground"
                       }`}
                     >
                       {item.label}

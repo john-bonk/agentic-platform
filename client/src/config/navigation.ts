@@ -255,10 +255,10 @@ export const agentHubNavSections: SideNavSection[] = [
     collapsible: false,
     defaultExpanded: true,
     items: [
-      { id: "ah-scenario-analysis", label: "Scenario Analysis", path: "/#scenarios", icon: "flame" },
-      { id: "ah-mitigation-plans", label: "Mitigation Plans", path: "/#mitigation", icon: "target" },
+      { id: "ah-new-project", label: "+ New Project", path: "/#new-project", icon: "plus" },
     ],
   },
+  /* Monitoring and Continuous sections — hidden for now, ready to restore
   {
     id: "agent-hub-monitoring",
     title: "Monitoring",
@@ -281,6 +281,7 @@ export const agentHubNavSections: SideNavSection[] = [
       { id: "ah-risk-appetite", label: "Risk Appetite", path: "/#appetite", icon: "target" },
     ],
   },
+  */
 ];
 
 /**

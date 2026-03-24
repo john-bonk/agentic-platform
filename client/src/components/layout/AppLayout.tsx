@@ -81,11 +81,13 @@ export function AppLayout({
       badge: undefined,
     }));
     return agentHubNavSections.map((section) => {
-      if (section.id === "agent-hub-projects" && projectItems.length > 0) {
-        const staticItems = section.items.filter(
-          (item) => !activeProjects.some((p) => item.id === `ah-active-${p.sessionId}`)
-        );
-        return { ...section, items: [...projectItems, ...staticItems] };
+      if (section.id === "agent-hub-projects") {
+        const newProjectItem = section.items.find(item => item.id === "ah-new-project");
+        const items = [
+          ...projectItems,
+          ...(newProjectItem ? [newProjectItem] : []),
+        ];
+        return { ...section, items };
       }
       return section;
     });
