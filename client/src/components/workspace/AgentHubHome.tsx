@@ -47,6 +47,7 @@ import {
   ExternalLink,
   Users,
   ChevronLeft,
+  ChevronRight,
   RefreshCcw,
   ArrowUpRight,
   History,
@@ -2111,57 +2112,19 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   const isIneffective = isComplete && hasException;
   const blockRule = fieldworkBlockRules.find(r => r.controlId === controlId) ?? null;
   const isDemo = controlId === DEMO_CONTROL_ID;
-  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
+
+  const initialStepIndex = useMemo(() => {
+    if (!controlStatus) return 0;
+    for (let i = 0; i < fieldworkStepOrder.length; i++) {
+      const s = controlStatus.steps[fieldworkStepOrder[i] as keyof typeof controlStatus.steps];
+      if (s !== "complete") return i;
+    }
+    return fieldworkStepOrder.length - 1;
+  }, []);
+
+  const [activeStepIdx, setActiveStepIdx] = useState(initialStepIndex);
   const [actionToast, setActionToast] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hasAutoExpanded = useRef(false);
-
-  useEffect(() => {
-    if (!controlStatus || hasAutoExpanded.current) return;
-    for (const step of fieldworkStepOrder) {
-      const s = controlStatus.steps[step as keyof typeof controlStatus.steps];
-      if (s === "running" || s === "blocked" || s === "waiting") {
-        setExpandedSteps(new Set([step]));
-        hasAutoExpanded.current = true;
-        return;
-      }
-    }
-  }, [controlStatus]);
-
-  const handleStepAction = useCallback((stepKey: string, actionId: string) => {
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    const isPrimaryAdvance = actionId === "approve-step" || actionId.startsWith("approve") || actionId.startsWith("confirm") || actionId.startsWith("finalize") || actionId.startsWith("accept") || actionId.startsWith("validate") || actionId.startsWith("run-") || actionId === "upload-evidence";
-    if (isDemo && onAdvanceStep && isPrimaryAdvance) {
-      const currentStepStatus = controlStatus?.steps[stepKey as keyof typeof controlStatus.steps];
-      if (currentStepStatus === "complete") return;
-      onAdvanceStep(stepKey);
-      setExpandedSteps(prev => {
-        const next = new Set(prev);
-        next.delete(stepKey);
-        const stepIdx = fieldworkStepOrder.indexOf(stepKey);
-        if (stepIdx < fieldworkStepOrder.length - 1) {
-          next.add(fieldworkStepOrder[stepIdx + 1]);
-        }
-        return next;
-      });
-      const stepIdx = fieldworkStepOrder.indexOf(stepKey);
-      const nextLabel = stepIdx < fieldworkStepOrder.length - 1
-        ? stepLabels[fieldworkStepOrder[stepIdx + 1]] ?? fieldworkStepOrder[stepIdx + 1]
-        : null;
-      setActionToast(nextLabel ? `Step complete — advancing to ${nextLabel}` : "All steps complete");
-    } else {
-      setActionToast(`${actionId} triggered for ${stepKey}`);
-    }
-    toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
-  }, [isDemo, onAdvanceStep, controlStatus]);
-
-  const toggleStep = (step: string) => {
-    setExpandedSteps(prev => {
-      const next = new Set(prev);
-      if (next.has(step)) next.delete(step); else next.add(step);
-      return next;
-    });
-  };
 
   const stepLabels: Record<string, string> = {
     readiness: "Readiness Assessment",
@@ -2172,6 +2135,56 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
     evidenceUnderstanding: "Evidence Understanding",
     attributeEvaluation: "Attribute Evaluation",
     testEffectiveness: "Test Effectiveness",
+  };
+
+  const stepShortLabels: Record<string, string> = {
+    readiness: "Readiness",
+    controlSetup: "Setup",
+    population: "Population",
+    sampling: "Sampling",
+    evidence: "Evidence",
+    evidenceUnderstanding: "Understanding",
+    attributeEvaluation: "Evaluation",
+    testEffectiveness: "Effectiveness",
+  };
+
+  const handleStepAction = useCallback((stepKey: string, actionId: string) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    const isPrimaryAdvance = actionId === "approve-step" || actionId.startsWith("approve") || actionId.startsWith("confirm") || actionId.startsWith("finalize") || actionId.startsWith("accept") || actionId.startsWith("validate") || actionId.startsWith("run-") || actionId === "upload-evidence";
+    if (isDemo && onAdvanceStep && isPrimaryAdvance) {
+      const currentStepStatus = controlStatus?.steps[stepKey as keyof typeof controlStatus.steps];
+      if (currentStepStatus === "complete") return;
+      onAdvanceStep(stepKey);
+      const stepIdx = fieldworkStepOrder.indexOf(stepKey);
+      if (stepIdx < fieldworkStepOrder.length - 1) {
+        setActiveStepIdx(stepIdx + 1);
+      }
+      const nextLabel = stepIdx < fieldworkStepOrder.length - 1
+        ? stepLabels[fieldworkStepOrder[stepIdx + 1]] ?? fieldworkStepOrder[stepIdx + 1]
+        : null;
+      setActionToast(nextLabel ? `Step complete — advancing to ${nextLabel}` : "All steps complete");
+    } else {
+      setActionToast(`${actionId} triggered for ${stepKey}`);
+    }
+    toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
+  }, [isDemo, onAdvanceStep, controlStatus]);
+
+  const activeStep = fieldworkStepOrder[activeStepIdx];
+  const activeStepStatus = controlStatus ? controlStatus.steps[activeStep as keyof typeof controlStatus.steps] : "pending";
+
+  const canNavigateTo = (idx: number): boolean => {
+    if (!controlStatus) return false;
+    const step = fieldworkStepOrder[idx];
+    const status = controlStatus.steps[step as keyof typeof controlStatus.steps];
+    if (status === "complete") return true;
+    if (status === "running" || status === "waiting" || status === "blocked") return true;
+    const prevIdx = idx - 1;
+    if (prevIdx >= 0) {
+      const prevStep = fieldworkStepOrder[prevIdx];
+      const prevStatus = controlStatus.steps[prevStep as keyof typeof controlStatus.steps];
+      if (prevStatus === "complete") return true;
+    }
+    return idx === 0;
   };
 
   return (
@@ -2196,123 +2209,185 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
         {isIneffective && <Badge className="ml-auto text-[10px] bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 border-0">Ineffective</Badge>}
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto">
-        <div className="w-[80%] max-w-6xl mx-auto px-6 py-6 space-y-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-testid="control-focus-info-grid">
-            <div className="p-3 rounded-lg border border-slate-200 dark:border-border">
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Category</p>
-              <p className="text-sm font-medium text-foreground">{master?.category ?? "—"}</p>
-            </div>
-            <div className="p-3 rounded-lg border border-slate-200 dark:border-border">
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Risk Level</p>
-              <p className={`text-sm font-medium ${master?.riskLevel === "Critical" ? "text-red-600 dark:text-red-400" : master?.riskLevel === "High" ? "text-orange-600 dark:text-orange-400" : "text-foreground"}`}>{master?.riskLevel ?? "—"}</p>
-            </div>
-            <div className="p-3 rounded-lg border border-slate-200 dark:border-border">
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Control Owner</p>
-              <p className="text-sm font-medium text-foreground">{master?.owner ?? "—"}</p>
-            </div>
-            <div className="p-3 rounded-lg border border-slate-200 dark:border-border">
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Data Source</p>
-              <p className="text-sm font-medium text-foreground">{controlStatus?.dataSource === "connected" ? master?.system ?? "Connected" : "PBC / Manual"}</p>
-            </div>
-          </div>
-
-          {master && (
-            <Card className="border border-slate-200 dark:border-border">
-              <CardHeader className="pb-2 pt-3 px-4">
-                <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                  <Users className="w-4 h-4 text-slate-400" />
-                  Ownership
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Control Owner</p>
-                    <p className="text-sm text-foreground">{master.owner}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">PBC Owner</p>
-                    <p className="text-sm text-foreground">{master.pbcOwner}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {controlStatus && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-[#266C92]" />
-                <h3 className="text-sm font-semibold text-foreground">Workflow Progress</h3>
-                <span className="text-xs text-muted-foreground ml-auto">{controlStatus.overallProgress}% complete</span>
-              </div>
-
-              {(["readiness", "controlSetup", "population", "sampling", "evidence", "evidenceUnderstanding", "attributeEvaluation", "testEffectiveness"] as const).map((step) => {
-                const status = controlStatus.steps[step];
-                const isExpanded = expandedSteps.has(step);
+      {controlStatus && (
+        <div className="shrink-0 border-b border-slate-200 dark:border-border bg-slate-50/80 dark:bg-muted/20">
+          <div className="w-[90%] max-w-5xl mx-auto py-4 px-2">
+            <div className="flex items-center">
+              {fieldworkStepOrder.map((step, idx) => {
+                const status = controlStatus.steps[step as keyof typeof controlStatus.steps];
+                const isActive = idx === activeStepIdx;
+                const navigable = canNavigateTo(idx);
                 return (
-                  <div
-                    key={step}
-                    className={`rounded-lg border transition-colors ${isExpanded ? "border-[#266C92]/30 bg-white dark:bg-card" : "border-slate-200 dark:border-border bg-white dark:bg-card"}`}
-                    data-testid={`control-step-block-${step}`}
-                  >
+                  <div key={step} className="flex items-center flex-1 last:flex-initial">
                     <button
-                      onClick={() => toggleStep(step)}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50/50 dark:hover:bg-muted/10 transition-colors rounded-lg"
-                      data-testid={`button-toggle-step-${step}`}
+                      onClick={() => navigable && setActiveStepIdx(idx)}
+                      disabled={!navigable}
+                      className={`flex flex-col items-center gap-1.5 group min-w-0 ${navigable ? "cursor-pointer" : "cursor-default"}`}
+                      data-testid={`stepper-step-${step}`}
                     >
-                      <div className="w-5 flex justify-center shrink-0">
-                        {status === "complete" ? <CheckCircle2 className="w-4 h-4 text-[#266C92]" /> :
-                         status === "running" ? <Loader2 className="w-4 h-4 text-[#266C92] animate-spin" /> :
-                         status === "waiting" ? <Clock className="w-4 h-4 text-slate-400" /> :
-                         status === "blocked" ? <AlertCircle className="w-4 h-4 text-red-500" /> :
-                         <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600" />}
-                      </div>
-                      <span className={`text-sm font-medium flex-1 ${status === "complete" || status === "running" || status === "waiting" ? "text-foreground" : "text-muted-foreground"}`}>{stepLabels[step]}</span>
-                      <Badge className={`text-[9px] ${status === "complete" ? "bg-[#266C92]/10 text-[#266C92]" : status === "running" ? "bg-[#266C92]/10 text-[#266C92]" : status === "waiting" ? "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300" : status === "blocked" ? "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"} border-0`}>
-                        {status === "complete" ? "Complete" : status === "running" ? "Running" : status === "waiting" ? "Waiting" : status === "blocked" ? "Blocked" : "Pending"}
-                      </Badge>
-                      <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
-                    </button>
-                    {isExpanded && (
-                      <div className="px-4 pb-4">
-                        {step === "readiness" ? (
-                          <div className="space-y-3">
-                            <ReadinessAssessmentContent stepStatus={status} rows={isDemo ? demoReadinessRows : undefined} />
-                            {isDemo && status !== "complete" && (
-                              <div className="flex items-center gap-2 pt-1">
-                                <Button
-                                  size="sm"
-                                  className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-                                  onClick={() => handleStepAction("readiness", "approve-step")}
-                                  data-testid="button-advance-readiness-CTL-003"
-                                >
-                                  <CheckCircle2 className="w-3.5 h-3.5" />
-                                  Approve & Continue
-                                </Button>
-                              </div>
-                            )}
-                          </div>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all border-2 ${
+                        status === "complete"
+                          ? "bg-[#266C92] border-[#266C92] text-white"
+                          : isActive && (status === "running" || status === "waiting")
+                            ? "bg-white dark:bg-card border-[#266C92] text-[#266C92] ring-4 ring-[#266C92]/15"
+                            : isActive
+                              ? "bg-white dark:bg-card border-[#266C92] text-[#266C92] ring-4 ring-[#266C92]/15"
+                              : status === "blocked"
+                                ? "bg-white dark:bg-card border-red-400 text-red-500"
+                                : "bg-white dark:bg-card border-slate-300 dark:border-slate-600 text-slate-400 dark:text-slate-500"
+                      }`}>
+                        {status === "complete" ? (
+                          <CheckCircle2 className="w-4 h-4" />
+                        ) : status === "running" && isActive ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : status === "blocked" ? (
+                          <AlertCircle className="w-3.5 h-3.5" />
                         ) : (
-                          <StepNodeContent
-                            step={step}
-                            stepStatus={status}
-                            controlId={controlId}
-                            blockRule={blockRule}
-                            onResolve={onResolve}
-                            isResolved={isResolved}
-                            onAction={handleStepAction}
-                          />
+                          <span className="text-xs font-semibold">{idx + 1}</span>
                         )}
+                      </div>
+                      <span className={`text-[10px] leading-tight text-center max-w-[72px] transition-colors ${
+                        isActive
+                          ? "text-[#266C92] font-semibold"
+                          : status === "complete"
+                            ? "text-[#266C92]/70 font-medium"
+                            : "text-muted-foreground"
+                      }`}>
+                        {stepShortLabels[step]}
+                      </span>
+                    </button>
+                    {idx < fieldworkStepOrder.length - 1 && (
+                      <div className="flex-1 mx-1 mt-[-18px]">
+                        <div className={`h-0.5 w-full rounded-full ${
+                          controlStatus.steps[fieldworkStepOrder[idx] as keyof typeof controlStatus.steps] === "complete"
+                            ? "bg-[#266C92]"
+                            : "bg-slate-200 dark:bg-slate-700"
+                        }`} />
                       </div>
                     )}
                   </div>
                 );
               })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="w-[80%] max-w-6xl mx-auto px-6 py-6 space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" data-testid="control-focus-info-grid">
+            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border">
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5">Category</p>
+              <p className="text-xs font-medium text-foreground">{master?.category ?? "—"}</p>
+            </div>
+            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border">
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5">Risk Level</p>
+              <p className={`text-xs font-medium ${master?.riskLevel === "Critical" ? "text-red-600 dark:text-red-400" : master?.riskLevel === "High" ? "text-orange-600 dark:text-orange-400" : "text-foreground"}`}>{master?.riskLevel ?? "—"}</p>
+            </div>
+            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border">
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5">Control Owner</p>
+              <p className="text-xs font-medium text-foreground">{master?.owner ?? "—"}</p>
+            </div>
+            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border">
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5">Data Source</p>
+              <p className="text-xs font-medium text-foreground">{controlStatus?.dataSource === "connected" ? master?.system ?? "Connected" : "PBC / Manual"}</p>
+            </div>
+          </div>
+
+          {controlStatus && (
+            <>
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                  activeStepStatus === "complete" ? "bg-[#266C92]/10" :
+                  activeStepStatus === "running" ? "bg-[#266C92]/10" :
+                  activeStepStatus === "blocked" ? "bg-red-50 dark:bg-red-900/20" :
+                  "bg-slate-100 dark:bg-muted/30"
+                }`}>
+                  {activeStepStatus === "complete" ? <CheckCircle2 className="w-4 h-4 text-[#266C92]" /> :
+                   activeStepStatus === "running" ? <Loader2 className="w-4 h-4 text-[#266C92] animate-spin" /> :
+                   activeStepStatus === "waiting" ? <Clock className="w-4 h-4 text-slate-500" /> :
+                   activeStepStatus === "blocked" ? <AlertCircle className="w-4 h-4 text-red-500" /> :
+                   <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-semibold text-foreground">{stepLabels[activeStep]}</h3>
+                    <Badge className={`text-[9px] ${
+                      activeStepStatus === "complete" ? "bg-[#266C92]/10 text-[#266C92]" :
+                      activeStepStatus === "running" ? "bg-[#266C92]/10 text-[#266C92]" :
+                      activeStepStatus === "waiting" ? "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300" :
+                      activeStepStatus === "blocked" ? "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400" :
+                      "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                    } border-0`}>
+                      {activeStepStatus === "complete" ? "Complete" : activeStepStatus === "running" ? "Running" : activeStepStatus === "waiting" ? "Waiting" : activeStepStatus === "blocked" ? "Blocked" : "Pending"}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">Step {activeStepIdx + 1} of {fieldworkStepOrder.length}</p>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-slate-200 dark:border-border bg-white dark:bg-card" data-testid={`control-step-block-${activeStep}`}>
+                <div className="p-5">
+                  {activeStep === "readiness" ? (
+                    <div className="space-y-3">
+                      <ReadinessAssessmentContent stepStatus={activeStepStatus} rows={isDemo ? demoReadinessRows : undefined} />
+                    </div>
+                  ) : (
+                    <StepNodeContent
+                      step={activeStep}
+                      stepStatus={activeStepStatus}
+                      controlId={controlId}
+                      blockRule={blockRule}
+                      onResolve={onResolve}
+                      isResolved={isResolved}
+                      onAction={handleStepAction}
+                    />
+                  )}
+                </div>
+
+                <div className="px-5 py-3 border-t border-slate-100 dark:border-border/50 flex items-center justify-between bg-slate-50/50 dark:bg-muted/10 rounded-b-xl">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
+                    onClick={() => setActiveStepIdx(Math.max(0, activeStepIdx - 1))}
+                    disabled={activeStepIdx === 0}
+                    data-testid="button-step-prev"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                    Previous
+                  </Button>
+
+                  <div className="flex items-center gap-2">
+                    {isDemo && activeStepStatus !== "complete" && (
+                      <Button
+                        size="sm"
+                        className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                        onClick={() => handleStepAction(activeStep, "approve-step")}
+                        data-testid={`button-advance-${activeStep}-${controlId}`}
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        Approve & Continue
+                      </Button>
+                    )}
+
+                    {activeStepStatus === "complete" && activeStepIdx < fieldworkStepOrder.length - 1 && (
+                      <Button
+                        size="sm"
+                        className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                        onClick={() => setActiveStepIdx(activeStepIdx + 1)}
+                        data-testid="button-step-next"
+                      >
+                        Next Step
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               {isComplete && (
-                <div className={`p-3 rounded-lg border ${isIneffective ? "border-red-200 dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/10" : "border-[#266C92]/20 bg-[#266C92]/5"}`}>
+                <div className={`p-4 rounded-xl border ${isIneffective ? "border-red-200 dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/10" : "border-[#266C92]/20 bg-[#266C92]/5"}`}>
                   <div className="flex items-center gap-2">
                     {isIneffective ? <AlertTriangle className="w-4 h-4 text-red-500" /> : <ShieldCheck className="w-4 h-4 text-[#266C92]" />}
                     <span className={`text-sm font-medium ${isIneffective ? "text-red-600 dark:text-red-400" : "text-[#266C92]"}`}>
@@ -2321,7 +2396,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
                   </div>
                 </div>
               )}
-            </div>
+            </>
           )}
 
           {exceptions.length > 0 && (
