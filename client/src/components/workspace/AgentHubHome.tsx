@@ -1063,7 +1063,7 @@ function OptroHome() {
   return (
     <div className="flex flex-col h-full overflow-hidden" data-testid="optro-home">
       <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="w-[80%] mx-auto px-6 py-8">
           <div className="mb-6">
             <h1 className="text-xl font-semibold text-foreground mb-1" data-testid="text-optro-welcome">Welcome back</h1>
             <p className="text-sm text-muted-foreground">Here's what needs your attention today.</p>
