@@ -2043,7 +2043,7 @@ function StepNodeContent({ step, stepStatus, controlId, blockRule, onResolve, is
         </div>
       )}
 
-      {controlId === DEMO_CONTROL_ID && stepStatus === "running" && (
+      {controlId === DEMO_CONTROL_ID && (stepStatus === "running" || stepStatus === "waiting") && (
         <div className="flex items-center gap-2 flex-wrap pt-1" data-testid={`step-actions-${step}`}>
           <Button
             size="sm"
@@ -2110,20 +2110,22 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   const isIneffective = isComplete && hasException;
   const blockRule = fieldworkBlockRules.find(r => r.controlId === controlId) ?? null;
   const isDemo = controlId === DEMO_CONTROL_ID;
-  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(() => {
-    if (!controlStatus) return new Set<string>();
-    const initial = new Set<string>();
+  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
+  const [actionToast, setActionToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasAutoExpanded = useRef(false);
+
+  useEffect(() => {
+    if (!controlStatus || hasAutoExpanded.current) return;
     for (const step of fieldworkStepOrder) {
       const s = controlStatus.steps[step as keyof typeof controlStatus.steps];
       if (s === "running" || s === "blocked" || s === "waiting") {
-        initial.add(step);
-        break;
+        setExpandedSteps(new Set([step]));
+        hasAutoExpanded.current = true;
+        return;
       }
     }
-    return initial;
-  });
-  const [actionToast, setActionToast] = useState<string | null>(null);
-  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  }, [controlStatus]);
 
   const handleStepAction = useCallback((stepKey: string, actionId: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -2460,6 +2462,21 @@ function FieldworkComplexHub() {
       setBlockState(sid, "fieldwork-execution", "resolvedBlocks", [...prev, controlId]);
     }
   }, [fieldworkProject, setBlockState]);
+
+  useEffect(() => {
+    if (!fieldworkProject) return;
+    const sid = fieldworkProject.sessionId;
+    const store = useWorkflowSessionStore.getState();
+    const statuses = (store.runtimeStates[sid]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
+    const demoCtrl = statuses.find(s => s.controlId === DEMO_CONTROL_ID);
+    if (demoCtrl && demoCtrl.steps.readiness === "pending") {
+      const updated = statuses.map(s => {
+        if (s.controlId !== DEMO_CONTROL_ID) return s;
+        return { ...s, steps: { ...s.steps, readiness: "running" as const } };
+      });
+      store.setBlockState(sid, "fieldwork-execution", "statuses", updated);
+    }
+  }, [fieldworkProject]);
 
   useEffect(() => {
     if (!isHubVisible || !fieldworkProject || executionPhaseForTimer !== "running") return;
