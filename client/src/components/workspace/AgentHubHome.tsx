@@ -68,6 +68,7 @@ import {
   SlidersHorizontal,
   Flag,
   Scale,
+  Settings,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -958,6 +959,35 @@ function OptroHome() {
     window.dispatchEvent(new CustomEvent("agent-hub:launch-workflow", { detail: { workflowId: "control-testing" } }));
   }, []);
 
+  const launchControlTestingDirect = useCallback(() => {
+    const meta = workflowSessionConfigs["control-testing"];
+    if (!meta) return;
+    const existing = activeProjects.find((p) => p.sessionId === "control-testing");
+    if (existing) {
+      setCurrentSession("control-testing");
+    } else {
+      const config = meta.create();
+      addProject({ sessionId: "control-testing", label: meta.label, icon: meta.icon }, config);
+    }
+    const sid = "control-testing";
+    const store = useWorkflowSessionStore.getState();
+    const currentStatuses = (store.runtimeStates[sid]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
+    if (currentStatuses.length === 0) {
+      const pendingSteps = { readiness: "pending" as const, controlSetup: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, evidenceUnderstanding: "pending" as const, attributeEvaluation: "pending" as const, testEffectiveness: "pending" as const };
+      const seedStatuses: ControlWorkflowStatus[] = masterControlsList.map(c => ({
+        controlId: c.id,
+        name: c.name,
+        dataSource: c.dataSource as "connected" | "manual",
+        system: c.system,
+        owner: c.owner,
+        steps: { ...pendingSteps, readiness: (c.id === DEMO_CONTROL_ID ? "running" : "pending") as "running" | "pending" },
+        overallProgress: 0,
+      })).sort((a, b) => (a.dataSource === "manual" ? 0 : 1) - (b.dataSource === "manual" ? 0 : 1));
+      store.setBlockState(sid, "fieldwork-execution", "statuses", seedStatuses);
+    }
+    store.setBlockState(sid, "fieldwork-execution", "phase", "running");
+  }, [addProject, setCurrentSession, activeProjects]);
+
   const taskItems = [
     {
       id: "task-control-testing",
@@ -966,8 +996,9 @@ function OptroHome() {
       icon: Shield,
       iconColor: "text-slate-500 dark:text-slate-400",
       iconBg: "bg-slate-100 dark:bg-slate-800/30",
-      action: launchControlTestingFromCard,
-      actionLabel: "Start Testing",
+      action: launchControlTestingDirect,
+      actionLabel: "Start",
+      configAction: launchControlTestingFromCard,
       priority: "high" as const,
     },
     {
@@ -1107,15 +1138,28 @@ function OptroHome() {
                       <p className="text-xs text-muted-foreground leading-relaxed">{task.description}</p>
                     </div>
                     {task.action && (
-                      <Button
-                        size="sm"
-                        className="h-7 text-xs bg-[#266C92] hover:bg-[#1e5a7a] text-white shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => { e.stopPropagation(); task.action!(); }}
-                        data-testid={`button-${task.id}`}
-                      >
-                        <Play className="w-3 h-3 mr-1" />
-                        {task.actionLabel}
-                      </Button>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {task.configAction && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 w-7 p-0 opacity-60 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => { e.stopPropagation(); task.configAction!(); }}
+                            data-testid={`button-config-${task.id}`}
+                          >
+                            <Settings className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          className="h-7 text-xs bg-[#266C92] hover:bg-[#1e5a7a] text-white shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => { e.stopPropagation(); task.action!(); }}
+                          data-testid={`button-${task.id}`}
+                        >
+                          <Play className="w-3 h-3 mr-1" />
+                          {task.actionLabel}
+                        </Button>
+                      </div>
                     )}
                     {!task.action && (
                       <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 mt-2 opacity-0 group-hover:opacity-50 transition-opacity" />
