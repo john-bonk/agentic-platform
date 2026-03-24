@@ -1259,6 +1259,78 @@ function OptroHome() {
   );
 }
 
+type ReadinessRow = { category: string; dataSource: string; status: "green" | "amber" | "red" };
+
+const readinessAssessmentRows: ReadinessRow[] = [
+  { category: "Control Description", dataSource: "SOXHUB Control Record", status: "green" },
+  { category: "Testing Procedure", dataSource: "Control Record / Test Plan", status: "green" },
+  { category: "Testing Attributes", dataSource: "Control Record / Test Plan", status: "amber" },
+  { category: "Supplementary Docs", dataSource: "Attached to control/process", status: "green" },
+  { category: "Population File", dataSource: "Uploaded / Requested", status: "red" },
+  { category: "Sample Selections", dataSource: "Derived by AI / Pre-selected", status: "red" },
+  { category: "Sample Evidence", dataSource: "Uploaded / Requested", status: "red" },
+];
+
+const stepStubDescriptions: Record<string, string> = {
+  population: "Population file ingestion, validation, and completeness checks against the control period.",
+  sampling: "AI-driven sample selection using risk-weighted stratification and statistical coverage targets.",
+  evidence: "Evidence collection, document matching, and completeness verification for each sample item.",
+  testing: "Automated attribute testing, exception identification, and control effectiveness determination.",
+};
+
+function ReadinessAssessmentContent({ stepStatus }: { stepStatus: string }) {
+  const statusDot = (s: ReadinessRow["status"]) => {
+    const colors = { green: "bg-emerald-400", amber: "bg-amber-400", red: "bg-red-500" };
+    return <div className={`w-3 h-3 rounded-full ${colors[s]}`} />;
+  };
+
+  return (
+    <div className="mt-3" data-testid="readiness-assessment-content">
+      <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
+        <div className="grid grid-cols-[1fr_1fr_auto] gap-4 px-4 py-2.5 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border">
+          <span className="text-xs font-semibold text-foreground">Input Category</span>
+          <span className="text-xs font-semibold text-foreground">Data Source</span>
+          <span className="text-xs font-semibold text-foreground text-center">AI Assessment Status</span>
+        </div>
+        {readinessAssessmentRows.map((row) => (
+          <div key={row.category} className="grid grid-cols-[1fr_1fr_auto] gap-4 px-4 py-2.5 border-b border-slate-100 dark:border-border/50 last:border-b-0 items-center">
+            <span className="text-sm text-foreground">{row.category}</span>
+            <span className="text-sm text-muted-foreground">{row.dataSource}</span>
+            <div className="flex justify-center w-20">{statusDot(stepStatus === "complete" || stepStatus === "running" ? row.status : "red")}</div>
+          </div>
+        ))}
+      </div>
+      {stepStatus === "complete" && (() => {
+        const hasBlockers = readinessAssessmentRows.some(r => r.status === "red");
+        const hasWarnings = readinessAssessmentRows.some(r => r.status === "amber");
+        if (hasBlockers) return (
+          <div className="mt-3 p-3 rounded-lg bg-amber-50/80 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-800/30">
+            <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">Assessment complete. {readinessAssessmentRows.filter(r => r.status === "red").length} input(s) pending — workflow proceeds with available data; outstanding items tracked for follow-up.</p>
+          </div>
+        );
+        if (hasWarnings) return (
+          <div className="mt-3 p-3 rounded-lg bg-[#266C92]/5 border border-[#266C92]/15">
+            <p className="text-xs text-[#266C92] font-medium">Assessment complete with advisory findings. Workflow may proceed — review flagged items as needed.</p>
+          </div>
+        );
+        return (
+          <div className="mt-3 p-3 rounded-lg bg-[#266C92]/5 border border-[#266C92]/15">
+            <p className="text-xs text-[#266C92] font-medium">All required inputs assessed. Readiness check passed — workflow may proceed.</p>
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
+
+function StepStubContent({ step }: { step: string }) {
+  return (
+    <div className="mt-3 p-4 rounded-lg border border-dashed border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10" data-testid={`step-stub-${step}`}>
+      <p className="text-xs text-muted-foreground">{stepStubDescriptions[step] ?? "Step details will appear here when available."}</p>
+    </div>
+  );
+}
+
 function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: string; controlStatus: ControlWorkflowStatus | null; onBack: () => void }) {
   const master = masterControlsList.find(c => c.id === controlId);
   const exceptionControlIds = new Set(fieldworkExceptions.map(e => e.controlId));
@@ -1267,6 +1339,15 @@ function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: str
   const isComplete = controlStatus?.steps.testing === "complete";
   const isEffective = isComplete && !hasException;
   const isIneffective = isComplete && hasException;
+  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set(["readiness"]));
+
+  const toggleStep = (step: string) => {
+    setExpandedSteps(prev => {
+      const next = new Set(prev);
+      if (next.has(step)) next.delete(step); else next.add(step);
+      return next;
+    });
+  };
 
   const stepLabels: Record<string, string> = {
     readiness: "Readiness Assessment",
@@ -1299,7 +1380,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: str
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-6 py-6 space-y-6">
+        <div className="w-[80%] max-w-6xl mx-auto px-6 py-6 space-y-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-testid="control-focus-info-grid">
             <div className="p-3 rounded-lg border border-slate-200 dark:border-border">
               <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Category</p>
@@ -1343,47 +1424,64 @@ function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: str
           )}
 
           {controlStatus && (
-            <Card className="border border-slate-200 dark:border-border">
-              <CardHeader className="pb-2 pt-3 px-4">
-                <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-[#266C92]" />
-                  Workflow Progress
-                  <span className="text-xs font-normal text-muted-foreground ml-auto">{controlStatus.overallProgress}% complete</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4">
-                <div className="space-y-2">
-                  {(["readiness", "population", "sampling", "evidence", "testing"] as const).map((step) => {
-                    const status = controlStatus.steps[step];
-                    return (
-                      <div key={step} className="flex items-center gap-3" data-testid={`control-step-${step}`}>
-                        <div className="w-5 flex justify-center">
-                          {status === "complete" ? <CheckCircle2 className="w-4 h-4 text-[#266C92]" /> :
-                           status === "running" ? <Loader2 className="w-4 h-4 text-[#266C92] animate-spin" /> :
-                           status === "waiting" ? <Clock className="w-4 h-4 text-slate-400" /> :
-                           status === "blocked" ? <AlertCircle className="w-4 h-4 text-red-500" /> :
-                           <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600" />}
-                        </div>
-                        <span className={`text-sm flex-1 ${status === "complete" ? "text-foreground" : status === "running" || status === "waiting" ? "text-foreground" : "text-muted-foreground"}`}>{stepLabels[step]}</span>
-                        <Badge className={`text-[9px] ${status === "complete" ? "bg-[#266C92]/10 text-[#266C92]" : status === "running" ? "bg-[#266C92]/10 text-[#266C92]" : status === "waiting" ? "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300" : status === "blocked" ? "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"} border-0`}>
-                          {status === "complete" ? "Complete" : status === "running" ? "Running" : status === "waiting" ? "Waiting" : status === "blocked" ? "Blocked" : "Pending"}
-                        </Badge>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-[#266C92]" />
+                <h3 className="text-sm font-semibold text-foreground">Workflow Progress</h3>
+                <span className="text-xs text-muted-foreground ml-auto">{controlStatus.overallProgress}% complete</span>
+              </div>
+
+              {(["readiness", "population", "sampling", "evidence", "testing"] as const).map((step) => {
+                const status = controlStatus.steps[step];
+                const isExpanded = expandedSteps.has(step);
+                return (
+                  <div
+                    key={step}
+                    className={`rounded-lg border transition-colors ${isExpanded ? "border-[#266C92]/30 bg-white dark:bg-card" : "border-slate-200 dark:border-border bg-white dark:bg-card"}`}
+                    data-testid={`control-step-block-${step}`}
+                  >
+                    <button
+                      onClick={() => toggleStep(step)}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50/50 dark:hover:bg-muted/10 transition-colors rounded-lg"
+                      data-testid={`button-toggle-step-${step}`}
+                    >
+                      <div className="w-5 flex justify-center shrink-0">
+                        {status === "complete" ? <CheckCircle2 className="w-4 h-4 text-[#266C92]" /> :
+                         status === "running" ? <Loader2 className="w-4 h-4 text-[#266C92] animate-spin" /> :
+                         status === "waiting" ? <Clock className="w-4 h-4 text-slate-400" /> :
+                         status === "blocked" ? <AlertCircle className="w-4 h-4 text-red-500" /> :
+                         <div className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600" />}
                       </div>
-                    );
-                  })}
-                </div>
-                {isComplete && (
-                  <div className={`mt-4 p-3 rounded-lg border ${isIneffective ? "border-red-200 dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/10" : "border-[#266C92]/20 bg-[#266C92]/5"}`}>
-                    <div className="flex items-center gap-2">
-                      {isIneffective ? <AlertTriangle className="w-4 h-4 text-red-500" /> : <ShieldCheck className="w-4 h-4 text-[#266C92]" />}
-                      <span className={`text-sm font-medium ${isIneffective ? "text-red-600 dark:text-red-400" : "text-[#266C92]"}`}>
-                        Control Effectiveness: {isIneffective ? "Ineffective" : "Effective"}
-                      </span>
-                    </div>
+                      <span className={`text-sm font-medium flex-1 ${status === "complete" || status === "running" || status === "waiting" ? "text-foreground" : "text-muted-foreground"}`}>{stepLabels[step]}</span>
+                      <Badge className={`text-[9px] ${status === "complete" ? "bg-[#266C92]/10 text-[#266C92]" : status === "running" ? "bg-[#266C92]/10 text-[#266C92]" : status === "waiting" ? "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300" : status === "blocked" ? "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"} border-0`}>
+                        {status === "complete" ? "Complete" : status === "running" ? "Running" : status === "waiting" ? "Waiting" : status === "blocked" ? "Blocked" : "Pending"}
+                      </Badge>
+                      <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                    </button>
+                    {isExpanded && (
+                      <div className="px-4 pb-4">
+                        {step === "readiness" ? (
+                          <ReadinessAssessmentContent stepStatus={status} />
+                        ) : (
+                          <StepStubContent step={step} />
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                );
+              })}
+
+              {isComplete && (
+                <div className={`p-3 rounded-lg border ${isIneffective ? "border-red-200 dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/10" : "border-[#266C92]/20 bg-[#266C92]/5"}`}>
+                  <div className="flex items-center gap-2">
+                    {isIneffective ? <AlertTriangle className="w-4 h-4 text-red-500" /> : <ShieldCheck className="w-4 h-4 text-[#266C92]" />}
+                    <span className={`text-sm font-medium ${isIneffective ? "text-red-600 dark:text-red-400" : "text-[#266C92]"}`}>
+                      Control Effectiveness: {isIneffective ? "Ineffective" : "Effective"}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {exceptions.length > 0 && (
@@ -2030,7 +2128,7 @@ function FieldworkComplexHub() {
                             return (
                               <div
                                 key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors cursor-pointer ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
                                 onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
@@ -2064,7 +2162,7 @@ function FieldworkComplexHub() {
                             return (
                               <div
                                 key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors cursor-pointer ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                                className={`grid grid-cols-[1fr_6rem_2rem_2rem_2rem_2rem_2rem_2rem] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
                                 onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
