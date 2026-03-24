@@ -1346,8 +1346,8 @@ const stepNodeInfo: Record<string, StepNodeInfo> = {
       { id: "pop-anomaly", label: "Anomaly Detection", description: "Flag duplicate records, date gaps, and statistical outliers", icon: AlertTriangle },
     ],
     actions: [
-      { id: "confirm-population", label: "Confirm Population", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "complete"] },
-      { id: "upload-replacement", label: "Upload Replacement", variant: "outline", icon: Upload, showWhen: ["waiting", "blocked"] },
+      { id: "confirm-population", label: "Confirm Population", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "running", "complete"] },
+      { id: "upload-replacement", label: "Upload Replacement", variant: "outline", icon: Upload, showWhen: ["waiting", "running", "blocked"] },
       { id: "resolve-population", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
     ],
     outputRows: [
@@ -1393,8 +1393,8 @@ const stepNodeInfo: Record<string, StepNodeInfo> = {
       { id: "evd-verify", label: "Completeness Verification", description: "Confirm all sample items have minimum required evidence coverage", icon: FileCheck },
     ],
     actions: [
-      { id: "upload-evidence", label: "Upload Evidence", variant: "primary", icon: Upload, showWhen: ["waiting", "blocked"] },
-      { id: "send-pbc", label: "Send PBC Request", variant: "outline", icon: Send, showWhen: ["waiting", "blocked"] },
+      { id: "upload-evidence", label: "Upload Evidence", variant: "primary", icon: Upload, showWhen: ["waiting", "running", "blocked"] },
+      { id: "send-pbc", label: "Send PBC Request", variant: "outline", icon: Send, showWhen: ["waiting", "running", "blocked"] },
       { id: "resolve-evidence", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
     ],
     outputRows: [
@@ -1416,7 +1416,7 @@ const stepNodeInfo: Record<string, StepNodeInfo> = {
       { id: "eu-xref", label: "Cross-Reference Validation", description: "Match extracted values against population/sample data for consistency", icon: GitBranch },
     ],
     actions: [
-      { id: "confirm-extraction", label: "Confirm Extraction", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "complete"] },
+      { id: "confirm-extraction", label: "Confirm Extraction", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "running", "complete"] },
       { id: "flag-rereview", label: "Flag for Re-review", variant: "outline", icon: Flag, showWhen: ["waiting", "running", "complete"] },
       { id: "resolve-understanding", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
     ],
@@ -1526,9 +1526,9 @@ const demoReadinessRows: ReadinessRow[] = [
   { category: "Control Description", dataSource: "Engagement workpaper / RCM", status: "green" },
   { category: "Control Attributes", dataSource: "RCM attribute mapping", status: "green" },
   { category: "SoD Policy Documentation", dataSource: "Uploaded — Corporate Policy P-114", status: "green" },
-  { category: "SoD Conflict Matrix", dataSource: "PBC — pending from David Kim", status: "red" },
-  { category: "User Access Listing", dataSource: "PBC — pending from David Kim", status: "red" },
-  { category: "Role-Permission Mapping", dataSource: "PBC — IT Security Team", status: "amber" },
+  { category: "SoD Conflict Matrix", dataSource: "PBC — received from David Kim", status: "green" },
+  { category: "User Access Listing", dataSource: "System extract — Okta / SAP", status: "green" },
+  { category: "Role-Permission Mapping", dataSource: "IT Security Team — partial coverage", status: "amber" },
   { category: "Organizational Chart", dataSource: "HR System Export", status: "green" },
   { category: "Prior Period Findings", dataSource: "Audit Management System", status: "green" },
 ];
@@ -2043,7 +2043,21 @@ function StepNodeContent({ step, stepStatus, controlId, blockRule, onResolve, is
         </div>
       )}
 
-      {visibleActions.length > 0 && (
+      {controlId === DEMO_CONTROL_ID && stepStatus === "running" && (
+        <div className="flex items-center gap-2 flex-wrap pt-1" data-testid={`step-actions-${step}`}>
+          <Button
+            size="sm"
+            className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+            onClick={() => onAction?.(step, "approve-step")}
+            data-testid={`button-advance-${step}-${controlId}`}
+          >
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            Approve & Continue
+          </Button>
+        </div>
+      )}
+
+      {controlId !== DEMO_CONTROL_ID && visibleActions.length > 0 && (
         <div className="flex items-center gap-2 flex-wrap pt-1" data-testid={`step-actions-${step}`}>
           {visibleActions.map((action) => {
             const Icon = action.icon;
@@ -2097,7 +2111,6 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   const blockRule = fieldworkBlockRules.find(r => r.controlId === controlId) ?? null;
   const isDemo = controlId === DEMO_CONTROL_ID;
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(() => {
-    if (isDemo) return new Set<string>();
     if (!controlStatus) return new Set<string>();
     const initial = new Set<string>();
     for (const step of fieldworkStepOrder) {
@@ -2114,7 +2127,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
 
   const handleStepAction = useCallback((stepKey: string, actionId: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    const isPrimaryAdvance = actionId.startsWith("approve") || actionId.startsWith("confirm") || actionId.startsWith("finalize") || actionId.startsWith("accept") || actionId.startsWith("validate") || actionId.startsWith("run-") || actionId === "upload-evidence";
+    const isPrimaryAdvance = actionId === "approve-step" || actionId.startsWith("approve") || actionId.startsWith("confirm") || actionId.startsWith("finalize") || actionId.startsWith("accept") || actionId.startsWith("validate") || actionId.startsWith("run-") || actionId === "upload-evidence";
     if (isDemo && onAdvanceStep && isPrimaryAdvance) {
       const currentStepStatus = controlStatus?.steps[stepKey as keyof typeof controlStatus.steps];
       if (currentStepStatus === "complete") return;
@@ -2137,7 +2150,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
       setActionToast(`${actionId} triggered for ${stepKey}`);
     }
     toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
-  }, [isDemo, onAdvanceStep]);
+  }, [isDemo, onAdvanceStep, controlStatus]);
 
   const toggleStep = (step: string) => {
     setExpandedSteps(prev => {
@@ -2268,12 +2281,12 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
                               <div className="flex items-center gap-2 pt-1">
                                 <Button
                                   size="sm"
-                                  className="h-7 text-xs bg-[#266C92] hover:bg-[#1e5a7a]"
-                                  onClick={() => handleStepAction("readiness", "confirm-readiness")}
-                                  data-testid="button-confirm-readiness"
+                                  className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                                  onClick={() => handleStepAction("readiness", "approve-step")}
+                                  data-testid="button-advance-readiness-CTL-003"
                                 >
-                                  <ThumbsUp className="w-3 h-3 mr-1.5" />
-                                  Confirm Readiness
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                  Approve & Continue
                                 </Button>
                               </div>
                             )}
