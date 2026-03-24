@@ -56,6 +56,17 @@ import {
   GitBranch,
   Layers,
   Hash,
+  Upload,
+  Send,
+  ThumbsUp,
+  RotateCcw,
+  FileCheck,
+  Table2,
+  Search,
+  Sparkles,
+  SlidersHorizontal,
+  Flag,
+  Scale,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -1274,47 +1285,194 @@ const readinessAssessmentRows: ReadinessRow[] = [
   { category: "Sample Evidence", dataSource: "Uploaded / Requested", status: "red" },
 ];
 
+type SubStepDef = {
+  id: string;
+  label: string;
+  description: string;
+  icon: typeof FileCheck;
+};
+
+type StepActionDef = {
+  id: string;
+  label: string;
+  variant: "primary" | "secondary" | "outline" | "destructive";
+  icon: typeof FileCheck;
+  showWhen: string[];
+  isResolve?: boolean;
+};
+
+type OutputRow = { label: string; value: string; status?: "green" | "amber" | "red" | "neutral" };
+
 type StepNodeInfo = {
   nodeLabel: string;
   aiDescription: string;
   userTouchpoint: string;
+  substeps: SubStepDef[];
+  actions: StepActionDef[];
+  outputRows: OutputRow[];
 };
 
 const stepNodeInfo: Record<string, StepNodeInfo> = {
   controlSetup: {
-    nodeLabel: "Node 1: Control Setup",
-    aiDescription: "AI translates descriptions/attributes into a structured test plan.",
-    userTouchpoint: "Review interpreted test plan pre-execution.",
+    nodeLabel: "Control Setup",
+    aiDescription: "AI interprets the control description and attributes to produce a structured, reviewable test plan prior to execution.",
+    userTouchpoint: "Review and approve the interpreted test plan before workflow proceeds.",
+    substeps: [
+      { id: "cs-interpret", label: "Control Description Interpretation", description: "AI parses narrative control description into structured fields", icon: Search },
+      { id: "cs-extract", label: "Attribute Extraction", description: "Identify testable attributes from control documentation", icon: Table2 },
+      { id: "cs-plan", label: "Test Plan Generation", description: "Compose step-by-step test plan aligned to extracted attributes", icon: ClipboardCheck },
+      { id: "cs-review", label: "User Review Gate", description: "Auditor reviews and approves the generated test plan", icon: Eye },
+    ],
+    actions: [
+      { id: "approve-plan", label: "Approve Test Plan", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "running", "complete"] },
+      { id: "request-revision", label: "Request Revision", variant: "outline", icon: RotateCcw, showWhen: ["waiting", "running", "complete"] },
+      { id: "resolve-setup", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
+    ],
+    outputRows: [
+      { label: "Control Objective", value: "Ensure access provisioning follows approval matrix", status: "green" },
+      { label: "Test Approach", value: "Inspect sample of provisioning requests against approval logs", status: "green" },
+      { label: "Attributes Identified", value: "4 testable attributes extracted", status: "green" },
+      { label: "Estimated Samples", value: "25 (risk-adjusted)", status: "neutral" },
+    ],
   },
   population: {
-    nodeLabel: "Node 2: Population Acquisition",
-    aiDescription: "AI processes population file into a validated dataset, flagging gaps.",
-    userTouchpoint: "Review validation results and anomalies.",
+    nodeLabel: "Population Acquisition",
+    aiDescription: "AI ingests the population data file, validates record completeness, and flags gaps or anomalies against the defined control period.",
+    userTouchpoint: "Review validation results and resolve any flagged anomalies before sampling.",
+    substeps: [
+      { id: "pop-ingest", label: "File Ingestion", description: "Parse and load population data from source file", icon: Upload },
+      { id: "pop-validate", label: "Schema Validation", description: "Validate field types, required columns, and format consistency", icon: FileCheck },
+      { id: "pop-complete", label: "Completeness Check", description: "Verify coverage against expected control period and entity scope", icon: Table2 },
+      { id: "pop-anomaly", label: "Anomaly Detection", description: "Flag duplicate records, date gaps, and statistical outliers", icon: AlertTriangle },
+    ],
+    actions: [
+      { id: "confirm-population", label: "Confirm Population", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "complete"] },
+      { id: "upload-replacement", label: "Upload Replacement", variant: "outline", icon: Upload, showWhen: ["waiting", "blocked"] },
+      { id: "resolve-population", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
+    ],
+    outputRows: [
+      { label: "Total Records", value: "2,847", status: "green" },
+      { label: "Period Coverage", value: "Jan 2025 – Dec 2025", status: "green" },
+      { label: "Gap Days", value: "0", status: "green" },
+      { label: "Duplicates Found", value: "3 (auto-excluded)", status: "amber" },
+      { label: "Schema Errors", value: "0", status: "green" },
+    ],
   },
   sampling: {
-    nodeLabel: "Node 3: Sampling",
-    aiDescription: "AI applies sampling methodology to yield a reproducible sample subset.",
-    userTouchpoint: "Verify methodology, size, exclusions, and selections.",
+    nodeLabel: "Sampling",
+    aiDescription: "AI applies risk-weighted stratification and statistical methods to select a reproducible sample subset from the validated population.",
+    userTouchpoint: "Verify methodology, sample size, exclusions, and final selections.",
+    substeps: [
+      { id: "smp-method", label: "Methodology Selection", description: "Determine sampling approach (statistical, judgmental, or hybrid)", icon: SlidersHorizontal },
+      { id: "smp-stratify", label: "Risk Stratification", description: "Assign risk weights to population segments for proportional coverage", icon: Layers },
+      { id: "smp-size", label: "Sample Size Calculation", description: "Compute minimum sample size for target confidence and tolerable error", icon: Scale },
+      { id: "smp-select", label: "Selection Execution", description: "Execute random/stratified selection and record seed for reproducibility", icon: Sparkles },
+    ],
+    actions: [
+      { id: "approve-sample", label: "Approve Sample", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "running", "complete"] },
+      { id: "adjust-parameters", label: "Adjust Parameters", variant: "outline", icon: SlidersHorizontal, showWhen: ["waiting", "running", "complete"] },
+      { id: "resolve-sampling", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
+    ],
+    outputRows: [
+      { label: "Methodology", value: "Stratified random (MUS)", status: "neutral" },
+      { label: "Confidence Level", value: "95%", status: "green" },
+      { label: "Population Size", value: "2,847", status: "neutral" },
+      { label: "Sample Size", value: "25", status: "green" },
+      { label: "Strata", value: "3 risk tiers", status: "neutral" },
+      { label: "Exclusions", value: "0", status: "green" },
+    ],
   },
   evidence: {
-    nodeLabel: "Node 4: Evidence Collection",
-    aiDescription: "AI maps requirements to samples to organize sample-linked evidence.",
-    userTouchpoint: "Audit available files; upload or trigger PBC requests.",
+    nodeLabel: "Evidence Collection",
+    aiDescription: "AI maps evidence requirements to each sample item, identifies available sources, and tracks collection completeness.",
+    userTouchpoint: "Audit the evidence matrix; upload documents or trigger PBC requests for missing items.",
+    substeps: [
+      { id: "evd-map", label: "Requirement Mapping", description: "Map each sample item to its required evidence types", icon: Table2 },
+      { id: "evd-source", label: "Source Identification", description: "Match required evidence to available connected systems or file uploads", icon: Search },
+      { id: "evd-collect", label: "Collection & Upload", description: "Pull from connected sources or accept manual uploads", icon: Upload },
+      { id: "evd-verify", label: "Completeness Verification", description: "Confirm all sample items have minimum required evidence coverage", icon: FileCheck },
+    ],
+    actions: [
+      { id: "upload-evidence", label: "Upload Evidence", variant: "primary", icon: Upload, showWhen: ["waiting", "blocked"] },
+      { id: "send-pbc", label: "Send PBC Request", variant: "outline", icon: Send, showWhen: ["waiting", "blocked"] },
+      { id: "resolve-evidence", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
+    ],
+    outputRows: [
+      { label: "Items Requiring Evidence", value: "25", status: "neutral" },
+      { label: "Auto-Collected", value: "18 (72%)", status: "green" },
+      { label: "Manually Uploaded", value: "4 (16%)", status: "green" },
+      { label: "Pending / Missing", value: "3 (12%)", status: "red" },
+      { label: "PBC Requests Sent", value: "2", status: "amber" },
+    ],
   },
   evidenceUnderstanding: {
-    nodeLabel: "Node 5: Evidence Understanding",
-    aiDescription: "AI parses evidence files to extract structured, traceable data.",
-    userTouchpoint: "Review extracted key fields, values, and document classifications.",
+    nodeLabel: "Evidence Understanding",
+    aiDescription: "AI parses collected evidence files, classifies document types, extracts structured fields and values, and cross-references against sample requirements.",
+    userTouchpoint: "Review extracted key fields, values, and document classifications for accuracy.",
+    substeps: [
+      { id: "eu-classify", label: "Document Classification", description: "Categorize each evidence file by type (approval, log, report, screenshot)", icon: Layers },
+      { id: "eu-extract", label: "Field Extraction", description: "Extract key fields (dates, approvers, amounts, statuses) from documents", icon: Search },
+      { id: "eu-parse", label: "Value Parsing", description: "Normalize extracted values into comparable, structured data", icon: Table2 },
+      { id: "eu-xref", label: "Cross-Reference Validation", description: "Match extracted values against population/sample data for consistency", icon: GitBranch },
+    ],
+    actions: [
+      { id: "confirm-extraction", label: "Confirm Extraction", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "complete"] },
+      { id: "flag-rereview", label: "Flag for Re-review", variant: "outline", icon: Flag, showWhen: ["waiting", "running", "complete"] },
+      { id: "resolve-understanding", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
+    ],
+    outputRows: [
+      { label: "Documents Processed", value: "22", status: "green" },
+      { label: "Fields Extracted", value: "88", status: "green" },
+      { label: "Classification Confidence", value: "94% avg", status: "green" },
+      { label: "Cross-Ref Matches", value: "20 / 22", status: "green" },
+      { label: "Low-Confidence Items", value: "2 flagged", status: "amber" },
+    ],
   },
   attributeEvaluation: {
-    nodeLabel: "Node 6: Attribute Evaluation",
-    aiDescription: "AI tests samples against attributes yielding Pass/Fail + rationale.",
-    userTouchpoint: "Audit individual attribute reasoning and evidence references.",
+    nodeLabel: "Attribute Evaluation",
+    aiDescription: "AI tests each sample against defined control attributes, producing Pass/Fail determinations with rationale and evidence references.",
+    userTouchpoint: "Audit individual attribute results, review AI reasoning, and override findings where warranted.",
+    substeps: [
+      { id: "ae-test", label: "Attribute Testing", description: "Evaluate each sample item against each control attribute", icon: ClipboardCheck },
+      { id: "ae-determine", label: "Pass/Fail Determination", description: "Apply pass/fail logic based on attribute criteria and evidence", icon: Scale },
+      { id: "ae-rationale", label: "Rationale Generation", description: "Document reasoning chain and evidence links for each determination", icon: FileText },
+      { id: "ae-exception", label: "Exception Identification", description: "Flag failed attributes and classify exception severity", icon: AlertTriangle },
+    ],
+    actions: [
+      { id: "approve-results", label: "Approve Results", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "running", "complete"] },
+      { id: "override-finding", label: "Override Finding", variant: "outline", icon: RotateCcw, showWhen: ["waiting", "running", "complete"] },
+      { id: "resolve-evaluation", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
+    ],
+    outputRows: [
+      { label: "Samples Evaluated", value: "25 / 25", status: "green" },
+      { label: "Attributes Tested", value: "100 (4 × 25)", status: "neutral" },
+      { label: "Pass Rate", value: "92%", status: "green" },
+      { label: "Exceptions Found", value: "2", status: "red" },
+      { label: "Avg Confidence", value: "96%", status: "green" },
+    ],
   },
   testEffectiveness: {
-    nodeLabel: "Node 7: Test Effectiveness",
-    aiDescription: "AI cross-checks results, validates completeness, flags low-confidence.",
-    userTouchpoint: "Address flagged items requiring human judgment.",
+    nodeLabel: "Test Effectiveness",
+    aiDescription: "AI aggregates attribute results, validates testing completeness, assesses confidence levels, and produces the control effectiveness conclusion.",
+    userTouchpoint: "Address flagged items, confirm the conclusion, and escalate if needed.",
+    substeps: [
+      { id: "te-aggregate", label: "Results Aggregation", description: "Consolidate all attribute evaluations into control-level metrics", icon: BarChart3 },
+      { id: "te-complete", label: "Completeness Validation", description: "Confirm all required samples and attributes have been evaluated", icon: FileCheck },
+      { id: "te-confidence", label: "Confidence Assessment", description: "Score overall testing confidence and flag low-confidence areas", icon: Target },
+      { id: "te-conclude", label: "Effectiveness Conclusion", description: "Determine Effective / Ineffective with supporting rationale", icon: ShieldCheck },
+    ],
+    actions: [
+      { id: "finalize-conclusion", label: "Finalize Conclusion", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "running", "complete"] },
+      { id: "escalate-review", label: "Escalate for Review", variant: "outline", icon: Send, showWhen: ["waiting", "running", "complete", "blocked"] },
+      { id: "resolve-effectiveness", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
+    ],
+    outputRows: [
+      { label: "Overall Pass Rate", value: "92%", status: "green" },
+      { label: "Testing Coverage", value: "100%", status: "green" },
+      { label: "Confidence Score", value: "High (96%)", status: "green" },
+      { label: "Exceptions", value: "2 identified", status: "red" },
+      { label: "Conclusion", value: "Pending finalization", status: "amber" },
+    ],
   },
 };
 
@@ -1363,60 +1521,227 @@ function ReadinessAssessmentContent({ stepStatus }: { stepStatus: string }) {
   );
 }
 
-function StepNodeContent({ step, stepStatus }: { step: string; stepStatus: string }) {
+function computeSubstepStatuses(substeps: SubStepDef[], stepStatus: string): Map<string, string> {
+  const map = new Map<string, string>();
+  if (stepStatus === "complete") {
+    substeps.forEach(s => map.set(s.id, "complete"));
+  } else if (stepStatus === "running") {
+    const activeIdx = Math.floor(Math.random() * 1000) % substeps.length;
+    substeps.forEach((s, i) => {
+      if (i < activeIdx) map.set(s.id, "complete");
+      else if (i === activeIdx) map.set(s.id, "running");
+      else map.set(s.id, "pending");
+    });
+  } else if (stepStatus === "waiting") {
+    const waitIdx = substeps.length - 1;
+    substeps.forEach((s, i) => {
+      if (i < waitIdx) map.set(s.id, "complete");
+      else map.set(s.id, "waiting");
+    });
+  } else if (stepStatus === "blocked") {
+    substeps.forEach((s, i) => {
+      if (i === 0) map.set(s.id, "blocked");
+      else map.set(s.id, "pending");
+    });
+  } else {
+    substeps.forEach(s => map.set(s.id, "pending"));
+  }
+  return map;
+}
+
+const substepStatusCache = new Map<string, Map<string, string>>();
+
+function getStableSubstepStatuses(stepKey: string, substeps: SubStepDef[], stepStatus: string): Map<string, string> {
+  const cacheKey = `${stepKey}-${stepStatus}`;
+  if (substepStatusCache.has(cacheKey)) return substepStatusCache.get(cacheKey)!;
+  const result = computeSubstepStatuses(substeps, stepStatus);
+  substepStatusCache.set(cacheKey, result);
+  return result;
+}
+
+function SubStepIndicator({ status }: { status: string }) {
+  if (status === "complete") return <CheckCircle2 className="w-3.5 h-3.5 text-[#266C92]" />;
+  if (status === "running") return <Loader2 className="w-3.5 h-3.5 text-[#266C92] animate-spin" />;
+  if (status === "waiting") return <Clock className="w-3.5 h-3.5 text-amber-500" />;
+  if (status === "blocked") return <AlertCircle className="w-3.5 h-3.5 text-red-500" />;
+  return <div className="w-3.5 h-3.5 rounded-full border-[1.5px] border-slate-300 dark:border-slate-600" />;
+}
+
+function OutputStatusDot({ status }: { status?: "green" | "amber" | "red" | "neutral" }) {
+  if (!status || status === "neutral") return null;
+  const colors = { green: "bg-emerald-400", amber: "bg-amber-400", red: "bg-red-500" };
+  return <div className={`w-2 h-2 rounded-full shrink-0 ${colors[status]}`} />;
+}
+
+type StepNodeContentProps = {
+  step: string;
+  stepStatus: string;
+  controlId: string;
+  blockRule?: { controlId: string; blockAtStep: string; title: string; description: string; severity: string } | null;
+  onResolve?: (controlId: string) => void;
+  isResolved?: boolean;
+  onAction?: (stepKey: string, actionId: string) => void;
+};
+
+function StepNodeContent({ step, stepStatus, controlId, blockRule, onResolve, isResolved, onAction }: StepNodeContentProps) {
   const info = stepNodeInfo[step];
   if (!info) return null;
+
+  const substepStatuses = getStableSubstepStatuses(`${controlId}-${step}`, info.substeps, stepStatus);
+  const showOutputs = stepStatus === "complete" || stepStatus === "running" || stepStatus === "waiting";
+  const isBlockedAtThisStep = blockRule && blockRule.blockAtStep === step && stepStatus === "blocked";
+  const visibleActions = info.actions.filter(a => a.showWhen.includes(stepStatus));
+
   return (
-    <div className="mt-3 space-y-3" data-testid={`step-node-${step}`}>
+    <div className="mt-3 space-y-4" data-testid={`step-node-${step}`}>
       <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
-        <div className="px-4 py-2.5 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border">
+        <div className="px-4 py-2.5 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border flex items-center justify-between">
           <span className="text-xs font-semibold text-foreground">{info.nodeLabel}</span>
+          {stepStatus === "running" && <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />}
+          {stepStatus === "complete" && <CheckCircle2 className="w-3 h-3 text-[#266C92]" />}
         </div>
-        <div className="px-4 py-3 space-y-3">
-          <div>
-            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">AI Process</p>
-            <p className="text-sm text-foreground">{info.aiDescription}</p>
-          </div>
-          <div className="border-t border-slate-100 dark:border-border/50 pt-3">
-            <p className="text-[10px] font-medium uppercase tracking-wider mb-1 text-[#266C92]">User Touchpoint</p>
-            <p className="text-sm text-foreground">{info.userTouchpoint}</p>
+        <div className="px-4 py-3 space-y-2">
+          <p className="text-xs text-muted-foreground leading-relaxed">{info.aiDescription}</p>
+          <div className="flex items-start gap-1.5 pt-1">
+            <Eye className="w-3 h-3 text-[#266C92] shrink-0 mt-0.5" />
+            <p className="text-xs text-[#266C92] font-medium">{info.userTouchpoint}</p>
           </div>
         </div>
       </div>
-      {stepStatus === "complete" && (
-        <div className="p-3 rounded-lg bg-[#266C92]/5 border border-[#266C92]/15">
-          <p className="text-xs text-[#266C92] font-medium">Step completed successfully.</p>
+
+      <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
+        <div className="px-4 py-2 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border">
+          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Substeps</span>
         </div>
-      )}
-      {stepStatus === "running" && (
-        <div className="p-3 rounded-lg bg-[#266C92]/5 border border-[#266C92]/15">
-          <div className="flex items-center gap-2">
-            <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />
-            <p className="text-xs text-[#266C92] font-medium">Agent processing…</p>
+        <div className="divide-y divide-slate-100 dark:divide-border/50">
+          {info.substeps.map((sub, idx) => {
+            const subStatus = substepStatuses.get(sub.id) ?? "pending";
+            const SubIcon = sub.icon;
+            return (
+              <div
+                key={sub.id}
+                className={`flex items-start gap-3 px-4 py-2.5 ${subStatus === "running" ? "bg-[#266C92]/[0.03]" : subStatus === "blocked" ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}
+                data-testid={`substep-${sub.id}`}
+              >
+                <div className="flex items-center gap-2 shrink-0 mt-0.5">
+                  <span className="text-[9px] text-muted-foreground font-mono w-4 text-right">{idx + 1}</span>
+                  <SubStepIndicator status={subStatus} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <SubIcon className="w-3 h-3 text-muted-foreground shrink-0" />
+                    <span className={`text-xs font-medium ${subStatus === "complete" || subStatus === "running" ? "text-foreground" : "text-muted-foreground"}`}>{sub.label}</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{sub.description}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {showOutputs && info.outputRows.length > 0 && (
+        <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
+          <div className="px-4 py-2 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border">
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Output Summary</span>
+          </div>
+          <div className="divide-y divide-slate-100 dark:divide-border/50">
+            {info.outputRows.map((row) => (
+              <div key={row.label} className="flex items-center justify-between px-4 py-2" data-testid={`output-row-${row.label.toLowerCase().replace(/\s+/g, "-")}`}>
+                <span className="text-xs text-muted-foreground">{row.label}</span>
+                <div className="flex items-center gap-2">
+                  <OutputStatusDot status={row.status} />
+                  <span className={`text-xs font-medium ${row.status === "red" ? "text-red-600 dark:text-red-400" : row.status === "amber" ? "text-amber-600 dark:text-amber-400" : "text-foreground"}`}>{row.value}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
-      {stepStatus === "waiting" && (
-        <div className="p-3 rounded-lg bg-amber-50/80 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-800/30">
+
+      {isBlockedAtThisStep && blockRule && (
+        <div className="p-3 rounded-lg bg-red-50/80 border border-red-200 dark:bg-red-900/10 dark:border-red-800/30 space-y-2">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0" />
+            <span className="text-xs font-semibold text-red-700 dark:text-red-400">{blockRule.title}</span>
+            <Badge className="text-[9px] h-4 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-0 ml-auto">
+              {blockRule.severity}
+            </Badge>
+          </div>
+          <p className="text-[11px] text-red-600/80 dark:text-red-400/80 leading-relaxed">{blockRule.description}</p>
+        </div>
+      )}
+
+      {stepStatus === "complete" && !isBlockedAtThisStep && (
+        <div className="p-2.5 rounded-lg bg-[#266C92]/5 border border-[#266C92]/15">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#266C92]" />
+            <p className="text-xs text-[#266C92] font-medium">Step completed — all substeps processed successfully.</p>
+          </div>
+        </div>
+      )}
+
+      {stepStatus === "running" && (
+        <div className="p-2.5 rounded-lg bg-[#266C92]/5 border border-[#266C92]/15">
+          <div className="flex items-center gap-2">
+            <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />
+            <p className="text-xs text-[#266C92] font-medium">Agent processing — {info.substeps.filter((_, i) => (substepStatuses.get(info.substeps[i].id) ?? "pending") === "complete").length}/{info.substeps.length} substeps complete</p>
+          </div>
+        </div>
+      )}
+
+      {stepStatus === "waiting" && !isBlockedAtThisStep && (
+        <div className="p-2.5 rounded-lg bg-amber-50/80 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-800/30">
           <div className="flex items-center gap-2">
             <Clock className="w-3 h-3 text-amber-600 dark:text-amber-400" />
             <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">Awaiting user action — {info.userTouchpoint.toLowerCase()}</p>
           </div>
         </div>
       )}
-      {stepStatus === "blocked" && (
-        <div className="p-3 rounded-lg bg-red-50/80 border border-red-200 dark:bg-red-900/10 dark:border-red-800/30">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-3 h-3 text-red-500" />
-            <p className="text-xs text-red-600 dark:text-red-400 font-medium">Step blocked — requires resolution before proceeding.</p>
-          </div>
+
+      {visibleActions.length > 0 && (
+        <div className="flex items-center gap-2 flex-wrap pt-1" data-testid={`step-actions-${step}`}>
+          {visibleActions.map((action) => {
+            const Icon = action.icon;
+            const handleClick = () => {
+              if (action.isResolve && onResolve) {
+                onResolve(controlId);
+                if (onAction) onAction(step, "Resolve & Resume");
+              } else if (onAction) {
+                onAction(step, action.id);
+              }
+            };
+            const isResolveDisabled = action.isResolve && isResolved;
+            return (
+              <Button
+                key={action.id}
+                size="sm"
+                variant={action.variant === "primary" ? "default" : action.variant === "outline" ? "outline" : action.variant === "destructive" ? "destructive" : "secondary"}
+                className={`h-7 text-[11px] gap-1.5 ${action.variant === "primary" ? "bg-[#266C92] hover:bg-[#1e5a7a] text-white" : ""}`}
+                onClick={handleClick}
+                disabled={!!isResolveDisabled}
+                data-testid={`button-action-${action.id}-${controlId}`}
+              >
+                <Icon className="w-3 h-3" />
+                {isResolveDisabled ? "Resolved" : action.label}
+              </Button>
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
 
-function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: string; controlStatus: ControlWorkflowStatus | null; onBack: () => void }) {
+type ControlFocusPageProps = {
+  controlId: string;
+  controlStatus: ControlWorkflowStatus | null;
+  onBack: () => void;
+  onResolve?: (controlId: string) => void;
+  isResolved?: boolean;
+};
+
+function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResolved }: ControlFocusPageProps) {
   const master = masterControlsList.find(c => c.id === controlId);
   const exceptionControlIds = new Set(fieldworkExceptions.map(e => e.controlId));
   const exceptions = fieldworkExceptions.filter(e => e.controlId === controlId);
@@ -1424,7 +1749,25 @@ function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: str
   const isComplete = controlStatus?.steps.testEffectiveness === "complete";
   const isEffective = isComplete && !hasException;
   const isIneffective = isComplete && hasException;
-  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set(["readiness"]));
+  const blockRule = fieldworkBlockRules.find(r => r.controlId === controlId) ?? null;
+  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(() => {
+    if (blockRule && controlStatus) {
+      const blockedStep = Object.entries(controlStatus.steps).find(([, v]) => v === "blocked")?.[0];
+      if (blockedStep) return new Set(["readiness", blockedStep]);
+    }
+    const activeStep = controlStatus
+      ? Object.entries(controlStatus.steps).find(([, v]) => v === "running" || v === "waiting")?.[0]
+      : undefined;
+    return new Set(activeStep ? ["readiness", activeStep] : ["readiness"]);
+  });
+  const [actionToast, setActionToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleStepAction = useCallback((stepKey: string, actionId: string) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setActionToast(`${actionId} triggered for ${stepKey}`);
+    toastTimerRef.current = setTimeout(() => setActionToast(null), 2500);
+  }, []);
 
   const toggleStep = (step: string) => {
     setExpandedSteps(prev => {
@@ -1446,7 +1789,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: str
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-background" data-testid={`control-focus-${controlId}`}>
+    <div className="relative flex flex-col h-full overflow-hidden bg-white dark:bg-background" data-testid={`control-focus-${controlId}`}>
       <div className="shrink-0 h-12 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
         <button
           onClick={onBack}
@@ -1551,7 +1894,15 @@ function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: str
                         {step === "readiness" ? (
                           <ReadinessAssessmentContent stepStatus={status} />
                         ) : (
-                          <StepNodeContent step={step} stepStatus={status} />
+                          <StepNodeContent
+                            step={step}
+                            stepStatus={status}
+                            controlId={controlId}
+                            blockRule={blockRule}
+                            onResolve={onResolve}
+                            isResolved={isResolved}
+                            onAction={handleStepAction}
+                          />
                         )}
                       </div>
                     )}
@@ -1595,6 +1946,15 @@ function ControlFocusPage({ controlId, controlStatus, onBack }: { controlId: str
           )}
         </div>
       </div>
+
+      {actionToast && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="px-4 py-2 rounded-lg bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-medium shadow-lg flex items-center gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            {actionToast}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1781,6 +2141,8 @@ function FieldworkComplexHub() {
         controlId={focusControlId}
         controlStatus={focusStatus}
         onBack={() => setHubDetailView(null)}
+        onResolve={handleResolveAction}
+        isResolved={resolvedSet.has(focusControlId)}
       />
     );
   }
