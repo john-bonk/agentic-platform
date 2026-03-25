@@ -2528,27 +2528,25 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
                 </div>
               </div>
 
-              <div className="rounded-xl border border-slate-200 dark:border-border bg-white dark:bg-card" data-testid={`control-step-block-${activeStep}`}>
-                <div className="p-5">
-                  {activeStep === "readiness" ? (
-                    <div className="space-y-3">
-                      <ReadinessAssessmentContent stepStatus={activeStepStatus} rows={isDemo ? demoReadinessRows : undefined} />
-                    </div>
-                  ) : (
-                    <StepNodeContent
-                      step={activeStep}
-                      stepStatus={activeStepStatus}
-                      controlId={controlId}
-                      substepProgress={substepProgress[activeStep] ?? 0}
-                      blockRule={blockRule}
-                      onResolve={onResolve}
-                      isResolved={isResolved}
-                      onAction={handleStepAction}
-                      onSubstepAction={handleSubstepAction}
-                      autoExpandedSubs={autoExpandedSubs}
-                    />
-                  )}
-                </div>
+              <div data-testid={`control-step-block-${activeStep}`}>
+                {activeStep === "readiness" ? (
+                  <div className="space-y-3">
+                    <ReadinessAssessmentContent stepStatus={activeStepStatus} rows={isDemo ? demoReadinessRows : undefined} />
+                  </div>
+                ) : (
+                  <StepNodeContent
+                    step={activeStep}
+                    stepStatus={activeStepStatus}
+                    controlId={controlId}
+                    substepProgress={substepProgress[activeStep] ?? 0}
+                    blockRule={blockRule}
+                    onResolve={onResolve}
+                    isResolved={isResolved}
+                    onAction={handleStepAction}
+                    onSubstepAction={handleSubstepAction}
+                    autoExpandedSubs={autoExpandedSubs}
+                  />
+                )}
               </div>
 
               {isComplete && (
