@@ -2109,19 +2109,19 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
         return (
           <div
             key={sub.id}
-            className={`rounded-lg border transition-colors ${
-              subStatus === "running" ? "border-[#266C92]/30 bg-[#266C92]/[0.02]" :
-              subStatus === "waiting" ? "border-amber-200 dark:border-amber-800/30 bg-amber-50/20 dark:bg-amber-900/5" :
-              subStatus === "blocked" ? "border-red-200 dark:border-red-800/30 bg-red-50/30 dark:bg-red-900/5" :
-              subStatus === "complete" ? "border-slate-200 dark:border-border" :
-              "border-slate-100 dark:border-border/50 opacity-60"
-            }`}
+            className="transition-colors"
             data-testid={`substep-${sub.id}`}
           >
             <button
               onClick={() => isExpandable && hasContent && toggleSub(sub.id)}
               disabled={!isExpandable || !hasContent}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-left ${isExpandable && hasContent ? "cursor-pointer hover:bg-slate-50/50 dark:hover:bg-muted/10" : "cursor-default"}`}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg transition-colors ${
+                subStatus === "running" ? "bg-[#266C92]/[0.04]" :
+                subStatus === "waiting" ? "bg-amber-50/30 dark:bg-amber-900/5" :
+                subStatus === "blocked" ? "bg-red-50/30 dark:bg-red-900/5" :
+                isExpandable && hasContent ? "hover:bg-slate-50/80 dark:hover:bg-muted/10 cursor-pointer" :
+                "cursor-default"
+              } ${subStatus === "pending" ? "opacity-50" : ""}`}
               data-testid={`substep-toggle-${sub.id}`}
             >
               <div className="flex items-center gap-2 shrink-0">
@@ -2141,7 +2141,7 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
             </button>
 
             {showInlineUpload && (
-              <div className="px-3.5 pb-3 pt-1 border-t border-slate-100 dark:border-border/50">
+              <div className="pl-12 pr-3 pb-2 pt-1">
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
@@ -2167,13 +2167,13 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
             )}
 
             {showEvidenceTracker && (
-              <div className="px-3.5 pb-3 pt-2 border-t border-slate-100 dark:border-border/50">
+              <div className="pl-12 pr-3 pb-3 pt-1">
                 <EvidenceCollectionTracker onComplete={() => onSubstepAction?.("evd-collect", "tracker-complete")} />
               </div>
             )}
 
             {isExpanded && hasContent && (
-              <div className="px-3.5 pb-3 pt-1 border-t border-slate-100 dark:border-border/50 space-y-2">
+              <div className="pl-12 pr-3 pb-3 pt-1 space-y-2">
                 {outputs.map((table, tIdx) => (
                   <DemoOutputTable key={tIdx} data={table} />
                 ))}
