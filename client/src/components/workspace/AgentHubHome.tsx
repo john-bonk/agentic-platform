@@ -3056,14 +3056,14 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
                       key={step}
                       onClick={() => navigable && setActiveStepIdx(idx)}
                       disabled={!navigable}
-                      className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium transition-all z-10 ${navigable ? "cursor-pointer" : "cursor-default"} ${
+                      className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all z-10 ring-2 ring-slate-50 dark:ring-slate-900 ${navigable ? "cursor-pointer" : "cursor-default"} ${
                         isActive
                           ? "bg-[#266C92] text-white shadow-sm"
                           : status === "complete"
-                            ? "bg-[#266C92]/10 text-[#266C92]"
+                            ? "bg-slate-50 dark:bg-slate-900 text-[#266C92]"
                             : status === "blocked"
-                              ? "bg-red-50 dark:bg-red-900/20 text-red-500"
-                              : "bg-slate-100 dark:bg-slate-800 text-muted-foreground"
+                              ? "bg-slate-50 dark:bg-slate-900 text-red-500"
+                              : "bg-slate-50 dark:bg-slate-900 text-muted-foreground"
                       }`}
                       data-testid={`stepper-step-${step}`}
                     >
