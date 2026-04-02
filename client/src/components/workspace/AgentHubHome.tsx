@@ -1361,6 +1361,7 @@ const stepNodeInfo: Record<string, StepNodeInfo> = {
     aiDescription: "AI evaluates required inputs, interprets the control description, extracts testable attributes, and produces a structured test plan.",
     userTouchpoint: "Review readiness assessment and approve the interpreted test plan before workflow proceeds.",
     substeps: [
+      { id: "rd-assess", label: "Input Readiness Assessment", description: "Evaluate availability and quality of all required control inputs and data sources", icon: FileCheck },
       { id: "cs-interpret", label: "Control Description Interpretation", description: "AI parses narrative control description into structured fields", icon: Search },
       { id: "cs-extract", label: "Attribute Extraction", description: "Identify testable attributes from control documentation", icon: Table2 },
       { id: "cs-plan", label: "Test Plan Generation", description: "Compose step-by-step test plan aligned to extracted attributes", icon: ClipboardCheck },
@@ -1469,10 +1470,10 @@ const stepNodeInfo: Record<string, StepNodeInfo> = {
     ],
     outputRows: [
       { label: "Samples Evaluated", value: "25 / 25", status: "green" },
-      { label: "Attributes Tested", value: "100 (4 × 25)", status: "neutral" },
-      { label: "Pass Rate", value: "92%", status: "green" },
-      { label: "Exceptions Found", value: "2", status: "red" },
-      { label: "Avg Confidence", value: "96%", status: "green" },
+      { label: "Attributes Tested", value: "125 (5 × 25)", status: "neutral" },
+      { label: "Attributes Passed", value: "2 of 5 (A2, A5)", status: "red" },
+      { label: "Attributes Failed", value: "3 of 5 (A1, A3, A4)", status: "red" },
+      { label: "Exceptions Identified", value: "3", status: "red" },
     ],
   },
   testEffectiveness: {
@@ -1491,11 +1492,11 @@ const stepNodeInfo: Record<string, StepNodeInfo> = {
       { id: "resolve-effectiveness", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
     ],
     outputRows: [
-      { label: "Overall Pass Rate", value: "92%", status: "green" },
+      { label: "Attribute Pass Rate", value: "40% (2 of 5)", status: "red" },
       { label: "Testing Coverage", value: "100%", status: "green" },
-      { label: "Confidence Score", value: "High (96%)", status: "green" },
-      { label: "Exceptions", value: "2 identified", status: "red" },
-      { label: "Conclusion", value: "Pending finalization", status: "amber" },
+      { label: "Confidence Score", value: "Medium-High", status: "amber" },
+      { label: "Exceptions", value: "3 identified", status: "red" },
+      { label: "Conclusion", value: "Ineffective", status: "red" },
     ],
   },
 };
@@ -1840,6 +1841,7 @@ const demoStepOutputs: Record<string, DemoStepOutputData[]> = {
 };
 
 const demoSubstepOutputs: Record<string, DemoStepOutputData[]> = {
+  "rd-assess": [],
   "cs-interpret": [demoStepOutputs.readiness[0]],
   "cs-extract": [demoStepOutputs.readiness[1]],
   "cs-plan": [demoStepOutputs.readiness[2]],
@@ -2082,7 +2084,8 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
         const isExpandable = subStatus === "complete";
         const isExpanded = mergedExpanded.has(sub.id);
         const outputs = isDemo ? (demoSubstepOutputs[sub.id] ?? []) : [];
-        const hasContent = outputs.length > 0;
+        const isReadinessAssess = sub.id === "rd-assess";
+        const hasContent = outputs.length > 0 || isReadinessAssess;
         const showInlineUpload = isDemo && sub.id === "pop-ingest" && subStatus === "running";
         const showEvidenceTracker = isDemo && sub.id === "evd-collect" && subStatus === "running";
 
@@ -2154,9 +2157,13 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
 
             {isExpanded && hasContent && (
               <div className="pl-12 pr-3 pb-3 pt-1 space-y-2">
-                {outputs.map((table, tIdx) => (
-                  <DemoOutputTable key={tIdx} data={table} />
-                ))}
+                {isReadinessAssess ? (
+                  <ReadinessAssessmentContent stepStatus={stepStatus} rows={isDemo ? demoReadinessRows : undefined} />
+                ) : (
+                  outputs.map((table, tIdx) => (
+                    <DemoOutputTable key={tIdx} data={table} />
+                  ))
+                )}
               </div>
             )}
           </div>
@@ -2497,9 +2504,6 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
               </div>
 
               <div data-testid={`control-step-block-${activeStep}`}>
-                {activeStep === "readiness" && (
-                  <ReadinessAssessmentContent stepStatus={activeStepStatus} rows={isDemo ? demoReadinessRows : undefined} />
-                )}
                 <StepNodeContent
                   step={activeStep}
                   stepStatus={activeStepStatus}
@@ -2661,16 +2665,15 @@ function ControlSummaryReport({ controlId, onBack }: { controlId: string; onBack
   const exceptions = fieldworkExceptions.filter(e => e.controlId === controlId);
   const hasException = exceptions.length > 0;
   const passed = !hasException;
-  const totalSamples = exceptions.reduce((sum, e) => sum + e.samplesTested, 0) || 25;
-  const failedSamples = exceptions.reduce((sum, e) => sum + e.samplesFailed, 0);
+  const totalSamples = exceptions.length > 0 ? Math.max(...exceptions.map(e => e.samplesTested)) : 25;
 
   const stepDetails = [
     { step: "Readiness", detail: "Control objective, risk classification, attributes extracted, and test plan established" },
     { step: "Population", detail: master?.dataSource === "connected" ? `Retrieved from ${master.system}` : "Population file uploaded via PBC request" },
     { step: "Sampling", detail: `${totalSamples} items selected using statistical sampling methodology` },
     { step: "Evidence", detail: master?.dataSource === "connected" ? `Automated extraction from ${master.system}, documents classified, fields extracted and cross-referenced` : "Evidence collected via PBC owner submission, documents classified, fields extracted and cross-referenced" },
-    { step: "Testing", detail: `${totalSamples} samples evaluated against ${exceptions.length > 0 ? exceptions.length + " testing attributes" : "all testing attributes"}` },
-    { step: "Test of Effectiveness", detail: passed ? "All attributes satisfied — control operating effectively" : `${failedSamples} of ${totalSamples} samples failed — exceptions identified` },
+    { step: "Testing", detail: passed ? `${totalSamples} samples evaluated against all testing attributes — no exceptions` : `${totalSamples} samples evaluated — ${exceptions.length} exception(s) identified across testing attributes` },
+    { step: "Test of Effectiveness", detail: passed ? "All attributes satisfied — control operating effectively" : `Control determined ineffective — ${exceptions.length} exception(s) requiring remediation` },
   ];
 
   return (
@@ -2707,7 +2710,7 @@ function ControlSummaryReport({ controlId, onBack }: { controlId: string; onBack
               <p className="text-[10px] text-muted-foreground">Risk Level</p>
             </div>
             <div className={`p-3 rounded-lg border text-center ${passed ? "border-emerald-200 dark:border-emerald-800/30 bg-emerald-50/30 dark:bg-emerald-900/10" : "border-red-200 dark:border-red-800/30 bg-red-50/30 dark:bg-red-900/10"}`}>
-              <p className={`text-2xl font-bold ${passed ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>{passed ? "Effective" : "Exception"}</p>
+              <p className={`text-2xl font-bold ${passed ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>{passed ? "Effective" : "Ineffective"}</p>
               <p className="text-[10px] text-muted-foreground">Result</p>
             </div>
             <div className="p-3 rounded-lg border border-slate-200 dark:border-border text-center">
@@ -2808,7 +2811,7 @@ function ControlSummaryReport({ controlId, onBack }: { controlId: string; onBack
             <p className="text-xs text-muted-foreground leading-relaxed">
               {passed
                 ? `The ${master?.name} control (${controlId}) was tested as part of the FY2026 Q1 automated control testing cycle. ${totalSamples} samples were selected and evaluated against all relevant testing attributes. All samples passed — the control is operating effectively with no exceptions or further action required.`
-                : `The ${master?.name} control (${controlId}) was tested as part of the FY2026 Q1 automated control testing cycle. ${totalSamples} samples were selected and evaluated. ${failedSamples} sample${failedSamples > 1 ? "s" : ""} failed testing, resulting in ${exceptions.length} exception${exceptions.length > 1 ? "s" : ""}. Management response and remediation plans are required within the prescribed timeline.`
+                : `The ${master?.name} control (${controlId}) was tested as part of the FY2026 Q1 automated control testing cycle. ${totalSamples} samples were selected and evaluated across all testing attributes. ${exceptions.length} exception${exceptions.length > 1 ? "s were" : " was"} identified — the control is determined to be operating ineffectively. Management response and remediation plans are required within the prescribed timeline.`
               }
             </p>
           </div>

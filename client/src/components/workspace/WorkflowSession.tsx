@@ -938,7 +938,9 @@ export function ExecutiveReportView() {
   const manualControls = masterControlsList.filter(c => c.dataSource === "manual").length;
   const highExceptions = fieldworkExceptions.filter(e => e.severity === "high").length;
   const mediumExceptions = fieldworkExceptions.filter(e => e.severity === "medium").length;
-  const passedControls = totalControls - fieldworkExceptions.length;
+  const failedControlIds = new Set(fieldworkExceptions.map(e => e.controlId));
+  const failedControls = failedControlIds.size;
+  const passedControls = totalControls - failedControls;
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
@@ -957,8 +959,8 @@ export function ExecutiveReportView() {
           <p className="text-[10px] text-muted-foreground">Passed</p>
         </div>
         <div className="p-3 rounded-lg border border-red-200 dark:border-red-800/30 bg-red-50/30 dark:bg-red-900/10 text-center">
-          <p className="text-2xl font-bold text-red-600 dark:text-red-400">{fieldworkExceptions.length}</p>
-          <p className="text-[10px] text-muted-foreground">Exceptions</p>
+          <p className="text-2xl font-bold text-red-600 dark:text-red-400">{failedControls}</p>
+          <p className="text-[10px] text-muted-foreground">Ineffective</p>
         </div>
         <div className="p-3 rounded-lg border border-slate-200 dark:border-border text-center">
           <p className="text-2xl font-bold text-foreground">{Math.round((passedControls / totalControls) * 100)}%</p>
@@ -1054,11 +1056,13 @@ export function ExecutiveReportView() {
       <DetailSection title="Conclusion & Recommendations">
         <div className="space-y-3 text-xs text-foreground leading-relaxed">
           <p>The Q1 FY2026 automated control testing cycle covered {totalControls} controls across IT General Controls, Financial Controls, and Compliance Controls. {autoControls} controls ({Math.round((autoControls / totalControls) * 100)}%) were tested via automated system connections, while {manualControls} controls ({Math.round((manualControls / totalControls) * 100)}%) required PBC-based evidence collection.</p>
-          <p>{passedControls} controls ({Math.round((passedControls / totalControls) * 100)}%) passed all testing procedures. {fieldworkExceptions.length} exceptions were identified — {highExceptions} high severity and {mediumExceptions} medium severity. The high-severity exceptions involve unauthorized access provisioning, journal entry segregation failures, and vendor payment structuring — all requiring immediate management attention and formal remediation plans.</p>
+          <p>{passedControls} controls ({Math.round((passedControls / totalControls) * 100)}%) passed all testing procedures. {fieldworkExceptions.length} exceptions were identified — {highExceptions} high severity and {mediumExceptions} medium severity. The high-severity exceptions involve unauthorized access provisioning, SoD matrix incompleteness and remediation delays, journal entry segregation failures, and vendor payment structuring — all requiring immediate management attention and formal remediation plans.</p>
           <p className="font-medium">Key Recommendations:</p>
           <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
-            <li>Escalate the 3 high-severity exceptions to the Audit Committee at the next scheduled meeting</li>
+            <li>Escalate the {highExceptions} high-severity exceptions to the Audit Committee at the next scheduled meeting</li>
             <li>Request formal management responses within the prescribed timelines</li>
+            <li>Expand the SoD conflict matrix to cover all P-114 function pairs and add Workday HR to scope</li>
+            <li>Assign dedicated SoD remediation coordinators in the Finance department to address systemic SLA overruns</li>
             <li>Schedule targeted re-testing for Q2 to validate remediation effectiveness</li>
             <li>Review automation rules in Okta and SAP that enable approval bypass</li>
             <li>Implement cumulative vendor spend monitoring to detect future structuring</li>
@@ -2345,6 +2349,48 @@ export const fieldworkExceptions: FieldworkException[] = [
     recommendation: "Implement a maximum 72-hour cap on the SOC exception list with mandatory re-approval. Add automated alerting for any escalation exceeding SLA regardless of exception status.",
     nextSteps: ["Create formal issue in audit management system", "Assign remediation to SOC Team Lead", "Request management response within 15 business days", "Verify exception list has been purged of stale entries"],
   },
+  {
+    id: "EXC-006",
+    controlId: "CTL-003",
+    controlName: "Segregation of Duties",
+    severity: "high",
+    title: "SoD Conflict Matrix Incomplete — Missing Function Pairs and System Coverage",
+    summary: "SoD matrix covers only 156 of 160 required function pairs and excludes Workday HR from in-scope systems, rendering Attribute A1 ineffective.",
+    detail: "Testing of the Segregation of Duties control revealed that the SoD conflict matrix maintained by the IT Security team omits 4 Treasury × IT Admin function-pair combinations required by Policy P-114 §4.2. Additionally, the Workday HR system — which manages role assignments for 340 users — is not included in the matrix scope. Without these entries, potential conflicts involving treasury operations and HR-provisioned roles are not detected by the preventive control. The matrix was last updated November 2025 but has not been reconciled to the current P-114 requirements since the policy was revised in September 2025.",
+    samplesTested: 25,
+    samplesFailed: 25,
+    rootCause: "P-114 was revised in September 2025 to include Treasury × IT Admin pairs, but the SoD matrix update process has no formal trigger tied to policy changes. Workday HR was onboarded in Q2 2025 and was never added to the SoD monitoring scope.",
+    recommendation: "Expand the SoD conflict matrix to include all 160 P-114 function pairs and add Workday HR to the in-scope systems. Implement a formal reconciliation process triggered by any policy revision.",
+    nextSteps: ["Create formal issue in audit management system", "Assign remediation to IT Security Lead and GRC team", "Request management response within 10 business days", "Re-test after matrix update"],
+  },
+  {
+    id: "EXC-007",
+    controlId: "CTL-003",
+    controlName: "Segregation of Duties",
+    severity: "high",
+    title: "SoD Conflict Remediation SLA Routinely Exceeded",
+    summary: "6 of 25 identified SoD conflicts were not remediated within the 5-business-day SLA, with an average overrun of 7.3 days.",
+    detail: "Attribute A3 testing identified that 24% of sampled SoD conflicts exceeded the mandated 5-business-day remediation window. The six failures (S01, S08, S09, S14, S17, S22) showed remediation timelines ranging from 8 to 16 business days. A pattern emerged in the Finance department, where all 4 Finance-related conflicts exceeded SLA, suggesting a systemic delay in that business unit's remediation process. The remaining 2 overruns were in IT Operations. None of the delayed remediations had documented SLA extension approvals.",
+    samplesTested: 25,
+    samplesFailed: 6,
+    rootCause: "Finance department lacks a dedicated SoD remediation owner; requests are routed to the general IT Security queue where they compete with lower-priority tickets. No automated escalation triggers when remediation approaches or exceeds SLA.",
+    recommendation: "Assign a dedicated SoD remediation coordinator for the Finance department. Implement automated escalation at 3-day and 5-day marks. Require documented extension approval for any remediation exceeding SLA.",
+    nextSteps: ["Create formal issue in audit management system", "Escalate to Finance Controller and IT Security Lead", "Request management action plan within 10 business days", "Assess whether delayed remediations resulted in actual unauthorized transactions"],
+  },
+  {
+    id: "EXC-008",
+    controlId: "CTL-003",
+    controlName: "Segregation of Duties",
+    severity: "medium",
+    title: "Q4 Quarterly SoD Review Not Performed",
+    summary: "No evidence of Q4 2025 quarterly SoD review execution was provided, rendering Attribute A4 partially ineffective.",
+    detail: "Attribute A4 requires formal quarterly reviews of SoD conflicts by the control owner with documented sign-off. Q1, Q2, and Q3 2025 reviews were performed on schedule with signed attestations and meeting minutes. However, the Q4 review — due by January 15, 2026 — has no evidence of execution. The control owner (S. Chen) confirmed verbally that the review was delayed due to year-end close activities but could not provide a rescheduled date or interim compensating procedures. Without the Q4 review, there is a 3-month gap in detective oversight of SoD conflicts.",
+    samplesTested: 4,
+    samplesFailed: 1,
+    rootCause: "No formal backup or delegation process exists for quarterly SoD reviews. Year-end close activities consistently compete with control execution, and there is no automated reminder or escalation for overdue reviews.",
+    recommendation: "Establish a formal backup reviewer for quarterly SoD reviews. Implement calendar-based automated reminders with escalation to the Audit Committee if review is not completed within 5 business days of the due date.",
+    nextSteps: ["Create formal issue in audit management system", "Request immediate completion of Q4 review from control owner", "Request management response within 15 business days", "Verify Q4 review is completed and documented"],
+  },
 ];
 
 export const fieldworkBlockRules: FieldworkBlockRule[] = [
@@ -2586,7 +2632,7 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
 
 export const fieldworkNextStepActions = [
   { icon: "FileText", label: "Generate Executive Report", desc: "Full summary report with testing coverage, exceptions, and recommendations for audit committee", actionId: "executive-report" },
-  { icon: "AlertTriangle", label: "Triage Exceptions", desc: `Review ${fieldworkExceptions.length} controls flagged with testing exceptions`, actionId: "triage-exceptions" },
+  { icon: "AlertTriangle", label: "Triage Exceptions", desc: `Review ${new Set(fieldworkExceptions.map(e => e.controlId)).size} controls flagged with ${fieldworkExceptions.length} testing exceptions`, actionId: "triage-exceptions" },
   { icon: "Target", label: "Remediation Tracking", desc: "Assign and track remediation actions for failed controls", actionId: "remediation" },
   { icon: "FileText", label: "Review Testing Results", desc: "Examine agent-annotated workpapers and testing conclusions", actionId: "review-results" },
   { icon: "Users", label: "Share with Audit Committee", desc: "Prepare executive summary for committee review", actionId: "share-committee" },
