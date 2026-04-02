@@ -2466,7 +2466,7 @@ function ControlDetailsTab({ controlId }: { controlId: string }) {
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto">
-      <div className="max-w-5xl mx-auto px-8 py-6 space-y-0">
+      <div className="w-[80%] mx-auto px-6 py-6 space-y-0">
         <div>
           <button
             onClick={() => setControlInfoOpen(!controlInfoOpen)}
@@ -2671,6 +2671,99 @@ function ControlAutomationsStub({ controlId }: { controlId: string }) {
 
 type ControlFocusTab = "details" | "testing" | "issues" | "automations";
 
+type TestCycle = "walkthrough" | "interim" | "rollforward";
+const testCycles: { id: TestCycle; label: string; period: string; status: string }[] = [
+  { id: "walkthrough", label: "Walkthrough", period: "Q4 FY2025", status: "Complete" },
+  { id: "interim", label: "Interim", period: "Q1 FY2026", status: "In Progress" },
+  { id: "rollforward", label: "Roll Forward", period: "Q2 FY2026", status: "Not Started" },
+];
+
+type TestDetailInfo = {
+  tester: string;
+  reviewer: string;
+  pbcRequest: string;
+  secondaryReviewer: string;
+  sampleSize: string;
+  budgetedHours: string;
+  sampleSelections: string;
+  dueDate: string;
+};
+
+function getTestDetailInfo(controlId: string, cycle: TestCycle): TestDetailInfo {
+  const master = masterControlsList.find(c => c.id === controlId);
+  const detail = getControlDetail(controlId);
+  if (!master || !detail) {
+    return { tester: "—", reviewer: "—", pbcRequest: "N/A", secondaryReviewer: "—", sampleSize: "—", budgetedHours: "—", sampleSelections: "—", dueDate: "—" };
+  }
+
+  const sampleSizeNum = master.riskLevel === "Critical" ? 5 : master.riskLevel === "High" ? 3 : 2;
+  const freq = detail.frequency;
+  const riskLabel = master.riskLevel;
+
+  const periodSelections: Record<string, string> = {
+    "Upon occurrence": cycle === "interim" ? "Sample of 25 transactions from Jul–Dec 2025" : cycle === "rollforward" ? "Sample of 25 transactions from Jan–Mar 2026" : "Sample of 10 transactions from Apr–Jun 2025",
+    "Daily": cycle === "interim" ? "15 randomly selected days from Jul–Dec 2025" : cycle === "rollforward" ? "10 randomly selected days from Jan–Mar 2026" : "5 randomly selected days from Apr–Jun 2025",
+    "Monthly": cycle === "interim" ? "March (P1), July (P6), November (P10)" : cycle === "rollforward" ? "January (P1), February (P2), March (P3)" : "October (P1), November (P2), December (P3)",
+    "Quarterly": cycle === "interim" ? "Q3 FY2025, Q4 FY2025" : cycle === "rollforward" ? "Q1 FY2026" : "Q2 FY2025",
+    "Annually": cycle === "interim" ? "Annual review — FY2025" : cycle === "rollforward" ? "Annual review — FY2026" : "Annual review — FY2025 (preliminary)",
+    "Per pay period": cycle === "interim" ? "PP12 (Jun), PP18 (Sep), PP24 (Dec)" : cycle === "rollforward" ? "PP2 (Jan), PP6 (Mar)" : "PP6 (Sep), PP12 (Dec)",
+    "Continuous": cycle === "interim" ? "Continuous monitoring — Jul–Dec 2025 period" : cycle === "rollforward" ? "Continuous monitoring — Jan–Mar 2026 period" : "Continuous monitoring — Apr–Jun 2025 period",
+  };
+
+  const testerLookup: Record<string, string> = {
+    "CTL-001": "Reginald Lee", "CTL-002": "Amanda Chen", "CTL-003": "Priya Kapoor",
+    "CTL-004": "Jason Park", "CTL-005": "Reginald Lee", "CTL-006": "Amanda Chen",
+    "CTL-007": "Natasha Hall", "CTL-008": "Reginald Lee", "CTL-009": "Jason Park",
+    "CTL-010": "Priya Kapoor", "CTL-011": "Amanda Chen", "CTL-012": "Natasha Hall",
+    "CTL-013": "Reginald Lee", "CTL-014": "Amanda Chen", "CTL-015": "Priya Kapoor",
+    "CTL-016": "Jason Park", "CTL-017": "Natasha Hall", "CTL-018": "Reginald Lee",
+    "CTL-019": "Amanda Chen", "CTL-020": "Priya Kapoor", "CTL-021": "Jason Park",
+    "CTL-022": "Reginald Lee", "CTL-023": "Natasha Hall", "CTL-024": "Amanda Chen",
+    "CTL-025": "Priya Kapoor",
+  };
+
+  const reviewerLookup: Record<string, string> = {
+    "CTL-001": "Michelle Allen", "CTL-002": "Michelle Allen", "CTL-003": "Michelle Allen",
+    "CTL-004": "David Okafor", "CTL-005": "Michelle Allen", "CTL-006": "David Okafor",
+    "CTL-007": "Michelle Allen", "CTL-008": "David Okafor", "CTL-009": "Michelle Allen",
+    "CTL-010": "David Okafor", "CTL-011": "Michelle Allen", "CTL-012": "David Okafor",
+    "CTL-013": "Michelle Allen", "CTL-014": "David Okafor", "CTL-015": "Michelle Allen",
+    "CTL-016": "David Okafor", "CTL-017": "Michelle Allen", "CTL-018": "David Okafor",
+    "CTL-019": "Michelle Allen", "CTL-020": "David Okafor", "CTL-021": "Michelle Allen",
+    "CTL-022": "David Okafor", "CTL-023": "Michelle Allen", "CTL-024": "David Okafor",
+    "CTL-025": "Michelle Allen",
+  };
+
+  const secondaryReviewerLookup: Record<string, string> = {
+    "CTL-001": "Natasha Hall", "CTL-002": "Priya Kapoor", "CTL-003": "Natasha Hall",
+    "CTL-004": "Amanda Chen", "CTL-005": "Natasha Hall", "CTL-006": "Priya Kapoor",
+    "CTL-007": "Amanda Chen", "CTL-008": "Natasha Hall", "CTL-009": "Priya Kapoor",
+    "CTL-010": "Natasha Hall", "CTL-011": "Priya Kapoor", "CTL-012": "Amanda Chen",
+    "CTL-013": "Natasha Hall", "CTL-014": "Amanda Chen", "CTL-015": "Natasha Hall",
+    "CTL-016": "Priya Kapoor", "CTL-017": "Amanda Chen", "CTL-018": "Natasha Hall",
+    "CTL-019": "Priya Kapoor", "CTL-020": "Amanda Chen", "CTL-021": "Natasha Hall",
+    "CTL-022": "Priya Kapoor", "CTL-023": "Amanda Chen", "CTL-024": "Natasha Hall",
+    "CTL-025": "Priya Kapoor",
+  };
+
+  const dueDates: Record<TestCycle, string> = {
+    walkthrough: "Dec 15, 2025",
+    interim: "Mar 31, 2026",
+    rollforward: "Jun 30, 2026",
+  };
+
+  return {
+    tester: testerLookup[controlId] || "Reginald Lee",
+    reviewer: reviewerLookup[controlId] || "Michelle Allen",
+    pbcRequest: master.dataSource === "manual" ? `PBC-${controlId.replace("CTL-", "")}-${cycle === "interim" ? "INT" : cycle === "rollforward" ? "RF" : "WT"}` : "N/A",
+    secondaryReviewer: secondaryReviewerLookup[controlId] || "Natasha Hall",
+    sampleSize: `${sampleSizeNum} based on control frequency of ${freq} and risk rating of ${riskLabel}`,
+    budgetedHours: "—",
+    sampleSelections: periodSelections[freq] || `${sampleSizeNum} items selected for the ${cycle} testing period`,
+    dueDate: dueDates[cycle],
+  };
+}
+
 type ControlFocusPageProps = {
   controlId: string;
   controlStatus: ControlWorkflowStatus | null;
@@ -2692,6 +2785,8 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   const blockRule = fieldworkBlockRules.find(r => r.controlId === controlId) ?? null;
   const isDemo = controlId === DEMO_CONTROL_ID;
   const [activeTab, setActiveTab] = useState<ControlFocusTab>("testing");
+  const [activeTestCycle, setActiveTestCycle] = useState<TestCycle>("interim");
+  const [testDetailsOpen, setTestDetailsOpen] = useState(false);
 
   const initialStepIndex = useMemo(() => {
     if (!controlStatus) return 0;
@@ -2882,6 +2977,29 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
 
       {activeTab === "testing" && (
         <>
+        <div className="shrink-0 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
+          <div className="px-6 flex items-center gap-1">
+            {testCycles.map(cycle => (
+              <button
+                key={cycle.id}
+                onClick={() => setActiveTestCycle(cycle.id)}
+                className={`px-3 py-2 text-xs font-medium rounded-t-md transition-colors flex items-center gap-2 ${
+                  activeTestCycle === cycle.id
+                    ? "bg-slate-50 dark:bg-muted/30 text-foreground border border-b-0 border-slate-200 dark:border-border -mb-px"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                data-testid={`cycle-${cycle.id}`}
+              >
+                {cycle.label}
+                <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${
+                  cycle.status === "Complete" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" :
+                  cycle.status === "In Progress" ? "bg-[#266C92]/10 text-[#266C92]" :
+                  "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                }`}>{cycle.status}</span>
+              </button>
+            ))}
+          </div>
+        </div>
         {controlStatus && (
         <div className="shrink-0 border-b border-slate-200 dark:border-border bg-slate-50/80 dark:bg-muted/20">
           <div className="w-[90%] max-w-5xl mx-auto py-4 px-2">
@@ -2947,7 +3065,54 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
       )}
 
       <div className="flex-1 min-h-0 overflow-y-auto">
-        <div className="w-[80%] max-w-6xl mx-auto px-6 py-6 space-y-6">
+        <div className="w-[80%] mx-auto px-6 py-6 space-y-6">
+          <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
+            <button
+              onClick={() => setTestDetailsOpen(!testDetailsOpen)}
+              className="w-full flex items-center gap-2 px-4 py-2.5 bg-slate-50/80 dark:bg-muted/20 hover:bg-slate-100 dark:hover:bg-muted/30 transition-colors"
+              data-testid="toggle-test-details"
+            >
+              <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${testDetailsOpen ? "" : "-rotate-90"}`} />
+              <span className="text-xs font-semibold text-foreground">Test Details</span>
+              {(() => { const cyc = testCycles.find(c => c.id === activeTestCycle); return cyc ? <span className="text-[10px] text-muted-foreground ml-1">— {cyc.label} · {cyc.period}</span> : null; })()}
+            </button>
+            {testDetailsOpen && (() => {
+              const td = getTestDetailInfo(controlId, activeTestCycle);
+              return (
+                <div className="px-4 py-4">
+                  <div className="flex gap-12">
+                    <div className="flex-1 space-y-4">
+                      {([
+                        ["Tester", td.tester],
+                        ["PBC Request", td.pbcRequest],
+                        ["Sample Size", td.sampleSize],
+                        ["Sample Selections", td.sampleSelections],
+                      ] as [string, string][]).map(([label, value]) => (
+                        <div key={label} className="flex items-baseline gap-4">
+                          <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase w-28 shrink-0 text-right">{label}</p>
+                          <p className="text-xs text-foreground">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="w-52 shrink-0 space-y-4">
+                      {([
+                        ["Reviewer", td.reviewer],
+                        ["Secondary Reviewer", td.secondaryReviewer],
+                        ["Budgeted Hours", td.budgetedHours],
+                        ["Due Date", td.dueDate],
+                      ] as [string, string][]).map(([label, value]) => (
+                        <div key={label} className="flex items-baseline gap-4">
+                          <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase w-24 shrink-0 text-right">{label}</p>
+                          <p className="text-xs text-foreground font-medium">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
           {controlStatus && (
             <>
               <div className="flex items-center gap-2">
