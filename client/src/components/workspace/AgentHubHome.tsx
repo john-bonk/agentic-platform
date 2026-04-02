@@ -2213,6 +2213,464 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
   );
 }
 
+type ControlDetailInfo = {
+  refId: string;
+  shortDesc: string;
+  longDesc: string;
+  process: string;
+  riskCode: string;
+  riskDesc: string;
+  assertions: string[];
+  practices: string[];
+  testingProcedure: string;
+  reviewer: string;
+  significance: string;
+  classification: string;
+  frequency: string;
+  nature: string;
+  controlType: string;
+  finAccounts: string;
+  pwcReliance: boolean;
+  supervisor: string | null;
+  ipe: string;
+  testDetail: string;
+  samplingApproach: string;
+  finApplications: string;
+  testTypes: string[];
+  attributes: { ref: string; name: string; desc: string }[];
+};
+
+const controlMetaLookup: Record<string, {
+  sub: string; freq: string; nat: string; rev: string; fin?: string;
+  desc?: string; longDesc?: string; testProc?: string;
+  attrs?: { ref: string; name: string; desc: string }[];
+}> = {
+  "CTL-001": { sub: "Identity & Access Management", freq: "Upon occurrence", nat: "Preventive", rev: "David Kim",
+    desc: "Access provisioning requests analyzed for appropriate approval and completeness",
+    longDesc: "Upon occurrence, the IT Security team reviews and processes access provisioning requests through the identity management system. Each request is validated against the role-based access control (RBAC) matrix to ensure appropriate access levels are granted, approvals are obtained from authorized managers, and provisioning is completed within SLA.",
+    testProc: "For selected samples, verify that access provisioning requests have appropriate manager approval, role assignments match the RBAC matrix, and provisioning was completed within the defined SLA.",
+    attrs: [
+      { ref: "A", name: "Manager approval present", desc: "Verify that access request has documented approval from authorized manager" },
+      { ref: "B", name: "Role assignment accuracy", desc: "Confirm assigned roles match the RBAC matrix for the user's job function" },
+      { ref: "C", name: "Provisioning timeliness", desc: "Verify access was provisioned within the 48-hour SLA" },
+      { ref: "D", name: "Access scope validation", desc: "Confirm access scope does not exceed the minimum necessary principle" },
+    ],
+  },
+  "CTL-002": { sub: "Change & Release Management", freq: "Upon occurrence", nat: "Preventive", rev: "Sarah Chen",
+    desc: "Change requests reviewed for proper authorization, testing, and deployment approval",
+    longDesc: "Upon occurrence, the IT Operations team manages change requests through the ITSM platform. Each change undergoes impact assessment, receives appropriate approval based on risk level, is tested in a non-production environment, and follows the approved deployment window with rollback procedures documented.",
+    testProc: "For selected changes, verify that change requests have appropriate CAB approval, testing evidence is documented, deployment followed the approved window, and rollback procedures were available.",
+    attrs: [
+      { ref: "A", name: "CAB approval documented", desc: "Verify change advisory board approval is documented for the change request" },
+      { ref: "B", name: "Testing evidence available", desc: "Confirm pre-deployment testing was performed and results documented" },
+      { ref: "C", name: "Deployment window compliance", desc: "Verify the change was deployed within the approved maintenance window" },
+      { ref: "D", name: "Rollback plan present", desc: "Confirm a documented rollback procedure exists for the change" },
+    ],
+  },
+  "CTL-004": { sub: "Infrastructure & Operations", freq: "Daily", nat: "Preventive", rev: "Michael Torres", fin: "N/A — IT General Control",
+    desc: "Backup and recovery procedures verified for completeness and restoration capability",
+    longDesc: "Daily, the IT Infrastructure team monitors automated backup jobs across critical systems. Backup completion status is reviewed, failures are investigated and resolved, and quarterly restoration tests are performed to validate data integrity and recovery time objectives (RTO).",
+    testProc: "For selected periods, verify that backup jobs completed successfully, failures were investigated and resolved, and restoration tests meet documented RTO/RPO requirements.",
+    attrs: [
+      { ref: "A", name: "Backup completion status", desc: "Verify daily backup jobs completed successfully for all critical systems" },
+      { ref: "B", name: "Failure resolution timeliness", desc: "Confirm backup failures were investigated and resolved within 24 hours" },
+      { ref: "C", name: "Restoration test performed", desc: "Verify quarterly restoration tests were performed and documented" },
+      { ref: "D", name: "RTO/RPO compliance", desc: "Confirm restoration times meet the documented recovery objectives" },
+    ],
+  },
+  "CTL-005": { sub: "General Ledger / Journal Entries", freq: "Upon occurrence", nat: "Preventive", rev: "Claire Dubois", fin: "AUT100 — General Ledger",
+    desc: "Journal entries reviewed for appropriate authorization, supporting documentation, and accuracy",
+    longDesc: "Upon occurrence, the Controller's team reviews all manual journal entries exceeding the materiality threshold. Entries are validated for proper authorization, adequate supporting documentation, accurate account classification, and compliance with the company's accounting policies.",
+    testProc: "For selected journal entries, verify that entries have dual approval from authorized personnel, supporting documentation is adequate, account codes are accurate, and entries comply with applicable accounting standards.",
+    attrs: [
+      { ref: "A", name: "Dual approval present", desc: "Verify journal entry has approval from two authorized personnel" },
+      { ref: "B", name: "Supporting documentation adequate", desc: "Confirm adequate supporting documentation is attached and referenced" },
+      { ref: "C", name: "Account classification accuracy", desc: "Verify account codes and cost centers are correctly assigned" },
+      { ref: "D", name: "Posting period compliance", desc: "Confirm entry is posted in the correct accounting period" },
+    ],
+  },
+  "CTL-006": { sub: "Treasury / Cash Management", freq: "Monthly", nat: "Detective", rev: "Oliver Wright", fin: "AUT200 — Cash & Bank",
+    desc: "Bank reconciliations prepared and reviewed for completeness and timely resolution of discrepancies",
+    longDesc: "Monthly, the Treasury team prepares bank reconciliations for all active accounts. Reconciliations compare GL balances to bank statements, identify and investigate outstanding items, and are reviewed and approved by Treasury management within the prescribed deadline.",
+    testProc: "For selected months, verify that bank reconciliations are prepared timely, outstanding items are investigated and resolved, and reconciliations are reviewed and approved by management.",
+    attrs: [
+      { ref: "A", name: "Reconciliation timeliness", desc: "Verify bank reconciliation is completed within 5 business days of month-end" },
+      { ref: "B", name: "Outstanding item investigation", desc: "Confirm outstanding items over 30 days are investigated with documented resolution" },
+      { ref: "C", name: "Management review sign-off", desc: "Verify reconciliation is reviewed and signed off by Treasury management" },
+      { ref: "D", name: "Balance agreement", desc: "Confirm GL balance agrees to bank statement balance after reconciling items" },
+    ],
+  },
+  "CTL-007": { sub: "Revenue Cycle / Contract Accounting", freq: "Monthly", nat: "Detective", rev: "Jun Li", fin: "AUT300 — Revenue",
+    desc: "Revenue recognition calculations reviewed for compliance with ASC 606 and contract terms",
+    longDesc: "Monthly, the Revenue Accounting team reviews revenue recognition for all active contracts. Reviews ensure compliance with ASC 606 requirements, proper identification of performance obligations, accurate transaction price allocation, and appropriate timing of revenue recognition based on satisfaction of performance obligations.",
+    testProc: "For selected contracts, verify that performance obligations are properly identified, transaction prices are accurately allocated, revenue is recognized upon satisfaction of obligations, and calculations comply with ASC 606.",
+    attrs: [
+      { ref: "A", name: "Performance obligation identification", desc: "Verify all distinct performance obligations are identified per the contract" },
+      { ref: "B", name: "Transaction price allocation", desc: "Confirm transaction price is allocated to obligations using standalone selling prices" },
+      { ref: "C", name: "Recognition timing accuracy", desc: "Verify revenue is recognized when performance obligations are satisfied" },
+      { ref: "D", name: "ASC 606 compliance", desc: "Confirm revenue recognition treatment complies with ASC 606 requirements" },
+    ],
+  },
+  "CTL-008": { sub: "Accounts Payable / Disbursements", freq: "Upon occurrence", nat: "Preventive", rev: "Amy Lau", fin: "AUT000 — Accounts Payable",
+    desc: "Vendor payments authorized through 3-way match verification and approval workflow",
+    longDesc: "Upon occurrence, the AP Manager ensures that all vendor payments exceeding the tolerance threshold are processed through a 3-way match verification (purchase order, goods receipt, invoice). Discrepancies are investigated and resolved, and payments require documented manager approval before release.",
+    testProc: "For selected payments, verify that 3-way match is completed, discrepancies exceeding tolerance are investigated with documented resolution, and payment release has appropriate manager authorization.",
+    attrs: [
+      { ref: "A", name: "3-way match completion", desc: "Verify purchase order, goods receipt, and invoice are matched and agree" },
+      { ref: "B", name: "Tolerance threshold compliance", desc: "Confirm discrepancies exceeding the $3,000 tolerance are investigated" },
+      { ref: "C", name: "Manager authorization present", desc: "Verify payment release has documented approval from authorized manager" },
+      { ref: "D", name: "Vendor master data accuracy", desc: "Confirm payment is directed to validated vendor bank account details" },
+    ],
+  },
+  "CTL-009": { sub: "Physical Security / Facility Access", freq: "Upon occurrence", nat: "Preventive", rev: "Claire Dubois", fin: "N/A — Entity Level Control" },
+  "CTL-010": { sub: "Security Operations / Incident Management", freq: "Upon occurrence", nat: "Detective", rev: "Priya Sharma" },
+  "CTL-011": { sub: "Data Governance / Information Security", freq: "Quarterly", nat: "Preventive", rev: "Sarah Chen", fin: "N/A — Entity Level Control" },
+  "CTL-012": { sub: "Procurement / Purchasing", freq: "Upon occurrence", nat: "Preventive", rev: "Oliver Wright", fin: "AUT400 — Procurement" },
+  "CTL-013": { sub: "Identity & Access Reviews", freq: "Quarterly", nat: "Detective", rev: "Sarah Chen" },
+  "CTL-014": { sub: "Financial Reporting / Period Close", freq: "Monthly", nat: "Detective", rev: "Claire Dubois", fin: "AUT100 — General Ledger" },
+  "CTL-015": { sub: "Vendor Risk Management", freq: "Annually", nat: "Preventive", rev: "Wei Zhang", fin: "N/A — Entity Level Control" },
+  "CTL-016": { sub: "Security Operations / Privilege Management", freq: "Continuous", nat: "Detective", rev: "Nina Patel" },
+  "CTL-017": { sub: "Cost Accounting / Inventory", freq: "Monthly", nat: "Detective", rev: "Hans Mueller", fin: "AUT500 — Inventory" },
+  "CTL-018": { sub: "Accounts Receivable / Collections", freq: "Monthly", nat: "Detective", rev: "Emma Scott", fin: "AUT600 — Accounts Receivable" },
+  "CTL-019": { sub: "Human Resources / Payroll", freq: "Per pay period", nat: "Preventive", rev: "Raj Anand", fin: "AUT700 — Payroll & Benefits" },
+  "CTL-020": { sub: "Fixed Assets / Capital Expenditure", freq: "Monthly", nat: "Detective", rev: "Jun Li", fin: "AUT800 — Fixed Assets" },
+  "CTL-021": { sub: "Database Administration / Access Control", freq: "Continuous", nat: "Detective", rev: "David Kim" },
+  "CTL-022": { sub: "Network Security / Monitoring", freq: "Continuous", nat: "Detective", rev: "Michael Torres" },
+  "CTL-023": { sub: "Business Continuity / Disaster Recovery", freq: "Annually", nat: "Preventive", rev: "Alex Morrison", fin: "N/A — Entity Level Control" },
+  "CTL-024": { sub: "Ethics & Compliance", freq: "Upon occurrence", nat: "Detective", rev: "Ciara O'Brien", fin: "N/A — Entity Level Control" },
+  "CTL-025": { sub: "Consolidation / Intercompany", freq: "Monthly", nat: "Detective", rev: "Oliver Wright", fin: "AUT900 — Intercompany" },
+};
+
+function getControlDetail(controlId: string): ControlDetailInfo | null {
+  const master = masterControlsList.find(c => c.id === controlId);
+  if (!master) return null;
+
+  const num = parseInt(controlId.replace("CTL-", ""));
+  const catCode = master.category === "IT General Controls" ? "IT" : master.category === "Financial Controls" ? "FN" : "EL";
+  const refId = `US.${catCode}.${num}.C${num.toString().padStart(2, "0")}`;
+
+  if (controlId === "CTL-003") {
+    return {
+      refId: "US.IT.3.C03",
+      shortDesc: "Segregation of duties conflict matrix analyzed for appropriate role separation and access governance",
+      longDesc: "Quarterly, the Internal Audit team reviews the SoD conflict matrix across all critical business processes. The team ensures that incompatible duties are properly separated and that compensating controls exist where separation is not feasible. Access conflicts are identified through automated role-permission analysis against the approved SoD rule set, with manual review of exception cases.",
+      process: "Corporate / IT Security / Access Governance",
+      riskCode: "R012",
+      riskDesc: "Unauthorized access to critical functions may result in fraudulent transactions or undetected errors due to inadequate segregation of incompatible duties",
+      assertions: ["Existence/Occurrence", "Rights & Obligations", "Completeness"],
+      practices: ["D1 - Displays through policies and procedures", "D5 - Selects and develops control activities", "D7 - Evaluates and communicates deficiencies"],
+      testingProcedure: "For selected samples, verify that the SoD conflict matrix is complete for all in-scope role combinations, remediation actions for identified conflicts are performed within the prescribed SLA, and quarterly review sign-offs are documented and approved.",
+      reviewer: "Michael Torres",
+      significance: "Key",
+      classification: "Operational",
+      frequency: "Quarterly",
+      nature: "Detective",
+      controlType: "Manual",
+      finAccounts: "N/A — IT General Control",
+      pwcReliance: false,
+      supervisor: null,
+      ipe: "#IPE.IT.3.C03: SoD conflict matrix report",
+      testDetail: "For selected samples, verify that the SoD conflict matrix is complete for all in-scope role combinations, identify conflicts where incompatible access exists, confirm remediation actions are performed within the 30-day SLA, and verify quarterly review sign-offs are documented and approved by the control owner.",
+      samplingApproach: "Judgmental",
+      finApplications: "Okta IAM, SAP ERP",
+      testTypes: ["Inspection", "Inquiry"],
+      attributes: [
+        { ref: "A", name: "SoD matrix completeness", desc: "Verify the conflict matrix covers all critical function pairs across in-scope systems" },
+        { ref: "B", name: "Conflict identification accuracy", desc: "Confirm that identified conflicts match the approved SoD rule set definitions" },
+        { ref: "C", name: "Remediation timeliness", desc: "Verify that conflict remediation actions are completed within the 30-day SLA" },
+        { ref: "D", name: "Quarterly review sign-off", desc: "Confirm quarterly SoD review is performed and signed off by the control owner" },
+        { ref: "E", name: "Compensating control documentation", desc: "Where conflicts cannot be resolved, verify compensating controls are documented and approved" },
+      ],
+    };
+  }
+
+  const meta = controlMetaLookup[controlId] || { sub: master.name, freq: "Monthly", nat: "Detective", rev: "Review Team" };
+
+  const processBase = master.category === "IT General Controls"
+    ? "Corporate / Information Technology"
+    : master.category === "Financial Controls"
+      ? "Corporate / Finance & Accounting"
+      : "Corporate / Enterprise Governance";
+
+  const assertions = master.category === "Financial Controls"
+    ? ["Completeness", "Existence/Occurrence", "Valuation & Accuracy", "Rights & Obligations"]
+    : master.category === "IT General Controls"
+      ? ["Existence/Occurrence", "Rights & Obligations", "Completeness"]
+      : ["Completeness", "Existence/Occurrence", "Rights & Obligations"];
+
+  const practices = master.category === "Financial Controls"
+    ? ["D1 - Displays through policies and procedures", "D7 - Evaluates and communicates deficiencies"]
+    : master.category === "IT General Controls"
+      ? ["D1 - Displays through policies and procedures", "D5 - Selects and develops control activities"]
+      : ["D1 - Displays through policies and procedures", "D3 - Uses relevant information"];
+
+  const controlType = master.dataSource === "connected" ? "IT Dependent Manual" : "Manual";
+  const classification = master.category === "Financial Controls" ? "Financial Reporting" : "Operational";
+  const significance = master.riskLevel === "Critical" || master.riskLevel === "High" ? "Key" : "Non-Key";
+  const finAccounts = meta.fin || (master.category === "IT General Controls" ? "N/A — IT General Control" : "Various");
+  const riskCode = `R${(10 + num * 3).toString().padStart(3, "0")}`;
+
+  const riskDescMap: Record<string, string> = {
+    "IT General Controls": "IT systems and access controls may not operate effectively, resulting in unauthorized access or undetected changes to critical systems and data",
+    "Financial Controls": "Financial statements may contain material misstatements due to errors or fraud in transaction processing and reporting",
+    "Entity Level Controls": "Entity-level governance controls may not provide adequate oversight, resulting in undetected compliance or operational failures",
+  };
+
+  const shortDesc = meta.desc || `${master.name} control verification and compliance testing`;
+  const longDesc = meta.longDesc || `${meta.freq === "Upon occurrence" ? "Upon occurrence" : meta.freq === "Continuous" ? "Continuously" : meta.freq}, the ${master.owner} team performs ${master.name.toLowerCase()} procedures. ${master.dataSource === "connected" ? `Data is sourced from ${master.system} for automated analysis and validation.` : "Evidence is collected through manual PBC requests and reviewed for completeness."} Results are documented and exceptions are escalated per the established remediation framework.`;
+  const testProc = meta.testProc || `For selected samples, verify that ${master.name.toLowerCase()} procedures are performed in accordance with the control design, required approvals are obtained, supporting documentation is adequate, and results are accurately recorded.`;
+
+  const defaultAttrs: { ref: string; name: string; desc: string }[] = [
+    { ref: "A", name: `${master.name} execution completeness`, desc: `Verify that ${master.name.toLowerCase()} procedures were fully executed for the sample period` },
+    { ref: "B", name: "Authorization and approval", desc: "Confirm appropriate authorization and approval documentation is present" },
+    { ref: "C", name: "Timeliness of execution", desc: "Verify the control was performed within the prescribed timeline or frequency" },
+    { ref: "D", name: "Documentation adequacy", desc: "Confirm supporting documentation is complete, accurate, and appropriately retained" },
+  ];
+
+  return {
+    refId,
+    shortDesc,
+    longDesc,
+    process: `${processBase} / ${meta.sub}`,
+    riskCode,
+    riskDesc: riskDescMap[master.category] || "Control failure may result in material misstatement or operational disruption",
+    assertions,
+    practices,
+    testingProcedure: testProc,
+    reviewer: meta.rev,
+    significance,
+    classification,
+    frequency: meta.freq,
+    nature: meta.nat,
+    controlType,
+    finAccounts,
+    pwcReliance: false,
+    supervisor: null,
+    ipe: `#IPE.${catCode}.${num}.C${num.toString().padStart(2, "0")}: ${master.name} report`,
+    testDetail: testProc,
+    samplingApproach: master.riskLevel === "Critical" ? "Statistical" : "Random",
+    finApplications: master.system || "N/A",
+    testTypes: master.dataSource === "connected" ? ["Inspection", "Reperformance"] : ["Inspection", "Inquiry"],
+    attributes: meta.attrs || defaultAttrs,
+  };
+}
+
+function ControlDetailsTab({ controlId }: { controlId: string }) {
+  const detail = getControlDetail(controlId);
+  const master = masterControlsList.find(c => c.id === controlId);
+  const [controlInfoOpen, setControlInfoOpen] = useState(true);
+  const [testInfoOpen, setTestInfoOpen] = useState(true);
+  const [attributesOpen, setAttributesOpen] = useState(true);
+
+  if (!detail || !master) return null;
+
+  return (
+    <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="max-w-5xl mx-auto px-8 py-6 space-y-0">
+        <div>
+          <button
+            onClick={() => setControlInfoOpen(!controlInfoOpen)}
+            className="flex items-center gap-1.5 py-4"
+            data-testid="toggle-control-info"
+          >
+            <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${controlInfoOpen ? "" : "-rotate-90"}`} />
+            <span className="text-sm font-semibold text-foreground">Control Information</span>
+          </button>
+          {controlInfoOpen && (
+            <div className="flex gap-12 pb-6">
+              <div className="flex-1 space-y-5">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Description</p>
+                  <p className="text-xs text-foreground">
+                    <span className="text-[#266C92] font-medium">{detail.refId}</span>{" "}
+                    {detail.shortDesc}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed mt-1.5">{detail.longDesc}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Process/Subprocess</p>
+                  <p className="text-xs text-foreground mt-0.5">{detail.process}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Risk Level</p>
+                  <p className={`text-xs mt-0.5 font-medium ${master.riskLevel === "Critical" ? "text-red-600 dark:text-red-400" : master.riskLevel === "High" ? "text-orange-600 dark:text-orange-400" : "text-foreground"}`}>{master.riskLevel}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Risk</p>
+                  <p className="text-xs text-foreground mt-0.5">
+                    <span className="text-[#266C92] underline cursor-pointer">{detail.riskCode}</span>{" "}
+                    {detail.riskDesc}
+                  </p>
+                  <ul className="mt-2 space-y-0.5 ml-8">
+                    {detail.assertions.map(a => (
+                      <li key={a} className="text-xs text-muted-foreground">{a}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Control Practices</p>
+                  <div className="mt-0.5 space-y-0.5">
+                    {detail.practices.map(p => (
+                      <p key={p} className="text-xs text-foreground">{p}</p>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Testing Procedure</p>
+                  <p className="text-xs text-foreground leading-relaxed mt-0.5">{detail.testingProcedure}</p>
+                </div>
+              </div>
+              <div className="w-52 shrink-0 space-y-3.5">
+                {([
+                  ["Control Owner", master.owner],
+                  ["PBC Owners", master.pbcOwner || "—"],
+                  ["Control Reviewer", detail.reviewer],
+                  ["Significance", detail.significance],
+                  ["Classification", detail.classification],
+                  ["Frequency", detail.frequency],
+                  ["Nature", detail.nature],
+                  ["Control Type", detail.controlType],
+                  ["Fin. Accounts", detail.finAccounts],
+                  ["PWC Reliance Control", detail.pwcReliance ? "Yes" : "No"],
+                  ["Supervisor", detail.supervisor || "—"],
+                ] as [string, string][]).map(([label, value]) => (
+                  <div key={label}>
+                    <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">{label}</p>
+                    <p className="text-xs text-foreground font-medium mt-0.5">{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-slate-200 dark:border-border" />
+
+        <div>
+          <button
+            onClick={() => setTestInfoOpen(!testInfoOpen)}
+            className="flex items-center gap-1.5 py-4"
+            data-testid="toggle-test-info"
+          >
+            <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${testInfoOpen ? "" : "-rotate-90"}`} />
+            <span className="text-sm font-semibold text-foreground">Control Test Information</span>
+          </button>
+          {testInfoOpen && (
+            <div className="flex gap-12 pb-6">
+              <div className="flex-1 space-y-5">
+                <div>
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">IPE</p>
+                  <p className="text-xs mt-0.5">
+                    <span className="text-[#266C92] font-medium">{detail.ipe}</span>
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Test Procedures</p>
+                  <p className="text-xs text-foreground leading-relaxed mt-0.5">{detail.testDetail}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Sampling Approach</p>
+                  <p className="text-xs text-foreground mt-0.5">{detail.samplingApproach}</p>
+                </div>
+              </div>
+              <div className="w-52 shrink-0 space-y-3.5">
+                <div>
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Fin. Applications</p>
+                  <p className="text-xs text-foreground font-medium mt-0.5">{detail.finApplications}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Test Types</p>
+                  <div className="mt-0.5 space-y-0.5">
+                    {detail.testTypes.map(t => (
+                      <p key={t} className="text-xs text-foreground font-medium">{t}</p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-slate-200 dark:border-border" />
+
+        <div>
+          <button
+            onClick={() => setAttributesOpen(!attributesOpen)}
+            className="flex items-center gap-1.5 py-4"
+            data-testid="toggle-attributes"
+          >
+            <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${attributesOpen ? "" : "-rotate-90"}`} />
+            <span className="text-sm font-semibold text-foreground">Attributes</span>
+          </button>
+          {attributesOpen && (
+            <div className="pb-6">
+              <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-border bg-slate-50/80 dark:bg-muted/20">
+                      <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground w-20">Reference</th>
+                      <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground w-52">Name</th>
+                      <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detail.attributes.map(attr => (
+                      <tr key={attr.ref} className="border-b last:border-b-0 border-slate-100 dark:border-border/50">
+                        <td className="px-4 py-3 text-foreground font-medium align-top">{attr.ref}</td>
+                        <td className="px-4 py-3 text-foreground align-top">{attr.name}</td>
+                        <td className="px-4 py-3 text-muted-foreground">{attr.desc}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <button className="mt-3 text-xs text-[#266C92] hover:text-[#1e5a7a] font-medium flex items-center gap-1" data-testid="button-add-attribute">
+                + Add Attribute
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ControlIssuesStub({ controlId }: { controlId: string }) {
+  return (
+    <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="max-w-5xl mx-auto px-8 py-12 flex flex-col items-center justify-center text-center">
+        <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-muted/30 flex items-center justify-center mb-4">
+          <AlertCircle className="w-5 h-5 text-muted-foreground" />
+        </div>
+        <h3 className="text-sm font-semibold text-foreground mb-1">No Issues</h3>
+        <p className="text-xs text-muted-foreground max-w-sm">Issues related to {controlId} will appear here once identified during testing or review cycles.</p>
+      </div>
+    </div>
+  );
+}
+
+function ControlAutomationsStub({ controlId }: { controlId: string }) {
+  const master = masterControlsList.find(c => c.id === controlId);
+  return (
+    <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="max-w-5xl mx-auto px-8 py-12 flex flex-col items-center justify-center text-center">
+        <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-muted/30 flex items-center justify-center mb-4">
+          <Workflow className="w-5 h-5 text-muted-foreground" />
+        </div>
+        <h3 className="text-sm font-semibold text-foreground mb-1">No Automations Configured</h3>
+        <p className="text-xs text-muted-foreground max-w-sm">
+          {master?.dataSource === "connected"
+            ? `Automation rules for ${controlId} via ${master.system} can be configured here.`
+            : `Automation rules for ${controlId} can be configured here once a connected data source is available.`
+          }
+        </p>
+      </div>
+    </div>
+  );
+}
+
+type ControlFocusTab = "details" | "testing" | "issues" | "automations";
+
 type ControlFocusPageProps = {
   controlId: string;
   controlStatus: ControlWorkflowStatus | null;
@@ -2233,6 +2691,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   const isIneffective = isComplete && hasException;
   const blockRule = fieldworkBlockRules.find(r => r.controlId === controlId) ?? null;
   const isDemo = controlId === DEMO_CONTROL_ID;
+  const [activeTab, setActiveTab] = useState<ControlFocusTab>("testing");
 
   const initialStepIndex = useMemo(() => {
     if (!controlStatus) return 0;
@@ -2398,7 +2857,32 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
         {isIneffective && <Badge className="ml-auto text-[10px] bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 border-0">Ineffective</Badge>}
       </div>
 
-      {controlStatus && (
+      <div className="shrink-0 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
+        <div className="px-6 flex items-center gap-6">
+          {(["details", "testing", "issues", "automations"] as ControlFocusTab[]).map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`py-2.5 text-sm font-medium border-b-2 transition-colors capitalize ${
+                activeTab === tab
+                  ? "border-[#266C92] text-[#266C92]"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+              data-testid={`tab-control-${tab}`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {activeTab === "details" && <ControlDetailsTab controlId={controlId} />}
+      {activeTab === "issues" && <ControlIssuesStub controlId={controlId} />}
+      {activeTab === "automations" && <ControlAutomationsStub controlId={controlId} />}
+
+      {activeTab === "testing" && (
+        <>
+        {controlStatus && (
         <div className="shrink-0 border-b border-slate-200 dark:border-border bg-slate-50/80 dark:bg-muted/20">
           <div className="w-[90%] max-w-5xl mx-auto py-4 px-2">
             <div className="flex items-center">
@@ -2464,25 +2948,6 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
 
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="w-[80%] max-w-6xl mx-auto px-6 py-6 space-y-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" data-testid="control-focus-info-grid">
-            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border">
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5">Category</p>
-              <p className="text-xs font-medium text-foreground">{master?.category ?? "—"}</p>
-            </div>
-            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border">
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5">Risk Level</p>
-              <p className={`text-xs font-medium ${master?.riskLevel === "Critical" ? "text-red-600 dark:text-red-400" : master?.riskLevel === "High" ? "text-orange-600 dark:text-orange-400" : "text-foreground"}`}>{master?.riskLevel ?? "—"}</p>
-            </div>
-            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border">
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5">Control Owner</p>
-              <p className="text-xs font-medium text-foreground">{master?.owner ?? "—"}</p>
-            </div>
-            <div className="p-2.5 rounded-lg border border-slate-200 dark:border-border">
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5">Data Source</p>
-              <p className="text-xs font-medium text-foreground">{controlStatus?.dataSource === "connected" ? master?.system ?? "Connected" : "PBC / Manual"}</p>
-            </div>
-          </div>
-
           {controlStatus && (
             <>
               <div className="flex items-center gap-2">
@@ -2625,6 +3090,8 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
             </div>
           </div>
         </div>
+      )}
+      </>
       )}
 
       {actionToast && (
