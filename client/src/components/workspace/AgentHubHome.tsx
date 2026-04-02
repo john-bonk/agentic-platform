@@ -2925,7 +2925,7 @@ const stepCompletionComments: Record<string, (controlId: string) => { title: str
 };
 
 function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUploadPopulation }: { controlId: string; controlStatus: ControlWorkflowStatus | null; substepProgress: Record<string, number>; onUploadPopulation?: () => void }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const [activeUtilTab, setActiveUtilTab] = useState<UtilityPanelTab>("comments");
   const [commentFilter, setCommentFilter] = useState<"open" | "closed">("open");
   const [liveComments, setLiveComments] = useState<ControlAgentComment[]>([]);
