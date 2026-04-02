@@ -2897,18 +2897,101 @@ const utilityToolbarItems: { id: UtilityPanelTab | "close"; icon: typeof Message
   { id: "history", icon: Clock, label: "History" },
 ];
 
-function ControlUtilityPanel({ controlId, controlStatus }: { controlId: string; controlStatus: ControlWorkflowStatus | null }) {
+const stepCompletionComments: Record<string, (controlId: string) => { title: string; body: string }> = {
+  readiness: (cid) => ({
+    title: "Readiness — Complete",
+    body: `Readiness assessment for ${cid} finished.\n\n- Input Readiness Assessment — evaluated data sources and availability\n- Control Description Interpretation — parsed narrative into structured fields\n- Attribute Extraction — identified 4 testable attributes\n- Test Plan Generation — composed step-by-step testing plan\n\nAll readiness substeps completed. Proceeding to Population Acquisition.`,
+  }),
+  population: (cid) => ({
+    title: "Population Acquisition — Complete",
+    body: `Population data for ${cid} ingested and validated.\n\n- File Ingestion — loaded 2,847 records from source\n- Schema Validation — 12/12 columns validated\n- Completeness Check — control period and entity coverage verified\n- Anomaly Detection — 3 duplicates excluded, 5 termed users flagged\n\nPopulation confirmed. Proceeding to Sampling.`,
+  }),
+  sampling: (cid) => ({
+    title: "Sampling — Complete",
+    body: `Sample selection for ${cid} finalized.\n\n- Methodology Selection — stratified random (MUS) applied\n- Risk Stratification — 3 risk tiers weighted\n- Sample Size Calculation — 25 items at 95% confidence\n- Selection Execution — 25 items selected (seed: 48291)\n\nSample approved. Proceeding to Evidence Collection.`,
+  }),
+  evidence: (cid) => ({
+    title: "Evidence Collection — Complete",
+    body: `Evidence for ${cid} collected and processed.\n\n- Requirement Mapping — mapped evidence types per sample item\n- Source Identification — matched to SAP, Okta, and SharePoint\n- Collection & Upload — 25/25 evidence packages assembled\n- Document Classification — categorized by type\n- Field Extraction — key fields extracted from documents\n- Cross-Reference Validation — evidence matched to sample data\n\nEvidence package complete. Proceeding to Testing.`,
+  }),
+  testing: (cid) => ({
+    title: "Attribute Testing — Complete",
+    body: `Automated testing for ${cid} executed.\n\n- Execute Attribute Tests — ran 4 attributes across 25 samples\n- Determine Pass/Fail — 3 exceptions identified (EXC-006, EXC-007, EXC-008)\n- Generate Rationale — detailed findings documented per exception\n\n3 exceptions flagged. Proceeding to Effectiveness determination.`,
+  }),
+  testEffectiveness: (cid) => ({
+    title: "Effectiveness Determination — Complete",
+    body: `Control effectiveness for ${cid} concluded.\n\n- Aggregate Results — compiled pass/fail across all attributes\n- Completeness Review — verified all samples tested\n- Confidence Assessment — statistical confidence calculated\n- Final Conclusion — **Control rated Ineffective** (60% pass rate)\n\nWorkflow complete. Review the Control Summary report for full details.`,
+  }),
+};
+
+function ControlUtilityPanel({ controlId, controlStatus, onUploadPopulation }: { controlId: string; controlStatus: ControlWorkflowStatus | null; onUploadPopulation?: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const [activeUtilTab, setActiveUtilTab] = useState<UtilityPanelTab>("comments");
   const [commentFilter, setCommentFilter] = useState<"open" | "closed">("open");
+  const [liveComments, setLiveComments] = useState<ControlAgentComment[]>([]);
+  const completedStepsRef = useRef<Set<string>>(new Set());
 
-  const comments = getAgentCommentsForControl(controlId);
+  const seededStepsRef = useRef<Set<string>>(new Set());
 
-  const visibleComments = commentFilter === "open"
-    ? comments.filter(c => c.status !== "complete")
-    : comments.filter(c => c.status === "complete");
+  useEffect(() => {
+    if (!controlStatus) return;
+    const now = new Date();
+    const ts = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }).toLowerCase();
 
-  const openCount = comments.filter(c => c.status !== "complete").length;
+    fieldworkStepOrder.forEach(step => {
+      const status = controlStatus.steps[step as keyof typeof controlStatus.steps];
+
+      if ((status === "running" || status === "blocked" || status === "waiting") && step === "population" && !seededStepsRef.current.has("population-blocked")) {
+        seededStepsRef.current.add("population-blocked");
+        setLiveComments(prev => [{
+          id: `live-pop-blocked-${Date.now()}`,
+          stepId: "population",
+          substepId: "pop-ingest",
+          timestamp: ts,
+          title: "Population Data Required",
+          body: "The population file is needed to proceed with testing. The 3-way match discrepancy report from SharePoint is required for the current testing period.\n\nPlease upload the population file or request it from the control owner.",
+          status: "blocked",
+        }, ...prev]);
+      }
+
+      if (status === "complete" && !completedStepsRef.current.has(step)) {
+        completedStepsRef.current.add(step);
+        const gen = stepCompletionComments[step];
+        if (gen) {
+          const { title, body } = gen(controlId);
+          setLiveComments(prev => [{
+            id: `live-${step}-${Date.now()}`,
+            stepId: step,
+            timestamp: ts,
+            title,
+            body,
+            status: "info",
+          }, ...prev]);
+        }
+      }
+    });
+  }, [controlStatus, controlId]);
+
+  const addUploadComment = useCallback(() => {
+    const now = new Date();
+    const ts = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }).toLowerCase();
+    setLiveComments(prev => [{
+      id: `live-upload-${Date.now()}`,
+      stepId: "population",
+      substepId: "pop-ingest",
+      timestamp: ts,
+      title: "Population File Uploaded",
+      body: `Population data file uploaded for ${controlId}. The agent will now validate the file schema, check completeness against the control period, and scan for anomalies.\n\nProcessing...`,
+      status: "info",
+    }, ...prev]);
+  }, [controlId]);
+
+  const handleUploadClick = useCallback(() => {
+    addUploadComment();
+    onUploadPopulation?.();
+  }, [addUploadComment, onUploadPopulation]);
+
+  const visibleComments = commentFilter === "open" ? liveComments : [];
 
   return (
     <div className="flex h-full shrink-0">
@@ -2916,7 +2999,7 @@ function ControlUtilityPanel({ controlId, controlStatus }: { controlId: string; 
         {expanded && (
           <button
             onClick={() => setExpanded(false)}
-            className="w-7 h-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-muted/40 transition-colors mb-1"
+            className="w-7 h-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-muted/40 transition-colors"
             data-testid="utility-close"
           >
             <X className="w-3.5 h-3.5" />
@@ -2938,14 +3021,12 @@ function ControlUtilityPanel({ controlId, controlStatus }: { controlId: string; 
               data-testid={`utility-tab-${item.id}`}
             >
               <Icon className="w-3.5 h-3.5" />
-              {item.id === "comments" && openCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center">{openCount > 9 ? "9+" : openCount}</span>
+              {item.id === "comments" && liveComments.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center">{liveComments.length > 9 ? "9+" : liveComments.length}</span>
               )}
             </button>
           );
         })}
-
-        <div className="flex-1" />
         <button
           onClick={() => {}}
           className="w-7 h-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-muted/40 transition-colors"
@@ -3012,11 +3093,12 @@ function ControlUtilityPanel({ controlId, controlStatus }: { controlId: string; 
               <div className="flex-1 min-h-0 overflow-y-auto">
                 {visibleComments.length === 0 && (
                   <div className="px-4 py-8 text-center">
-                    <p className="text-xs text-muted-foreground">No {commentFilter} comments</p>
+                    <MessageSquare className="w-6 h-6 text-muted-foreground/30 mx-auto mb-2" />
+                    <p className="text-xs text-muted-foreground">{commentFilter === "open" ? "No comments yet — agent updates will appear here as workflow steps progress" : "No closed comments"}</p>
                   </div>
                 )}
                 {visibleComments.map(comment => (
-                  <div key={comment.id} className="px-4 py-4 border-b border-slate-100 dark:border-border/50" data-testid={`comment-${comment.id}`}>
+                  <div key={comment.id} className="px-4 py-4 border-b border-slate-100 dark:border-border/50 animate-in fade-in slide-in-from-top-2 duration-300" data-testid={`comment-${comment.id}`}>
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 rounded-full bg-[#6C5CE7] flex items-center justify-center shrink-0 mt-0.5">
                         <span className="text-[10px] font-bold text-white">FA</span>
@@ -3037,6 +3119,25 @@ function ControlUtilityPanel({ controlId, controlStatus }: { controlId: string; 
                             return <span key={i}>{part}</span>;
                           })}
                         </div>
+                        {comment.stepId === "population" && comment.status === "blocked" && onUploadPopulation && (
+                          <div className="mt-3 flex items-center gap-2">
+                            <button
+                              onClick={handleUploadClick}
+                              className="text-[10px] font-semibold text-white bg-[#266C92] hover:bg-[#1e5a7a] px-2.5 py-1 rounded transition-colors flex items-center gap-1"
+                              data-testid="comment-action-upload"
+                            >
+                              <Upload className="w-3 h-3" />
+                              Upload
+                            </button>
+                            <button
+                              onClick={() => {}}
+                              className="text-[10px] font-medium text-[#266C92] border border-[#266C92]/30 hover:bg-[#266C92]/5 px-2.5 py-1 rounded transition-colors"
+                              data-testid="comment-action-request"
+                            >
+                              Request from control owner
+                            </button>
+                          </div>
+                        )}
                         {comment.actions && comment.actions.length > 0 && (
                           <div className="mt-2 space-y-0.5">
                             {comment.actions.map((action, i) => (
@@ -3048,7 +3149,7 @@ function ControlUtilityPanel({ controlId, controlStatus }: { controlId: string; 
                           </div>
                         )}
                         <div className="flex items-center gap-3 mt-3">
-                          {["Reply", "Close", "Permalink", "Mute", "Delete Thread"].map(a => (
+                          {["Reply", "Close", "Permalink", "Mute"].map(a => (
                             <button key={a} className="text-[10px] text-[#266C92] hover:underline font-medium" data-testid={`comment-action-${a.toLowerCase().replace(/\s/g, "-")}`}>{a}</button>
                           ))}
                         </div>
@@ -3593,7 +3694,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
         </div>
       )}
     </div>
-    <ControlUtilityPanel controlId={controlId} controlStatus={controlStatus} />
+    <ControlUtilityPanel controlId={controlId} controlStatus={controlStatus} onUploadPopulation={() => handleSubstepAction("pop-ingest", "upload")} />
     </div>
   );
 }
