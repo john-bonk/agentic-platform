@@ -2924,17 +2924,16 @@ const stepCompletionComments: Record<string, (controlId: string) => { title: str
   }),
 };
 
-function ControlUtilityPanel({ controlId, controlStatus, onUploadPopulation }: { controlId: string; controlStatus: ControlWorkflowStatus | null; onUploadPopulation?: () => void }) {
+function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUploadPopulation }: { controlId: string; controlStatus: ControlWorkflowStatus | null; substepProgress: Record<string, number>; onUploadPopulation?: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const [activeUtilTab, setActiveUtilTab] = useState<UtilityPanelTab>("comments");
   const [commentFilter, setCommentFilter] = useState<"open" | "closed">("open");
   const [liveComments, setLiveComments] = useState<ControlAgentComment[]>([]);
-  const completedStepsRef = useRef<Set<string>>(new Set());
-
+  const commentedStepsRef = useRef<Set<string>>(new Set());
   const seededStepsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!controlStatus) return;
+    if (!controlStatus?.steps) return;
     const now = new Date();
     const ts = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }).toLowerCase();
 
@@ -2954,8 +2953,13 @@ function ControlUtilityPanel({ controlId, controlStatus, onUploadPopulation }: {
         }, ...prev]);
       }
 
-      if (status === "complete" && !completedStepsRef.current.has(step)) {
-        completedStepsRef.current.add(step);
+      const info = stepNodeInfo[step];
+      const totalSubs = info?.substeps.length ?? 0;
+      const prog = substepProgress[step] ?? 0;
+      const allSubsDone = prog >= totalSubs && totalSubs > 0;
+
+      if (allSubsDone && !commentedStepsRef.current.has(step)) {
+        commentedStepsRef.current.add(step);
         const gen = stepCompletionComments[step];
         if (gen) {
           const { title, body } = gen(controlId);
@@ -2970,7 +2974,7 @@ function ControlUtilityPanel({ controlId, controlStatus, onUploadPopulation }: {
         }
       }
     });
-  }, [controlStatus, controlId]);
+  }, [controlStatus, controlId, substepProgress]);
 
   const addUploadComment = useCallback(() => {
     const now = new Date();
@@ -3134,7 +3138,7 @@ function ControlUtilityPanel({ controlId, controlStatus, onUploadPopulation }: {
                               className="text-[10px] font-medium text-[#266C92] border border-[#266C92]/30 hover:bg-[#266C92]/5 px-2.5 py-1 rounded transition-colors"
                               data-testid="comment-action-request"
                             >
-                              Request from control owner
+                              Request via Workstream
                             </button>
                           </div>
                         )}
@@ -3694,7 +3698,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
         </div>
       )}
     </div>
-    <ControlUtilityPanel controlId={controlId} controlStatus={controlStatus} onUploadPopulation={() => handleSubstepAction("pop-ingest", "upload")} />
+    <ControlUtilityPanel controlId={controlId} controlStatus={controlStatus} substepProgress={substepProgress} onUploadPopulation={() => handleSubstepAction("pop-ingest", "upload")} />
     </div>
   );
 }
