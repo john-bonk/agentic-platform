@@ -984,7 +984,7 @@ function OptroHome() {
         dataSource: c.dataSource as "connected" | "manual",
         system: c.system,
         owner: c.owner,
-        steps: { ...pendingSteps, readiness: (c.id === DEMO_CONTROL_ID ? "running" : "pending") as "running" | "pending" },
+        steps: { ...pendingSteps },
         overallProgress: 0,
       })).sort((a, b) => (a.dataSource === "manual" ? 0 : 1) - (b.dataSource === "manual" ? 0 : 1));
       store.setBlockState(sid, "fieldwork-execution", "statuses", seedStatuses);
@@ -3193,10 +3193,11 @@ type ControlFocusPageProps = {
   onResolve?: (controlId: string) => void;
   isResolved?: boolean;
   onAdvanceStep?: (currentStep: string) => void;
+  onStartWorkflow?: () => void;
   onViewReport?: () => void;
 };
 
-function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResolved, onAdvanceStep, onViewReport }: ControlFocusPageProps) {
+function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResolved, onAdvanceStep, onStartWorkflow, onViewReport }: ControlFocusPageProps) {
   const master = masterControlsList.find(c => c.id === controlId);
   const exceptionControlIds = new Set(fieldworkExceptions.map(e => e.controlId));
   const exceptions = fieldworkExceptions.filter(e => e.controlId === controlId);
@@ -3206,7 +3207,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   const isIneffective = isComplete && hasException;
   const blockRule = fieldworkBlockRules.find(r => r.controlId === controlId) ?? null;
   const isDemo = controlId === DEMO_CONTROL_ID;
-  const [activeTab, setActiveTab] = useState<ControlFocusTab>("testing");
+  const [activeTab, setActiveTab] = useState<ControlFocusTab>("details");
   const [activeTestCycle, setActiveTestCycle] = useState<TestCycle>("interim");
   const [testDetailsOpen, setTestDetailsOpen] = useState(false);
   const [testCycleDropdownOpen, setTestCycleDropdownOpen] = useState(false);
@@ -3455,7 +3456,48 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
       {activeTab === "issues" && <ControlIssuesStub controlId={controlId} />}
       {activeTab === "automations" && <ControlAutomationsStub controlId={controlId} />}
 
-      {activeTab === "testing" && (
+      {activeTab === "testing" && (() => {
+        const allPending = controlStatus && fieldworkStepOrder.every(s => controlStatus.steps[s as keyof typeof controlStatus.steps] === "pending");
+        if (allPending && isDemo) {
+          return (
+            <div className="flex-1 min-h-0 flex items-center justify-center">
+              <div className="text-center max-w-md space-y-5">
+                <div className="mx-auto w-14 h-14 rounded-2xl bg-[#266C92]/10 flex items-center justify-center">
+                  <Bot className="w-7 h-7 text-[#266C92]" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-foreground">Automated Control Testing</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Run the agent-assisted testing workflow for <span className="font-medium text-foreground">{controlId} — {master?.name ?? "Control"}</span>. The agent will guide you through readiness checks, population ingestion, sampling, evidence collection, test execution, and effectiveness assessment.
+                  </p>
+                </div>
+                <div className="pt-2 flex flex-col items-center gap-3">
+                  <Button
+                    size="default"
+                    className="h-10 px-6 text-sm gap-2 bg-[#266C92] hover:bg-[#1e5a7a] text-white shadow-sm"
+                    onClick={() => onStartWorkflow?.()}
+                    data-testid="button-start-workflow"
+                  >
+                    <Play className="w-4 h-4" />
+                    Test with Agent
+                  </Button>
+                  <p className="text-[11px] text-muted-foreground">6 steps · ~15 min estimated</p>
+                </div>
+                <div className="pt-4 border-t border-slate-200 dark:border-border">
+                  <div className="flex items-center justify-center gap-6">
+                    {fieldworkStepOrder.map((step, idx) => (
+                      <div key={step} className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
+                        <span className="text-[10px] text-muted-foreground">{stepShortLabels[step]}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        return (
         <>
         {controlStatus && (
         <div className="shrink-0 border-b border-slate-200 dark:border-border bg-slate-50/80 dark:bg-muted/20">
@@ -3687,7 +3729,8 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
         </div>
       )}
       </>
-      )}
+      )
+      })()}
 
       {actionToast && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -3905,7 +3948,7 @@ function FieldworkComplexHub() {
     const defaultSeedControls: ControlWorkflowStatus[] = [
       { controlId: "CTL-001", name: "Access Provisioning", dataSource: "connected", system: "Okta IAM", owner: "IT Security", steps: { ...pendingSteps }, overallProgress: 0 },
       { controlId: "CTL-002", name: "Change Management", dataSource: "connected", system: "ServiceNow", owner: "IT Operations", steps: { ...pendingSteps }, overallProgress: 0 },
-      { controlId: "CTL-003", name: "Segregation of Duties", dataSource: "manual", system: null, owner: "Internal Audit", steps: { ...pendingSteps, readiness: "running" }, overallProgress: 0 },
+      { controlId: "CTL-003", name: "Segregation of Duties", dataSource: "manual", system: null, owner: "Internal Audit", steps: { ...pendingSteps }, overallProgress: 0 },
       { controlId: "CTL-004", name: "Backup & Recovery", dataSource: "connected", system: "AWS", owner: "IT Infrastructure", steps: { ...pendingSteps }, overallProgress: 0 },
       { controlId: "CTL-005", name: "Journal Entry Approval", dataSource: "connected", system: "SAP ERP", owner: "Controller", steps: { ...pendingSteps }, overallProgress: 0 },
       { controlId: "CTL-006", name: "Bank Reconciliation", dataSource: "connected", system: "SAP ERP", owner: "Treasury", steps: { ...pendingSteps }, overallProgress: 0 },
@@ -4001,21 +4044,7 @@ function FieldworkComplexHub() {
   }, [isHubVisible, fieldworkProject, executionPhaseForTimer]);
 
   const rawControlStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
-  const demoNeedsFix = rawControlStatuses.some(s => s.controlId === DEMO_CONTROL_ID && s.steps.readiness === "pending");
-  const controlStatuses = useMemo(() => {
-    if (!demoNeedsFix) return rawControlStatuses;
-    return rawControlStatuses.map(s =>
-      s.controlId === DEMO_CONTROL_ID && s.steps.readiness === "pending"
-        ? { ...s, steps: { ...s.steps, readiness: "running" as const } }
-        : s
-    );
-  }, [rawControlStatuses, demoNeedsFix]);
-
-  useEffect(() => {
-    if (demoNeedsFix && fieldworkProject) {
-      setBlockState(fieldworkProject.sessionId, "fieldwork-execution", "statuses", controlStatuses);
-    }
-  }, [demoNeedsFix, fieldworkProject, controlStatuses, setBlockState]);
+  const controlStatuses = rawControlStatuses;
 
   if (showCanvas && fieldworkConfig && fieldworkProject) {
     return (
@@ -4065,6 +4094,17 @@ function FieldworkComplexHub() {
   if (hubDetailView?.startsWith("control:")) {
     const focusControlId = hubDetailView.replace("control:", "");
     const focusStatus = controlStatuses.find(s => s.controlId === focusControlId) ?? null;
+    const handleStartDemoWorkflow = () => {
+      if (!fieldworkProject) return;
+      const sid = fieldworkProject.sessionId;
+      const currentStatuses = [...controlStatuses];
+      const idx = currentStatuses.findIndex(s => s.controlId === focusControlId);
+      if (idx === -1) return;
+      const ctrl = { ...currentStatuses[idx], steps: { ...currentStatuses[idx].steps } };
+      ctrl.steps.readiness = "running";
+      currentStatuses[idx] = ctrl;
+      setBlockState(sid, "fieldwork-execution", "statuses", currentStatuses);
+    };
     const handleAdvanceDemoStep = (currentStep: string) => {
       if (!fieldworkProject) return;
       const sid = fieldworkProject.sessionId;
@@ -4097,6 +4137,7 @@ function FieldworkComplexHub() {
         onResolve={handleResolveAction}
         isResolved={resolvedSet.has(focusControlId)}
         onAdvanceStep={focusControlId === DEMO_CONTROL_ID ? handleAdvanceDemoStep : undefined}
+        onStartWorkflow={focusControlId === DEMO_CONTROL_ID ? handleStartDemoWorkflow : undefined}
         onViewReport={() => setHubDetailView(`control-report:${focusControlId}`)}
       />
     );
