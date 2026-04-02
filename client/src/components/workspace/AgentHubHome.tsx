@@ -69,6 +69,12 @@ import {
   Flag,
   Scale,
   Settings,
+  MessageSquare,
+  Copy,
+  Bookmark,
+  Link2,
+  X,
+  Pencil,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -2764,6 +2770,317 @@ function getTestDetailInfo(controlId: string, cycle: TestCycle): TestDetailInfo 
   };
 }
 
+type ControlAgentComment = {
+  id: string;
+  stepId: string;
+  substepId?: string;
+  timestamp: string;
+  title: string;
+  body: string;
+  actions?: { label: string; bold?: boolean }[];
+  status?: "info" | "blocked" | "complete" | "warning";
+};
+
+const controlAgentComments: Record<string, ControlAgentComment[]> = {
+  "CTL-003": [
+    {
+      id: "cmt-001", stepId: "readiness", substepId: "rd-assess", timestamp: "02:51 pm",
+      title: "Input Readiness Assessment",
+      body: "Beginning readiness assessment for CTL-003 (Segregation of Duties). Scanning configured inputs and data source connections.\n\n- 3 inputs available\n- 1 input needs review (testing attributes - may be incomplete)\n- 3 inputs missing (population file, sample selections, evidence files)\n\n**Blocked:** Cannot proceed without a population file. The 3-way match discrepancy report from SharePoint is required for the current testing period.\n\nHow would you like to resolve?",
+      actions: [
+        { label: "Upload", bold: true },
+        { label: "Request from control owner", bold: true },
+      ],
+      status: "blocked",
+    },
+    {
+      id: "cmt-002", stepId: "readiness", substepId: "cs-interpret", timestamp: "02:51 pm",
+      title: "Control Description Interpretation",
+      body: "Parsed the control narrative for CTL-003. Identified segregation of duties requirements across:\n\n- Order entry vs. approval authority\n- Payment processing vs. reconciliation\n- User provisioning vs. access review\n\nThe procedure references manager approval verification which may require checking both SharePoint signature and SAP workflow confirmation.\n\nWould you like to review and confirm the attributes before I proceed?",
+      status: "info",
+    },
+    {
+      id: "cmt-003", stepId: "readiness", substepId: "cs-extract", timestamp: "02:52 pm",
+      title: "Attribute Extraction Complete",
+      body: "Extracted 4 testable attributes from the control documentation:\n\n1. **Conflicting role combinations** are defined in the SoD matrix (P-114)\n2. **Preventive controls** block conflicting assignments at provisioning\n3. **Detective monitoring** runs on a defined schedule\n4. **Remediation actions** are documented for identified violations\n\nI also found 4 testing attributes, but they may not cover everything in the testing procedure. The procedure references manager approval verification which may require checking both SharePoint signature and SAP workflow confirmation.",
+      status: "complete",
+    },
+    {
+      id: "cmt-004", stepId: "readiness", substepId: "cs-plan", timestamp: "02:52 pm",
+      title: "Test Plan Generated",
+      body: "Composed a structured test plan aligned to the 4 extracted attributes. The plan includes:\n\n- **Step 1:** Obtain SoD conflict matrix (P-114) and validate completeness\n- **Step 2:** Select sample of 25 role assignments across high-risk function pairs\n- **Step 3:** For each sample, verify preventive control enforcement in SAP\n- **Step 4:** Inspect detective monitoring reports for the testing period\n- **Step 5:** Verify remediation documentation for flagged violations\n\nReady for your review and approval.",
+      status: "complete",
+    },
+    {
+      id: "cmt-005", stepId: "population", substepId: "pop-ingest", timestamp: "02:53 pm",
+      title: "Population File Ingested",
+      body: "Loaded the SoD conflict report from SharePoint. File contains 2,847 role assignment records across 5 business units.\n\n- Format: CSV (UTF-8)\n- Columns: 12 fields detected\n- Date range: Jan 2025 – Dec 2025\n- Source: SAP GRC Access Risk Analysis",
+      status: "complete",
+    },
+    {
+      id: "cmt-006", stepId: "population", substepId: "pop-validate", timestamp: "02:53 pm",
+      title: "Schema Validation Results",
+      body: "All 12 columns validated against expected schema. No format inconsistencies detected.\n\n- Required fields: 12/12 present\n- Data types: All consistent\n- Null values: 0 critical fields\n- Encoding: UTF-8 confirmed",
+      status: "complete",
+    },
+    {
+      id: "cmt-007", stepId: "population", substepId: "pop-complete", timestamp: "02:54 pm",
+      title: "Completeness Check",
+      body: "Population coverage verified against the control period and entity scope:\n\n- Control period: Jan – Dec 2025 ✓\n- Entity scope: 5/5 business units ✓\n- Function pairs (P-114): 156/160 defined (97.5%)\n- User population: 3,421 users (including 5 termed)\n- Source systems: SAP, Okta, Coupa — 3/3 connected ✓\n\n4 function pairs are not represented in the population. These may need manual review.",
+      status: "warning",
+    },
+    {
+      id: "cmt-008", stepId: "population", substepId: "pop-anomaly", timestamp: "02:54 pm",
+      title: "Anomaly Detection Summary",
+      body: "Flagged 3 potential anomalies in the population data:\n\n- 3 duplicate role assignment records (auto-excluded)\n- 5 terminated users with active role assignments (flagged for review)\n- 0 date gaps detected\n\nThe 5 terminated user records have been retained in the population for testing as they represent potential SoD violations that occurred during the control period.",
+      status: "warning",
+    },
+    {
+      id: "cmt-009", stepId: "sampling", substepId: "smp-method", timestamp: "02:55 pm",
+      title: "Sampling Methodology Selected",
+      body: "Applied stratified random sampling (MUS) based on risk tier assignment:\n\n- **Tier 1 (Critical):** Payment + Approval conflicts — 40% weight\n- **Tier 2 (High):** Provisioning + Review conflicts — 35% weight\n- **Tier 3 (Medium):** Monitoring + Reporting conflicts — 25% weight\n\nThis approach ensures proportional coverage across the highest-risk function pair categories.",
+      status: "complete",
+    },
+    {
+      id: "cmt-010", stepId: "sampling", substepId: "smp-select", timestamp: "02:56 pm",
+      title: "Sample Selection Complete",
+      body: "25 items selected using stratified random method:\n\n- Tier 1: 10 items selected\n- Tier 2: 9 items selected\n- Tier 3: 6 items selected\n\nRandom seed: 48291 (recorded for reproducibility)\nSelection date: Mar 15, 2026",
+      status: "complete",
+    },
+    {
+      id: "cmt-011", stepId: "evidence", substepId: "evd-collect", timestamp: "02:57 pm",
+      title: "Evidence Collection Status",
+      body: "Collecting evidence for 25 sample items. Progress:\n\n- SAP access logs: 25/25 retrieved ✓\n- Okta provisioning records: 23/25 retrieved\n- Manager approval screenshots: 20/25 located\n- Remediation documentation: 18/25 available\n\n2 Okta records pending — system timeout. Retrying.\n5 approval screenshots not found — may require manual upload.",
+      status: "warning",
+    },
+    {
+      id: "cmt-012", stepId: "testing", substepId: "ae-test", timestamp: "02:58 pm",
+      title: "Automated Testing In Progress",
+      body: "Executing attribute testing across 25 sample items:\n\n- **Attribute 1** (SoD matrix defined): 25/25 passed ✓\n- **Attribute 2** (Preventive controls): 22/25 passed — 3 exceptions identified\n- **Attribute 3** (Detective monitoring): 25/25 passed ✓\n- **Attribute 4** (Remediation documented): 23/25 passed — 2 aligned with Attr 2 exceptions\n\n3 exceptions flagged for detailed review.",
+      status: "warning",
+    },
+    {
+      id: "cmt-013", stepId: "testing", substepId: "ae-determine", timestamp: "02:59 pm",
+      title: "Exception Analysis",
+      body: "3 exceptions identified across the sample:\n\n- **EXC-006:** User in BU-3 had conflicting payment + approval roles active for 45 days without preventive block\n- **EXC-007:** Provisioning request approved by user's direct report (below required approval level)\n- **EXC-008:** SoD violation detected but remediation action not documented within the 30-day SLA\n\nAll 3 exceptions confirmed as control deviations. Generating detailed rationale for each.",
+      status: "blocked",
+    },
+    {
+      id: "cmt-014", stepId: "testEffectiveness", substepId: "te-conclude", timestamp: "03:00 pm",
+      title: "Control Effectiveness Conclusion",
+      body: "**Control Effectiveness: Ineffective**\n\nOverall pass rate: 60% (15/25 attributes passed across sample)\n\nKey findings:\n- 3 unique exceptions across 2 attributes\n- Preventive control failures in BU-3 indicate systemic gap\n- Remediation SLA non-compliance suggests monitoring weakness\n\nRecommendation: Escalate to control owner for remediation plan. Consider expanding sample in Roll Forward testing cycle.",
+      status: "blocked",
+    },
+  ],
+};
+
+function getAgentCommentsForControl(controlId: string): ControlAgentComment[] {
+  if (controlAgentComments[controlId]) return controlAgentComments[controlId];
+  const master = masterControlsList.find(c => c.id === controlId);
+  if (!master) return [];
+  return [
+    {
+      id: `${controlId}-auto-001`, stepId: "readiness", timestamp: "—",
+      title: "Workflow Initialized",
+      body: `Fieldwork agent initialized for ${controlId} — ${master.name}. Awaiting control inputs to begin readiness assessment.`,
+      status: "info",
+    },
+  ];
+}
+
+type UtilityPanelTab = "comments" | "notes" | "attachments" | "history";
+
+const utilityToolbarItems: { id: UtilityPanelTab | "close"; icon: typeof MessageSquare; label: string }[] = [
+  { id: "comments", icon: MessageSquare, label: "Comments" },
+  { id: "notes", icon: Pencil, label: "Notes" },
+  { id: "attachments", icon: Copy, label: "Attachments" },
+  { id: "history", icon: Clock, label: "History" },
+];
+
+function ControlUtilityPanel({ controlId, controlStatus }: { controlId: string; controlStatus: ControlWorkflowStatus | null }) {
+  const [expanded, setExpanded] = useState(false);
+  const [activeUtilTab, setActiveUtilTab] = useState<UtilityPanelTab>("comments");
+  const [commentFilter, setCommentFilter] = useState<"open" | "closed">("open");
+
+  const comments = getAgentCommentsForControl(controlId);
+
+  const visibleComments = commentFilter === "open"
+    ? comments.filter(c => c.status !== "complete")
+    : comments.filter(c => c.status === "complete");
+
+  const openCount = comments.filter(c => c.status !== "complete").length;
+
+  return (
+    <div className="flex h-full shrink-0">
+      <div className="w-10 shrink-0 bg-slate-50 dark:bg-muted/20 border-l border-slate-200 dark:border-border flex flex-col items-center py-2 gap-1">
+        {expanded && (
+          <button
+            onClick={() => setExpanded(false)}
+            className="w-7 h-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-muted/40 transition-colors mb-1"
+            data-testid="utility-close"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
+        {utilityToolbarItems.map(item => {
+          const Icon = item.icon;
+          const isActive = expanded && activeUtilTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => { if (!expanded) { setExpanded(true); setActiveUtilTab(item.id as UtilityPanelTab); } else if (activeUtilTab === item.id) { setExpanded(false); } else { setActiveUtilTab(item.id as UtilityPanelTab); } }}
+              className={`relative w-7 h-7 rounded flex items-center justify-center transition-colors ${
+                isActive
+                  ? "bg-[#266C92]/10 text-[#266C92]"
+                  : "text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-muted/40"
+              }`}
+              title={item.label}
+              data-testid={`utility-tab-${item.id}`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {item.id === "comments" && openCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center">{openCount > 9 ? "9+" : openCount}</span>
+              )}
+            </button>
+          );
+        })}
+
+        <div className="flex-1" />
+        <button
+          onClick={() => {}}
+          className="w-7 h-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-muted/40 transition-colors"
+          title="Bookmark"
+          data-testid="utility-bookmark"
+        >
+          <Bookmark className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={() => {}}
+          className="w-7 h-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-muted/40 transition-colors"
+          title="Link"
+          data-testid="utility-link"
+        >
+          <Link2 className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={() => {}}
+          className="w-7 h-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-muted/40 transition-colors"
+          title="Team"
+          data-testid="utility-team"
+        >
+          <Users className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={() => {}}
+          className="w-7 h-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-muted/40 transition-colors"
+          title="Settings"
+          data-testid="utility-settings"
+        >
+          <Settings className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {expanded && (
+        <div className="w-80 border-l border-slate-200 dark:border-border bg-white dark:bg-card flex flex-col overflow-hidden">
+          <div className="shrink-0 px-4 py-3 border-b border-slate-200 dark:border-border flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-foreground capitalize">{activeUtilTab}</h3>
+          </div>
+
+          {activeUtilTab === "comments" && (
+            <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="shrink-0 px-4 py-3">
+                <div className="border border-slate-200 dark:border-border rounded-lg px-3 py-2">
+                  <p className="text-xs text-muted-foreground">Start a conversation here by tagging someone using @name (ex: @Joe).</p>
+                </div>
+              </div>
+              <div className="shrink-0 px-4 pb-2 flex items-center gap-4 border-b border-slate-200 dark:border-border">
+                <button
+                  onClick={() => setCommentFilter("open")}
+                  className={`text-xs font-medium pb-1.5 border-b-2 transition-colors ${commentFilter === "open" ? "border-[#266C92] text-[#266C92]" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                  data-testid="comments-filter-open"
+                >
+                  Open Comments
+                </button>
+                <button
+                  onClick={() => setCommentFilter("closed")}
+                  className={`text-xs font-medium pb-1.5 border-b-2 transition-colors ${commentFilter === "closed" ? "border-[#266C92] text-[#266C92]" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                  data-testid="comments-filter-closed"
+                >
+                  Closed Comments
+                </button>
+              </div>
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                {visibleComments.length === 0 && (
+                  <div className="px-4 py-8 text-center">
+                    <p className="text-xs text-muted-foreground">No {commentFilter} comments</p>
+                  </div>
+                )}
+                {visibleComments.map(comment => (
+                  <div key={comment.id} className="px-4 py-4 border-b border-slate-100 dark:border-border/50" data-testid={`comment-${comment.id}`}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#6C5CE7] flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-[10px] font-bold text-white">FA</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold text-foreground">FIELDWORK AGENT</span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground">{comment.timestamp}</span>
+                        {comment.title && (
+                          <p className="text-xs font-semibold text-foreground mt-2">{comment.title}</p>
+                        )}
+                        <div className="mt-1.5 text-xs text-foreground leading-relaxed whitespace-pre-wrap">
+                          {comment.body.split(/(\*\*.*?\*\*)/).map((part, i) => {
+                            if (part.startsWith("**") && part.endsWith("**")) {
+                              return <strong key={i}>{part.slice(2, -2)}</strong>;
+                            }
+                            return <span key={i}>{part}</span>;
+                          })}
+                        </div>
+                        {comment.actions && comment.actions.length > 0 && (
+                          <div className="mt-2 space-y-0.5">
+                            {comment.actions.map((action, i) => (
+                              <p key={i} className="text-xs">
+                                <span className="text-muted-foreground">- </span>
+                                <span className={`${action.bold ? "font-semibold text-[#266C92] cursor-pointer hover:underline" : "text-foreground"}`}>{action.label}</span>
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-3 mt-3">
+                          {["Reply", "Close", "Permalink", "Mute", "Delete Thread"].map(a => (
+                            <button key={a} className="text-[10px] text-[#266C92] hover:underline font-medium" data-testid={`comment-action-${a.toLowerCase().replace(/\s/g, "-")}`}>{a}</button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeUtilTab === "notes" && (
+            <div className="flex-1 px-4 py-6 flex items-center justify-center">
+              <p className="text-xs text-muted-foreground">No notes yet</p>
+            </div>
+          )}
+          {activeUtilTab === "attachments" && (
+            <div className="flex-1 px-4 py-6 flex items-center justify-center">
+              <p className="text-xs text-muted-foreground">No attachments</p>
+            </div>
+          )}
+          {activeUtilTab === "history" && (
+            <div className="flex-1 px-4 py-6 flex items-center justify-center">
+              <p className="text-xs text-muted-foreground">No history entries</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 type ControlFocusPageProps = {
   controlId: string;
   controlStatus: ControlWorkflowStatus | null;
@@ -2943,7 +3260,8 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   };
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden bg-white dark:bg-background" data-testid={`control-focus-${controlId}`}>
+    <div className="relative flex h-full overflow-hidden bg-white dark:bg-background" data-testid={`control-focus-${controlId}`}>
+    <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
       <div className="shrink-0 h-12 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
         <button
           onClick={onBack}
@@ -3274,6 +3592,8 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
           </div>
         </div>
       )}
+    </div>
+    <ControlUtilityPanel controlId={controlId} controlStatus={controlStatus} />
     </div>
   );
 }
