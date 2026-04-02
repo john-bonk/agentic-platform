@@ -2242,12 +2242,10 @@ export interface ControlWorkflowStatus {
   owner: string;
   steps: {
     readiness: FieldworkStepStatus;
-    controlSetup: FieldworkStepStatus;
     population: FieldworkStepStatus;
     sampling: FieldworkStepStatus;
     evidence: FieldworkStepStatus;
-    evidenceUnderstanding: FieldworkStepStatus;
-    attributeEvaluation: FieldworkStepStatus;
+    testing: FieldworkStepStatus;
     testEffectiveness: FieldworkStepStatus;
   };
   overallProgress: number;
@@ -2375,7 +2373,7 @@ export const fieldworkBlockRules: FieldworkBlockRule[] = [
 
 export const DEMO_CONTROL_ID = "CTL-003";
 
-export const fieldworkStepOrder: (keyof ControlWorkflowStatus["steps"])[] = ["readiness", "controlSetup", "population", "sampling", "evidence", "evidenceUnderstanding", "attributeEvaluation", "testEffectiveness"];
+export const fieldworkStepOrder: (keyof ControlWorkflowStatus["steps"])[] = ["readiness", "population", "sampling", "evidence", "testing", "testEffectiveness"];
 
 export function tickFieldworkStatuses(prev: ControlWorkflowStatus[], resolvedBlockIds?: Set<string>): ControlWorkflowStatus[] | null {
   let anyChange = false;
@@ -2389,7 +2387,7 @@ export function tickFieldworkStatuses(prev: ControlWorkflowStatus[], resolvedBlo
       if (steps[step] === "complete") continue;
       if (steps[step] === "blocked") {
         if (resolved.has(ctrl.controlId)) {
-          steps[step] = isAuto ? "running" : (step === "population" || step === "evidence" || step === "evidenceUnderstanding" ? "waiting" : "running");
+          steps[step] = isAuto ? "running" : (step === "population" || step === "evidence" ? "waiting" : "running");
           anyChange = true;
         }
         break;
@@ -2406,13 +2404,13 @@ export function tickFieldworkStatuses(prev: ControlWorkflowStatus[], resolvedBlo
         if (step === "readiness") {
           steps[step] = "running";
         } else {
-          steps[step] = isAuto ? "running" : (step === "population" || step === "evidence" || step === "evidenceUnderstanding" ? "waiting" : "running");
+          steps[step] = isAuto ? "running" : (step === "population" || step === "evidence" ? "waiting" : "running");
         }
         anyChange = true;
         break;
       }
       if (steps[step] === "running" || steps[step] === "waiting") {
-        const speed = step === "readiness" ? 0.85 : step === "controlSetup" ? 0.75 : (isAuto ? 0.7 : (steps[step] === "waiting" ? 0.08 : 0.15));
+        const speed = step === "readiness" ? 0.85 : (isAuto ? 0.7 : (steps[step] === "waiting" ? 0.08 : 0.15));
         if (Math.random() < speed) {
           steps[step] = "complete";
           anyChange = true;
@@ -2422,7 +2420,7 @@ export function tickFieldworkStatuses(prev: ControlWorkflowStatus[], resolvedBlo
     }
     const completedSteps = fieldworkStepOrder.filter((s) => steps[s] === "complete").length;
     const runningSteps = fieldworkStepOrder.filter((s) => steps[s] === "running" || steps[s] === "waiting").length;
-    const overallProgress = Math.round(((completedSteps * 100) + (runningSteps * 40)) / 8);
+    const overallProgress = Math.round(((completedSteps * 100) + (runningSteps * 40)) / 6);
     return { ...ctrl, steps, overallProgress };
   });
   return anyChange ? next : null;
@@ -2444,7 +2442,7 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
       owner: c.owner,
       steps: {
         readiness: (c.id === DEMO_CONTROL_ID ? "running" : "pending") as "running" | "pending",
-        controlSetup: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, evidenceUnderstanding: "pending" as const, attributeEvaluation: "pending" as const, testEffectiveness: "pending" as const,
+        population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const, testEffectiveness: "pending" as const,
       },
       overallProgress: 0,
     }))
@@ -2543,14 +2541,14 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
           </div>
 
           <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
-            <div className="grid grid-cols-[1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem] gap-0.5 px-3 py-1.5 bg-slate-50 dark:bg-muted/20 text-[7px] font-semibold text-muted-foreground uppercase tracking-wider">
-              <span>Control</span><span className="text-center">Rdy</span><span className="text-center">Set</span><span className="text-center">Pop</span><span className="text-center">Smp</span><span className="text-center">Evd</span><span className="text-center">Und</span><span className="text-center">Att</span><span className="text-center">Eff</span><span className="text-center">Res</span>
+            <div className="grid grid-cols-[1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem] gap-0.5 px-3 py-1.5 bg-slate-50 dark:bg-muted/20 text-[7px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Control</span><span className="text-center">Rdy</span><span className="text-center">Pop</span><span className="text-center">Smp</span><span className="text-center">Evd</span><span className="text-center">Tst</span><span className="text-center">Eff</span><span className="text-center">Res</span>
             </div>
             <div className="max-h-64 overflow-y-auto">
               {statuses.map(ctrl => {
                 const isIneffective = ctrl.steps.testEffectiveness === "complete" && exceptionControlIds.has(ctrl.controlId);
                 return (
-                  <div key={ctrl.controlId} className={`grid grid-cols-[1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem] gap-0.5 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/10 ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}>
+                  <div key={ctrl.controlId} className={`grid grid-cols-[1fr_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem_2.5rem] gap-0.5 px-3 py-1.5 text-xs items-center border-t border-slate-100 dark:border-border/50 hover:bg-slate-50 dark:hover:bg-muted/10 ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5" : ""}`}>
                     <div className="flex items-center gap-1.5 min-w-0">
                       <span className={`text-[10px] font-mono font-medium ${isIneffective ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>{ctrl.controlId}</span>
                       <span className="text-[10px] text-muted-foreground truncate">{ctrl.name}</span>

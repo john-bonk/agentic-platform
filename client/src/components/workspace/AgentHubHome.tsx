@@ -662,7 +662,7 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
     const currentStatuses = (runtime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
     const completedStatuses = currentStatuses.map(s => ({
       ...s,
-      steps: { readiness: "complete", controlSetup: "complete", population: "complete", sampling: "complete", evidence: "complete", evidenceUnderstanding: "complete", attributeEvaluation: "complete", testEffectiveness: "complete" },
+      steps: { readiness: "complete", population: "complete", sampling: "complete", evidence: "complete", testing: "complete", testEffectiveness: "complete" },
       overallProgress: 100,
     }));
     if (completedStatuses.length > 0) {
@@ -686,8 +686,8 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
       if (next) {
         store.setBlockState(sessionId, "fieldwork-execution", "statuses", next);
         const allDone = next.every((s) =>
-          s.steps.controlSetup === "complete" && s.steps.population === "complete" && s.steps.sampling === "complete" &&
-          s.steps.evidence === "complete" && s.steps.evidenceUnderstanding === "complete" && s.steps.attributeEvaluation === "complete" && s.steps.testEffectiveness === "complete"
+          s.steps.population === "complete" && s.steps.sampling === "complete" &&
+          s.steps.evidence === "complete" && s.steps.testing === "complete" && s.steps.testEffectiveness === "complete"
         );
         if (allDone) {
           store.setBlockState(sessionId, "fieldwork-execution", "phase", "complete");
@@ -836,22 +836,20 @@ function FieldworkTracker({ sessionId }: { sessionId: string }) {
           </div>
 
           <div className="space-y-0.5 max-h-48 overflow-y-auto pr-1">
-            <div className="grid grid-cols-[1fr_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_2.5rem] gap-0.5 px-2 py-1 text-[7px] font-semibold text-muted-foreground uppercase tracking-wider">
-              <span>Control</span><span className="text-center">Rdy</span><span className="text-center">Set</span><span className="text-center">Pop</span><span className="text-center">Smp</span><span className="text-center">Evd</span><span className="text-center">Und</span><span className="text-center">Att</span><span className="text-center">Tst</span><span className="text-center">%</span>
+            <div className="grid grid-cols-[1fr_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_2.5rem] gap-0.5 px-2 py-1 text-[7px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <span>Control</span><span className="text-center">Rdy</span><span className="text-center">Pop</span><span className="text-center">Smp</span><span className="text-center">Evd</span><span className="text-center">Tst</span><span className="text-center">Eff</span><span className="text-center">%</span>
             </div>
             {controlStatuses.map(ctrl => (
-              <div key={ctrl.controlId} className="grid grid-cols-[1fr_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_2.5rem] gap-0.5 px-2 py-1 rounded text-xs items-center hover:bg-slate-50 dark:hover:bg-muted/20">
+              <div key={ctrl.controlId} className="grid grid-cols-[1fr_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_1.8rem_2.5rem] gap-0.5 px-2 py-1 rounded text-xs items-center hover:bg-slate-50 dark:hover:bg-muted/20">
                 <div className="flex items-center gap-1 min-w-0">
                   <span className="text-[9px] font-mono font-medium text-foreground">{ctrl.controlId}</span>
                   <span className="text-[9px] text-muted-foreground truncate">{ctrl.name}</span>
                 </div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.readiness)}</div>
-                <div className="flex justify-center">{stepIcon(ctrl.steps.controlSetup)}</div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.population)}</div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.sampling)}</div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.evidence)}</div>
-                <div className="flex justify-center">{stepIcon(ctrl.steps.evidenceUnderstanding)}</div>
-                <div className="flex justify-center">{stepIcon(ctrl.steps.attributeEvaluation)}</div>
+                <div className="flex justify-center">{stepIcon(ctrl.steps.testing)}</div>
                 <div className="flex justify-center">{stepIcon(ctrl.steps.testEffectiveness)}</div>
                 <span className={`text-[8px] text-center font-medium ${ctrl.overallProgress === 100 ? "text-[#266C92]" : "text-muted-foreground"}`}>{ctrl.overallProgress}%</span>
               </div>
@@ -973,7 +971,7 @@ function OptroHome() {
     const store = useWorkflowSessionStore.getState();
     const currentStatuses = (store.runtimeStates[sid]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
     if (currentStatuses.length === 0) {
-      const pendingSteps = { readiness: "pending" as const, controlSetup: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, evidenceUnderstanding: "pending" as const, attributeEvaluation: "pending" as const, testEffectiveness: "pending" as const };
+      const pendingSteps = { readiness: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const, testEffectiveness: "pending" as const };
       const seedStatuses: ControlWorkflowStatus[] = masterControlsList.map(c => ({
         controlId: c.id,
         name: c.name,
@@ -1358,10 +1356,10 @@ type StepNodeInfo = {
 };
 
 const stepNodeInfo: Record<string, StepNodeInfo> = {
-  controlSetup: {
-    nodeLabel: "Control Setup",
-    aiDescription: "AI interprets the control description and attributes to produce a structured, reviewable test plan prior to execution.",
-    userTouchpoint: "Review and approve the interpreted test plan before workflow proceeds.",
+  readiness: {
+    nodeLabel: "Readiness",
+    aiDescription: "AI evaluates required inputs, interprets the control description, extracts testable attributes, and produces a structured test plan.",
+    userTouchpoint: "Review readiness assessment and approve the interpreted test plan before workflow proceeds.",
     substeps: [
       { id: "cs-interpret", label: "Control Description Interpretation", description: "AI parses narrative control description into structured fields", icon: Search },
       { id: "cs-extract", label: "Attribute Extraction", description: "Identify testable attributes from control documentation", icon: Table2 },
@@ -1427,52 +1425,35 @@ const stepNodeInfo: Record<string, StepNodeInfo> = {
     ],
   },
   evidence: {
-    nodeLabel: "Evidence Collection",
-    aiDescription: "AI maps evidence requirements to each sample item, identifies available sources, and tracks collection completeness.",
-    userTouchpoint: "Audit the evidence matrix; upload documents or trigger PBC requests for missing items.",
+    nodeLabel: "Evidence",
+    aiDescription: "AI maps evidence requirements, collects from sources, classifies documents, extracts structured fields, and cross-references against sample data.",
+    userTouchpoint: "Audit the evidence matrix, upload documents, and review extracted fields for accuracy.",
     substeps: [
       { id: "evd-map", label: "Requirement Mapping", description: "Map each sample item to its required evidence types", icon: Table2 },
       { id: "evd-source", label: "Source Identification", description: "Match required evidence to available connected systems or file uploads", icon: Search },
       { id: "evd-collect", label: "Collection & Upload", description: "Pull from connected sources or accept manual uploads", icon: Upload },
-    ],
-    actions: [
-      { id: "upload-evidence", label: "Upload Evidence", variant: "primary", icon: Upload, showWhen: ["waiting", "running", "blocked"] },
-      { id: "send-pbc", label: "Send PBC Request", variant: "outline", icon: Send, showWhen: ["waiting", "running", "blocked"] },
-      { id: "resolve-evidence", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
-    ],
-    outputRows: [
-      { label: "Items Requiring Evidence", value: "25", status: "neutral" },
-      { label: "Auto-Collected", value: "18 (72%)", status: "green" },
-      { label: "Manually Uploaded", value: "4 (16%)", status: "green" },
-      { label: "Pending / Missing", value: "3 (12%)", status: "red" },
-      { label: "PBC Requests Sent", value: "2", status: "amber" },
-    ],
-  },
-  evidenceUnderstanding: {
-    nodeLabel: "Evidence Understanding",
-    aiDescription: "AI parses collected evidence files, classifies document types, extracts structured fields and values, and cross-references against sample requirements.",
-    userTouchpoint: "Review extracted key fields, values, and document classifications for accuracy.",
-    substeps: [
       { id: "eu-classify", label: "Document Classification", description: "Categorize each evidence file by type (approval, log, report, screenshot)", icon: Layers },
       { id: "eu-extract", label: "Field Extraction", description: "Extract key fields (dates, approvers, amounts, statuses) from documents", icon: Search },
       { id: "eu-parse", label: "Value Parsing", description: "Normalize extracted values into comparable, structured data", icon: Table2 },
       { id: "eu-xref", label: "Cross-Reference Validation", description: "Match extracted values against population/sample data for consistency", icon: GitBranch },
     ],
     actions: [
+      { id: "upload-evidence", label: "Upload Evidence", variant: "primary", icon: Upload, showWhen: ["waiting", "running", "blocked"] },
+      { id: "send-pbc", label: "Send PBC Request", variant: "outline", icon: Send, showWhen: ["waiting", "running", "blocked"] },
       { id: "confirm-extraction", label: "Confirm Extraction", variant: "primary", icon: ThumbsUp, showWhen: ["waiting", "running", "complete"] },
-      { id: "flag-rereview", label: "Flag for Re-review", variant: "outline", icon: Flag, showWhen: ["waiting", "running", "complete"] },
-      { id: "resolve-understanding", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
+      { id: "resolve-evidence", label: "Resolve & Resume", variant: "primary", icon: CheckCircle2, showWhen: ["blocked"], isResolve: true },
     ],
     outputRows: [
+      { label: "Items Requiring Evidence", value: "25", status: "neutral" },
+      { label: "Auto-Collected", value: "18 (72%)", status: "green" },
+      { label: "Manually Uploaded", value: "4 (16%)", status: "green" },
       { label: "Documents Processed", value: "22", status: "green" },
       { label: "Fields Extracted", value: "88", status: "green" },
-      { label: "Classification Confidence", value: "94% avg", status: "green" },
       { label: "Cross-Ref Matches", value: "20 / 22", status: "green" },
-      { label: "Low-Confidence Items", value: "2 flagged", status: "amber" },
     ],
   },
-  attributeEvaluation: {
-    nodeLabel: "Attribute Evaluation",
+  testing: {
+    nodeLabel: "Testing",
     aiDescription: "AI tests each sample against defined control attributes, producing Pass/Fail determinations with rationale and evidence references.",
     userTouchpoint: "Audit individual attribute results, review AI reasoning, and override findings where warranted.",
     substeps: [
@@ -1585,7 +1566,7 @@ type DemoStepOutputData = {
 };
 
 const demoStepOutputs: Record<string, DemoStepOutputData[]> = {
-  controlSetup: [
+  readiness: [
     {
       title: "Interpreted Control Objective",
       headers: ["Field", "AI Interpretation"],
@@ -1718,7 +1699,7 @@ const demoStepOutputs: Record<string, DemoStepOutputData[]> = {
       ],
     },
   ],
-  evidenceUnderstanding: [
+  evidenceUnderstanding_merged: [
     {
       title: "Document Classification Results",
       headers: ["Document", "Classified As", "Pages", "Confidence"],
@@ -1753,7 +1734,7 @@ const demoStepOutputs: Record<string, DemoStepOutputData[]> = {
       ],
     },
   ],
-  attributeEvaluation: [
+  testing: [
     {
       title: "Attribute A1: SoD Matrix Completeness",
       headers: ["Criteria", "Finding", "Result"],
@@ -1859,9 +1840,9 @@ const demoStepOutputs: Record<string, DemoStepOutputData[]> = {
 };
 
 const demoSubstepOutputs: Record<string, DemoStepOutputData[]> = {
-  "cs-interpret": [demoStepOutputs.controlSetup[0]],
-  "cs-extract": [demoStepOutputs.controlSetup[1]],
-  "cs-plan": [demoStepOutputs.controlSetup[2]],
+  "cs-interpret": [demoStepOutputs.readiness[0]],
+  "cs-extract": [demoStepOutputs.readiness[1]],
+  "cs-plan": [demoStepOutputs.readiness[2]],
   "pop-ingest": [demoStepOutputs.population[0]],
   "pop-validate": [demoStepOutputs.population[1]],
   "pop-complete": [{
@@ -1895,13 +1876,13 @@ const demoSubstepOutputs: Record<string, DemoStepOutputData[]> = {
   "evd-map": [demoStepOutputs.evidence[0]],
   "evd-source": [],
   "evd-collect": [demoStepOutputs.evidence[1]],
-  "eu-classify": [demoStepOutputs.evidenceUnderstanding[0]],
-  "eu-extract": [demoStepOutputs.evidenceUnderstanding[1]],
+  "eu-classify": [demoStepOutputs.evidenceUnderstanding_merged[0]],
+  "eu-extract": [demoStepOutputs.evidenceUnderstanding_merged[1]],
   "eu-parse": [],
-  "eu-xref": [demoStepOutputs.evidenceUnderstanding[2]],
-  "ae-test": [demoStepOutputs.attributeEvaluation[0], demoStepOutputs.attributeEvaluation[1]],
-  "ae-determine": [demoStepOutputs.attributeEvaluation[2], demoStepOutputs.attributeEvaluation[3]],
-  "ae-rationale": [demoStepOutputs.attributeEvaluation[4]],
+  "eu-xref": [demoStepOutputs.evidenceUnderstanding_merged[2]],
+  "ae-test": [demoStepOutputs.testing[0], demoStepOutputs.testing[1]],
+  "ae-determine": [demoStepOutputs.testing[2], demoStepOutputs.testing[3]],
+  "ae-rationale": [demoStepOutputs.testing[4]],
   "ae-exception": [],
   "te-aggregate": [demoStepOutputs.testEffectiveness[0]],
   "te-complete": [],
@@ -1910,12 +1891,11 @@ const demoSubstepOutputs: Record<string, DemoStepOutputData[]> = {
 };
 
 const demoStepBehavior: Record<string, { autoProgress: boolean; pauseAtSubstep?: number }> = {
-  controlSetup: { autoProgress: true },
+  readiness: { autoProgress: true },
   population: { autoProgress: true, pauseAtSubstep: 0 },
   sampling: { autoProgress: true },
   evidence: { autoProgress: true, pauseAtSubstep: 2 },
-  evidenceUnderstanding: { autoProgress: true },
-  attributeEvaluation: { autoProgress: true },
+  testing: { autoProgress: true },
   testEffectiveness: { autoProgress: true },
 };
 
@@ -2278,7 +2258,6 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   useEffect(() => {
     if (!isDemo || !controlStatus) return;
     const step = activeStep;
-    if (step === "readiness") return;
     const stepStatus = controlStatus.steps[step as keyof typeof controlStatus.steps];
     if (stepStatus !== "running") return;
 
@@ -2303,35 +2282,29 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   }, [isDemo, activeStep, controlStatus, substepProgress]);
 
   const stepLabels: Record<string, string> = {
-    readiness: "Readiness Assessment",
-    controlSetup: "Control Setup",
+    readiness: "Readiness",
     population: "Population Acquisition",
     sampling: "Sampling",
-    evidence: "Evidence Collection",
-    evidenceUnderstanding: "Evidence Understanding",
-    attributeEvaluation: "Attribute Evaluation",
+    evidence: "Evidence",
+    testing: "Testing",
     testEffectiveness: "Test Effectiveness",
   };
 
   const stepShortLabels: Record<string, string> = {
     readiness: "Readiness",
-    controlSetup: "Setup",
     population: "Population",
     sampling: "Sampling",
     evidence: "Evidence",
-    evidenceUnderstanding: "Understanding",
-    attributeEvaluation: "Evaluation",
+    testing: "Testing",
     testEffectiveness: "Effectiveness",
   };
 
   const stepDescriptions: Record<string, string> = {
-    readiness: "AI evaluates required inputs and data sources to confirm the control is ready for automated testing.",
-    controlSetup: stepNodeInfo.controlSetup.aiDescription,
+    readiness: stepNodeInfo.readiness.aiDescription,
     population: stepNodeInfo.population.aiDescription,
     sampling: stepNodeInfo.sampling.aiDescription,
     evidence: stepNodeInfo.evidence.aiDescription,
-    evidenceUnderstanding: stepNodeInfo.evidenceUnderstanding.aiDescription,
-    attributeEvaluation: stepNodeInfo.attributeEvaluation.aiDescription,
+    testing: stepNodeInfo.testing.aiDescription,
     testEffectiveness: stepNodeInfo.testEffectiveness.aiDescription,
   };
 
@@ -2357,12 +2330,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
       const currentStepStatus = controlStatus?.steps[stepKey as keyof typeof controlStatus.steps];
       if (currentStepStatus === "complete") return;
 
-      if (stepKey === "readiness") {
-        onAdvanceStep(stepKey);
-        const stepIdx = fieldworkStepOrder.indexOf(stepKey);
-        if (stepIdx < fieldworkStepOrder.length - 1) setActiveStepIdx(stepIdx + 1);
-        setActionToast(`Readiness complete — advancing to ${stepLabels[fieldworkStepOrder[fieldworkStepOrder.indexOf(stepKey) + 1]] ?? "next step"}`);
-      } else if (actionId === "confirm-step") {
+      if (actionId === "confirm-step") {
         const info = stepNodeInfo[stepKey];
         const totalSubs = info?.substeps.length ?? 0;
         setSubstepProgress(prev => ({ ...prev, [stepKey]: totalSubs }));
@@ -2383,7 +2351,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
   }, [isDemo, onAdvanceStep, controlStatus, substepProgress]);
 
   const activeStepStatus = controlStatus ? controlStatus.steps[activeStep as keyof typeof controlStatus.steps] : "pending";
-  const activeStepInfo = activeStep !== "readiness" ? stepNodeInfo[activeStep] : null;
+  const activeStepInfo = stepNodeInfo[activeStep] ?? null;
   const activeVisibleActions = activeStepInfo ? activeStepInfo.actions.filter(a => a.showWhen.includes(activeStepStatus)) : [];
 
   const canNavigateTo = (idx: number): boolean => {
@@ -2529,24 +2497,21 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
               </div>
 
               <div data-testid={`control-step-block-${activeStep}`}>
-                {activeStep === "readiness" ? (
-                  <div className="space-y-3">
-                    <ReadinessAssessmentContent stepStatus={activeStepStatus} rows={isDemo ? demoReadinessRows : undefined} />
-                  </div>
-                ) : (
-                  <StepNodeContent
-                    step={activeStep}
-                    stepStatus={activeStepStatus}
-                    controlId={controlId}
-                    substepProgress={substepProgress[activeStep] ?? 0}
-                    blockRule={blockRule}
-                    onResolve={onResolve}
-                    isResolved={isResolved}
-                    onAction={handleStepAction}
-                    onSubstepAction={handleSubstepAction}
-                    autoExpandedSubs={autoExpandedSubs}
-                  />
+                {activeStep === "readiness" && (
+                  <ReadinessAssessmentContent stepStatus={activeStepStatus} rows={isDemo ? demoReadinessRows : undefined} />
                 )}
+                <StepNodeContent
+                  step={activeStep}
+                  stepStatus={activeStepStatus}
+                  controlId={controlId}
+                  substepProgress={substepProgress[activeStep] ?? 0}
+                  blockRule={blockRule}
+                  onResolve={onResolve}
+                  isResolved={isResolved}
+                  onAction={handleStepAction}
+                  onSubstepAction={handleSubstepAction}
+                  autoExpandedSubs={autoExpandedSubs}
+                />
               </div>
 
               {isComplete && (
@@ -2603,19 +2568,6 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
 
             <div className="flex items-center gap-2">
               {isDemo && activeStepStatus === "running" && (() => {
-                if (activeStep === "readiness") {
-                  return (
-                    <Button
-                      size="sm"
-                      className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-                      onClick={() => handleStepAction(activeStep, "approve-step")}
-                      data-testid={`button-advance-${activeStep}-${controlId}`}
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      Approve & Continue
-                    </Button>
-                  );
-                }
                 const stepInfo = stepNodeInfo[activeStep];
                 const totalSubs = stepInfo?.substeps.length ?? 0;
                 const currentProg = substepProgress[activeStep] ?? 0;
@@ -2713,12 +2665,11 @@ function ControlSummaryReport({ controlId, onBack }: { controlId: string; onBack
   const failedSamples = exceptions.reduce((sum, e) => sum + e.samplesFailed, 0);
 
   const stepDetails = [
-    { step: "Control Setup", detail: "Control objective, risk classification, and testing parameters established" },
+    { step: "Readiness", detail: "Control objective, risk classification, attributes extracted, and test plan established" },
     { step: "Population", detail: master?.dataSource === "connected" ? `Retrieved from ${master.system}` : "Population file uploaded via PBC request" },
     { step: "Sampling", detail: `${totalSamples} items selected using statistical sampling methodology` },
-    { step: "Evidence Collection", detail: master?.dataSource === "connected" ? `Automated extraction from ${master.system}` : "Evidence collected via PBC owner submission" },
-    { step: "Understanding", detail: "Control design and implementation evaluated for operating effectiveness" },
-    { step: "Attribute Evaluation", detail: `${totalSamples} samples evaluated against ${exceptions.length > 0 ? exceptions.length + " testing attributes" : "all testing attributes"}` },
+    { step: "Evidence", detail: master?.dataSource === "connected" ? `Automated extraction from ${master.system}, documents classified, fields extracted and cross-referenced` : "Evidence collected via PBC owner submission, documents classified, fields extracted and cross-referenced" },
+    { step: "Testing", detail: `${totalSamples} samples evaluated against ${exceptions.length > 0 ? exceptions.length + " testing attributes" : "all testing attributes"}` },
     { step: "Test of Effectiveness", detail: passed ? "All attributes satisfied — control operating effectively" : `${failedSamples} of ${totalSamples} samples failed — exceptions identified` },
   ];
 
@@ -2904,7 +2855,7 @@ function FieldworkComplexHub() {
     if (!fieldworkProject) return;
     const sid = fieldworkProject.sessionId;
     const currentStatuses = (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
-    const pendingSteps = { readiness: "pending" as const, controlSetup: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, evidenceUnderstanding: "pending" as const, attributeEvaluation: "pending" as const, testEffectiveness: "pending" as const };
+    const pendingSteps = { readiness: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const, testEffectiveness: "pending" as const };
     const defaultSeedControls: ControlWorkflowStatus[] = [
       { controlId: "CTL-001", name: "Access Provisioning", dataSource: "connected", system: "Okta IAM", owner: "IT Security", steps: { ...pendingSteps }, overallProgress: 0 },
       { controlId: "CTL-002", name: "Change Management", dataSource: "connected", system: "ServiceNow", owner: "IT Operations", steps: { ...pendingSteps }, overallProgress: 0 },
@@ -2935,7 +2886,7 @@ function FieldworkComplexHub() {
     const baseStatuses = currentStatuses.length > 0 ? currentStatuses : defaultSeedControls;
     const completedStatuses = baseStatuses.map((s) => ({
       ...s,
-      steps: { readiness: "complete", controlSetup: "complete", population: "complete", sampling: "complete", evidence: "complete", evidenceUnderstanding: "complete", attributeEvaluation: "complete", testEffectiveness: "complete" },
+      steps: { readiness: "complete", population: "complete", sampling: "complete", evidence: "complete", testing: "complete", testEffectiveness: "complete" },
       overallProgress: 100,
     }));
     setBlockState(sid, "fieldwork-execution", "statuses", completedStatuses);
@@ -2983,8 +2934,7 @@ function FieldworkComplexHub() {
       if (next) {
         store.setBlockState(sid, "fieldwork-execution", "statuses", next);
         const allDone = next.every((s) =>
-          s.steps.controlSetup === "complete" && s.steps.population === "complete" && s.steps.sampling === "complete" &&
-          s.steps.evidence === "complete" && s.steps.evidenceUnderstanding === "complete" && s.steps.attributeEvaluation === "complete" && s.steps.testEffectiveness === "complete"
+          fieldworkStepOrder.every(step => s.steps[step as keyof typeof s.steps] === "complete")
         );
         if (allDone) {
           store.setBlockState(sid, "fieldwork-execution", "phase", "complete");
@@ -3512,18 +3462,16 @@ function FieldworkComplexHub() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-y-auto">
-                      <div className="grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
+                      <div className="grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
                         <span>Control</span>
                         <span>Source</span>
-                        <span className="text-center" title="Readiness Assessment">Rdy</span>
-                        <span className="text-center" title="Control Setup">Set</span>
+                        <span className="text-center" title="Readiness">Rdy</span>
                         <span className="text-center" title="Population Acquisition">Pop</span>
                         <span className="text-center" title="Sampling">Smp</span>
-                        <span className="text-center" title="Evidence Collection">Evd</span>
-                        <span className="text-center" title="Evidence Understanding">Und</span>
-                        <span className="text-center" title="Attribute Evaluation">Att</span>
-                        <span className="text-center" title="Test Effectiveness">Tst</span>
-                        <span className="text-center" title="Effectiveness Result">Eff</span>
+                        <span className="text-center" title="Evidence">Evd</span>
+                        <span className="text-center" title="Testing">Tst</span>
+                        <span className="text-center" title="Test Effectiveness">Eff</span>
+                        <span className="text-center" title="Effectiveness Result">Res</span>
                       </div>
 
                       <div>
@@ -3541,7 +3489,7 @@ function FieldworkComplexHub() {
                             return (
                               <div
                                 key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
+                                className={`grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
                                 onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
@@ -3551,12 +3499,10 @@ function FieldworkComplexHub() {
                                 </div>
                                 <span className={`text-[10px] font-medium truncate ${isBlocked ? "text-red-500" : "text-muted-foreground"}`}>{isBlocked ? "Blocked" : "PBC"}</span>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.readiness)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.controlSetup)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.evidenceUnderstanding)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.attributeEvaluation)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.testEffectiveness)}</div>
                                 <div className="flex justify-center">{effectivenessDot(ctrl)}</div>
                               </div>
@@ -3578,7 +3524,7 @@ function FieldworkComplexHub() {
                             return (
                               <div
                                 key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
+                                className={`grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
                                 onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                                 data-testid={`pipeline-row-${ctrl.controlId}`}
                               >
@@ -3588,12 +3534,10 @@ function FieldworkComplexHub() {
                                 </div>
                                 <span className="text-[10px] text-muted-foreground font-medium truncate">Connected</span>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.readiness)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.controlSetup)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.evidenceUnderstanding)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.attributeEvaluation)}</div>
+                                <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
                                 <div className="flex justify-center">{stepDot(ctrl.steps.testEffectiveness)}</div>
                                 <div className="flex justify-center">{effectivenessDot(ctrl)}</div>
                               </div>
