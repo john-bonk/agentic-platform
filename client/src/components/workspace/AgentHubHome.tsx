@@ -2972,7 +2972,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
               return (
                 <div key={tab} className="relative" ref={cycleDropdownRef}>
                   <button
-                    onClick={() => { setActiveTab("testing"); setTestCycleDropdownOpen(!testCycleDropdownOpen); }}
+                    onClick={() => { if (activeTab !== "testing") { setActiveTab("testing"); setTestCycleDropdownOpen(false); } else { setTestCycleDropdownOpen(!testCycleDropdownOpen); } }}
                     className={`py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
                       activeTab === "testing"
                         ? "border-[#266C92] text-[#266C92]"
@@ -3036,63 +3036,49 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
         <>
         {controlStatus && (
         <div className="shrink-0 border-b border-slate-200 dark:border-border bg-slate-50/80 dark:bg-muted/20">
-          <div className="w-[90%] max-w-5xl mx-auto py-4 px-2">
-            <div className="flex items-center">
-              {fieldworkStepOrder.map((step, idx) => {
-                const status = controlStatus.steps[step as keyof typeof controlStatus.steps];
-                const isActive = idx === activeStepIdx;
-                const navigable = canNavigateTo(idx);
-                return (
-                  <div key={step} className="flex items-center flex-1 last:flex-initial">
+          <div className="px-5 py-2">
+            <div className="relative flex items-center h-8">
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 rounded-full bg-slate-200 dark:bg-slate-700" />
+              {(() => {
+                const completedCount = fieldworkStepOrder.filter(
+                  s => controlStatus.steps[s as keyof typeof controlStatus.steps] === "complete"
+                ).length;
+                const pct = fieldworkStepOrder.length > 1 ? (completedCount / (fieldworkStepOrder.length - 1)) * 100 : 0;
+                return <div className="absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full bg-[#266C92] transition-all duration-500" style={{ width: `${Math.min(pct, 100)}%` }} />;
+              })()}
+              <div className="relative flex items-center justify-between w-full">
+                {fieldworkStepOrder.map((step, idx) => {
+                  const status = controlStatus.steps[step as keyof typeof controlStatus.steps];
+                  const isActive = idx === activeStepIdx;
+                  const navigable = canNavigateTo(idx);
+                  return (
                     <button
+                      key={step}
                       onClick={() => navigable && setActiveStepIdx(idx)}
                       disabled={!navigable}
-                      className={`flex flex-col items-center gap-1.5 group min-w-0 ${navigable ? "cursor-pointer" : "cursor-default"}`}
+                      className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium transition-all z-10 ${navigable ? "cursor-pointer" : "cursor-default"} ${
+                        isActive
+                          ? "bg-[#266C92] text-white shadow-sm"
+                          : status === "complete"
+                            ? "bg-[#266C92]/10 text-[#266C92]"
+                            : status === "blocked"
+                              ? "bg-red-50 dark:bg-red-900/20 text-red-500"
+                              : "bg-slate-100 dark:bg-slate-800 text-muted-foreground"
+                      }`}
                       data-testid={`stepper-step-${step}`}
                     >
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all border-2 ${
-                        status === "complete"
-                          ? "bg-[#266C92] border-[#266C92] text-white"
-                          : isActive && (status === "running" || status === "waiting")
-                            ? "bg-white dark:bg-card border-[#266C92] text-[#266C92] ring-4 ring-[#266C92]/15"
-                            : isActive
-                              ? "bg-white dark:bg-card border-[#266C92] text-[#266C92] ring-4 ring-[#266C92]/15"
-                              : status === "blocked"
-                                ? "bg-white dark:bg-card border-red-400 text-red-500"
-                                : "bg-white dark:bg-card border-slate-300 dark:border-slate-600 text-slate-400 dark:text-slate-500"
-                      }`}>
-                        {status === "complete" ? (
-                          <CheckCircle2 className="w-4 h-4" />
-                        ) : status === "running" && isActive ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : status === "blocked" ? (
-                          <AlertCircle className="w-3.5 h-3.5" />
-                        ) : (
-                          <span className="text-xs font-semibold">{idx + 1}</span>
-                        )}
-                      </div>
-                      <span className={`text-[10px] leading-tight text-center max-w-[72px] transition-colors ${
-                        isActive
-                          ? "text-[#266C92] font-semibold"
-                          : status === "complete"
-                            ? "text-[#266C92]/70 font-medium"
-                            : "text-muted-foreground"
-                      }`}>
-                        {stepShortLabels[step]}
-                      </span>
+                      {status === "complete" ? (
+                        <CheckCircle2 className="w-3 h-3" />
+                      ) : status === "running" && isActive ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : status === "blocked" ? (
+                        <AlertCircle className="w-3 h-3" />
+                      ) : null}
+                      <span>{stepShortLabels[step]}</span>
                     </button>
-                    {idx < fieldworkStepOrder.length - 1 && (
-                      <div className="flex-1 mx-1 mt-[-18px]">
-                        <div className={`h-0.5 w-full rounded-full ${
-                          controlStatus.steps[fieldworkStepOrder[idx] as keyof typeof controlStatus.steps] === "complete"
-                            ? "bg-[#266C92]"
-                            : "bg-slate-200 dark:bg-slate-700"
-                        }`} />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
           <div className="border-t border-slate-200/60 dark:border-border/40">
@@ -3108,33 +3094,22 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
               const td = getTestDetailInfo(controlId, activeTestCycle);
               return (
                 <div className="px-5 pb-3">
-                  <div className="flex gap-12">
-                    <div className="flex-1 space-y-3">
-                      {([
-                        ["Tester", td.tester],
-                        ["PBC Request", td.pbcRequest],
-                        ["Sample Size", td.sampleSize],
-                        ["Sample Selections", td.sampleSelections],
-                      ] as [string, string][]).map(([label, value]) => (
-                        <div key={label} className="flex items-baseline gap-4">
-                          <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase w-28 shrink-0 text-right">{label}</p>
-                          <p className="text-xs text-foreground">{value}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="w-52 shrink-0 space-y-3">
-                      {([
-                        ["Reviewer", td.reviewer],
-                        ["Secondary Reviewer", td.secondaryReviewer],
-                        ["Budgeted Hours", td.budgetedHours],
-                        ["Due Date", td.dueDate],
-                      ] as [string, string][]).map(([label, value]) => (
-                        <div key={label} className="flex items-baseline gap-4">
-                          <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase w-24 shrink-0 text-right">{label}</p>
-                          <p className="text-xs text-foreground font-medium">{value}</p>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="grid grid-cols-2 gap-x-16 gap-y-3">
+                    {([
+                      ["Tester", td.tester],
+                      ["Reviewer", td.reviewer],
+                      ["PBC Request", td.pbcRequest],
+                      ["Secondary Reviewer", td.secondaryReviewer],
+                      ["Sample Size", td.sampleSize],
+                      ["Budgeted Hours", td.budgetedHours],
+                      ["Sample Selections", td.sampleSelections],
+                      ["Due Date", td.dueDate],
+                    ] as [string, string][]).map(([label, value]) => (
+                      <div key={label} className="flex items-baseline gap-4">
+                        <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase w-28 shrink-0 text-right">{label}</p>
+                        <p className="text-xs text-foreground">{value}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               );
