@@ -2531,27 +2531,6 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
             </>
           )}
 
-          {exceptions.length > 0 && (
-            <Card className="border border-red-200 dark:border-red-800/30">
-              <CardHeader className="pb-2 pt-3 px-4">
-                <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
-                  Exceptions ({exceptions.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 space-y-3">
-                {exceptions.map((exc) => (
-                  <div key={exc.id} className="p-3 rounded-lg border border-red-100 dark:border-red-900/20 bg-red-50/30 dark:bg-red-900/5">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge className={`text-[9px] ${exc.severity === "high" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"} border-0`}>{exc.severity}</Badge>
-                      <span className="text-xs font-medium text-foreground">{exc.title}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">{exc.description}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
 
