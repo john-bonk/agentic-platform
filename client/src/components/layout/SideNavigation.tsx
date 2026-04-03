@@ -157,6 +157,7 @@ function CollapsibleSection({ section, isExpanded, onToggle, isActive, onOpenInN
                       if (hashPart.startsWith("project-")) {
                         const sessionId = hashPart.replace("project-", "");
                         setCurrentSession(sessionId);
+                        if (window.location.hash) { window.location.hash = ""; window.history.replaceState(null, "", window.location.pathname); }
                         setLocation("/");
                         return;
                       }
@@ -493,7 +494,7 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
       const [basePath, hashPart] = path.split("#");
       if (hashPart.startsWith("project-")) {
         const sessionId = hashPart.replace("project-", "");
-        return currentSessionId === sessionId;
+        return currentSessionId === sessionId && !hasEnvironmentHash;
       }
       return location === basePath && currentHash === `#${hashPart}`;
     }
