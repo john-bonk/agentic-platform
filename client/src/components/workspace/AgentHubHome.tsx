@@ -3465,10 +3465,10 @@ type AutomationMode = "full" | "checkpoint" | "manual";
 
 type AutomationConfig = Record<string, { mode: AutomationMode; substeps: Record<string, AutomationMode> }>;
 
-const automationModeLabels: Record<AutomationMode, { label: string; short: string; description: string; color: string; bg: string }> = {
-  full: { label: "Full Automation", short: "Auto", description: "Runs automatically, pausing only for missing inputs", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-100 dark:bg-emerald-900/40 border-emerald-200 dark:border-emerald-800" },
-  checkpoint: { label: "Checkpoint", short: "Check", description: "Pauses at each boundary for confirmation", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-100 dark:bg-amber-900/40 border-amber-200 dark:border-amber-800" },
-  manual: { label: "Manual", short: "Manual", description: "Must be explicitly triggered to proceed", color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-100 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800" },
+const automationModeLabels: Record<AutomationMode, { label: string; short: string; description: string; color: string; bg: string; mutedIcon: string }> = {
+  full: { label: "Full Automation", short: "Auto", description: "Runs automatically, pausing only for missing inputs", color: "text-[#266C92] dark:text-[#4da3c9]", bg: "bg-[#266C92]/10 dark:bg-[#266C92]/15 border-[#266C92]/20 dark:border-[#266C92]/25", mutedIcon: "text-[#266C92]/70" },
+  checkpoint: { label: "Checkpoint", short: "Check", description: "Pauses at each boundary for confirmation", color: "text-[#6B7280] dark:text-slate-400", bg: "bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700", mutedIcon: "text-slate-500/70" },
+  manual: { label: "Manual", short: "Manual", description: "Must be explicitly triggered to proceed", color: "text-[#4B5563] dark:text-slate-300", bg: "bg-slate-50 dark:bg-slate-800/25 border-slate-200/80 dark:border-slate-700/60", mutedIcon: "text-slate-400/70" },
 };
 
 function buildDefaultAutomationConfig(): AutomationConfig {
@@ -3497,7 +3497,7 @@ function AutomationModeSelector({ value, onChange, size = "default", scopeId }: 
             onClick={(e) => { e.stopPropagation(); onChange(m); }}
             className={`${size === "small" ? "px-2 text-[10px]" : "px-2.5 text-[11px]"} font-medium transition-colors whitespace-nowrap ${
               active
-                ? `${info.bg} ${info.color} border-r border-slate-200 dark:border-border`
+                ? `bg-[#266C92]/10 dark:bg-[#266C92]/15 text-[#266C92] dark:text-[#4da3c9] border-r border-[#266C92]/20 dark:border-[#266C92]/25`
                 : "bg-white dark:bg-card text-muted-foreground hover:bg-slate-50 dark:hover:bg-muted/40 border-r border-slate-200 dark:border-border"
             } last:border-r-0`}
             data-testid={`automation-mode-${m}${idSuffix}`}
@@ -3589,7 +3589,7 @@ function AutomationConfigModal({ open, onOpenChange, config, onSave }: { open: b
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-foreground">Global Automation Level</span>
                   {globalMode === "mixed" && (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 font-medium">Mixed</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#266C92]/10 dark:bg-[#266C92]/15 text-[#266C92] dark:text-[#4da3c9] font-medium">Mixed</span>
                   )}
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-0.5">Apply to all steps and substeps</p>
@@ -3625,7 +3625,7 @@ function AutomationConfigModal({ open, onOpenChange, config, onSave }: { open: b
                           <span className="text-sm font-medium text-foreground">{info.nodeLabel}</span>
                           <span className="text-[10px] text-muted-foreground">{info.substeps.length} substeps</span>
                           {hasSubOverrides && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 font-medium">Mixed</span>
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#266C92]/10 dark:bg-[#266C92]/15 text-[#266C92] dark:text-[#4da3c9] font-medium">Mixed</span>
                           )}
                         </div>
                       </div>
@@ -3672,9 +3672,13 @@ function AutomationConfigModal({ open, onOpenChange, config, onSave }: { open: b
             <div className="grid grid-cols-3 gap-2 pt-2">
               {(["full", "checkpoint", "manual"] as AutomationMode[]).map((m) => {
                 const info = automationModeLabels[m];
+                const MIcon = automationModeIcons[m].icon;
                 return (
-                  <div key={m} className={`p-2.5 rounded-lg border ${info.bg}`} data-testid={`automation-mode-info-${m}`}>
-                    <div className={`text-xs font-semibold ${info.color}`}>{info.label}</div>
+                  <div key={m} className="p-2.5 rounded-lg border border-slate-200/80 dark:border-border bg-slate-50/50 dark:bg-muted/15" data-testid={`automation-mode-info-${m}`}>
+                    <div className="flex items-center gap-1.5">
+                      <MIcon className={`w-3 h-3 ${info.mutedIcon}`} />
+                      <div className="text-xs font-semibold text-foreground">{info.label}</div>
+                    </div>
                     <div className="text-[10px] text-muted-foreground mt-1 leading-tight">{info.description}</div>
                   </div>
                 );
@@ -4015,6 +4019,63 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                     Run the agent-assisted testing workflow for <span className="font-medium text-foreground">{controlId} — {master?.name ?? "Control"}</span>. The agent will guide you through readiness checks, population ingestion, sampling, evidence collection, test execution, and effectiveness assessment.
                   </p>
                 </div>
+                {(() => {
+                  const stepModes = fieldworkStepOrder.map(s => automationConfig?.[s]?.mode ?? "full");
+                  const allSame = stepModes.every(m => m === stepModes[0]);
+                  const globalLabel = allSame ? automationModeLabels[stepModes[0]].label : null;
+                  const GlobalIcon = allSame ? automationModeIcons[stepModes[0]].icon : null;
+                  const fullCount = stepModes.filter(m => m === "full").length;
+                  const checkCount = stepModes.filter(m => m === "checkpoint").length;
+                  const manualCount = stepModes.filter(m => m === "manual").length;
+
+                  return (
+                    <div className="p-3 rounded-lg bg-slate-50/80 dark:bg-muted/20 border border-slate-200/60 dark:border-border/40 space-y-2">
+                      <div className="flex items-center justify-center gap-1.5">
+                        {GlobalIcon && <GlobalIcon className="w-3 h-3 text-[#266C92]/60" />}
+                        <span className="text-[11px] font-semibold text-foreground/80">
+                          {allSame ? `${globalLabel} across all steps` : "Mixed automation levels"}
+                        </span>
+                      </div>
+                      {allSame && stepModes[0] === "full" && (
+                        <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
+                          The agent will execute all 6 steps end-to-end, pausing only when user input or external data is required. Use the gear icon to customize per-step behavior.
+                        </p>
+                      )}
+                      {allSame && stepModes[0] === "checkpoint" && (
+                        <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
+                          The agent will pause after each substep for your review and confirmation before proceeding. This provides maximum visibility into the testing process.
+                        </p>
+                      )}
+                      {allSame && stepModes[0] === "manual" && (
+                        <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
+                          Each substep must be configured and triggered manually. You control the parameters and timing of every action in the workflow.
+                        </p>
+                      )}
+                      {!allSame && (
+                        <div className="flex items-center justify-center gap-3">
+                          {fullCount > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Zap className="w-2.5 h-2.5 text-[#266C92]/50" />
+                              <span className="text-[10px] text-muted-foreground">{fullCount} auto</span>
+                            </div>
+                          )}
+                          {checkCount > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Flag className="w-2.5 h-2.5 text-slate-400" />
+                              <span className="text-[10px] text-muted-foreground">{checkCount} checkpoint</span>
+                            </div>
+                          )}
+                          {manualCount > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Fingerprint className="w-2.5 h-2.5 text-slate-400" />
+                              <span className="text-[10px] text-muted-foreground">{manualCount} manual</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
                 <div className="pt-2 flex flex-col items-center gap-3">
                   <div className="flex items-center gap-2">
                     {onStartWorkflow ? (
