@@ -2935,12 +2935,21 @@ const stepCompletionComments: Record<string, (controlId: string) => { title: str
 };
 
 function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUploadPopulation }: { controlId: string; controlStatus: ControlWorkflowStatus | null; substepProgress: Record<string, number>; onUploadPopulation?: () => void }) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [activeUtilTab, setActiveUtilTab] = useState<UtilityPanelTab>("agent");
   const [commentFilter, setCommentFilter] = useState<"open" | "closed">("open");
   const [liveComments, setLiveComments] = useState<ControlAgentComment[]>([]);
   const commentedStepsRef = useRef<Set<string>>(new Set());
   const seededStepsRef = useRef<Set<string>>(new Set());
+  const hasAutoExpandedRef = useRef(false);
+
+  useEffect(() => {
+    if (liveComments.length > 0 && !hasAutoExpandedRef.current) {
+      hasAutoExpandedRef.current = true;
+      setExpanded(true);
+      setActiveUtilTab("agent");
+    }
+  }, [liveComments.length]);
 
   useEffect(() => {
     if (!controlStatus?.steps) return;

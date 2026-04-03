@@ -42,7 +42,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (isAgentHub) {
-      setAssistantOpen(true);
+      setAssistantOpen(false);
     }
   }, [isAgentHub, setAssistantOpen]);
   
