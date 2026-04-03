@@ -3471,7 +3471,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
 
       {activeTab === "testing" && (() => {
         const allPending = !controlStatus || fieldworkStepOrder.every(s => controlStatus.steps[s as keyof typeof controlStatus.steps] === "pending");
-        if (allPending && isDemo) {
+        if (allPending) {
           return (
             <div className="flex-1 min-h-0 flex items-center justify-center">
               <div className="text-center max-w-md space-y-5">
@@ -3485,15 +3485,27 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                   </p>
                 </div>
                 <div className="pt-2 flex flex-col items-center gap-3">
-                  <Button
-                    size="default"
-                    className="h-10 px-6 text-sm gap-2 bg-[#266C92] hover:bg-[#1e5a7a] text-white shadow-sm"
-                    onClick={() => onStartWorkflow?.()}
-                    data-testid="button-start-workflow"
-                  >
-                    <Play className="w-4 h-4" />
-                    Test with Agent
-                  </Button>
+                  {onStartWorkflow ? (
+                    <Button
+                      size="default"
+                      className="h-10 px-6 text-sm gap-2 bg-[#266C92] hover:bg-[#1e5a7a] text-white shadow-sm"
+                      onClick={() => onStartWorkflow()}
+                      data-testid="button-start-workflow"
+                    >
+                      <Play className="w-4 h-4" />
+                      Test with Agent
+                    </Button>
+                  ) : (
+                    <Button
+                      size="default"
+                      className="h-10 px-6 text-sm gap-2 bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400 cursor-not-allowed"
+                      disabled
+                      data-testid="button-start-workflow-disabled"
+                    >
+                      <Play className="w-4 h-4" />
+                      Test with Agent
+                    </Button>
+                  )}
                   <p className="text-[11px] text-muted-foreground">6 steps · ~15 min estimated</p>
                 </div>
                 <div className="pt-4 border-t border-slate-200 dark:border-border">
