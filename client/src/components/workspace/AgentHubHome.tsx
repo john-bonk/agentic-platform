@@ -3202,6 +3202,7 @@ type ControlFocusPageProps = {
   controlId: string;
   controlStatus: ControlWorkflowStatus | null;
   onBack: () => void;
+  backLabel?: string;
   onResolve?: (controlId: string) => void;
   isResolved?: boolean;
   onAdvanceStep?: (currentStep: string) => void;
@@ -3209,7 +3210,7 @@ type ControlFocusPageProps = {
   onViewReport?: () => void;
 };
 
-function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResolved, onAdvanceStep, onStartWorkflow, onViewReport }: ControlFocusPageProps) {
+function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResolve, isResolved, onAdvanceStep, onStartWorkflow, onViewReport }: ControlFocusPageProps) {
   const master = masterControlsList.find(c => c.id === controlId);
   const exceptionControlIds = new Set(fieldworkExceptions.map(e => e.controlId));
   const exceptions = fieldworkExceptions.filter(e => e.controlId === controlId);
@@ -3387,7 +3388,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, onResolve, isResol
           data-testid="button-control-focus-back"
         >
           <ChevronLeft className="w-4 h-4" />
-          <span>Overview</span>
+          <span>{backLabel || "Overview"}</span>
         </button>
         <div className="w-px h-5 bg-slate-200 dark:bg-border" />
         <div className="flex items-center gap-2">
@@ -4005,25 +4006,6 @@ function FieldworkComplexHub() {
   const [selectedExceptionId, setSelectedExceptionId] = useState<string | null>(null);
   const [nextStepsExpanded, setNextStepsExpanded] = useState(false);
   const [hubDetailView, setHubDetailView] = useState<string | null>(null);
-  const previousViewRef = useRef<string | null>(null);
-
-  const navigateHub = useCallback((view: string | null, fromView?: string) => {
-    if (fromView !== undefined) previousViewRef.current = fromView;
-    setHubDetailView(view);
-  }, []);
-
-  useEffect(() => {
-    const onHashChange = () => {
-      const hash = window.location.hash.replace("#", "");
-      if (hash === "controls") {
-        setHubDetailView("controls-list");
-      }
-    };
-    onHashChange();
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
-  }, []);
-
   const resolvedBlocksList = useMemo(() => {
     if (!fieldworkProject) return [] as string[];
     return (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.resolvedBlocks as string[] | undefined) ?? [];
@@ -4083,80 +4065,6 @@ function FieldworkComplexHub() {
         sessionId={fieldworkProject.sessionId}
         onBack={() => setShowCanvas(false)}
       />
-    );
-  }
-
-  if (hubDetailView === "controls-list") {
-    const sortedControls = [...masterControlsList].sort((a, b) => {
-      if (a.id === DEMO_CONTROL_ID) return -1;
-      if (b.id === DEMO_CONTROL_ID) return 1;
-      return 0;
-    });
-    return (
-      <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-background">
-        <div className="shrink-0 h-12 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
-          <button
-            onClick={() => { setHubDetailView(null); window.location.hash = ""; window.history.replaceState(null, "", window.location.pathname); }}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            data-testid="button-controls-list-back"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span>Overview</span>
-          </button>
-          <div className="w-px h-5 bg-slate-200 dark:bg-border" />
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-[#266C92]" />
-            <h2 className="text-sm font-semibold text-foreground">Controls</h2>
-          </div>
-          <Badge className="text-[10px] bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-0">{sortedControls.length}</Badge>
-        </div>
-        <div className="flex-1 min-h-0 overflow-y-auto">
-          <div className="divide-y divide-slate-100 dark:divide-border/50">
-            {sortedControls.map((control) => {
-              const status = controlStatuses.find(s => s.controlId === control.id);
-              const progress = status?.overallProgress ?? 0;
-              const isComplete = progress === 100;
-              const isRunning = status && Object.values(status.steps).some(s => s === "running");
-              return (
-                <button
-                  key={control.id}
-                  onClick={() => { navigateHub(`control:${control.id}`, "controls-list"); window.location.hash = ""; window.history.replaceState(null, "", window.location.pathname); }}
-                  className="w-full flex items-center gap-4 px-5 py-3.5 text-left hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors group"
-                  data-testid={`controls-list-item-${control.id}`}
-                >
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                    <Shield className={`w-4 h-4 ${isComplete ? "text-emerald-500" : isRunning ? "text-[#266C92]" : "text-slate-400"}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono text-muted-foreground">{control.id}</span>
-                      <span className="text-sm font-medium text-foreground truncate">{control.name}</span>
-                    </div>
-                    <div className="flex items-center gap-3 mt-0.5">
-                      <span className="text-[11px] text-muted-foreground">{control.owner}</span>
-                      {control.system && <span className="text-[11px] text-muted-foreground">· {control.system}</span>}
-                      <span className={`text-[11px] font-medium ${control.dataSource === "manual" ? "text-amber-600" : "text-emerald-600"}`}>
-                        {control.dataSource === "manual" ? "Manual PBC" : "Connected"}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    {status && (
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                          <div className="h-full rounded-full bg-[#266C92] transition-all" style={{ width: `${progress}%` }} />
-                        </div>
-                        <span className="text-[10px] text-muted-foreground w-7 text-right">{progress}%</span>
-                      </div>
-                    )}
-                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors" />
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
     );
   }
 
@@ -4237,7 +4145,7 @@ function FieldworkComplexHub() {
         key={focusControlId}
         controlId={focusControlId}
         controlStatus={focusStatus}
-        onBack={() => { setHubDetailView(previousViewRef.current || null); previousViewRef.current = null; }}
+        onBack={() => setHubDetailView(null)}
         onResolve={handleResolveAction}
         isResolved={resolvedSet.has(focusControlId)}
         onAdvanceStep={focusControlId === DEMO_CONTROL_ID ? handleAdvanceDemoStep : undefined}
@@ -5109,46 +5017,86 @@ const workflowRowToSession: Record<string, string> = {
   "er-direct-1": "risk-assessment",
 };
 
+function EnvironmentView({ initialView, onExit }: { initialView: string; onExit: () => void }) {
+  const [view, setView] = useState<string>(initialView);
+
+  if (view.startsWith("control:")) {
+    const focusControlId = view.replace("control:", "");
+    return (
+      <ControlFocusPage
+        key={focusControlId}
+        controlId={focusControlId}
+        controlStatus={null}
+        onBack={() => setView("controls-list")}
+        backLabel="Controls"
+      />
+    );
+  }
+
+  if (view === "controls-list") {
+    return (
+      <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-background">
+        <div className="shrink-0 h-12 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-[#266C92]" />
+            <h2 className="text-sm font-semibold text-foreground">Controls</h2>
+          </div>
+          <Badge className="text-[10px] bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-0">{masterControlsList.length}</Badge>
+        </div>
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <div className="divide-y divide-slate-100 dark:divide-border/50">
+            {masterControlsList.map((control) => (
+              <button
+                key={control.id}
+                onClick={() => setView(`control:${control.id}`)}
+                className="w-full flex items-center gap-4 px-5 py-3.5 text-left hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors group"
+                data-testid={`env-controls-list-item-${control.id}`}
+              >
+                <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                  <Shield className="w-4 h-4 text-slate-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-muted-foreground">{control.id}</span>
+                    <span className="text-sm font-medium text-foreground truncate">{control.name}</span>
+                  </div>
+                  <div className="flex items-center gap-3 mt-0.5">
+                    <span className="text-[11px] text-muted-foreground">{control.owner}</span>
+                    {control.system && <span className="text-[11px] text-muted-foreground">· {control.system}</span>}
+                    <span className={`text-[11px] font-medium ${control.dataSource === "manual" ? "text-amber-600" : "text-emerald-600"}`}>
+                      {control.dataSource === "manual" ? "Manual PBC" : "Connected"}
+                    </span>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors shrink-0" />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
 export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps) {
   const settings = useSettings();
   const isSimple = settings.agentHubViewMode !== "complex";
   const scenario = settings.agentHubScenario || "fieldwork-automation";
   const currentSessionId = useWorkflowSessionStore((s) => s.currentSessionId);
-  const addProject = useWorkflowSessionStore((s) => s.addProject);
-  const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
-  const activeProjects = useWorkflowSessionStore((s) => s.projects);
+  const [envView, setEnvView] = useState<string | null>(null);
 
   useEffect(() => {
     const environmentHashes = ["controls", "tests", "issues", "financial-accounts", "library-controls", "control-self-assessments", "processes"];
     const checkEnvHash = () => {
       const hash = window.location.hash.replace("#", "");
-      const store = useWorkflowSessionStore.getState();
-      if (environmentHashes.includes(hash) && store.currentSessionId !== "control-testing") {
-        const meta = workflowSessionConfigs["control-testing"];
-        if (!meta) return;
-        const projects = store.projects ?? [];
-        const existing = projects.find((p) => p.sessionId === "control-testing");
-        if (existing) {
-          store.setCurrentSession("control-testing");
-        } else {
-          const config = meta.create();
-          store.addProject({ sessionId: "control-testing", label: meta.label, icon: meta.icon }, config);
-          const currentStatuses = (store.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
-          if (currentStatuses.length === 0) {
-            const pendingSteps = { readiness: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const, testEffectiveness: "pending" as const };
-            const seedStatuses: ControlWorkflowStatus[] = masterControlsList.map(c => ({
-              controlId: c.id,
-              name: c.name,
-              dataSource: c.dataSource as "connected" | "manual",
-              system: c.system,
-              owner: c.owner,
-              steps: { ...pendingSteps },
-              overallProgress: 0,
-            })).sort((a, b) => (a.dataSource === "manual" ? 0 : 1) - (b.dataSource === "manual" ? 0 : 1));
-            store.setBlockState("control-testing", "fieldwork-execution", "statuses", seedStatuses);
-          }
-          store.setBlockState("control-testing", "fieldwork-execution", "phase", "running");
+      if (environmentHashes.includes(hash)) {
+        if (hash === "controls") {
+          setEnvView("controls-list");
         }
+      } else {
+        setEnvView(null);
       }
     };
     checkEnvHash();
@@ -5158,6 +5106,10 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
 
   if (isSimple) {
     return <SimpleAgentHub welcomeMessage={welcomeMessage} scenario={scenario} />;
+  }
+
+  if (envView) {
+    return <EnvironmentView initialView={envView} onExit={() => { setEnvView(null); window.location.hash = ""; window.history.replaceState(null, "", window.location.pathname); }} />;
   }
 
   if (scenario === "fieldwork-automation") {
