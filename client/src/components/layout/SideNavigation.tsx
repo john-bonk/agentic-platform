@@ -555,7 +555,9 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
     onWorkspaceCreated?.(workspace);
   };
 
-  const isHomeActive = location === "/" || location === "/my-dashboard" || location === "/custom-workspace";
+  const environmentHashes = ["#controls", "#tests", "#issues", "#financial-accounts", "#library-controls", "#control-self-assessments", "#processes"];
+  const hasEnvironmentHash = environmentHashes.includes(currentHash);
+  const isHomeActive = (location === "/" || location === "/my-dashboard" || location === "/custom-workspace") && !hasEnvironmentHash;
 
   const { openTab, setPreviousRoute } = useBrowserTabStore();
 
@@ -772,7 +774,7 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
                 label="Home" 
                 path={currentWorkspace.isCustom ? "/custom-workspace" : "/"} 
                 isActive={isHomeActive && !currentSessionId}
-                onClick={() => setCurrentSession(null)}
+                onClick={() => { setCurrentSession(null); if (window.location.hash) { window.location.hash = ""; window.history.replaceState(null, "", window.location.pathname); } }}
               />
               <QuickAccessItem 
                 icon={Clock} 
