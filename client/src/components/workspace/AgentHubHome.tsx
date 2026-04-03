@@ -5019,16 +5019,80 @@ const workflowRowToSession: Record<string, string> = {
 
 function EnvironmentView({ initialView, onExit }: { initialView: string; onExit: () => void }) {
   const [view, setView] = useState<string>(initialView);
+  const setBlockState = useWorkflowSessionStore((s) => s.setBlockState);
+  const addProject = useWorkflowSessionStore((s) => s.addProject);
+  const runtimeStates = useWorkflowSessionStore((s) => s.runtimeStates);
+  const projects = useWorkflowSessionStore((s) => s.projects);
+
+  const ensureSession = useCallback(() => {
+    const store = useWorkflowSessionStore.getState();
+    const existing = (store.projects ?? []).find((p) => p.sessionId === "control-testing");
+    if (!existing) {
+      const meta = workflowSessionConfigs["control-testing"];
+      if (!meta) return;
+      const config = meta.create();
+      store.addProject({ sessionId: "control-testing", label: meta.label, icon: meta.icon }, config);
+      const currentStatuses = (store.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
+      if (currentStatuses.length === 0) {
+        const pendingSteps = { readiness: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const, testEffectiveness: "pending" as const };
+        const seedStatuses: ControlWorkflowStatus[] = masterControlsList.map(c => ({
+          controlId: c.id, name: c.name, dataSource: c.dataSource as "connected" | "manual",
+          system: c.system, owner: c.owner, steps: { ...pendingSteps }, overallProgress: 0,
+        })).sort((a, b) => (a.dataSource === "manual" ? 0 : 1) - (b.dataSource === "manual" ? 0 : 1));
+        store.setBlockState("control-testing", "fieldwork-execution", "statuses", seedStatuses);
+      }
+      store.setBlockState("control-testing", "fieldwork-execution", "phase", "running");
+    }
+  }, []);
+
+  const controlStatuses = (runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
 
   if (view.startsWith("control:")) {
     const focusControlId = view.replace("control:", "");
+    const focusStatus = controlStatuses.find(s => s.controlId === focusControlId) ?? null;
+
+    const handleStartDemoWorkflow = () => {
+      ensureSession();
+      const store = useWorkflowSessionStore.getState();
+      const statuses = [...((store.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [])];
+      const idx = statuses.findIndex(s => s.controlId === focusControlId);
+      if (idx === -1) return;
+      const ctrl = { ...statuses[idx], steps: { ...statuses[idx].steps } };
+      ctrl.steps.readiness = "running";
+      statuses[idx] = ctrl;
+      store.setBlockState("control-testing", "fieldwork-execution", "statuses", statuses);
+    };
+
+    const handleAdvanceDemoStep = (currentStep: string) => {
+      const store = useWorkflowSessionStore.getState();
+      const statuses = [...((store.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [])];
+      const idx = statuses.findIndex(s => s.controlId === focusControlId);
+      if (idx === -1) return;
+      const ctrl = { ...statuses[idx], steps: { ...statuses[idx].steps } };
+      if (ctrl.steps[currentStep as keyof typeof ctrl.steps] === "complete") return;
+      ctrl.steps[currentStep as keyof typeof ctrl.steps] = "complete";
+      const stepIdx = fieldworkStepOrder.indexOf(currentStep);
+      if (stepIdx < fieldworkStepOrder.length - 1) {
+        const nextStep = fieldworkStepOrder[stepIdx + 1];
+        if (ctrl.steps[nextStep as keyof typeof ctrl.steps] !== "complete") {
+          ctrl.steps[nextStep as keyof typeof ctrl.steps] = "running";
+        }
+      }
+      const completedCount = fieldworkStepOrder.filter(s => ctrl.steps[s as keyof typeof ctrl.steps] === "complete").length;
+      ctrl.overallProgress = Math.round((completedCount / fieldworkStepOrder.length) * 100);
+      statuses[idx] = ctrl;
+      store.setBlockState("control-testing", "fieldwork-execution", "statuses", statuses);
+    };
+
     return (
       <ControlFocusPage
         key={focusControlId}
         controlId={focusControlId}
-        controlStatus={null}
+        controlStatus={focusStatus}
         onBack={() => setView("controls-list")}
         backLabel="Controls"
+        onAdvanceStep={focusControlId === DEMO_CONTROL_ID ? handleAdvanceDemoStep : undefined}
+        onStartWorkflow={focusControlId === DEMO_CONTROL_ID ? handleStartDemoWorkflow : undefined}
       />
     );
   }
