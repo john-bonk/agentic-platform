@@ -2888,14 +2888,24 @@ function getAgentCommentsForControl(controlId: string): ControlAgentComment[] {
   ];
 }
 
-type UtilityPanelTab = "comments" | "notes" | "attachments" | "history";
+type UtilityPanelTab = "agent" | "comments" | "notes" | "attachments" | "history";
 
 const utilityToolbarItems: { id: UtilityPanelTab | "close"; icon: typeof MessageSquare; label: string }[] = [
+  { id: "agent", icon: Bot, label: "Optro Agent" },
   { id: "comments", icon: MessageSquare, label: "Comments" },
   { id: "notes", icon: Pencil, label: "Notes" },
   { id: "attachments", icon: Copy, label: "Attachments" },
   { id: "history", icon: Clock, label: "History" },
 ];
+
+const stepAgentName: Record<string, { name: string; initials: string }> = {
+  readiness: { name: "READINESS AGENT", initials: "RA" },
+  population: { name: "POPULATION AGENT", initials: "PA" },
+  sampling: { name: "SAMPLING AGENT", initials: "SA" },
+  evidence: { name: "EVIDENCE AGENT", initials: "EA" },
+  testing: { name: "TESTING AGENT", initials: "TA" },
+  testEffectiveness: { name: "EFFECTIVENESS AGENT", initials: "EA" },
+};
 
 const stepCompletionComments: Record<string, (controlId: string) => { title: string; body: string }> = {
   readiness: (cid) => ({
@@ -2926,7 +2936,7 @@ const stepCompletionComments: Record<string, (controlId: string) => { title: str
 
 function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUploadPopulation }: { controlId: string; controlStatus: ControlWorkflowStatus | null; substepProgress: Record<string, number>; onUploadPopulation?: () => void }) {
   const [expanded, setExpanded] = useState(true);
-  const [activeUtilTab, setActiveUtilTab] = useState<UtilityPanelTab>("comments");
+  const [activeUtilTab, setActiveUtilTab] = useState<UtilityPanelTab>("agent");
   const [commentFilter, setCommentFilter] = useState<"open" | "closed">("open");
   const [liveComments, setLiveComments] = useState<ControlAgentComment[]>([]);
   const commentedStepsRef = useRef<Set<string>>(new Set());
@@ -3025,8 +3035,8 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
               data-testid={`utility-tab-${item.id}`}
             >
               <Icon className="w-3.5 h-3.5" />
-              {item.id === "comments" && liveComments.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center">{liveComments.length > 9 ? "9+" : liveComments.length}</span>
+              {item.id === "agent" && liveComments.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#266C92] text-white text-[8px] font-bold flex items-center justify-center">{liveComments.length > 9 ? "9+" : liveComments.length}</span>
               )}
             </button>
           );
@@ -3068,8 +3078,72 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
       {expanded && (
         <div className="w-80 border-l border-slate-200 dark:border-border bg-white dark:bg-card flex flex-col overflow-hidden">
           <div className="shrink-0 px-4 py-3 border-b border-slate-200 dark:border-border flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-foreground capitalize">{activeUtilTab}</h3>
+            <div className="flex items-center gap-2">
+              {activeUtilTab === "agent" && <Bot className="w-3.5 h-3.5 text-[#266C92]" />}
+              <h3 className="text-sm font-semibold text-foreground">{activeUtilTab === "agent" ? "Optro Agent" : activeUtilTab.charAt(0).toUpperCase() + activeUtilTab.slice(1)}</h3>
+            </div>
           </div>
+
+          {activeUtilTab === "agent" && (
+            <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                {liveComments.length === 0 && (
+                  <div className="px-4 py-8 text-center">
+                    <Bot className="w-6 h-6 text-muted-foreground/30 mx-auto mb-2" />
+                    <p className="text-xs text-muted-foreground">Agent readouts will appear here as the testing workflow runs</p>
+                  </div>
+                )}
+                {liveComments.map(comment => {
+                  const agent = stepAgentName[comment.stepId ?? ""] ?? { name: "OPTRO AGENT", initials: "OA" };
+                  return (
+                    <div key={comment.id} className="px-4 py-4 border-b border-slate-100 dark:border-border/50 animate-in fade-in slide-in-from-top-2 duration-300" data-testid={`agent-readout-${comment.id}`}>
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#266C92] flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="text-[10px] font-bold text-white">{agent.initials}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-foreground">{agent.name}</span>
+                          </div>
+                          <span className="text-[10px] text-muted-foreground">{comment.timestamp}</span>
+                          {comment.title && (
+                            <p className="text-xs font-semibold text-foreground mt-2">{comment.title}</p>
+                          )}
+                          <div className="mt-1.5 text-xs text-foreground leading-relaxed whitespace-pre-wrap">
+                            {comment.body.split(/(\*\*.*?\*\*)/).map((part, i) => {
+                              if (part.startsWith("**") && part.endsWith("**")) {
+                                return <strong key={i}>{part.slice(2, -2)}</strong>;
+                              }
+                              return <span key={i}>{part}</span>;
+                            })}
+                          </div>
+                          {comment.stepId === "population" && comment.status === "blocked" && onUploadPopulation && (
+                            <div className="mt-3 flex items-center gap-2">
+                              <button
+                                onClick={handleUploadClick}
+                                className="text-[10px] font-semibold text-white bg-[#266C92] hover:bg-[#1e5a7a] px-2.5 py-1 rounded transition-colors flex items-center gap-1"
+                                data-testid="agent-action-upload"
+                              >
+                                <Upload className="w-3 h-3" />
+                                Upload
+                              </button>
+                              <button
+                                onClick={() => {}}
+                                className="text-[10px] font-medium text-[#266C92] border border-[#266C92]/30 hover:bg-[#266C92]/5 px-2.5 py-1 rounded transition-colors"
+                                data-testid="agent-action-request"
+                              >
+                                Request via Workstream
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {activeUtilTab === "comments" && (
             <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
@@ -3095,72 +3169,10 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
                 </button>
               </div>
               <div className="flex-1 min-h-0 overflow-y-auto">
-                {visibleComments.length === 0 && (
-                  <div className="px-4 py-8 text-center">
-                    <MessageSquare className="w-6 h-6 text-muted-foreground/30 mx-auto mb-2" />
-                    <p className="text-xs text-muted-foreground">{commentFilter === "open" ? "No comments yet — agent updates will appear here as workflow steps progress" : "No closed comments"}</p>
-                  </div>
-                )}
-                {visibleComments.map(comment => (
-                  <div key={comment.id} className="px-4 py-4 border-b border-slate-100 dark:border-border/50 animate-in fade-in slide-in-from-top-2 duration-300" data-testid={`comment-${comment.id}`}>
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#6C5CE7] flex items-center justify-center shrink-0 mt-0.5">
-                        <span className="text-[10px] font-bold text-white">FA</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-semibold text-foreground">FIELDWORK AGENT</span>
-                        </div>
-                        <span className="text-[10px] text-muted-foreground">{comment.timestamp}</span>
-                        {comment.title && (
-                          <p className="text-xs font-semibold text-foreground mt-2">{comment.title}</p>
-                        )}
-                        <div className="mt-1.5 text-xs text-foreground leading-relaxed whitespace-pre-wrap">
-                          {comment.body.split(/(\*\*.*?\*\*)/).map((part, i) => {
-                            if (part.startsWith("**") && part.endsWith("**")) {
-                              return <strong key={i}>{part.slice(2, -2)}</strong>;
-                            }
-                            return <span key={i}>{part}</span>;
-                          })}
-                        </div>
-                        {comment.stepId === "population" && comment.status === "blocked" && onUploadPopulation && (
-                          <div className="mt-3 flex items-center gap-2">
-                            <button
-                              onClick={handleUploadClick}
-                              className="text-[10px] font-semibold text-white bg-[#266C92] hover:bg-[#1e5a7a] px-2.5 py-1 rounded transition-colors flex items-center gap-1"
-                              data-testid="comment-action-upload"
-                            >
-                              <Upload className="w-3 h-3" />
-                              Upload
-                            </button>
-                            <button
-                              onClick={() => {}}
-                              className="text-[10px] font-medium text-[#266C92] border border-[#266C92]/30 hover:bg-[#266C92]/5 px-2.5 py-1 rounded transition-colors"
-                              data-testid="comment-action-request"
-                            >
-                              Request via Workstream
-                            </button>
-                          </div>
-                        )}
-                        {comment.actions && comment.actions.length > 0 && (
-                          <div className="mt-2 space-y-0.5">
-                            {comment.actions.map((action, i) => (
-                              <p key={i} className="text-xs">
-                                <span className="text-muted-foreground">- </span>
-                                <span className={`${action.bold ? "font-semibold text-[#266C92] cursor-pointer hover:underline" : "text-foreground"}`}>{action.label}</span>
-                              </p>
-                            ))}
-                          </div>
-                        )}
-                        <div className="flex items-center gap-3 mt-3">
-                          {["Reply", "Close", "Permalink", "Mute"].map(a => (
-                            <button key={a} className="text-[10px] text-[#266C92] hover:underline font-medium" data-testid={`comment-action-${a.toLowerCase().replace(/\s/g, "-")}`}>{a}</button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                <div className="px-4 py-8 text-center">
+                  <MessageSquare className="w-6 h-6 text-muted-foreground/30 mx-auto mb-2" />
+                  <p className="text-xs text-muted-foreground">{commentFilter === "open" ? "No comments yet" : "No closed comments"}</p>
+                </div>
               </div>
             </div>
           )}
