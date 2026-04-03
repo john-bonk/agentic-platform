@@ -3470,7 +3470,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       {activeTab === "automations" && <ControlAutomationsStub controlId={controlId} />}
 
       {activeTab === "testing" && (() => {
-        const allPending = controlStatus && fieldworkStepOrder.every(s => controlStatus.steps[s as keyof typeof controlStatus.steps] === "pending");
+        const allPending = !controlStatus || fieldworkStepOrder.every(s => controlStatus.steps[s as keyof typeof controlStatus.steps] === "pending");
         if (allPending && isDemo) {
           return (
             <div className="flex-1 min-h-0 flex items-center justify-center">
