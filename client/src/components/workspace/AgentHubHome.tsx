@@ -5122,16 +5122,17 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
     const environmentHashes = ["controls", "tests", "issues", "financial-accounts", "library-controls", "control-self-assessments", "processes"];
     const checkEnvHash = () => {
       const hash = window.location.hash.replace("#", "");
-      if (environmentHashes.includes(hash) && currentSessionId !== "control-testing") {
+      const store = useWorkflowSessionStore.getState();
+      if (environmentHashes.includes(hash) && store.currentSessionId !== "control-testing") {
         const meta = workflowSessionConfigs["control-testing"];
         if (!meta) return;
-        const existing = activeProjects.find((p) => p.sessionId === "control-testing");
+        const projects = store.projects ?? [];
+        const existing = projects.find((p) => p.sessionId === "control-testing");
         if (existing) {
-          setCurrentSession("control-testing");
+          store.setCurrentSession("control-testing");
         } else {
           const config = meta.create();
-          addProject({ sessionId: "control-testing", label: meta.label, icon: meta.icon }, config);
-          const store = useWorkflowSessionStore.getState();
+          store.addProject({ sessionId: "control-testing", label: meta.label, icon: meta.icon }, config);
           const currentStatuses = (store.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
           if (currentStatuses.length === 0) {
             const pendingSteps = { readiness: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const, testEffectiveness: "pending" as const };
@@ -5153,7 +5154,7 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
     checkEnvHash();
     window.addEventListener("hashchange", checkEnvHash);
     return () => window.removeEventListener("hashchange", checkEnvHash);
-  }, [currentSessionId, activeProjects, addProject, setCurrentSession]);
+  }, []);
 
   if (isSimple) {
     return <SimpleAgentHub welcomeMessage={welcomeMessage} scenario={scenario} />;
