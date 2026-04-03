@@ -2038,6 +2038,12 @@ function SubStepIndicator({ status }: { status: string }) {
   return <div className="w-3.5 h-3.5 rounded-full border-[1.5px] border-slate-300 dark:border-slate-600" />;
 }
 
+const automationModeIcons: Record<AutomationMode, { icon: typeof Zap; color: string; title: string }> = {
+  full: { icon: Zap, color: "text-emerald-400 dark:text-emerald-500", title: "Full Automation" },
+  checkpoint: { icon: Flag, color: "text-amber-400 dark:text-amber-500", title: "Checkpoint" },
+  manual: { icon: Fingerprint, color: "text-blue-400 dark:text-blue-500", title: "Manual" },
+};
+
 type StepNodeContentProps = {
   step: string;
   stepStatus: string;
@@ -2049,9 +2055,13 @@ type StepNodeContentProps = {
   onAction?: (stepKey: string, actionId: string) => void;
   onSubstepAction?: (substepId: string, action: string) => void;
   autoExpandedSubs?: Set<string>;
+  automationConfig?: AutomationConfig;
+  onResumeSubstep?: (substepId: string) => void;
+  checkpointAcked?: Set<string>;
+  onAckCheckpoint?: (substepId: string) => void;
 };
 
-function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule, onSubstepAction, autoExpandedSubs }: StepNodeContentProps) {
+function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule, onSubstepAction, autoExpandedSubs, automationConfig, onResumeSubstep, checkpointAcked, onAckCheckpoint }: StepNodeContentProps) {
   const info = stepNodeInfo[step];
   if (!info) return null;
 
@@ -2059,6 +2069,9 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
   const isBlockedAtThisStep = blockRule && blockRule.blockAtStep === step && stepStatus === "blocked";
   const isDemo = controlId === DEMO_CONTROL_ID;
   const allSubsDone = substepProgress >= info.substeps.length;
+
+  const stepAutoConfig = automationConfig?.[step];
+  const stepMode: AutomationMode = stepAutoConfig?.mode ?? "full";
 
   const mergedExpanded = useMemo(() => {
     const s = new Set(expandedSubs);
@@ -2077,7 +2090,8 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
   return (
     <div className="space-y-2" data-testid={`step-node-${step}`}>
       {info.substeps.map((sub, idx) => {
-        const subStatus = stepStatus === "complete" || idx < substepProgress
+        const subMode: AutomationMode = stepAutoConfig?.substeps?.[sub.id] ?? stepMode;
+        const baseStatus = stepStatus === "complete" || idx < substepProgress
           ? "complete"
           : stepStatus === "blocked" && idx === substepProgress
             ? "blocked"
@@ -2086,14 +2100,19 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               : idx === substepProgress && (stepStatus === "running")
                 ? "running"
                 : "pending";
+        const isCheckpointHeld = baseStatus === "complete" && subMode === "checkpoint" && !(checkpointAcked?.has(sub.id));
+        const isManualWaiting = baseStatus === "pending" && subMode === "manual" && stepStatus === "running" && idx === substepProgress;
+        const subStatus = isManualWaiting ? "manual-waiting" : isCheckpointHeld ? "checkpoint-held" : baseStatus;
         const SubIcon = sub.icon;
-        const isExpandable = subStatus === "complete";
+        const isExpandable = baseStatus === "complete";
         const isExpanded = mergedExpanded.has(sub.id);
         const outputs = isDemo ? (demoSubstepOutputs[sub.id] ?? []) : [];
         const isReadinessAssess = sub.id === "rd-assess";
         const hasContent = outputs.length > 0 || isReadinessAssess;
-        const showInlineUpload = isDemo && sub.id === "pop-ingest" && subStatus === "running";
-        const showEvidenceTracker = isDemo && sub.id === "evd-collect" && subStatus === "running";
+        const showInlineUpload = isDemo && sub.id === "pop-ingest" && baseStatus === "running";
+        const showEvidenceTracker = isDemo && sub.id === "evd-collect" && baseStatus === "running";
+        const modeIconInfo = automationModeIcons[subMode];
+        const ModeIcon = modeIconInfo.icon;
 
         return (
           <div
@@ -2106,6 +2125,8 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               disabled={!isExpandable || !hasContent}
               className={`w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-lg transition-colors ${
                 subStatus === "running" ? "bg-[#266C92]/[0.04]" :
+                subStatus === "checkpoint-held" ? "bg-amber-50/40 dark:bg-amber-900/10 border border-amber-200/60 dark:border-amber-800/30" :
+                subStatus === "manual-waiting" ? "bg-blue-50/40 dark:bg-blue-900/10 border border-blue-200/60 dark:border-blue-800/30" :
                 subStatus === "waiting" ? "bg-amber-50/30 dark:bg-amber-900/5" :
                 subStatus === "blocked" ? "bg-red-50/30 dark:bg-red-900/5" :
                 isExpandable && hasContent ? "hover:bg-slate-50/80 dark:hover:bg-muted/10 cursor-pointer" :
@@ -2115,12 +2136,13 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
             >
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-[9px] text-muted-foreground font-mono w-4 text-right">{idx + 1}</span>
-                <SubStepIndicator status={subStatus} />
+                <SubStepIndicator status={baseStatus} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <SubIcon className="w-3 h-3 text-muted-foreground shrink-0" />
-                  <span className={`text-xs font-medium ${subStatus === "complete" || subStatus === "running" ? "text-foreground" : "text-muted-foreground"}`}>{sub.label}</span>
+                  <span className={`text-xs font-medium ${baseStatus === "complete" || baseStatus === "running" ? "text-foreground" : "text-muted-foreground"}`}>{sub.label}</span>
+                  <ModeIcon className={`w-2.5 h-2.5 ${modeIconInfo.color} shrink-0 opacity-70`} title={modeIconInfo.title} />
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{sub.description}</p>
               </div>
@@ -2128,6 +2150,42 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
                 <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground shrink-0 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
               )}
             </button>
+
+            {subStatus === "checkpoint-held" && (
+              <div className="pl-12 pr-3 pb-2 pt-1">
+                <div className="flex items-center gap-2 p-2 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/30">
+                  <Flag className="w-3 h-3 text-amber-500 shrink-0" />
+                  <span className="text-[11px] text-amber-700 dark:text-amber-400 font-medium flex-1">Checkpoint — review before proceeding</span>
+                  <Button
+                    size="sm"
+                    className="h-6 px-2.5 text-[10px] gap-1 bg-amber-500 hover:bg-amber-600 text-white"
+                    onClick={(e) => { e.stopPropagation(); onAckCheckpoint?.(sub.id); }}
+                    data-testid={`button-ack-checkpoint-${sub.id}`}
+                  >
+                    <CheckCircle2 className="w-2.5 h-2.5" />
+                    Confirm
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {subStatus === "manual-waiting" && (
+              <div className="pl-12 pr-3 pb-2 pt-1">
+                <div className="flex items-center gap-2 p-2 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/30">
+                  <Fingerprint className="w-3 h-3 text-blue-500 shrink-0" />
+                  <span className="text-[11px] text-blue-700 dark:text-blue-400 font-medium flex-1">Manual mode — trigger when ready</span>
+                  <Button
+                    size="sm"
+                    className="h-6 px-2.5 text-[10px] gap-1 bg-blue-500 hover:bg-blue-600 text-white"
+                    onClick={(e) => { e.stopPropagation(); onResumeSubstep?.(sub.id); }}
+                    data-testid={`button-run-substep-${sub.id}`}
+                  >
+                    <Play className="w-2.5 h-2.5" />
+                    Run
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {showInlineUpload && (
               <div className="pl-12 pr-3 pb-2 pt-1">
@@ -2198,20 +2256,46 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
         </div>
       )}
 
-      {stepStatus === "running" && allSubsDone && (
-        <div className="p-2.5 rounded-lg bg-emerald-50/50 border border-emerald-200/50 dark:bg-emerald-900/10 dark:border-emerald-800/30">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-            <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">All substeps complete — awaiting your confirmation to proceed.</p>
+      {stepStatus === "running" && allSubsDone && (() => {
+        const lastSub = info.substeps[info.substeps.length - 1];
+        const lastSubMode: AutomationMode = (lastSub && stepAutoConfig?.substeps?.[lastSub.id]) ?? stepMode;
+        const lastCheckpointPending = lastSubMode === "checkpoint" && lastSub && !(checkpointAcked?.has(lastSub.id));
+        if (lastCheckpointPending) {
+          return null;
+        }
+        return (
+          <div className="p-2.5 rounded-lg bg-emerald-50/50 border border-emerald-200/50 dark:bg-emerald-900/10 dark:border-emerald-800/30">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                {stepMode === "checkpoint" ? "All substeps complete — checkpoint review passed. Confirm to proceed." :
+                 stepMode === "manual" ? "All substeps triggered and complete — confirm to proceed." :
+                 "All substeps complete — awaiting your confirmation to proceed."}
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {stepStatus === "running" && !allSubsDone && (
         <div className="p-2.5 rounded-lg bg-[#266C92]/5 border border-[#266C92]/15">
           <div className="flex items-center gap-2">
-            <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />
-            <p className="text-xs text-[#266C92] font-medium">Agent processing — substep {Math.min(substepProgress + 1, info.substeps.length)} of {info.substeps.length}</p>
+            {stepMode === "manual" ? (
+              <>
+                <Fingerprint className="w-3 h-3 text-blue-500" />
+                <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Manual mode — substep {Math.min(substepProgress + 1, info.substeps.length)} of {info.substeps.length} awaiting trigger</p>
+              </>
+            ) : stepMode === "checkpoint" ? (
+              <>
+                <Flag className="w-3 h-3 text-amber-500" />
+                <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">Checkpoint mode — substep {Math.min(substepProgress + 1, info.substeps.length)} of {info.substeps.length}</p>
+              </>
+            ) : (
+              <>
+                <Loader2 className="w-3 h-3 text-[#266C92] animate-spin" />
+                <p className="text-xs text-[#266C92] font-medium">Agent processing — substep {Math.min(substepProgress + 1, info.substeps.length)} of {info.substeps.length}</p>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -3505,6 +3589,16 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
   const [actionToast, setActionToast] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [autoExpandedSubs, setAutoExpandedSubs] = useState<Set<string>>(() => new Set());
+  const [checkpointAcked, setCheckpointAcked] = useState<Set<string>>(() => new Set());
+  const [manualTriggered, setManualTriggered] = useState<Set<string>>(() => new Set());
+
+  const handleAckCheckpoint = useCallback((substepId: string) => {
+    setCheckpointAcked(prev => new Set(prev).add(substepId));
+  }, []);
+
+  const handleResumeSubstep = useCallback((substepId: string) => {
+    setManualTriggered(prev => new Set(prev).add(substepId));
+  }, []);
 
   const initSubstepProgress = useMemo(() => {
     const prog: Record<string, number> = {};
@@ -3536,6 +3630,17 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
     if (currentProg >= totalSubs) return;
     if (behavior.pauseAtSubstep !== undefined && currentProg === behavior.pauseAtSubstep) return;
 
+    const stepCfg = automationConfig?.[step];
+    const currentSub = info?.substeps[currentProg];
+    const subMode: AutomationMode = (currentSub && stepCfg?.substeps?.[currentSub.id]) ?? stepCfg?.mode ?? "full";
+
+    if (subMode === "manual" && !manualTriggered.has(currentSub?.id ?? "")) return;
+
+    if (subMode === "checkpoint" && currentProg > 0) {
+      const prevSub = info?.substeps[currentProg - 1];
+      if (prevSub && !checkpointAcked.has(prevSub.id)) return;
+    }
+
     const stepKey = step;
     const timer = setTimeout(() => {
       setSubstepProgress(prev => {
@@ -3544,7 +3649,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       });
     }, 1200);
     return () => clearTimeout(timer);
-  }, [isDemo, activeStep, controlStatus, substepProgress]);
+  }, [isDemo, activeStep, controlStatus, substepProgress, automationConfig, manualTriggered, checkpointAcked]);
 
   const stepLabels: Record<string, string> = {
     readiness: "Readiness",
@@ -3898,6 +4003,17 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                     } border-0`}>
                       {activeStepStatus === "complete" ? "Complete" : activeStepStatus === "running" ? "Running" : activeStepStatus === "waiting" ? "Waiting" : activeStepStatus === "blocked" ? "Blocked" : "Pending"}
                     </Badge>
+                    {(() => {
+                      const sMode: AutomationMode = automationConfig?.[activeStep]?.mode ?? "full";
+                      const mi = automationModeIcons[sMode];
+                      const MI = mi.icon;
+                      return (
+                        <span className={`inline-flex items-center gap-1 text-[9px] font-medium ${mi.color} opacity-80`} title={mi.title}>
+                          <MI className="w-2.5 h-2.5" />
+                          {automationModeLabels[sMode].short}
+                        </span>
+                      );
+                    })()}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">Step {activeStepIdx + 1} of {fieldworkStepOrder.length}: {stepDescriptions[activeStep]}</p>
                 </div>
@@ -3915,6 +4031,10 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                   onAction={handleStepAction}
                   onSubstepAction={handleSubstepAction}
                   autoExpandedSubs={autoExpandedSubs}
+                  automationConfig={automationConfig}
+                  onResumeSubstep={handleResumeSubstep}
+                  checkpointAcked={checkpointAcked}
+                  onAckCheckpoint={handleAckCheckpoint}
                 />
               </div>
 
