@@ -3207,6 +3207,245 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
   );
 }
 
+type AutomationMode = "full" | "checkpoint" | "manual";
+
+type AutomationConfig = Record<string, { mode: AutomationMode; substeps: Record<string, AutomationMode> }>;
+
+const automationModeLabels: Record<AutomationMode, { label: string; short: string; description: string; color: string; bg: string }> = {
+  full: { label: "Full Automation", short: "Auto", description: "Runs automatically, pausing only for missing inputs", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-100 dark:bg-emerald-900/40 border-emerald-200 dark:border-emerald-800" },
+  checkpoint: { label: "Checkpoint", short: "Check", description: "Pauses at each boundary for confirmation", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-100 dark:bg-amber-900/40 border-amber-200 dark:border-amber-800" },
+  manual: { label: "Manual", short: "Manual", description: "Must be explicitly triggered to proceed", color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-100 dark:bg-blue-900/40 border-blue-200 dark:border-blue-800" },
+};
+
+function buildDefaultAutomationConfig(): AutomationConfig {
+  const config: AutomationConfig = {};
+  for (const step of fieldworkStepOrder) {
+    const info = stepNodeInfo[step];
+    if (!info) continue;
+    const substeps: Record<string, AutomationMode> = {};
+    for (const sub of info.substeps) { substeps[sub.id] = "full"; }
+    config[step] = { mode: "full", substeps };
+  }
+  return config;
+}
+
+function AutomationModeSelector({ value, onChange, size = "default", scopeId }: { value: AutomationMode; onChange: (m: AutomationMode) => void; size?: "default" | "small"; scopeId?: string }) {
+  const modes: AutomationMode[] = ["full", "checkpoint", "manual"];
+  const idSuffix = scopeId ? `-${scopeId}` : "";
+  return (
+    <div className={`inline-flex rounded-md border border-slate-200 dark:border-border overflow-hidden ${size === "small" ? "h-6" : "h-7"}`} data-testid={`automation-mode-selector${idSuffix}`}>
+      {modes.map((m) => {
+        const info = automationModeLabels[m];
+        const active = value === m;
+        return (
+          <button
+            key={m}
+            onClick={(e) => { e.stopPropagation(); onChange(m); }}
+            className={`${size === "small" ? "px-2 text-[10px]" : "px-2.5 text-[11px]"} font-medium transition-colors whitespace-nowrap ${
+              active
+                ? `${info.bg} ${info.color} border-r border-slate-200 dark:border-border`
+                : "bg-white dark:bg-card text-muted-foreground hover:bg-slate-50 dark:hover:bg-muted/40 border-r border-slate-200 dark:border-border"
+            } last:border-r-0`}
+            data-testid={`automation-mode-${m}${idSuffix}`}
+          >
+            {size === "small" ? info.short : info.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function AutomationConfigModal({ open, onOpenChange, config, onSave }: { open: boolean; onOpenChange: (open: boolean) => void; config: AutomationConfig; onSave: (config: AutomationConfig) => void }) {
+  const [draft, setDraft] = useState<AutomationConfig>(() => JSON.parse(JSON.stringify(config)));
+  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (open) { setDraft(JSON.parse(JSON.stringify(config))); setExpandedSteps(new Set()); }
+  }, [open, config]);
+
+  const setStepMode = (step: string, mode: AutomationMode) => {
+    setDraft(prev => {
+      const next = { ...prev };
+      const stepCfg = { ...next[step], substeps: { ...next[step].substeps } };
+      stepCfg.mode = mode;
+      for (const subId of Object.keys(stepCfg.substeps)) { stepCfg.substeps[subId] = mode; }
+      next[step] = stepCfg;
+      return next;
+    });
+  };
+
+  const setSubstepMode = (step: string, subId: string, mode: AutomationMode) => {
+    setDraft(prev => {
+      const next = { ...prev };
+      const stepCfg = { ...next[step], substeps: { ...next[step].substeps } };
+      stepCfg.substeps[subId] = mode;
+      const subModes = Object.values(stepCfg.substeps);
+      if (subModes.every(m => m === subModes[0])) { stepCfg.mode = subModes[0]; }
+      else { stepCfg.mode = "checkpoint"; }
+      next[step] = stepCfg;
+      return next;
+    });
+  };
+
+  const setAllMode = (mode: AutomationMode) => {
+    const next: AutomationConfig = {};
+    for (const step of fieldworkStepOrder) {
+      const info = stepNodeInfo[step];
+      if (!info) continue;
+      const substeps: Record<string, AutomationMode> = {};
+      for (const sub of info.substeps) { substeps[sub.id] = mode; }
+      next[step] = { mode, substeps };
+    }
+    setDraft(next);
+  };
+
+  const toggleExpand = (step: string) => {
+    setExpandedSteps(prev => {
+      const next = new Set(prev);
+      if (next.has(step)) next.delete(step); else next.add(step);
+      return next;
+    });
+  };
+
+  const globalMode: AutomationMode | "mixed" = (() => {
+    const stepModes = fieldworkStepOrder.map(s => draft[s]?.mode).filter(Boolean);
+    if (stepModes.every(m => m === "full")) return "full";
+    if (stepModes.every(m => m === "checkpoint")) return "checkpoint";
+    if (stepModes.every(m => m === "manual")) return "manual";
+    return "mixed";
+  })();
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col" data-testid="automation-config-modal">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <Settings className="w-4 h-4 text-[#266C92]" />
+            Workflow Automation Configuration
+          </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
+            Configure the degree of automation for each step and substep of the testing workflow.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-muted/30 border border-slate-200 dark:border-border">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-foreground">Global Automation Level</span>
+                  {globalMode === "mixed" && (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 font-medium">Mixed</span>
+                  )}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Apply to all steps and substeps</p>
+              </div>
+              <AutomationModeSelector
+                value={globalMode === "mixed" ? "full" : globalMode}
+                onChange={setAllMode}
+                scopeId="global"
+              />
+            </div>
+
+            <div className="space-y-1">
+              {fieldworkStepOrder.map((step, stepIdx) => {
+                const info = stepNodeInfo[step];
+                if (!info) return null;
+                const stepCfg = draft[step];
+                if (!stepCfg) return null;
+                const isExpanded = expandedSteps.has(step);
+                const StepIcon = info.substeps[0]?.icon ?? FileCheck;
+                const hasSubOverrides = Object.values(stepCfg.substeps).some(m => m !== stepCfg.mode);
+
+                return (
+                  <div key={step} className="border border-slate-200 dark:border-border rounded-lg overflow-hidden" data-testid={`automation-step-${step}`}>
+                    <div
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors cursor-pointer"
+                      data-testid={`automation-step-toggle-${step}`}
+                    >
+                      <div className="w-5 h-5 rounded flex items-center justify-center bg-[#266C92]/10 text-[#266C92] shrink-0" onClick={() => toggleExpand(step)}>
+                        <span className="text-[10px] font-bold">{stepIdx + 1}</span>
+                      </div>
+                      <div className="flex-1 min-w-0 cursor-pointer" onClick={() => toggleExpand(step)}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-foreground">{info.nodeLabel}</span>
+                          <span className="text-[10px] text-muted-foreground">{info.substeps.length} substeps</span>
+                          {hasSubOverrides && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 font-medium">Mixed</span>
+                          )}
+                        </div>
+                      </div>
+                      <AutomationModeSelector
+                        value={stepCfg.mode}
+                        onChange={(m) => setStepMode(step, m)}
+                        size="small"
+                        scopeId={step}
+                      />
+                      <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform cursor-pointer ${isExpanded ? "rotate-180" : ""}`} onClick={() => toggleExpand(step)} />
+                    </div>
+
+                    {isExpanded && (
+                      <div className="border-t border-slate-100 dark:border-border/50 bg-slate-50/50 dark:bg-muted/10">
+                        {info.substeps.map((sub) => {
+                          const SubIcon = sub.icon;
+                          return (
+                            <div
+                              key={sub.id}
+                              className="flex items-center gap-3 px-3 py-2 pl-10 border-b border-slate-100 dark:border-border/30 last:border-b-0"
+                              data-testid={`automation-substep-${sub.id}`}
+                            >
+                              <SubIcon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-medium text-foreground">{sub.label}</div>
+                                <div className="text-[10px] text-muted-foreground leading-tight mt-0.5">{sub.description}</div>
+                              </div>
+                              <AutomationModeSelector
+                                value={stepCfg.substeps[sub.id] ?? "full"}
+                                onChange={(m) => setSubstepMode(step, sub.id, m)}
+                                size="small"
+                                scopeId={sub.id}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 pt-2">
+              {(["full", "checkpoint", "manual"] as AutomationMode[]).map((m) => {
+                const info = automationModeLabels[m];
+                return (
+                  <div key={m} className={`p-2.5 rounded-lg border ${info.bg}`} data-testid={`automation-mode-info-${m}`}>
+                    <div className={`text-xs font-semibold ${info.color}`}>{info.label}</div>
+                    <div className="text-[10px] text-muted-foreground mt-1 leading-tight">{info.description}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)} data-testid="button-cancel-automation">
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            className="bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+            onClick={() => { onSave(draft); onOpenChange(false); }}
+            data-testid="button-save-automation"
+          >
+            Save Configuration
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 type ControlFocusPageProps = {
   controlId: string;
   controlStatus: ControlWorkflowStatus | null;
@@ -3233,6 +3472,14 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
   const [activeTestCycle, setActiveTestCycle] = useState<TestCycle>("interim");
   const [testDetailsOpen, setTestDetailsOpen] = useState(false);
   const [testCycleDropdownOpen, setTestCycleDropdownOpen] = useState(false);
+  const storedAutomationConfigs = useWorkflowSessionStore((s) => s.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.automationConfigs as Record<string, AutomationConfig> | undefined) ?? {};
+  const automationConfig = storedAutomationConfigs[controlId] ?? buildDefaultAutomationConfig();
+  const setAutomationConfig = useCallback((cfg: AutomationConfig) => {
+    const store = useWorkflowSessionStore.getState();
+    const existing = (store.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.automationConfigs as Record<string, AutomationConfig> | undefined) ?? {};
+    store.setBlockState("control-testing", "fieldwork-execution", "automationConfigs", { ...existing, [controlId]: cfg });
+  }, [controlId]);
+  const [automationModalOpen, setAutomationModalOpen] = useState(false);
   const cycleDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -3494,29 +3741,46 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                   </p>
                 </div>
                 <div className="pt-2 flex flex-col items-center gap-3">
-                  {onStartWorkflow ? (
+                  <div className="flex items-center gap-2">
+                    {onStartWorkflow ? (
+                      <Button
+                        size="default"
+                        className="h-10 px-6 text-sm gap-2 bg-[#266C92] hover:bg-[#1e5a7a] text-white shadow-sm"
+                        onClick={() => onStartWorkflow()}
+                        data-testid="button-start-workflow"
+                      >
+                        <Play className="w-4 h-4" />
+                        Test with Agent
+                      </Button>
+                    ) : (
+                      <Button
+                        size="default"
+                        className="h-10 px-6 text-sm gap-2 bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400 cursor-not-allowed"
+                        disabled
+                        data-testid="button-start-workflow-disabled"
+                      >
+                        <Play className="w-4 h-4" />
+                        Test with Agent
+                      </Button>
+                    )}
                     <Button
-                      size="default"
-                      className="h-10 px-6 text-sm gap-2 bg-[#266C92] hover:bg-[#1e5a7a] text-white shadow-sm"
-                      onClick={() => onStartWorkflow()}
-                      data-testid="button-start-workflow"
+                      variant="outline"
+                      size="icon"
+                      className="h-10 w-10 shrink-0"
+                      onClick={() => setAutomationModalOpen(true)}
+                      data-testid="button-automation-config"
                     >
-                      <Play className="w-4 h-4" />
-                      Test with Agent
+                      <Settings className="w-4 h-4" />
                     </Button>
-                  ) : (
-                    <Button
-                      size="default"
-                      className="h-10 px-6 text-sm gap-2 bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400 cursor-not-allowed"
-                      disabled
-                      data-testid="button-start-workflow-disabled"
-                    >
-                      <Play className="w-4 h-4" />
-                      Test with Agent
-                    </Button>
-                  )}
+                  </div>
                   <p className="text-[11px] text-muted-foreground">6 steps · ~15 min estimated</p>
                 </div>
+                <AutomationConfigModal
+                  open={automationModalOpen}
+                  onOpenChange={setAutomationModalOpen}
+                  config={automationConfig}
+                  onSave={setAutomationConfig}
+                />
                 <div className="pt-4 border-t border-slate-200 dark:border-border">
                   <div className="flex items-center justify-center gap-6">
                     {fieldworkStepOrder.map((step, idx) => (
@@ -5041,29 +5305,20 @@ const workflowRowToSession: Record<string, string> = {
 function EnvironmentView({ initialView, onExit }: { initialView: string; onExit: () => void }) {
   const [view, setView] = useState<string>(initialView);
   const setBlockState = useWorkflowSessionStore((s) => s.setBlockState);
-  const addProject = useWorkflowSessionStore((s) => s.addProject);
   const runtimeStates = useWorkflowSessionStore((s) => s.runtimeStates);
-  const projects = useWorkflowSessionStore((s) => s.projects);
 
-  const ensureSession = useCallback(() => {
+  const ensureRuntimeState = useCallback(() => {
     const store = useWorkflowSessionStore.getState();
-    const existing = (store.projects ?? []).find((p) => p.sessionId === "control-testing");
-    if (!existing) {
-      const meta = workflowSessionConfigs["control-testing"];
-      if (!meta) return;
-      const config = meta.create();
-      store.addProject({ sessionId: "control-testing", label: meta.label, icon: meta.icon }, config);
-      const currentStatuses = (store.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
-      if (currentStatuses.length === 0) {
-        const pendingSteps = { readiness: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const, testEffectiveness: "pending" as const };
-        const seedStatuses: ControlWorkflowStatus[] = masterControlsList.map(c => ({
-          controlId: c.id, name: c.name, dataSource: c.dataSource as "connected" | "manual",
-          system: c.system, owner: c.owner, steps: { ...pendingSteps }, overallProgress: 0,
-        })).sort((a, b) => (a.dataSource === "manual" ? 0 : 1) - (b.dataSource === "manual" ? 0 : 1));
-        store.setBlockState("control-testing", "fieldwork-execution", "statuses", seedStatuses);
-      }
-      store.setBlockState("control-testing", "fieldwork-execution", "phase", "running");
+    const currentStatuses = (store.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
+    if (currentStatuses.length === 0) {
+      const pendingSteps = { readiness: "pending" as const, population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const, testEffectiveness: "pending" as const };
+      const seedStatuses: ControlWorkflowStatus[] = masterControlsList.map(c => ({
+        controlId: c.id, name: c.name, dataSource: c.dataSource as "connected" | "manual",
+        system: c.system, owner: c.owner, steps: { ...pendingSteps }, overallProgress: 0,
+      })).sort((a, b) => (a.dataSource === "manual" ? 0 : 1) - (b.dataSource === "manual" ? 0 : 1));
+      store.setBlockState("control-testing", "fieldwork-execution", "statuses", seedStatuses);
     }
+    store.setBlockState("control-testing", "fieldwork-execution", "phase", "running");
   }, []);
 
   const controlStatuses = (runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
@@ -5073,7 +5328,7 @@ function EnvironmentView({ initialView, onExit }: { initialView: string; onExit:
     const focusStatus = controlStatuses.find(s => s.controlId === focusControlId) ?? null;
 
     const handleStartDemoWorkflow = () => {
-      ensureSession();
+      ensureRuntimeState();
       const store = useWorkflowSessionStore.getState();
       const statuses = [...((store.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [])];
       const idx = statuses.findIndex(s => s.controlId === focusControlId);
