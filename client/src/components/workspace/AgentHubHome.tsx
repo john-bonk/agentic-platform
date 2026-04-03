@@ -2044,6 +2044,189 @@ const automationModeIcons: Record<AutomationMode, { icon: typeof Zap; color: str
   manual: { icon: Fingerprint, color: "text-blue-400 dark:text-blue-500", title: "Manual" },
 };
 
+type ManualInputField = {
+  id: string;
+  label: string;
+  type: "select" | "toggle" | "text";
+  options?: string[];
+  defaultValue?: string;
+};
+
+const manualSubstepInputs: Record<string, { prompt: string; fields: ManualInputField[] }> = {
+  "rd-assess": { prompt: "Configure input readiness scan", fields: [
+    { id: "scope", label: "Assessment Scope", type: "select", options: ["All inputs", "Critical only", "Custom selection"], defaultValue: "All inputs" },
+    { id: "depth", label: "Depth", type: "select", options: ["Standard", "Deep inspection", "Surface check"], defaultValue: "Standard" },
+  ]},
+  "cs-interpret": { prompt: "Set control interpretation parameters", fields: [
+    { id: "mode", label: "Parsing Mode", type: "select", options: ["Standard NLP", "Enhanced (multi-pass)", "Rule-based"], defaultValue: "Standard NLP" },
+  ]},
+  "cs-extract": { prompt: "Define attribute extraction scope", fields: [
+    { id: "scope", label: "Extraction Scope", type: "select", options: ["All attributes", "Key attributes only", "Custom"], defaultValue: "All attributes" },
+    { id: "confidence", label: "Min Confidence", type: "select", options: ["High (90%+)", "Medium (70%+)", "Low (50%+)"], defaultValue: "High (90%+)" },
+  ]},
+  "cs-plan": { prompt: "Configure test plan generation", fields: [
+    { id: "template", label: "Plan Template", type: "select", options: ["SOX standard", "IA risk-based", "Custom framework"], defaultValue: "SOX standard" },
+  ]},
+  "pop-ingest": { prompt: "Select population data source", fields: [
+    { id: "source", label: "Source Type", type: "select", options: ["File upload", "API connection", "Database query", "Manual entry"], defaultValue: "File upload" },
+    { id: "format", label: "Expected Format", type: "select", options: ["CSV", "Excel (.xlsx)", "JSON", "Auto-detect"], defaultValue: "Auto-detect" },
+  ]},
+  "pop-validate": { prompt: "Set validation rules", fields: [
+    { id: "strictness", label: "Validation Level", type: "select", options: ["Strict (reject on warning)", "Standard", "Lenient (errors only)"], defaultValue: "Standard" },
+  ]},
+  "pop-complete": { prompt: "Define completeness criteria", fields: [
+    { id: "period", label: "Control Period", type: "select", options: ["Full year", "Current quarter", "Custom range"], defaultValue: "Full year" },
+    { id: "coverage", label: "Min Coverage", type: "select", options: ["100%", "95%", "90%", "85%"], defaultValue: "100%" },
+  ]},
+  "pop-anomaly": { prompt: "Configure anomaly detection", fields: [
+    { id: "sensitivity", label: "Sensitivity", type: "select", options: ["High", "Medium", "Low"], defaultValue: "Medium" },
+    { id: "action", label: "On Detection", type: "select", options: ["Flag & continue", "Flag & pause", "Auto-exclude"], defaultValue: "Flag & continue" },
+  ]},
+  "smp-method": { prompt: "Select sampling methodology", fields: [
+    { id: "method", label: "Approach", type: "select", options: ["Statistical (MUS)", "Random", "Judgmental", "Stratified random", "Hybrid"], defaultValue: "Stratified random" },
+  ]},
+  "smp-stratify": { prompt: "Configure risk stratification", fields: [
+    { id: "tiers", label: "Risk Tiers", type: "select", options: ["2 tiers", "3 tiers", "4 tiers", "5 tiers"], defaultValue: "3 tiers" },
+    { id: "weighting", label: "Weight Basis", type: "select", options: ["Transaction value", "Risk score", "Frequency", "Equal weight"], defaultValue: "Risk score" },
+  ]},
+  "smp-size": { prompt: "Set sample size parameters", fields: [
+    { id: "confidence", label: "Confidence Level", type: "select", options: ["99%", "95%", "90%"], defaultValue: "95%" },
+    { id: "error", label: "Tolerable Error", type: "select", options: ["1%", "3%", "5%", "10%"], defaultValue: "5%" },
+  ]},
+  "smp-select": { prompt: "Execute sample selection", fields: [
+    { id: "seed", label: "Random Seed", type: "text", defaultValue: "auto" },
+    { id: "replacement", label: "Allow Replacement", type: "select", options: ["No replacement", "With replacement"], defaultValue: "No replacement" },
+  ]},
+  "evd-map": { prompt: "Configure evidence mapping", fields: [
+    { id: "mode", label: "Mapping Mode", type: "select", options: ["Auto-map from RCM", "Template-based", "Manual assignment"], defaultValue: "Auto-map from RCM" },
+  ]},
+  "evd-source": { prompt: "Define evidence search scope", fields: [
+    { id: "scope", label: "Search Scope", type: "select", options: ["All connected systems", "Primary sources only", "Manual sources"], defaultValue: "All connected systems" },
+    { id: "fallback", label: "If Unavailable", type: "select", options: ["Request PBC", "Flag & skip", "Substitute allowed"], defaultValue: "Request PBC" },
+  ]},
+  "evd-collect": { prompt: "Set collection parameters", fields: [
+    { id: "method", label: "Collection Method", type: "select", options: ["Auto-pull from systems", "Manual upload", "Hybrid"], defaultValue: "Hybrid" },
+  ]},
+  "eu-classify": { prompt: "Configure document classification", fields: [
+    { id: "model", label: "Classification Model", type: "select", options: ["AI auto-classify", "Rule-based", "Manual tagging"], defaultValue: "AI auto-classify" },
+    { id: "categories", label: "Category Set", type: "select", options: ["Standard audit types", "Custom taxonomy", "PCAOB categories"], defaultValue: "Standard audit types" },
+  ]},
+  "eu-extract": { prompt: "Set field extraction parameters", fields: [
+    { id: "depth", label: "Extraction Depth", type: "select", options: ["Key fields only", "All structured fields", "Deep extraction (incl. unstructured)"], defaultValue: "All structured fields" },
+  ]},
+  "eu-parse": { prompt: "Configure value normalization", fields: [
+    { id: "rules", label: "Normalization Rules", type: "select", options: ["Standard (dates, currency, IDs)", "Extended (+ free text)", "Minimal"], defaultValue: "Standard (dates, currency, IDs)" },
+  ]},
+  "eu-xref": { prompt: "Set cross-reference parameters", fields: [
+    { id: "tolerance", label: "Match Tolerance", type: "select", options: ["Exact match", "Fuzzy (±1%)", "Flexible (±5%)"], defaultValue: "Exact match" },
+    { id: "unmatched", label: "Unmatched Action", type: "select", options: ["Flag as exception", "Request clarification", "Auto-resolve"], defaultValue: "Flag as exception" },
+  ]},
+  "ae-test": { prompt: "Configure attribute testing", fields: [
+    { id: "approach", label: "Testing Approach", type: "select", options: ["Systematic (all attributes)", "Risk-prioritized", "Targeted"], defaultValue: "Systematic (all attributes)" },
+  ]},
+  "ae-determine": { prompt: "Set pass/fail criteria", fields: [
+    { id: "threshold", label: "Pass Threshold", type: "select", options: ["100% match required", "Substantial compliance (≥95%)", "Material compliance (≥90%)"], defaultValue: "100% match required" },
+  ]},
+  "ae-rationale": { prompt: "Configure rationale documentation", fields: [
+    { id: "detail", label: "Detail Level", type: "select", options: ["Full reasoning chain", "Summary only", "Key findings"], defaultValue: "Full reasoning chain" },
+    { id: "refs", label: "Evidence References", type: "select", options: ["Include all refs", "Primary evidence only", "Exceptions only"], defaultValue: "Include all refs" },
+  ]},
+  "ae-exception": { prompt: "Set exception classification rules", fields: [
+    { id: "scheme", label: "Severity Scheme", type: "select", options: ["3-tier (High/Med/Low)", "5-tier (Critical–Info)", "Binary (Material/Immaterial)"], defaultValue: "3-tier (High/Med/Low)" },
+  ]},
+  "te-aggregate": { prompt: "Configure results aggregation", fields: [
+    { id: "method", label: "Aggregation Method", type: "select", options: ["Weighted average", "Worst-case", "Proportional"], defaultValue: "Weighted average" },
+  ]},
+  "te-complete": { prompt: "Set completeness validation criteria", fields: [
+    { id: "minCoverage", label: "Minimum Coverage", type: "select", options: ["100% required", "95% acceptable", "90% acceptable"], defaultValue: "100% required" },
+  ]},
+  "te-confidence": { prompt: "Configure confidence scoring", fields: [
+    { id: "model", label: "Confidence Model", type: "select", options: ["Statistical significance", "Expert judgment", "Blended approach"], defaultValue: "Blended approach" },
+  ]},
+  "te-conclude": { prompt: "Set effectiveness determination criteria", fields: [
+    { id: "threshold", label: "Effectiveness Threshold", type: "select", options: ["Effective ≥ 95% pass rate", "Effective ≥ 90% pass rate", "Effective ≥ 85% pass rate"], defaultValue: "Effective ≥ 95% pass rate" },
+    { id: "override", label: "Manual Override", type: "select", options: ["Allowed with justification", "Not allowed", "Escalation required"], defaultValue: "Allowed with justification" },
+  ]},
+};
+
+function ManualSubstepForm({ substepId, onRun }: { substepId: string; onRun: () => void }) {
+  const config = manualSubstepInputs[substepId];
+  const [values, setValues] = useState<Record<string, string>>(() => {
+    const defaults: Record<string, string> = {};
+    config?.fields.forEach(f => { defaults[f.id] = f.defaultValue ?? ""; });
+    return defaults;
+  });
+
+  if (!config) {
+    return (
+      <div className="pl-12 pr-3 pb-2 pt-1">
+        <div className="flex items-center gap-2 p-2 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/30">
+          <Fingerprint className="w-3 h-3 text-blue-500 shrink-0" />
+          <span className="text-[11px] text-blue-700 dark:text-blue-400 font-medium flex-1">Manual mode — trigger when ready</span>
+          <Button
+            size="sm"
+            className="h-6 px-2.5 text-[10px] gap-1 bg-blue-500 hover:bg-blue-600 text-white"
+            onClick={onRun}
+            data-testid={`button-run-substep-${substepId}`}
+          >
+            <Play className="w-2.5 h-2.5" />
+            Run
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pl-12 pr-3 pb-2 pt-1">
+      <div className="p-2.5 rounded-md bg-blue-50/60 dark:bg-blue-900/15 border border-blue-200/50 dark:border-blue-800/30 space-y-2">
+        <div className="flex items-center gap-2">
+          <Fingerprint className="w-3 h-3 text-blue-500 shrink-0" />
+          <span className="text-[11px] text-blue-700 dark:text-blue-400 font-semibold">{config.prompt}</span>
+        </div>
+        <div className="grid gap-1.5">
+          {config.fields.map(field => (
+            <div key={field.id} className="flex items-center gap-2">
+              <label className="text-[10px] text-blue-600/70 dark:text-blue-400/70 font-medium w-[110px] shrink-0 text-right">{field.label}</label>
+              {field.type === "select" ? (
+                <select
+                  value={values[field.id] ?? field.defaultValue}
+                  onChange={(e) => setValues(prev => ({ ...prev, [field.id]: e.target.value }))}
+                  className="flex-1 h-6 text-[10px] rounded border border-blue-200/60 dark:border-blue-700/40 bg-white dark:bg-slate-800 text-foreground px-1.5 focus:outline-none focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-600"
+                  data-testid={`manual-input-${substepId}-${field.id}`}
+                >
+                  {field.options?.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={values[field.id] ?? field.defaultValue}
+                  onChange={(e) => setValues(prev => ({ ...prev, [field.id]: e.target.value }))}
+                  className="flex-1 h-6 text-[10px] rounded border border-blue-200/60 dark:border-blue-700/40 bg-white dark:bg-slate-800 text-foreground px-1.5 focus:outline-none focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-600"
+                  data-testid={`manual-input-${substepId}-${field.id}`}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-end pt-0.5">
+          <Button
+            size="sm"
+            className="h-6 px-3 text-[10px] gap-1 bg-blue-500 hover:bg-blue-600 text-white"
+            onClick={onRun}
+            data-testid={`button-run-substep-${substepId}`}
+          >
+            <Play className="w-2.5 h-2.5" />
+            Run Step
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 type StepNodeContentProps = {
   step: string;
   stepStatus: string;
@@ -2057,11 +2240,12 @@ type StepNodeContentProps = {
   autoExpandedSubs?: Set<string>;
   automationConfig?: AutomationConfig;
   onResumeSubstep?: (substepId: string) => void;
+  manualTriggered?: Set<string>;
   checkpointAcked?: Set<string>;
   onAckCheckpoint?: (substepId: string) => void;
 };
 
-function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule, onSubstepAction, autoExpandedSubs, automationConfig, onResumeSubstep, checkpointAcked, onAckCheckpoint }: StepNodeContentProps) {
+function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule, onSubstepAction, autoExpandedSubs, automationConfig, onResumeSubstep, manualTriggered, checkpointAcked, onAckCheckpoint }: StepNodeContentProps) {
   const info = stepNodeInfo[step];
   if (!info) return null;
 
@@ -2101,7 +2285,7 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
                 ? "running"
                 : "pending";
         const isCheckpointHeld = baseStatus === "complete" && subMode === "checkpoint" && !(checkpointAcked?.has(sub.id));
-        const isManualWaiting = baseStatus === "pending" && subMode === "manual" && stepStatus === "running" && idx === substepProgress;
+        const isManualWaiting = subMode === "manual" && stepStatus === "running" && idx === substepProgress && !manualTriggered?.has(sub.id) && (baseStatus === "pending" || baseStatus === "running");
         const subStatus = isManualWaiting ? "manual-waiting" : isCheckpointHeld ? "checkpoint-held" : baseStatus;
         const SubIcon = sub.icon;
         const isExpandable = baseStatus === "complete";
@@ -2170,21 +2354,7 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
             )}
 
             {subStatus === "manual-waiting" && (
-              <div className="pl-12 pr-3 pb-2 pt-1">
-                <div className="flex items-center gap-2 p-2 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/30">
-                  <Fingerprint className="w-3 h-3 text-blue-500 shrink-0" />
-                  <span className="text-[11px] text-blue-700 dark:text-blue-400 font-medium flex-1">Manual mode — trigger when ready</span>
-                  <Button
-                    size="sm"
-                    className="h-6 px-2.5 text-[10px] gap-1 bg-blue-500 hover:bg-blue-600 text-white"
-                    onClick={(e) => { e.stopPropagation(); onResumeSubstep?.(sub.id); }}
-                    data-testid={`button-run-substep-${sub.id}`}
-                  >
-                    <Play className="w-2.5 h-2.5" />
-                    Run
-                  </Button>
-                </div>
-              </div>
+              <ManualSubstepForm substepId={sub.id} onRun={() => onResumeSubstep?.(sub.id)} />
             )}
 
             {showInlineUpload && (
@@ -3056,12 +3226,7 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
         }, ...prev]);
       }
 
-      const info = stepNodeInfo[step];
-      const totalSubs = info?.substeps.length ?? 0;
-      const prog = substepProgress[step] ?? 0;
-      const allSubsDone = prog >= totalSubs && totalSubs > 0;
-
-      if (allSubsDone && !commentedStepsRef.current.has(step)) {
+      if (status === "complete" && !commentedStepsRef.current.has(step)) {
         commentedStepsRef.current.add(step);
         const gen = stepCompletionComments[step];
         if (gen) {
@@ -3077,7 +3242,7 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
         }
       }
     });
-  }, [controlStatus, controlId, substepProgress]);
+  }, [controlStatus, controlId]);
 
   const addUploadComment = useCallback(() => {
     const now = new Date();
@@ -4033,6 +4198,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                   autoExpandedSubs={autoExpandedSubs}
                   automationConfig={automationConfig}
                   onResumeSubstep={handleResumeSubstep}
+                  manualTriggered={manualTriggered}
                   checkpointAcked={checkpointAcked}
                   onAckCheckpoint={handleAckCheckpoint}
                 />
