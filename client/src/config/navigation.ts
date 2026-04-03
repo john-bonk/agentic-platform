@@ -258,30 +258,21 @@ export const agentHubNavSections: SideNavSection[] = [
       { id: "ah-new-project", label: "+ New Project", path: "/#new-project", icon: "plus" },
     ],
   },
-  /* Monitoring and Continuous sections — hidden for now, ready to restore
   {
-    id: "agent-hub-monitoring",
-    title: "Monitoring",
+    id: "agent-hub-environment",
+    title: "Environment",
     collapsible: true,
     defaultExpanded: true,
     items: [
-      { id: "ah-risk-scores", label: "Risk Scores", path: "/#risk-scores", icon: "trending-up" },
-      { id: "ah-signal-intel", label: "Signal Intelligence", path: "/#signals", icon: "brain" },
-      { id: "ah-control-tracking", label: "Control Tracking", path: "/#controls", icon: "shield-check" },
+      { id: "ah-controls", label: "Controls", path: "/#controls" },
+      { id: "ah-tests", label: "Tests", path: "/#tests" },
+      { id: "ah-issues", label: "Issues", path: "/#issues" },
+      { id: "ah-financial-accounts", label: "Financial Accounts", path: "/#financial-accounts" },
+      { id: "ah-library-controls", label: "Library Controls", path: "/#library-controls" },
+      { id: "ah-control-self-assessments", label: "Control Self Assessments", path: "/#control-self-assessments" },
+      { id: "ah-processes", label: "Processes", path: "/#processes" },
     ],
   },
-  {
-    id: "agent-hub-scheduled",
-    title: "Scheduled",
-    collapsible: true,
-    defaultExpanded: false,
-    items: [
-      { id: "ah-quarterly-review", label: "Quarterly Review", path: "/#quarterly", icon: "clipboard-list" },
-      { id: "ah-kri-report", label: "KRI Report", path: "/#kri-report", icon: "trending-up" },
-      { id: "ah-risk-appetite", label: "Risk Appetite", path: "/#appetite", icon: "target" },
-    ],
-  },
-  */
 ];
 
 /**

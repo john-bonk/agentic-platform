@@ -4005,6 +4005,24 @@ function FieldworkComplexHub() {
   const [selectedExceptionId, setSelectedExceptionId] = useState<string | null>(null);
   const [nextStepsExpanded, setNextStepsExpanded] = useState(false);
   const [hubDetailView, setHubDetailView] = useState<string | null>(null);
+  const previousViewRef = useRef<string | null>(null);
+
+  const navigateHub = useCallback((view: string | null, fromView?: string) => {
+    if (fromView !== undefined) previousViewRef.current = fromView;
+    setHubDetailView(view);
+  }, []);
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash === "controls") {
+        setHubDetailView("controls-list");
+      }
+    };
+    onHashChange();
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   const resolvedBlocksList = useMemo(() => {
     if (!fieldworkProject) return [] as string[];
@@ -4065,6 +4083,80 @@ function FieldworkComplexHub() {
         sessionId={fieldworkProject.sessionId}
         onBack={() => setShowCanvas(false)}
       />
+    );
+  }
+
+  if (hubDetailView === "controls-list") {
+    const sortedControls = [...masterControlsList].sort((a, b) => {
+      if (a.id === DEMO_CONTROL_ID) return -1;
+      if (b.id === DEMO_CONTROL_ID) return 1;
+      return 0;
+    });
+    return (
+      <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-background">
+        <div className="shrink-0 h-12 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
+          <button
+            onClick={() => { setHubDetailView(null); window.location.hash = ""; window.history.replaceState(null, "", window.location.pathname); }}
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            data-testid="button-controls-list-back"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span>Overview</span>
+          </button>
+          <div className="w-px h-5 bg-slate-200 dark:bg-border" />
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-[#266C92]" />
+            <h2 className="text-sm font-semibold text-foreground">Controls</h2>
+          </div>
+          <Badge className="text-[10px] bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-0">{sortedControls.length}</Badge>
+        </div>
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          <div className="divide-y divide-slate-100 dark:divide-border/50">
+            {sortedControls.map((control) => {
+              const status = controlStatuses.find(s => s.controlId === control.id);
+              const progress = status?.overallProgress ?? 0;
+              const isComplete = progress === 100;
+              const isRunning = status && Object.values(status.steps).some(s => s === "running");
+              return (
+                <button
+                  key={control.id}
+                  onClick={() => { navigateHub(`control:${control.id}`, "controls-list"); window.location.hash = ""; window.history.replaceState(null, "", window.location.pathname); }}
+                  className="w-full flex items-center gap-4 px-5 py-3.5 text-left hover:bg-slate-50 dark:hover:bg-muted/20 transition-colors group"
+                  data-testid={`controls-list-item-${control.id}`}
+                >
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                    <Shield className={`w-4 h-4 ${isComplete ? "text-emerald-500" : isRunning ? "text-[#266C92]" : "text-slate-400"}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-muted-foreground">{control.id}</span>
+                      <span className="text-sm font-medium text-foreground truncate">{control.name}</span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-0.5">
+                      <span className="text-[11px] text-muted-foreground">{control.owner}</span>
+                      {control.system && <span className="text-[11px] text-muted-foreground">· {control.system}</span>}
+                      <span className={`text-[11px] font-medium ${control.dataSource === "manual" ? "text-amber-600" : "text-emerald-600"}`}>
+                        {control.dataSource === "manual" ? "Manual PBC" : "Connected"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    {status && (
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                          <div className="h-full rounded-full bg-[#266C92] transition-all" style={{ width: `${progress}%` }} />
+                        </div>
+                        <span className="text-[10px] text-muted-foreground w-7 text-right">{progress}%</span>
+                      </div>
+                    )}
+                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors" />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -4145,7 +4237,7 @@ function FieldworkComplexHub() {
         key={focusControlId}
         controlId={focusControlId}
         controlStatus={focusStatus}
-        onBack={() => setHubDetailView(null)}
+        onBack={() => { setHubDetailView(previousViewRef.current || null); previousViewRef.current = null; }}
         onResolve={handleResolveAction}
         isResolved={resolvedSet.has(focusControlId)}
         onAdvanceStep={focusControlId === DEMO_CONTROL_ID ? handleAdvanceDemoStep : undefined}
