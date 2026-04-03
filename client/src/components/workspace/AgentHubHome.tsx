@@ -1907,13 +1907,106 @@ const demoStepBehavior: Record<string, { autoProgress: boolean; pauseAtSubstep?:
   testEffectiveness: { autoProgress: true },
 };
 
+const workstreamRequestSteps = [
+  { label: "Identifying data owner", detail: "David Kim — Control Owner, Finance", icon: Users, delay: 900 },
+  { label: "Composing PBC request", detail: "Population data: SoD conflict report (Jan–Dec 2025)", icon: FileText, delay: 1100 },
+  { label: "Dispatching to workstream", detail: "Sent via Optro Workstream → david.kim@company.com", icon: Send, delay: 800 },
+  { label: "Awaiting acknowledgment", detail: "David Kim acknowledged — preparing file", icon: Clock, delay: 1800 },
+  { label: "Receiving file", detail: "sod_conflict_report_2025.csv — 2.4 MB", icon: Upload, delay: 1200 },
+  { label: "Validating file integrity", detail: "Schema check passed — 2,847 records, 12 fields", icon: FileCheck, delay: 800 },
+];
+
+function AgenticStepTracker({ title, steps, onComplete }: {
+  title: string;
+  steps: { label: string; detail: string; icon: typeof Users; delay: number }[];
+  onComplete: () => void;
+}) {
+  const [completedCount, setCompletedCount] = useState(0);
+  const completedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    if (completedCount >= steps.length) {
+      if (!completedRef.current) {
+        completedRef.current = true;
+        const t = setTimeout(() => onCompleteRef.current(), 600);
+        return () => clearTimeout(t);
+      }
+      return;
+    }
+    const delay = steps[completedCount].delay;
+    const t = setTimeout(() => setCompletedCount(prev => prev + 1), delay);
+    return () => clearTimeout(t);
+  }, [completedCount, steps]);
+
+  const allDone = completedCount >= steps.length;
+
+  return (
+    <div className="space-y-2" data-testid="agentic-step-tracker">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{title}</span>
+        <span className={`text-[10px] font-medium ${allDone ? "text-emerald-600 dark:text-emerald-400" : "text-[#266C92]"}`}>
+          {completedCount} / {steps.length} {allDone ? "complete" : "in progress"}
+        </span>
+      </div>
+      <div className="w-full h-1.5 bg-slate-100 dark:bg-muted/30 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${allDone ? "bg-emerald-500" : "bg-[#266C92]"}`}
+          style={{ width: `${(completedCount / steps.length) * 100}%` }}
+        />
+      </div>
+      <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
+        {steps.map((item, idx) => {
+          const status = idx < completedCount ? "done" : idx === completedCount ? "active" : "pending";
+          const StIcon = item.icon;
+          return (
+            <div key={idx} className={`flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0 border-slate-100 dark:border-border/50 transition-colors ${
+              status === "active" ? "bg-[#266C92]/[0.04]" : ""
+            }`}>
+              <div className="w-5 flex items-center justify-center shrink-0">
+                {status === "done" ? (
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+                ) : status === "active" ? (
+                  <Loader2 className="w-3.5 h-3.5 text-[#266C92] animate-spin" />
+                ) : (
+                  <div className="w-3.5 h-3.5 rounded-full border-[1.5px] border-slate-300 dark:border-slate-600" />
+                )}
+              </div>
+              <StIcon className={`w-3.5 h-3.5 shrink-0 ${status === "pending" ? "text-muted-foreground/40" : "text-muted-foreground"}`} />
+              <div className="flex-1 min-w-0">
+                <span className={`text-xs font-medium ${status === "pending" ? "text-muted-foreground/50" : "text-foreground"}`}>{item.label}</span>
+                {(status === "done" || status === "active") && (
+                  <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{item.detail}</p>
+                )}
+              </div>
+              {status === "done" && (
+                <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-medium shrink-0">Done</span>
+              )}
+              {status === "active" && (
+                <span className="text-[9px] text-[#266C92] font-medium shrink-0 animate-pulse">Running</span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {allDone && (
+        <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-200/40 dark:border-emerald-800/30">
+          <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+          <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">All steps complete — data received and validated</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const evidenceTrackerItems = [
-  { label: "User access listing snapshots", source: "PBC — David Kim", delay: 800 },
-  { label: "Role assignment change logs", source: "System extract — IT Security", delay: 700 },
-  { label: "SoD conflict resolution docs", source: "PBC — Department heads", delay: 1200 },
-  { label: "Quarterly SoD review packages", source: "PBC — Sarah Chen", delay: 900 },
-  { label: "Risk acceptance forms", source: "Audit Management System", delay: 600 },
-  { label: "IT change management tickets", source: "ServiceNow export", delay: 1000 },
+  { label: "User access listing snapshots", source: "PBC — David Kim", icon: FileText, delay: 800 },
+  { label: "Role assignment change logs", source: "System extract — IT Security", icon: Database, delay: 700 },
+  { label: "SoD conflict resolution docs", source: "PBC — Department heads", icon: FileCheck, delay: 1200 },
+  { label: "Quarterly SoD review packages", source: "PBC — Sarah Chen", icon: FileText, delay: 900 },
+  { label: "Risk acceptance forms", source: "Audit Management System", icon: ShieldCheck, delay: 600 },
+  { label: "IT change management tickets", source: "ServiceNow export", icon: ClipboardCheck, delay: 1000 },
 ];
 
 function EvidenceCollectionTracker({ onComplete }: { onComplete: () => void }) {
@@ -1941,7 +2034,7 @@ function EvidenceCollectionTracker({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="space-y-2" data-testid="evidence-tracker">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Evidence Request Tracker</span>
+        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Evidence Collection</span>
         <span className={`text-[10px] font-medium ${allDone ? "text-emerald-600 dark:text-emerald-400" : "text-[#266C92]"}`}>
           {receivedCount} / {evidenceTrackerItems.length} received
         </span>
@@ -1953,36 +2046,45 @@ function EvidenceCollectionTracker({ onComplete }: { onComplete: () => void }) {
         />
       </div>
       <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
-        <div className="grid grid-cols-[1fr_1fr_auto] gap-3 px-3 py-1.5 bg-slate-50 dark:bg-muted/30 border-b border-slate-200 dark:border-border">
-          <span className="text-[10px] font-semibold text-foreground">Evidence Request</span>
-          <span className="text-[10px] font-semibold text-foreground">Source</span>
-          <span className="text-[10px] font-semibold text-foreground text-center w-20">Status</span>
-        </div>
         {evidenceTrackerItems.map((item, idx) => {
           const status = idx < receivedCount ? "received" : idx === receivedCount ? "receiving" : "queued";
+          const EvIcon = item.icon;
           return (
-            <div key={idx} className={`grid grid-cols-[1fr_1fr_auto] gap-3 px-3 py-2 border-b last:border-b-0 border-slate-100 dark:border-border/50 ${
-              status === "receiving" ? "bg-[#266C92]/[0.03]" : ""
+            <div key={idx} className={`flex items-center gap-3 px-3 py-2.5 border-b last:border-b-0 border-slate-100 dark:border-border/50 transition-colors ${
+              status === "receiving" ? "bg-[#266C92]/[0.04]" : ""
             }`}>
-              <span className="text-xs text-foreground">{item.label}</span>
-              <span className="text-xs text-muted-foreground">{item.source}</span>
-              <div className="w-20 flex items-center justify-center">
+              <div className="w-5 flex items-center justify-center shrink-0">
                 {status === "received" ? (
-                  <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Received
-                  </span>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                 ) : status === "receiving" ? (
-                  <span className="text-[10px] font-medium text-[#266C92] flex items-center gap-1">
-                    <Loader2 className="w-3 h-3 animate-spin" /> Receiving
-                  </span>
+                  <Loader2 className="w-3.5 h-3.5 text-[#266C92] animate-spin" />
                 ) : (
-                  <span className="text-[10px] text-muted-foreground">Queued</span>
+                  <div className="w-3.5 h-3.5 rounded-full border-[1.5px] border-slate-300 dark:border-slate-600" />
                 )}
               </div>
+              <EvIcon className={`w-3.5 h-3.5 shrink-0 ${status === "queued" ? "text-muted-foreground/40" : "text-muted-foreground"}`} />
+              <div className="flex-1 min-w-0">
+                <span className={`text-xs font-medium ${status === "queued" ? "text-muted-foreground/50" : "text-foreground"}`}>{item.label}</span>
+                {(status === "received" || status === "receiving") && (
+                  <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{item.source}</p>
+                )}
+              </div>
+              {status === "received" && (
+                <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-medium shrink-0">Received</span>
+              )}
+              {status === "receiving" && (
+                <span className="text-[9px] text-[#266C92] font-medium shrink-0 animate-pulse">Receiving</span>
+              )}
             </div>
           );
         })}
       </div>
+      {allDone && (
+        <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-200/40 dark:border-emerald-800/30">
+          <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+          <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">All evidence collected — ready for classification</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -2243,9 +2345,10 @@ type StepNodeContentProps = {
   manualTriggered?: Set<string>;
   checkpointAcked?: Set<string>;
   onAckCheckpoint?: (substepId: string) => void;
+  workstreamActive?: boolean;
 };
 
-function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule, onSubstepAction, autoExpandedSubs, automationConfig, onResumeSubstep, manualTriggered, checkpointAcked, onAckCheckpoint }: StepNodeContentProps) {
+function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule, onSubstepAction, autoExpandedSubs, automationConfig, onResumeSubstep, manualTriggered, checkpointAcked, onAckCheckpoint, workstreamActive }: StepNodeContentProps) {
   const info = stepNodeInfo[step];
   if (!info) return null;
 
@@ -2357,7 +2460,7 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               <ManualSubstepForm substepId={sub.id} onRun={() => onResumeSubstep?.(sub.id)} />
             )}
 
-            {showInlineUpload && (
+            {showInlineUpload && !workstreamActive && (
               <div className="pl-12 pr-3 pb-2 pt-1">
                 <div className="flex items-center gap-2">
                   <Button
@@ -2368,7 +2471,7 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
                     data-testid="button-population-request"
                   >
                     <Send className="w-3 h-3" />
-                    Request
+                    Request via Workstream
                   </Button>
                   <Button
                     size="sm"
@@ -2380,6 +2483,16 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
                     Upload
                   </Button>
                 </div>
+              </div>
+            )}
+
+            {showInlineUpload && workstreamActive && (
+              <div className="pl-12 pr-3 pb-3 pt-1">
+                <AgenticStepTracker
+                  title="Workstream Request"
+                  steps={workstreamRequestSteps}
+                  onComplete={() => onSubstepAction?.("pop-ingest", "workstream-complete")}
+                />
               </div>
             )}
 
@@ -3188,7 +3301,7 @@ const stepCompletionComments: Record<string, (controlId: string) => { title: str
   }),
 };
 
-function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUploadPopulation }: { controlId: string; controlStatus: ControlWorkflowStatus | null; substepProgress: Record<string, number>; onUploadPopulation?: () => void }) {
+function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUploadPopulation, onRequestWorkstream, workstreamActive }: { controlId: string; controlStatus: ControlWorkflowStatus | null; substepProgress: Record<string, number>; onUploadPopulation?: () => void; onRequestWorkstream?: () => void; workstreamActive?: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const [activeUtilTab, setActiveUtilTab] = useState<UtilityPanelTab>("agent");
   const [commentFilter, setCommentFilter] = useState<"open" | "closed">("open");
@@ -3204,6 +3317,24 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
       setActiveUtilTab("agent");
     }
   }, [liveComments.length]);
+
+  const workstreamSeededRef = useRef(false);
+  useEffect(() => {
+    if (workstreamActive && !workstreamSeededRef.current) {
+      workstreamSeededRef.current = true;
+      const now = new Date();
+      const ts = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }).toLowerCase();
+      setLiveComments(prev => [{
+        id: `live-workstream-canvas-${Date.now()}`,
+        stepId: "population",
+        substepId: "pop-ingest",
+        timestamp: ts,
+        title: "Workstream Request Initiated",
+        body: "Initiating automated PBC request via Optro Workstream. The agent is identifying the data owner, composing the request, and dispatching it through the integrated workstream channel.\n\nYou can monitor the request progress in the workflow panel.",
+        status: "info",
+      }, ...prev]);
+    }
+  }, [workstreamActive]);
 
   useEffect(() => {
     if (!controlStatus?.steps) return;
@@ -3391,10 +3522,11 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
                                 Upload
                               </button>
                               <button
-                                onClick={() => {}}
-                                className="text-[10px] font-medium text-[#266C92] border border-[#266C92]/30 hover:bg-[#266C92]/5 px-2.5 py-1 rounded transition-colors"
+                                onClick={() => onRequestWorkstream?.()}
+                                className="text-[10px] font-medium text-[#266C92] border border-[#266C92]/30 hover:bg-[#266C92]/5 px-2.5 py-1 rounded transition-colors flex items-center gap-1"
                                 data-testid="agent-action-request"
                               >
+                                <Send className="w-3 h-3" />
                                 Request via Workstream
                               </button>
                             </div>
@@ -3765,6 +3897,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
   const [autoExpandedSubs, setAutoExpandedSubs] = useState<Set<string>>(() => new Set());
   const [checkpointAcked, setCheckpointAcked] = useState<Set<string>>(() => new Set());
   const [manualTriggered, setManualTriggered] = useState<Set<string>>(() => new Set());
+  const [workstreamActive, setWorkstreamActive] = useState(false);
 
   const handleAckCheckpoint = useCallback((substepId: string) => {
     setCheckpointAcked(prev => new Set(prev).add(substepId));
@@ -3855,11 +3988,18 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
   const handleSubstepAction = useCallback((substepId: string, action: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     if (substepId === "pop-ingest" && action === "upload") {
+      setWorkstreamActive(false);
       setSubstepProgress(prev => ({ ...prev, population: (prev.population ?? 0) + 1 }));
       setAutoExpandedSubs(prev => new Set(prev).add("pop-ingest"));
       setActionToast("Population data uploaded — validating...");
     } else if (substepId === "pop-ingest" && action === "request") {
-      setActionToast("PBC request sent to data owner");
+      setWorkstreamActive(true);
+      setActionToast("Initiating workstream request...");
+    } else if (substepId === "pop-ingest" && action === "workstream-complete") {
+      setWorkstreamActive(false);
+      setSubstepProgress(prev => ({ ...prev, population: (prev.population ?? 0) + 1 }));
+      setAutoExpandedSubs(prev => new Set(prev).add("pop-ingest"));
+      setActionToast("Population data received via workstream — validating...");
     } else if (substepId === "evd-collect" && action === "tracker-complete") {
       setSubstepProgress(prev => ({ ...prev, evidence: (prev.evidence ?? 0) + 1 }));
       setActionToast("Evidence collection complete — ready for confirmation");
@@ -4267,6 +4407,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                   manualTriggered={manualTriggered}
                   checkpointAcked={checkpointAcked}
                   onAckCheckpoint={handleAckCheckpoint}
+                  workstreamActive={workstreamActive}
                 />
               </div>
 
@@ -4391,7 +4532,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
         </div>
       )}
     </div>
-    <ControlUtilityPanel controlId={controlId} controlStatus={controlStatus} substepProgress={substepProgress} onUploadPopulation={() => handleSubstepAction("pop-ingest", "upload")} />
+    <ControlUtilityPanel controlId={controlId} controlStatus={controlStatus} substepProgress={substepProgress} onUploadPopulation={() => handleSubstepAction("pop-ingest", "upload")} onRequestWorkstream={() => handleSubstepAction("pop-ingest", "request")} workstreamActive={workstreamActive} />
     </div>
   );
 }
