@@ -3226,7 +3226,12 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
         }, ...prev]);
       }
 
-      if (status === "complete" && !commentedStepsRef.current.has(step)) {
+      const info = stepNodeInfo[step];
+      const totalSubs = info?.substeps.length ?? 0;
+      const prog = substepProgress[step] ?? 0;
+      const allSubsDone = prog >= totalSubs && totalSubs > 0;
+
+      if (allSubsDone && !commentedStepsRef.current.has(step)) {
         commentedStepsRef.current.add(step);
         const gen = stepCompletionComments[step];
         if (gen) {
@@ -3242,7 +3247,7 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
         }
       }
     });
-  }, [controlStatus, controlId]);
+  }, [controlStatus, controlId, substepProgress]);
 
   const addUploadComment = useCallback(() => {
     const now = new Date();
