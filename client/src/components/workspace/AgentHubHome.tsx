@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useCallback, useEffect, lazy, Suspense } from "react";
 import { useSettings } from "@/components/settings-panel";
+import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -4451,6 +4452,21 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
   const [completedTrackerSubs, setCompletedTrackerSubs] = useState<Set<string>>(() => new Set());
   const [outputsGenerated, setOutputsGenerated] = useState(false);
 
+  const assistantMirrorSeeded = useRef<Set<string>>(new Set());
+  const assistantMirrorCompleted = useRef<Set<string>>(new Set());
+  const assistantWorkstreamMirrored = useRef(false);
+
+  const mirrorToAssistant = useCallback((title: string, body: string, agentStep?: string) => {
+    const agentInfo = agentStep ? stepAgentName[agentStep] : undefined;
+    const prefix = agentInfo ? `**${agentInfo.name}**\n\n` : "";
+    useHomeAssistantStore.getState().addMessage({
+      id: `mirror-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      role: "assistant",
+      content: `${prefix}**${title}**\n\n${body}`,
+      timestamp: new Date().toISOString(),
+    });
+  }, []);
+
   const handleAckCheckpoint = useCallback((substepId: string) => {
     setCheckpointAcked(prev => new Set(prev).add(substepId));
   }, []);
@@ -4470,6 +4486,48 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
     return prog;
   }, []);
   const [substepProgress, setSubstepProgress] = useState<Record<string, number>>(initSubstepProgress);
+
+  useEffect(() => {
+    if (!controlStatus?.steps) return;
+
+    fieldworkStepOrder.forEach(step => {
+      const status = controlStatus.steps[step as keyof typeof controlStatus.steps];
+
+      if ((status === "running" || status === "blocked" || status === "waiting") && step === "population" && !assistantMirrorSeeded.current.has("population-blocked")) {
+        assistantMirrorSeeded.current.add("population-blocked");
+        mirrorToAssistant(
+          "Population Data Required",
+          "The population file is needed to proceed with testing. The 3-way match discrepancy report from SharePoint is required for the current testing period.\n\nPlease upload the population file or request it from the control owner.",
+          "population"
+        );
+      }
+
+      const info = stepNodeInfo[step];
+      const totalSubs = info?.substeps.length ?? 0;
+      const prog = substepProgress[step] ?? 0;
+      const allSubsDone = prog >= totalSubs && totalSubs > 0;
+
+      if (allSubsDone && !assistantMirrorCompleted.current.has(step)) {
+        assistantMirrorCompleted.current.add(step);
+        const gen = stepCompletionComments[step];
+        if (gen) {
+          const { title, body } = gen(controlId);
+          mirrorToAssistant(title, body, step);
+        }
+      }
+    });
+  }, [controlStatus, controlId, substepProgress, mirrorToAssistant]);
+
+  useEffect(() => {
+    if (workstreamActive && !assistantWorkstreamMirrored.current) {
+      assistantWorkstreamMirrored.current = true;
+      mirrorToAssistant(
+        "Workstream Request Initiated",
+        "Initiating automated PBC request via Optro Workstream. The agent is identifying the data owner, composing the request, and dispatching it through the integrated workstream channel.\n\nYou can monitor the request progress in the workflow panel.",
+        "population"
+      );
+    }
+  }, [workstreamActive, mirrorToAssistant]);
 
   const visibleStepOrder = useMemo(() =>
     outputsGenerated ? [...fieldworkStepOrder, "outputs"] : [...fieldworkStepOrder],
@@ -4555,6 +4613,11 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
         setAutoExpandedSubs(prev => { const n = new Set(prev); n.delete("pop-ingest"); return n; });
       }, 2500);
       setActionToast("Population data uploaded — validating...");
+      mirrorToAssistant(
+        "Population File Uploaded",
+        `Population data file uploaded for ${controlId}. The agent will now validate the file schema, check completeness against the control period, and scan for anomalies.\n\nProcessing...`,
+        "population"
+      );
     } else if (substepId === "pop-ingest" && action === "request") {
       setWorkstreamActive(true);
       setAutoExpandedSubs(prev => new Set(prev).add("pop-ingest"));
@@ -4578,7 +4641,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       setActionToast("Evidence collection complete — ready for confirmation");
     }
     toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
-  }, []);
+  }, [mirrorToAssistant, controlId]);
 
   const handleStepAction = useCallback((stepKey: string, actionId: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
