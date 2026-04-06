@@ -1979,7 +1979,7 @@ function AgenticStepTracker({ title, steps, onComplete, staticComplete }: {
               <div className="flex-1 min-w-0">
                 <span className={`text-xs font-medium ${status === "pending" ? "text-muted-foreground/50" : "text-foreground"}`}>{item.label}</span>
                 {(status === "done" || status === "active") && (
-                  <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{item.detail}</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{renderDocLinks(item.detail, "text-[10px] text-muted-foreground")}</p>
                 )}
               </div>
               {status === "done" && (
@@ -2067,7 +2067,11 @@ function EvidenceCollectionTracker({ onComplete, staticComplete }: { onComplete:
               </div>
               <EvIcon className={`w-3.5 h-3.5 shrink-0 ${status === "queued" ? "text-muted-foreground/40" : "text-muted-foreground"}`} />
               <div className="flex-1 min-w-0">
-                <span className={`text-xs font-medium ${status === "queued" ? "text-muted-foreground/50" : "text-foreground"}`}>{item.label}</span>
+                {status === "received" ? (
+                  <a href="#" onClick={(e) => e.preventDefault()} className="text-xs font-medium text-[#266C92] underline decoration-dotted underline-offset-2 hover:decoration-solid cursor-pointer" data-testid={`link-evidence-${idx}`}>{item.label}</a>
+                ) : (
+                  <span className={`text-xs font-medium ${status === "queued" ? "text-muted-foreground/50" : "text-foreground"}`}>{item.label}</span>
+                )}
                 {(status === "received" || status === "receiving") && (
                   <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">{item.source}</p>
                 )}
@@ -2092,13 +2096,303 @@ function EvidenceCollectionTracker({ onComplete, staticComplete }: { onComplete:
   );
 }
 
+const docFilePattern = /\b([\w\-\.]+\.(pdf|csv|xlsx|xls|msg|docx|doc|zip|txt))\b/gi;
+
+function renderDocLinks(text: string, className: string) {
+  const parts: (string | JSX.Element)[] = [];
+  let lastIdx = 0;
+  const regex = new RegExp(docFilePattern.source, "gi");
+  let m;
+  while ((m = regex.exec(text)) !== null) {
+    if (m.index > lastIdx) parts.push(text.slice(lastIdx, m.index));
+    const fileName = m[1];
+    parts.push(
+      <a key={m.index} href="#" onClick={(e) => e.preventDefault()} className={`${className} underline decoration-dotted underline-offset-2 hover:decoration-solid cursor-pointer`} data-testid={`link-doc-${fileName}`}>
+        {fileName}
+      </a>
+    );
+    lastIdx = m.index + m[1].length;
+  }
+  if (lastIdx < text.length) parts.push(text.slice(lastIdx));
+  if (parts.length === 0) return <span className={className}>{text}</span>;
+  return <span className={className}>{parts}</span>;
+}
+
+type AttributeResult = {
+  result: "Effective" | "Ineffective" | "Missing";
+  confidence: "High" | "Medium" | "Low";
+};
+
+type SampleAttributeDetail = {
+  key: string;
+  title: string;
+  description: string;
+  sourceDoc: string;
+  sourceLocation: string;
+  result: "Effective" | "Ineffective" | "Missing";
+  confidence: "High" | "Medium" | "Low";
+};
+
+type SampleTestRow = {
+  id: string;
+  label: string;
+  subtitle: string;
+  attributes: Record<string, AttributeResult>;
+  overall: "Effective" | "Ineffective" | "Incomplete";
+  details: SampleAttributeDetail[];
+};
+
+const testingAttributes = [
+  { key: "A", label: "A: Approval" },
+  { key: "B", label: "B: Amount" },
+  { key: "C", label: "C: Date" },
+  { key: "D", label: "D: Authorization" },
+];
+
+const demoSampleTestRows: SampleTestRow[] = [
+  {
+    id: "s1", label: "#1 — March 2025", subtitle: "Acme Corp, $4,250",
+    attributes: {
+      A: { result: "Effective", confidence: "High" },
+      B: { result: "Effective", confidence: "High" },
+      C: { result: "Effective", confidence: "High" },
+      D: { result: "Effective", confidence: "High" },
+    },
+    overall: "Effective",
+    details: [
+      { key: "A", title: "Approval signature present", description: "The discrepancy report for March 2025 contains a digital signature from VP of Operations K. Martinez dated 03/20/2025 in the designated approval field.", sourceDoc: "SP_Discrepancy_Report_Mar2025.pdf", sourceLocation: "page 2", result: "Effective", confidence: "High" },
+      { key: "B", title: "Amount matches threshold", description: "The variance amount of $4,250 is within the $5,000 tolerance threshold. PO amount of $12,500 vs invoice amount of $8,250, resulting in a $4,250 variance.", sourceDoc: "SP_Discrepancy_Report_Mar2025.pdf", sourceLocation: "page 1, line 18", result: "Effective", confidence: "High" },
+      { key: "C", title: "Date within testing period", description: "Transaction date of 03/15/2025 falls within the FY2025 testing period. Report header confirms March 2025 reporting period.", sourceDoc: "SP_Discrepancy_Report_Mar2025.pdf", sourceLocation: "page 1, header", result: "Effective", confidence: "High" },
+      { key: "D", title: "Manager authorization documented", description: "The SAP JE Workflow file for March 2025 shows completed manager authorization. Approval chain: Analyst → Manager K. Martinez → Director S. Chen, all completed within SLA.", sourceDoc: "SAP_JE_Workflow_Mar2025.pdf", sourceLocation: "page 1–2", result: "Effective", confidence: "High" },
+    ],
+  },
+  {
+    id: "s2", label: "#2 — July 2025", subtitle: "Global Supply Co, $7,800",
+    attributes: {
+      A: { result: "Ineffective", confidence: "High" },
+      B: { result: "Effective", confidence: "High" },
+      C: { result: "Effective", confidence: "High" },
+      D: { result: "Ineffective", confidence: "Medium" },
+    },
+    overall: "Ineffective",
+    details: [
+      { key: "A", title: "Approval signature present", description: "The discrepancy report for July 2025 is missing the required VP-level digital signature. Only the analyst signature is present — the approval field designated for VP of Operations is blank.", sourceDoc: "SP_Discrepancy_Report_Jul2025.pdf", sourceLocation: "page 2", result: "Ineffective", confidence: "High" },
+      { key: "B", title: "Amount matches threshold", description: "The variance amount of $7,800 exceeds the $5,000 tolerance threshold but has been flagged and escalated per policy. PO amount of $22,000 vs invoice amount of $14,200.", sourceDoc: "SP_Discrepancy_Report_Jul2025.pdf", sourceLocation: "page 1, line 22", result: "Effective", confidence: "High" },
+      { key: "C", title: "Date within testing period", description: "Transaction date of 07/18/2025 falls within the FY2025 testing period. Report header confirms July 2025 reporting period.", sourceDoc: "SP_Discrepancy_Report_Jul2025.pdf", sourceLocation: "page 1, header", result: "Effective", confidence: "High" },
+      { key: "D", title: "Manager authorization documented", description: "The SAP JE Workflow file for July 2025 shows incomplete authorization chain. Analyst approval is present but Manager approval is missing. The workflow appears to have been bypassed using an emergency posting procedure without proper documentation.", sourceDoc: "SAP_JE_Workflow_Jul2025.pdf", sourceLocation: "page 1", result: "Ineffective", confidence: "Medium" },
+    ],
+  },
+  {
+    id: "s3", label: "#3 — November 2025", subtitle: "TechParts Inc, $3,450",
+    attributes: {
+      A: { result: "Effective", confidence: "High" },
+      B: { result: "Effective", confidence: "High" },
+      C: { result: "Effective", confidence: "High" },
+      D: { result: "Missing", confidence: "Low" },
+    },
+    overall: "Incomplete",
+    details: [
+      { key: "A", title: "Approval signature present", description: "The SharePoint discrepancy report for November 2025 contains a digital signature from VP of Operations K. Martinez dated 11/20/2025 in the designated approval field.", sourceDoc: "SP_Discrepancy_Report_Nov2025.pdf", sourceLocation: "page 2", result: "Effective", confidence: "High" },
+      { key: "B", title: "Amount matches threshold", description: "The variance amount of $3,450 exceeds the $3,000 tolerance threshold. PO amount of $8,550 vs invoice amount of $12,000, resulting in a $3,450 variance.", sourceDoc: "SP_Discrepancy_Report_Nov2025.pdf", sourceLocation: "page 1, line 22", result: "Effective", confidence: "High" },
+      { key: "C", title: "Date within testing period", description: "Transaction date of 11/05/2025 falls within the FY2025 testing period. Report header confirms November 2025 reporting period.", sourceDoc: "SP_Discrepancy_Report_Nov2025.pdf", sourceLocation: "page 1, header", result: "Effective", confidence: "High" },
+      { key: "D", title: "Manager authorization documented", description: "The SAP JE Workflow file for November 2025 appears to be a partial export — the file ends abruptly at page 1 and the workflow approval section is cut off. The approval signature on the SharePoint report (Attribute A) suggests authorization occurred, but I cannot independently verify the SAP workflow without the complete file.", sourceDoc: "SAP_JE_Workflow_Nov2025.pdf (incomplete file — truncated at page 1)", sourceLocation: "page 1", result: "Missing", confidence: "Low" },
+    ],
+  },
+];
+
+function SampleAttributeTestingGrid({ samples }: { samples: SampleTestRow[] }) {
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [overrideAttr, setOverrideAttr] = useState<string | null>(null);
+  const [overrideValues, setOverrideValues] = useState<Record<string, { result: string; rationale: string }>>({});
+  const [appliedOverrides, setAppliedOverrides] = useState<Record<string, { result: string; rationale: string }>>({});
+
+  const resultColor = (r: string) =>
+    r === "Effective" ? "text-emerald-600 dark:text-emerald-400" :
+    r === "Ineffective" ? "text-red-600 dark:text-red-400" :
+    "text-red-500 dark:text-red-400";
+
+  const resultBg = (r: string) =>
+    r === "Effective" ? "bg-emerald-50 dark:bg-emerald-900/10" :
+    r === "Ineffective" ? "bg-red-50 dark:bg-red-900/10" :
+    "bg-amber-50 dark:bg-amber-900/10";
+
+  const confidenceColor = (c: string) =>
+    c === "High" ? "text-emerald-600 dark:text-emerald-400" :
+    c === "Medium" ? "text-amber-600 dark:text-amber-400" :
+    "text-red-500 dark:text-red-400";
+
+  const overallColor = (o: string) =>
+    o === "Effective" ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20" :
+    o === "Ineffective" ? "text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20" :
+    "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20";
+
+  const handleApplyOverride = (sampleId: string, attrKey: string) => {
+    const key = `${sampleId}-${attrKey}`;
+    const vals = overrideValues[key];
+    if (vals) {
+      setAppliedOverrides(prev => ({ ...prev, [key]: vals }));
+    }
+    setOverrideAttr(null);
+  };
+
+  return (
+    <div className="space-y-0" data-testid="sample-attribute-grid">
+      <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
+        <div className="grid grid-cols-[minmax(160px,1.5fr)_repeat(4,1fr)_100px] border-b border-slate-200 dark:border-border bg-slate-50 dark:bg-muted/30">
+          <div className="px-3 py-2.5 text-[10px] font-semibold text-foreground uppercase tracking-wider">Sample</div>
+          {testingAttributes.map(a => (
+            <div key={a.key} className="px-2 py-2.5 text-[10px] font-semibold text-foreground uppercase tracking-wider text-center">{a.label}</div>
+          ))}
+          <div className="px-2 py-2.5 text-[10px] font-semibold text-foreground uppercase tracking-wider text-center">Overall</div>
+        </div>
+
+        {samples.map((sample) => {
+          const isExpanded = expandedRow === sample.id;
+          return (
+            <div key={sample.id} data-testid={`sample-row-${sample.id}`}>
+              <button
+                onClick={() => setExpandedRow(isExpanded ? null : sample.id)}
+                className={`w-full grid grid-cols-[minmax(160px,1.5fr)_repeat(4,1fr)_100px] border-b border-slate-100 dark:border-border/50 hover:bg-slate-50/80 dark:hover:bg-muted/10 transition-colors ${isExpanded ? "bg-slate-50/60 dark:bg-muted/10" : ""}`}
+                data-testid={`button-expand-sample-${sample.id}`}
+              >
+                <div className="px-3 py-3 flex items-center gap-2 text-left">
+                  <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground shrink-0 transition-transform ${isExpanded ? "" : "-rotate-90"}`} />
+                  <div className="min-w-0">
+                    <span className="text-xs font-semibold text-foreground block">{sample.label}</span>
+                    <span className="text-[10px] text-muted-foreground">{sample.subtitle}</span>
+                  </div>
+                </div>
+                {testingAttributes.map(a => {
+                  const attr = sample.attributes[a.key];
+                  const overrideKey = `${sample.id}-${a.key}`;
+                  const applied = appliedOverrides[overrideKey];
+                  const displayResult = applied ? applied.result : attr?.result;
+                  return (
+                    <div key={a.key} className="px-2 py-3 flex flex-col items-center justify-center gap-0.5">
+                      <span className={`text-[11px] font-semibold ${resultColor(displayResult ?? "")}`}>{displayResult}</span>
+                      <span className={`text-[9px] ${confidenceColor(attr?.confidence ?? "")}`}>{attr?.confidence}</span>
+                    </div>
+                  );
+                })}
+                <div className="px-2 py-3 flex items-center justify-center">
+                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${overallColor(sample.overall)}`}>{sample.overall}</span>
+                </div>
+              </button>
+
+              {isExpanded && (
+                <div className="border-b border-slate-200 dark:border-border bg-slate-50/40 dark:bg-muted/5" data-testid={`sample-detail-${sample.id}`}>
+                  <div className="px-5 py-3 border-b border-slate-100 dark:border-border/40">
+                    <span className="text-xs font-semibold text-foreground">Sample {sample.label} — Detail View</span>
+                  </div>
+                  <div className="divide-y divide-slate-100 dark:divide-border/30">
+                    {sample.details.map((detail) => {
+                      const overrideKey = `${sample.id}-${detail.key}`;
+                      const isOverriding = overrideAttr === overrideKey;
+                      const applied = appliedOverrides[overrideKey];
+                      const displayResult = applied ? applied.result : detail.result;
+                      const displayConfidence = detail.confidence;
+                      return (
+                        <div key={detail.key} className="px-5 py-4" data-testid={`attr-detail-${sample.id}-${detail.key}`}>
+                          <div className="flex items-start gap-3">
+                            <span className="text-xs font-bold text-muted-foreground w-5 shrink-0 pt-0.5">{detail.key}</span>
+                            <div className="flex-1 min-w-0 space-y-1.5">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold text-foreground">{detail.title}</span>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <span className={`text-[11px] font-semibold ${resultColor(displayResult)}`}>{displayResult}</span>
+                                  <span className={`text-[9px] ${confidenceColor(displayConfidence)}`}>{displayConfidence}</span>
+                                </div>
+                              </div>
+                              <p className="text-[11px] text-muted-foreground leading-relaxed">{detail.description}</p>
+                              <div className="flex items-center gap-1 mt-1">
+                                <FileText className="w-3 h-3 text-[#266C92] shrink-0" />
+                                <a href="#" onClick={(e) => e.preventDefault()} className="text-[10px] text-[#266C92] underline decoration-dotted underline-offset-2 hover:decoration-solid cursor-pointer" data-testid={`link-source-${sample.id}-${detail.key}`}>
+                                  {detail.sourceDoc}, {detail.sourceLocation}
+                                </a>
+                              </div>
+                              {applied && !isOverriding && (
+                                <div className="mt-1.5 p-2 rounded bg-amber-50/80 dark:bg-amber-900/10 border border-amber-200/50 dark:border-amber-800/30">
+                                  <p className="text-[10px] text-amber-700 dark:text-amber-400"><span className="font-semibold">Override applied:</span> {applied.result} — {applied.rationale}</p>
+                                </div>
+                              )}
+                              {!isOverriding && (
+                                <button
+                                  onClick={() => {
+                                    setOverrideAttr(overrideKey);
+                                    if (!overrideValues[overrideKey]) {
+                                      setOverrideValues(prev => ({ ...prev, [overrideKey]: { result: displayResult, rationale: "" } }));
+                                    }
+                                  }}
+                                  className="text-[10px] text-[#266C92] font-medium hover:underline mt-1"
+                                  data-testid={`button-override-${sample.id}-${detail.key}`}
+                                >
+                                  Override
+                                </button>
+                              )}
+                              {isOverriding && (
+                                <div className="mt-2 p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-background space-y-2" data-testid={`override-form-${sample.id}-${detail.key}`}>
+                                  <div className="flex items-center gap-3">
+                                    <label className="text-[10px] font-semibold text-muted-foreground uppercase">Result:</label>
+                                    <select
+                                      value={overrideValues[overrideKey]?.result ?? displayResult}
+                                      onChange={(e) => setOverrideValues(prev => ({ ...prev, [overrideKey]: { ...prev[overrideKey], result: e.target.value } }))}
+                                      className="text-xs border border-slate-200 dark:border-border rounded px-2 py-1 bg-white dark:bg-background text-foreground"
+                                      data-testid={`select-override-result-${sample.id}-${detail.key}`}
+                                    >
+                                      <option value="Effective">Effective</option>
+                                      <option value="Ineffective">Ineffective</option>
+                                      <option value="Missing">Missing</option>
+                                    </select>
+                                  </div>
+                                  <input
+                                    type="text"
+                                    placeholder="Rationale for override..."
+                                    value={overrideValues[overrideKey]?.rationale ?? ""}
+                                    onChange={(e) => setOverrideValues(prev => ({ ...prev, [overrideKey]: { ...prev[overrideKey], rationale: e.target.value } }))}
+                                    className="w-full text-xs border border-slate-200 dark:border-border rounded px-3 py-1.5 bg-white dark:bg-background text-foreground placeholder:text-muted-foreground"
+                                    data-testid={`input-override-rationale-${sample.id}-${detail.key}`}
+                                  />
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => handleApplyOverride(sample.id, detail.key)}
+                                      className="text-[10px] font-semibold text-white bg-[#266C92] hover:bg-[#1e5a7a] px-3 py-1 rounded transition-colors"
+                                      data-testid={`button-apply-override-${sample.id}-${detail.key}`}
+                                    >
+                                      Apply Override
+                                    </button>
+                                    <button
+                                      onClick={() => setOverrideAttr(null)}
+                                      className="text-[10px] font-medium text-muted-foreground hover:text-foreground px-3 py-1 rounded border border-slate-200 dark:border-border transition-colors"
+                                      data-testid={`button-cancel-override-${sample.id}-${detail.key}`}
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function DemoOutputTable({ data }: { data: DemoStepOutputData }) {
   const cellContent = (cell: string | { text: string; color?: string }) => {
-    if (typeof cell === "string") return <span className="text-xs text-foreground">{cell}</span>;
+    if (typeof cell === "string") return renderDocLinks(cell, "text-xs text-foreground");
     const colorClass = cell.color === "green" ? "text-emerald-600 dark:text-emerald-400" :
       cell.color === "red" ? "text-red-600 dark:text-red-400" :
       cell.color === "amber" ? "text-amber-600 dark:text-amber-400" : "text-foreground";
-    return <span className={`text-xs font-medium ${colorClass}`}>{cell.text}</span>;
+    return renderDocLinks(cell.text, `text-xs font-medium ${colorClass}`);
   };
 
   return (
@@ -2399,7 +2693,8 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
         const isExpanded = mergedExpanded.has(sub.id);
         const outputs = isDemo ? (demoSubstepOutputs[sub.id] ?? []) : [];
         const isReadinessAssess = sub.id === "rd-assess";
-        const hasContent = outputs.length > 0 || isReadinessAssess;
+        const isTestingGrid = sub.id === "ae-test" && isDemo;
+        const hasContent = outputs.length > 0 || isReadinessAssess || isTestingGrid;
         const popIngestCompleted = completedTrackerSubs?.has("pop-ingest");
         const evdCollectCompleted = completedTrackerSubs?.has("evd-collect");
         const showInlineUpload = isDemo && sub.id === "pop-ingest" && (baseStatus === "running" || (baseStatus === "complete" && popIngestCompleted));
@@ -2516,6 +2811,8 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               <div className="pl-12 pr-3 pb-3 pt-1 space-y-2">
                 {isReadinessAssess ? (
                   <ReadinessAssessmentContent stepStatus={stepStatus} rows={isDemo ? demoReadinessRows : undefined} />
+                ) : sub.id === "ae-test" && isDemo ? (
+                  <SampleAttributeTestingGrid samples={demoSampleTestRows} />
                 ) : (
                   outputs.map((table, tIdx) => (
                     <DemoOutputTable key={tIdx} data={table} />
@@ -4002,6 +4299,9 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       setWorkstreamActive(false);
       setSubstepProgress(prev => ({ ...prev, population: (prev.population ?? 0) + 1 }));
       setAutoExpandedSubs(prev => new Set(prev).add("pop-ingest"));
+      setTimeout(() => {
+        setAutoExpandedSubs(prev => { const n = new Set(prev); n.delete("pop-ingest"); return n; });
+      }, 2500);
       setActionToast("Population data uploaded — validating...");
     } else if (substepId === "pop-ingest" && action === "request") {
       setWorkstreamActive(true);
@@ -4011,11 +4311,17 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       setCompletedTrackerSubs(prev => new Set(prev).add("pop-ingest"));
       setSubstepProgress(prev => ({ ...prev, population: (prev.population ?? 0) + 1 }));
       setAutoExpandedSubs(prev => new Set(prev).add("pop-ingest"));
+      setTimeout(() => {
+        setAutoExpandedSubs(prev => { const n = new Set(prev); n.delete("pop-ingest"); return n; });
+      }, 2500);
       setActionToast("Population data received via workstream — validating...");
     } else if (substepId === "evd-collect" && action === "tracker-complete") {
       setCompletedTrackerSubs(prev => new Set(prev).add("evd-collect"));
       setSubstepProgress(prev => ({ ...prev, evidence: (prev.evidence ?? 0) + 1 }));
       setAutoExpandedSubs(prev => new Set(prev).add("evd-collect"));
+      setTimeout(() => {
+        setAutoExpandedSubs(prev => { const n = new Set(prev); n.delete("evd-collect"); return n; });
+      }, 2500);
       setActionToast("Evidence collection complete — ready for confirmation");
     }
     toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
