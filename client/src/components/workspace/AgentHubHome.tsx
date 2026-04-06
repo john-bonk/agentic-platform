@@ -4431,7 +4431,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
   const [manualTriggered, setManualTriggered] = useState<Set<string>>(() => new Set());
   const [workstreamActive, setWorkstreamActive] = useState(false);
   const [completedTrackerSubs, setCompletedTrackerSubs] = useState<Set<string>>(() => new Set());
-  const [workpaperOpen, setWorkpaperOpen] = useState(false);
+  const [outputsGenerated, setOutputsGenerated] = useState(false);
 
   const handleAckCheckpoint = useCallback((substepId: string) => {
     setCheckpointAcked(prev => new Set(prev).add(substepId));
@@ -4453,7 +4453,12 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
   }, []);
   const [substepProgress, setSubstepProgress] = useState<Record<string, number>>(initSubstepProgress);
 
-  const activeStep = fieldworkStepOrder[activeStepIdx];
+  const visibleStepOrder = useMemo(() =>
+    outputsGenerated ? [...fieldworkStepOrder, "outputs"] : [...fieldworkStepOrder],
+    [outputsGenerated]
+  );
+
+  const activeStep = visibleStepOrder[activeStepIdx];
 
   useEffect(() => {
     if (!isDemo || !controlStatus) return;
@@ -4499,6 +4504,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
     evidence: "Evidence",
     testing: "Testing",
     testEffectiveness: "Test Effectiveness",
+    outputs: "Outputs",
   };
 
   const stepShortLabels: Record<string, string> = {
@@ -4508,6 +4514,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
     evidence: "Evidence",
     testing: "Testing",
     testEffectiveness: "Effectiveness",
+    outputs: "Outputs",
   };
 
   const stepDescriptions: Record<string, string> = {
@@ -4517,6 +4524,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
     evidence: stepNodeInfo.evidence.aiDescription,
     testing: stepNodeInfo.testing.aiDescription,
     testEffectiveness: stepNodeInfo.testEffectiveness.aiDescription,
+    outputs: "Generated workpaper summarizing the full automated control testing workflow, findings, and conclusions.",
   };
 
   const handleSubstepAction = useCallback((substepId: string, action: string) => {
@@ -4581,19 +4589,21 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
     toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
   }, [isDemo, onAdvanceStep, controlStatus, substepProgress]);
 
-  const activeStepStatus = controlStatus ? controlStatus.steps[activeStep as keyof typeof controlStatus.steps] : "pending";
+  const activeStepStatus = activeStep === "outputs" ? "complete" : controlStatus ? controlStatus.steps[activeStep as keyof typeof controlStatus.steps] : "pending";
   const activeStepInfo = stepNodeInfo[activeStep] ?? null;
   const activeVisibleActions = activeStepInfo ? activeStepInfo.actions.filter(a => a.showWhen.includes(activeStepStatus)) : [];
 
   const canNavigateTo = (idx: number): boolean => {
     if (!controlStatus) return false;
-    const step = fieldworkStepOrder[idx];
+    const step = visibleStepOrder[idx];
+    if (step === "outputs") return outputsGenerated;
     const status = controlStatus.steps[step as keyof typeof controlStatus.steps];
     if (status === "complete") return true;
     if (status === "running" || status === "waiting" || status === "blocked") return true;
     const prevIdx = idx - 1;
     if (prevIdx >= 0) {
-      const prevStep = fieldworkStepOrder[prevIdx];
+      const prevStep = visibleStepOrder[prevIdx];
+      if (prevStep === "outputs") return outputsGenerated;
       const prevStatus = controlStatus.steps[prevStep as keyof typeof controlStatus.steps];
       if (prevStatus === "complete") return true;
     }
@@ -4829,12 +4839,14 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                 const completedCount = fieldworkStepOrder.filter(
                   s => controlStatus.steps[s as keyof typeof controlStatus.steps] === "complete"
                 ).length;
-                const pct = fieldworkStepOrder.length > 1 ? (completedCount / (fieldworkStepOrder.length - 1)) * 100 : 0;
+                const totalSteps = visibleStepOrder.length;
+                const pct = totalSteps > 1 ? (completedCount / (totalSteps - 1)) * 100 : 0;
                 return <div className="absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full bg-[#266C92] transition-all duration-500" style={{ width: `${Math.min(pct, 100)}%` }} />;
               })()}
               <div className="relative flex items-center justify-between w-full">
-                {fieldworkStepOrder.map((step, idx) => {
-                  const status = controlStatus.steps[step as keyof typeof controlStatus.steps];
+                {visibleStepOrder.map((step, idx) => {
+                  const isOutputs = step === "outputs";
+                  const status = isOutputs ? "complete" : controlStatus.steps[step as keyof typeof controlStatus.steps];
                   const isActive = idx === activeStepIdx;
                   const navigable = canNavigateTo(idx);
                   return (
@@ -4933,41 +4945,70 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                       );
                     })()}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">Step {activeStepIdx + 1} of {fieldworkStepOrder.length}: {stepDescriptions[activeStep]}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Step {activeStepIdx + 1} of {visibleStepOrder.length}: {stepDescriptions[activeStep]}</p>
                 </div>
               </div>
 
-              <div data-testid={`control-step-block-${activeStep}`}>
-                <StepNodeContent
-                  step={activeStep}
-                  stepStatus={activeStepStatus}
-                  controlId={controlId}
-                  substepProgress={substepProgress[activeStep] ?? 0}
-                  blockRule={blockRule}
-                  onResolve={onResolve}
-                  isResolved={isResolved}
-                  onAction={handleStepAction}
-                  onSubstepAction={handleSubstepAction}
-                  autoExpandedSubs={autoExpandedSubs}
-                  automationConfig={automationConfig}
-                  onResumeSubstep={handleResumeSubstep}
-                  manualTriggered={manualTriggered}
-                  checkpointAcked={checkpointAcked}
-                  onAckCheckpoint={handleAckCheckpoint}
-                  workstreamActive={workstreamActive}
-                  completedTrackerSubs={completedTrackerSubs}
-                />
-              </div>
-
-              {isComplete && (
-                <div className={`p-4 rounded-xl border ${isIneffective ? "border-red-200 dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/10" : "border-[#266C92]/20 bg-[#266C92]/5"}`}>
-                  <div className="flex items-center gap-2">
-                    {isIneffective ? <AlertTriangle className="w-4 h-4 text-red-500" /> : <ShieldCheck className="w-4 h-4 text-[#266C92]" />}
-                    <span className={`text-sm font-medium ${isIneffective ? "text-red-600 dark:text-red-400" : "text-[#266C92]"}`}>
-                      Control Effectiveness: {isIneffective ? "Ineffective" : "Effective"}
-                    </span>
+              {activeStep === "outputs" ? (
+                <div data-testid="control-step-block-outputs" className="space-y-4">
+                  <div className="border border-slate-200 dark:border-border rounded-xl bg-white dark:bg-card overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-3 bg-slate-50/80 dark:bg-muted/20 border-b border-slate-200 dark:border-border">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-[#266C92]" />
+                        <span className="text-sm font-semibold text-foreground">Workpaper — CTL-003 Automated Control Testing</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
+                          data-testid="button-export-workpaper"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          Export
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <WorkpaperContent controlId={controlId} />
+                    </div>
                   </div>
                 </div>
+              ) : (
+                <>
+                  <div data-testid={`control-step-block-${activeStep}`}>
+                    <StepNodeContent
+                      step={activeStep}
+                      stepStatus={activeStepStatus}
+                      controlId={controlId}
+                      substepProgress={substepProgress[activeStep] ?? 0}
+                      blockRule={blockRule}
+                      onResolve={onResolve}
+                      isResolved={isResolved}
+                      onAction={handleStepAction}
+                      onSubstepAction={handleSubstepAction}
+                      autoExpandedSubs={autoExpandedSubs}
+                      automationConfig={automationConfig}
+                      onResumeSubstep={handleResumeSubstep}
+                      manualTriggered={manualTriggered}
+                      checkpointAcked={checkpointAcked}
+                      onAckCheckpoint={handleAckCheckpoint}
+                      workstreamActive={workstreamActive}
+                      completedTrackerSubs={completedTrackerSubs}
+                    />
+                  </div>
+
+                  {isComplete && (
+                    <div className={`p-4 rounded-xl border ${isIneffective ? "border-red-200 dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/10" : "border-[#266C92]/20 bg-[#266C92]/5"}`}>
+                      <div className="flex items-center gap-2">
+                        {isIneffective ? <AlertTriangle className="w-4 h-4 text-red-500" /> : <ShieldCheck className="w-4 h-4 text-[#266C92]" />}
+                        <span className={`text-sm font-medium ${isIneffective ? "text-red-600 dark:text-red-400" : "text-[#266C92]"}`}>
+                          Control Effectiveness: {isIneffective ? "Ineffective" : "Effective"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}
@@ -4997,14 +5038,17 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                 const currentProg = substepProgress[activeStep] ?? 0;
                 const allSubsDone = currentProg >= totalSubs;
                 if (allSubsDone) {
-                  const isLastStep = activeStep === "testEffectiveness";
-                  return isLastStep ? (
+                  const isLastFieldworkStep = activeStep === "testEffectiveness";
+                  return isLastFieldworkStep ? (
                     <Button
                       size="sm"
                       className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
                       onClick={() => {
-                        setWorkpaperOpen(true);
                         handleStepAction(activeStep, "confirm-step");
+                        setOutputsGenerated(true);
+                        setTimeout(() => {
+                          setActiveStepIdx(fieldworkStepOrder.length);
+                        }, 100);
                       }}
                       data-testid={`button-generate-workpaper-${controlId}`}
                     >
@@ -5053,7 +5097,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                 );
               })}
 
-              {activeStepStatus === "complete" && activeStepIdx < fieldworkStepOrder.length - 1 && (
+              {activeStepStatus === "complete" && activeStepIdx < visibleStepOrder.length - 1 && (
                 <Button
                   size="sm"
                   className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
@@ -5096,34 +5140,6 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
     </div>
     <ControlUtilityPanel controlId={controlId} controlStatus={controlStatus} substepProgress={substepProgress} onUploadPopulation={() => handleSubstepAction("pop-ingest", "upload")} onRequestWorkstream={() => handleSubstepAction("pop-ingest", "request")} workstreamActive={workstreamActive} />
 
-    <Dialog open={workpaperOpen} onOpenChange={setWorkpaperOpen}>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base">
-            <FileText className="w-4 h-4 text-[#266C92]" />
-            Automated Control Testing Workpaper
-          </DialogTitle>
-          <DialogDescription className="text-xs">
-            {controlId} — Segregation of Duties &middot; FY2025 Interim Testing
-          </DialogDescription>
-        </DialogHeader>
-        <DialogBody className="overflow-y-auto flex-1 space-y-5 text-sm pr-2">
-          <WorkpaperContent controlId={controlId} />
-        </DialogBody>
-        <DialogFooter className="flex items-center justify-between border-t pt-3">
-          <span className="text-[11px] text-muted-foreground">Generated {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setWorkpaperOpen(false)} data-testid="button-workpaper-close">
-              Close
-            </Button>
-            <Button size="sm" className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white" data-testid="button-workpaper-export">
-              <Download className="w-3.5 h-3.5" />
-              Export
-            </Button>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
     </div>
   );
 }
