@@ -17,6 +17,7 @@ import {
   ExternalLink, Workflow, Plus, Search,
   TrendingUp, AlertCircle, CheckCircle2,
   Building2, Globe, Zap, Target, RefreshCcw,
+  Upload,
   type LucideIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -263,6 +264,35 @@ function MessageBubble({ message, onResourceNavigate, assistantLabel }: MessageB
                 onNavigate={onResourceNavigate}
               />
             ))}
+          </div>
+        )}
+
+        {!isUser && message.actions && message.actions.length > 0 && (
+          <div className="mt-3 flex items-center gap-2">
+            {message.actions.map((action) => {
+              const onAction = useHomeAssistantStore.getState().onMessageAction;
+              return action.variant === "primary" ? (
+                <button
+                  key={action.actionId}
+                  onClick={() => onAction?.(action.actionId)}
+                  className="text-[10px] font-semibold text-white bg-[#266C92] hover:bg-[#1e5a7a] px-2.5 py-1 rounded transition-colors flex items-center gap-1"
+                  data-testid={`assistant-action-${action.actionId}`}
+                >
+                  <Upload className="w-3 h-3" />
+                  {action.label}
+                </button>
+              ) : (
+                <button
+                  key={action.actionId}
+                  onClick={() => onAction?.(action.actionId)}
+                  className="text-[10px] font-medium text-[#266C92] border border-[#266C92]/30 hover:bg-[#266C92]/5 px-2.5 py-1 rounded transition-colors flex items-center gap-1"
+                  data-testid={`assistant-action-${action.actionId}`}
+                >
+                  <Send className="w-3 h-3" />
+                  {action.label}
+                </button>
+              );
+            })}
           </div>
         )}
         

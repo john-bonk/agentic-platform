@@ -7,6 +7,12 @@
 
 import { create } from "zustand";
 
+interface ChatMessageAction {
+  label: string;
+  actionId: string;
+  variant?: "primary" | "outline";
+}
+
 interface ChatMessage {
   id: string;
   role: "user" | "assistant";
@@ -14,6 +20,7 @@ interface ChatMessage {
   timestamp: string;
   resources?: ResourceReference[];
   agentLabel?: string;
+  actions?: ChatMessageAction[];
 }
 
 interface ResourceReference {
@@ -40,6 +47,7 @@ interface HomeAssistantState {
   messages: ChatMessage[];
   suggestedActions: SuggestedAction[];
   isLoading: boolean;
+  onMessageAction: ((actionId: string) => void) | null;
   
   setOpen: (open: boolean) => void;
   toggleOpen: () => void;
@@ -49,6 +57,7 @@ interface HomeAssistantState {
   updateActionStatus: (actionId: string, status: SuggestedAction["status"]) => void;
   setLoading: (loading: boolean) => void;
   clearChat: () => void;
+  setOnMessageAction: (handler: ((actionId: string) => void) | null) => void;
 }
 
 export const useHomeAssistantStore = create<HomeAssistantState>((set) => ({
@@ -56,6 +65,7 @@ export const useHomeAssistantStore = create<HomeAssistantState>((set) => ({
   messages: [],
   suggestedActions: [],
   isLoading: false,
+  onMessageAction: null,
 
   setOpen: (open) => set({ isOpen: open }),
   toggleOpen: () => set((state) => ({ isOpen: !state.isOpen })),
@@ -77,6 +87,7 @@ export const useHomeAssistantStore = create<HomeAssistantState>((set) => ({
   setLoading: (loading) => set({ isLoading: loading }),
   
   clearChat: () => set({ messages: [], suggestedActions: [] }),
+  setOnMessageAction: (handler) => set({ onMessageAction: handler }),
 }));
 
-export type { ChatMessage, SuggestedAction, ResourceReference };
+export type { ChatMessage, ChatMessageAction, SuggestedAction, ResourceReference };

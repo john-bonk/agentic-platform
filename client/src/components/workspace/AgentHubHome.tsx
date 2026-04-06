@@ -77,6 +77,10 @@ import {
   X,
   Pencil,
   Download,
+  ChevronUp,
+  LayoutDashboard,
+  FileSpreadsheet,
+  Plus,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -1919,6 +1923,15 @@ const workstreamRequestSteps = [
   { label: "Validating file integrity", detail: "Schema check passed — 2,847 records, 12 fields", icon: FileCheck, delay: 800 },
 ];
 
+const evidenceWorkstreamSteps = [
+  { label: "Identifying evidence sources", detail: "25 sample items × 4 evidence types required", icon: Search, delay: 800 },
+  { label: "Connecting to SAP GRC", detail: "Pulling access logs and role assignment records", icon: Server, delay: 1000 },
+  { label: "Connecting to Okta", detail: "Pulling provisioning records for sampled users", icon: Server, delay: 900 },
+  { label: "Requesting SharePoint documents", detail: "Approval screenshots and remediation docs", icon: Send, delay: 1200 },
+  { label: "Downloading evidence files", detail: "68 files across 6 categories — 12.4 MB total", icon: Download, delay: 1400 },
+  { label: "Validating evidence completeness", detail: "25/25 sample items covered — 2 partial gaps flagged", icon: FileCheck, delay: 800 },
+];
+
 function AgenticStepTracker({ title, steps, onComplete, staticComplete }: {
   title: string;
   steps: { label: string; detail: string; icon: typeof Users; delay: number }[];
@@ -2783,10 +2796,11 @@ type StepNodeContentProps = {
   checkpointAcked?: Set<string>;
   onAckCheckpoint?: (substepId: string) => void;
   workstreamActive?: boolean;
+  evidenceWorkstreamActive?: boolean;
   completedTrackerSubs?: Set<string>;
 };
 
-function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule, onSubstepAction, autoExpandedSubs, automationConfig, onResumeSubstep, manualTriggered, checkpointAcked, onAckCheckpoint, workstreamActive, completedTrackerSubs }: StepNodeContentProps) {
+function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule, onSubstepAction, autoExpandedSubs, automationConfig, onResumeSubstep, manualTriggered, checkpointAcked, onAckCheckpoint, workstreamActive, evidenceWorkstreamActive, completedTrackerSubs }: StepNodeContentProps) {
   const info = stepNodeInfo[step];
   if (!info) return null;
 
@@ -2837,7 +2851,8 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
         const popIngestCompleted = completedTrackerSubs?.has("pop-ingest");
         const evdCollectCompleted = completedTrackerSubs?.has("evd-collect");
         const showInlineUpload = isDemo && sub.id === "pop-ingest" && (baseStatus === "running" || (baseStatus === "complete" && popIngestCompleted));
-        const showEvidenceTracker = isDemo && sub.id === "evd-collect" && (baseStatus === "running" || (baseStatus === "complete" && evdCollectCompleted));
+        const showEvidenceUpload = isDemo && sub.id === "evd-collect" && (baseStatus === "running" || (baseStatus === "complete" && evdCollectCompleted));
+        const showEvidenceTracker = showEvidenceUpload;
         const hasTrackerContent = (showInlineUpload && (workstreamActive || popIngestCompleted)) || showEvidenceTracker;
         const isExpandable = baseStatus === "complete" || hasTrackerContent;
         const modeIconInfo = automationModeIcons[subMode];
@@ -2939,11 +2954,39 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               </div>
             )}
 
-            {showEvidenceTracker && (isExpanded || baseStatus === "running") && (
+            {showEvidenceUpload && !evidenceWorkstreamActive && !evdCollectCompleted && baseStatus === "running" && (
+              <div className="pl-12 pr-3 pb-2 pt-1">
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-[11px] gap-1.5"
+                    onClick={() => onSubstepAction?.("evd-collect", "request")}
+                    data-testid="button-evidence-request"
+                  >
+                    <Send className="w-3 h-3" />
+                    Request via Workstream
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="h-7 text-[11px] gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                    onClick={() => onSubstepAction?.("evd-collect", "upload")}
+                    data-testid="button-evidence-upload"
+                  >
+                    <Upload className="w-3 h-3" />
+                    Upload
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {showEvidenceUpload && (evidenceWorkstreamActive || evdCollectCompleted) && (isExpanded || baseStatus === "running") && (
               <div className="pl-12 pr-3 pb-3 pt-1">
-                <EvidenceCollectionTracker
-                  onComplete={() => onSubstepAction?.("evd-collect", "tracker-complete")}
-                  staticComplete={baseStatus === "complete" && evdCollectCompleted}
+                <AgenticStepTracker
+                  title="Evidence Workstream Request"
+                  steps={evidenceWorkstreamSteps}
+                  onComplete={() => onSubstepAction?.("evd-collect", "workstream-complete")}
+                  staticComplete={!evidenceWorkstreamActive && evdCollectCompleted}
                 />
               </div>
             )}
@@ -3749,7 +3792,7 @@ const stepCompletionComments: Record<string, (controlId: string) => { title: str
   }),
 };
 
-function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUploadPopulation, onRequestWorkstream, workstreamActive }: { controlId: string; controlStatus: ControlWorkflowStatus | null; substepProgress: Record<string, number>; onUploadPopulation?: () => void; onRequestWorkstream?: () => void; workstreamActive?: boolean }) {
+function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUploadPopulation, onRequestWorkstream, workstreamActive, onUploadEvidence, onRequestEvidenceWorkstream }: { controlId: string; controlStatus: ControlWorkflowStatus | null; substepProgress: Record<string, number>; onUploadPopulation?: () => void; onRequestWorkstream?: () => void; workstreamActive?: boolean; onUploadEvidence?: () => void; onRequestEvidenceWorkstream?: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const [activeUtilTab, setActiveUtilTab] = useState<UtilityPanelTab>("agent");
   const [commentFilter, setCommentFilter] = useState<"open" | "closed">("open");
@@ -3800,6 +3843,19 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
           title: "Population Data Required",
           body: "The population file is needed to proceed with testing. The 3-way match discrepancy report from SharePoint is required for the current testing period.\n\nPlease upload the population file or request it from the control owner.",
           status: "blocked",
+        }, ...prev]);
+      }
+
+      if ((status === "running" || status === "blocked" || status === "waiting") && step === "evidence" && !seededStepsRef.current.has("evidence-blocked")) {
+        seededStepsRef.current.add("evidence-blocked");
+        setLiveComments(prev => [{
+          id: `live-evd-blocked-${Date.now()}`,
+          stepId: "evidence",
+          substepId: "evd-collect",
+          timestamp: ts,
+          title: "Evidence Collection Required",
+          body: "Evidence files are needed for the 25 sample items. The agent requires access logs, provisioning records, approval screenshots, and remediation documentation.\n\nPlease upload evidence files or request collection via workstream.",
+          status: "warning",
         }, ...prev]);
       }
 
@@ -3971,6 +4027,26 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
                                 onClick={() => onRequestWorkstream?.()}
                                 className="text-[10px] font-medium text-[#266C92] border border-[#266C92]/30 hover:bg-[#266C92]/5 px-2.5 py-1 rounded transition-colors flex items-center gap-1"
                                 data-testid="agent-action-request"
+                              >
+                                <Send className="w-3 h-3" />
+                                Request via Workstream
+                              </button>
+                            </div>
+                          )}
+                          {comment.stepId === "evidence" && (comment.status === "warning" || comment.status === "blocked") && onUploadEvidence && (
+                            <div className="mt-3 flex items-center gap-2">
+                              <button
+                                onClick={() => onUploadEvidence?.()}
+                                className="text-[10px] font-semibold text-white bg-[#266C92] hover:bg-[#1e5a7a] px-2.5 py-1 rounded transition-colors flex items-center gap-1"
+                                data-testid="agent-action-evidence-upload"
+                              >
+                                <Upload className="w-3 h-3" />
+                                Upload
+                              </button>
+                              <button
+                                onClick={() => onRequestEvidenceWorkstream?.()}
+                                className="text-[10px] font-medium text-[#266C92] border border-[#266C92]/30 hover:bg-[#266C92]/5 px-2.5 py-1 rounded transition-colors flex items-center gap-1"
+                                data-testid="agent-action-evidence-request"
                               >
                                 <Send className="w-3 h-3" />
                                 Request via Workstream
@@ -4397,6 +4473,162 @@ function WorkpaperContent({ controlId }: { controlId: string }) {
   );
 }
 
+function OutputsStepContent({ controlId }: { controlId: string }) {
+  const [workpaperCollapsed, setWorkpaperCollapsed] = useState(false);
+  const [createDropdownOpen, setCreateDropdownOpen] = useState(false);
+  const [summaryVisible, setSummaryVisible] = useState(false);
+
+  const summaryData = {
+    overall: "Ineffective",
+    passRate: "40%",
+    samplePassRate: "76%",
+    confidence: "Medium-High",
+    attributes: [
+      { name: "SoD Matrix Completeness", result: "Pass*", color: "text-amber-600" },
+      { name: "Conflict Identification", result: "88% Pass", color: "text-red-500" },
+      { name: "Remediation Timeliness", result: "76% Pass", color: "text-red-500" },
+      { name: "Quarterly Review Sign-off", result: "75%", color: "text-amber-600" },
+      { name: "Exception Approval", result: "100% Pass", color: "text-emerald-600" },
+    ],
+    exceptions: 4,
+    samplesTestedCount: 25,
+  };
+
+  return (
+    <div data-testid="control-step-block-outputs" className="space-y-4">
+      <div className="border border-slate-200 dark:border-border rounded-xl bg-white dark:bg-card overflow-hidden">
+        <button
+          onClick={() => setWorkpaperCollapsed(prev => !prev)}
+          className="w-full flex items-center justify-between px-5 py-3 bg-slate-50/80 dark:bg-muted/20 border-b border-slate-200 dark:border-border hover:bg-slate-100/80 dark:hover:bg-muted/30 transition-colors"
+          data-testid="toggle-workpaper-collapse"
+        >
+          <div className="flex items-center gap-2">
+            <FileText className="w-4 h-4 text-[#266C92]" />
+            <span className="text-sm font-semibold text-foreground">Workpaper — CTL-003 Automated Control Testing</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span
+              onClick={(e) => { e.stopPropagation(); }}
+              className="inline-flex"
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
+                data-testid="button-export-workpaper"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Export
+              </Button>
+            </span>
+            {workpaperCollapsed ? (
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+            ) : (
+              <ChevronUp className="w-4 h-4 text-muted-foreground" />
+            )}
+          </div>
+        </button>
+        {!workpaperCollapsed && (
+          <div className="p-5">
+            <WorkpaperContent controlId={controlId} />
+          </div>
+        )}
+      </div>
+
+      {summaryVisible && (
+        <div className="border border-slate-200 dark:border-border rounded-xl bg-white dark:bg-card overflow-hidden" data-testid="summary-artifact">
+          <div className="flex items-center justify-between px-5 py-3 bg-slate-50/80 dark:bg-muted/20 border-b border-slate-200 dark:border-border">
+            <div className="flex items-center gap-2">
+              <LayoutDashboard className="w-4 h-4 text-[#266C92]" />
+              <span className="text-sm font-semibold text-foreground">Control Testing Summary</span>
+            </div>
+            <Badge variant="outline" className="text-[10px] border-[#266C92]/30 text-[#266C92]">Dashboard</Badge>
+          </div>
+          <div className="p-5 space-y-4">
+            <div className="grid grid-cols-4 gap-3">
+              <div className="border rounded-lg p-3 text-center bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800/30">
+                <p className="text-[10px] text-muted-foreground mb-1">Overall Effectiveness</p>
+                <p className="text-sm font-bold text-red-600">{summaryData.overall}</p>
+              </div>
+              <div className="border rounded-lg p-3 text-center">
+                <p className="text-[10px] text-muted-foreground mb-1">Attribute Pass Rate</p>
+                <p className="text-sm font-bold text-foreground">{summaryData.passRate}</p>
+              </div>
+              <div className="border rounded-lg p-3 text-center">
+                <p className="text-[10px] text-muted-foreground mb-1">Sample Pass Rate</p>
+                <p className="text-sm font-bold text-foreground">{summaryData.samplePassRate}</p>
+              </div>
+              <div className="border rounded-lg p-3 text-center">
+                <p className="text-[10px] text-muted-foreground mb-1">Confidence</p>
+                <p className="text-sm font-bold text-foreground">{summaryData.confidence}</p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-semibold text-foreground mb-2">Attribute Results</h4>
+              <div className="space-y-1.5">
+                {summaryData.attributes.map((attr, i) => (
+                  <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg bg-slate-50 dark:bg-muted/20">
+                    <span className="text-xs text-foreground">{attr.name}</span>
+                    <span className={`text-xs font-semibold ${attr.color}`}>{attr.result}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                <span className="text-xs text-amber-700 dark:text-amber-400">{summaryData.exceptions} exceptions identified</span>
+              </div>
+              <span className="text-xs text-muted-foreground">{summaryData.samplesTestedCount} samples tested</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-end">
+        <DropdownMenu open={createDropdownOpen} onOpenChange={setCreateDropdownOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs gap-1.5"
+              data-testid="button-create-artifact"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Create
+              <ChevronDown className="w-3 h-3 ml-0.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem
+              onClick={() => setSummaryVisible(true)}
+              className="text-xs gap-2"
+              data-testid="create-summary-artifact"
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              Summary Dashboard
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-xs gap-2" data-testid="create-exception-report">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              Exception Report
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-xs gap-2" data-testid="create-testing-matrix">
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              Testing Matrix
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-xs gap-2" data-testid="create-executive-memo">
+              <FileText className="w-3.5 h-3.5" />
+              Executive Memo
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  );
+}
+
 function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResolve, isResolved, onAdvanceStep, onStartWorkflow, onViewReport }: ControlFocusPageProps) {
   const master = masterControlsList.find(c => c.id === controlId);
   const exceptionControlIds = new Set(fieldworkExceptions.map(e => e.controlId));
@@ -4431,6 +4663,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+
   const initialStepIndex = useMemo(() => {
     if (!controlStatus) return 0;
     for (let i = 0; i < fieldworkStepOrder.length; i++) {
@@ -4447,14 +4680,21 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
   const [checkpointAcked, setCheckpointAcked] = useState<Set<string>>(() => new Set());
   const [manualTriggered, setManualTriggered] = useState<Set<string>>(() => new Set());
   const [workstreamActive, setWorkstreamActive] = useState(false);
+  const [evidenceWorkstreamActive, setEvidenceWorkstreamActive] = useState(false);
   const [completedTrackerSubs, setCompletedTrackerSubs] = useState<Set<string>>(() => new Set());
-  const [outputsGenerated, setOutputsGenerated] = useState(false);
+  const [workflowPaused, setWorkflowPaused] = useState(false);
+  const outputsGenerated = useWorkflowSessionStore(s => !!(s.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.outputsGenerated as Record<string, boolean> | undefined)?.[controlId]);
+  const setOutputsGenerated = useCallback((val: boolean) => {
+    const store = useWorkflowSessionStore.getState();
+    const existing = (store.runtimeStates["control-testing"]?.blockStates?.["fieldwork-execution"]?.outputsGenerated as Record<string, boolean> | undefined) ?? {};
+    store.setBlockState("control-testing", "fieldwork-execution", "outputsGenerated", { ...existing, [controlId]: val });
+  }, [controlId]);
 
   const assistantMirrorSeeded = useRef<Set<string>>(new Set());
   const assistantMirrorCompleted = useRef<Set<string>>(new Set());
   const assistantWorkstreamMirrored = useRef(false);
 
-  const mirrorToAssistant = useCallback((title: string, body: string, agentStep?: string) => {
+  const mirrorToAssistant = useCallback((title: string, body: string, agentStep?: string, actions?: { label: string; actionId: string; variant?: "primary" | "outline" }[]) => {
     const agentInfo = agentStep ? stepAgentName[agentStep] : undefined;
     const label = agentInfo ? agentInfo.name.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ") : undefined;
     useHomeAssistantStore.getState().addMessage({
@@ -4463,6 +4703,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       content: `**${title}**\n\n${body}`,
       timestamp: new Date().toISOString(),
       agentLabel: label,
+      actions,
     });
   }, []);
 
@@ -4497,7 +4738,24 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
         mirrorToAssistant(
           "Population Data Required",
           "The population file is needed to proceed with testing. The 3-way match discrepancy report from SharePoint is required for the current testing period.\n\nPlease upload the population file or request it from the control owner.",
-          "population"
+          "population",
+          [
+            { label: "Upload", actionId: "pop-upload", variant: "primary" },
+            { label: "Request via Workstream", actionId: "pop-request", variant: "outline" },
+          ]
+        );
+      }
+
+      if ((status === "running" || status === "blocked" || status === "waiting") && step === "evidence" && !assistantMirrorSeeded.current.has("evidence-blocked")) {
+        assistantMirrorSeeded.current.add("evidence-blocked");
+        mirrorToAssistant(
+          "Evidence Collection Required",
+          "Evidence files are needed for the 25 sample items. The agent requires access logs, provisioning records, approval screenshots, and remediation documentation.\n\nPlease upload evidence files or request collection via workstream.",
+          "evidence",
+          [
+            { label: "Upload", actionId: "evd-upload", variant: "primary" },
+            { label: "Request via Workstream", actionId: "evd-request", variant: "outline" },
+          ]
         );
       }
 
@@ -4528,6 +4786,18 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
     }
   }, [workstreamActive, mirrorToAssistant]);
 
+  const assistantEvdWorkstreamMirrored = useRef(false);
+  useEffect(() => {
+    if (evidenceWorkstreamActive && !assistantEvdWorkstreamMirrored.current) {
+      assistantEvdWorkstreamMirrored.current = true;
+      mirrorToAssistant(
+        "Evidence Workstream Request Initiated",
+        "Initiating automated evidence collection via Optro Workstream. The agent is connecting to source systems, pulling documents, and assembling evidence packages for the 25 sample items.\n\nYou can monitor the request progress in the workflow panel.",
+        "evidence"
+      );
+    }
+  }, [evidenceWorkstreamActive, mirrorToAssistant]);
+
   const visibleStepOrder = useMemo(() =>
     outputsGenerated ? [...fieldworkStepOrder, "outputs"] : [...fieldworkStepOrder],
     [outputsGenerated]
@@ -4536,7 +4806,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
   const activeStep = visibleStepOrder[activeStepIdx];
 
   useEffect(() => {
-    if (!isDemo || !controlStatus) return;
+    if (!isDemo || !controlStatus || workflowPaused) return;
     const step = activeStep;
     const stepStatus = controlStatus.steps[step as keyof typeof controlStatus.steps];
     if (stepStatus !== "running") return;
@@ -4570,7 +4840,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       });
     }, 1200);
     return () => clearTimeout(timer);
-  }, [isDemo, activeStep, controlStatus, substepProgress, automationConfig, manualTriggered, checkpointAcked]);
+  }, [isDemo, activeStep, controlStatus, substepProgress, automationConfig, manualTriggered, checkpointAcked, workflowPaused]);
 
   const stepLabels: Record<string, string> = {
     readiness: "Readiness",
@@ -4630,6 +4900,32 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
         setAutoExpandedSubs(prev => { const n = new Set(prev); n.delete("pop-ingest"); return n; });
       }, 2500);
       setActionToast("Population data received via workstream — validating...");
+    } else if (substepId === "evd-collect" && action === "upload") {
+      setEvidenceWorkstreamActive(false);
+      setSubstepProgress(prev => ({ ...prev, evidence: (prev.evidence ?? 0) + 1 }));
+      setAutoExpandedSubs(prev => new Set(prev).add("evd-collect"));
+      setTimeout(() => {
+        setAutoExpandedSubs(prev => { const n = new Set(prev); n.delete("evd-collect"); return n; });
+      }, 2500);
+      setActionToast("Evidence files uploaded — classifying...");
+      mirrorToAssistant(
+        "Evidence Files Uploaded",
+        `Evidence package uploaded for ${controlId}. The agent will now classify documents, extract key fields, and cross-reference against the sample data.\n\nProcessing...`,
+        "evidence"
+      );
+    } else if (substepId === "evd-collect" && action === "request") {
+      setEvidenceWorkstreamActive(true);
+      setAutoExpandedSubs(prev => new Set(prev).add("evd-collect"));
+      setActionToast("Initiating evidence workstream request...");
+    } else if (substepId === "evd-collect" && action === "workstream-complete") {
+      setEvidenceWorkstreamActive(false);
+      setCompletedTrackerSubs(prev => new Set(prev).add("evd-collect"));
+      setSubstepProgress(prev => ({ ...prev, evidence: (prev.evidence ?? 0) + 1 }));
+      setAutoExpandedSubs(prev => new Set(prev).add("evd-collect"));
+      setTimeout(() => {
+        setAutoExpandedSubs(prev => { const n = new Set(prev); n.delete("evd-collect"); return n; });
+      }, 2500);
+      setActionToast("Evidence collected via workstream — classifying...");
     } else if (substepId === "evd-collect" && action === "tracker-complete") {
       setCompletedTrackerSubs(prev => new Set(prev).add("evd-collect"));
       setSubstepProgress(prev => ({ ...prev, evidence: (prev.evidence ?? 0) + 1 }));
@@ -4641,6 +4937,18 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
     }
     toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
   }, [mirrorToAssistant, controlId]);
+
+  const assistantActionHandler = useCallback((actionId: string) => {
+    if (actionId === "pop-upload") handleSubstepAction("pop-ingest", "upload");
+    else if (actionId === "pop-request") handleSubstepAction("pop-ingest", "request");
+    else if (actionId === "evd-upload") handleSubstepAction("evd-collect", "upload");
+    else if (actionId === "evd-request") handleSubstepAction("evd-collect", "request");
+  }, [handleSubstepAction]);
+
+  useEffect(() => {
+    useHomeAssistantStore.getState().setOnMessageAction(assistantActionHandler);
+    return () => { useHomeAssistantStore.getState().setOnMessageAction(null); };
+  }, [assistantActionHandler]);
 
   const handleStepAction = useCallback((stepKey: string, actionId: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -4912,8 +5220,8 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
         <>
         {controlStatus && (
         <div className="shrink-0 border-b border-slate-200 dark:border-border bg-slate-50/80 dark:bg-muted/20">
-          <div className="px-5 py-2">
-            <div className="relative flex items-center h-8">
+          <div className="px-5 py-2 flex items-center gap-3">
+            <div className="relative flex items-center h-8 flex-1 min-w-0">
               <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 rounded-full bg-slate-200 dark:bg-slate-700" />
               {(() => {
                 const completedCount = fieldworkStepOrder.filter(
@@ -4958,6 +5266,22 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                 })}
               </div>
             </div>
+            {isDemo && !isComplete && (
+              <div className="shrink-0 flex items-center">
+                <button
+                  onClick={() => setWorkflowPaused(p => !p)}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                    workflowPaused
+                      ? "bg-[#266C92]/10 text-[#266C92] hover:bg-[#266C92]/20"
+                      : "text-muted-foreground hover:text-foreground hover:bg-slate-200 dark:hover:bg-muted/40"
+                  }`}
+                  title={workflowPaused ? "Resume workflow" : "Pause workflow"}
+                  data-testid="button-workflow-pause-resume"
+                >
+                  {workflowPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            )}
           </div>
           <div className="border-t border-slate-200/60 dark:border-border/40">
             <button
@@ -5030,30 +5354,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
               </div>
 
               {activeStep === "outputs" ? (
-                <div data-testid="control-step-block-outputs" className="space-y-4">
-                  <div className="border border-slate-200 dark:border-border rounded-xl bg-white dark:bg-card overflow-hidden">
-                    <div className="flex items-center justify-between px-5 py-3 bg-slate-50/80 dark:bg-muted/20 border-b border-slate-200 dark:border-border">
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-[#266C92]" />
-                        <span className="text-sm font-semibold text-foreground">Workpaper — CTL-003 Automated Control Testing</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
-                          data-testid="button-export-workpaper"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          Export
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="p-5">
-                      <WorkpaperContent controlId={controlId} />
-                    </div>
-                  </div>
-                </div>
+                <OutputsStepContent controlId={controlId} />
               ) : (
                 <>
                   <div data-testid={`control-step-block-${activeStep}`}>
@@ -5074,6 +5375,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                       checkpointAcked={checkpointAcked}
                       onAckCheckpoint={handleAckCheckpoint}
                       workstreamActive={workstreamActive}
+                      evidenceWorkstreamActive={evidenceWorkstreamActive}
                       completedTrackerSubs={completedTrackerSubs}
                     />
                   </div>
@@ -5218,7 +5520,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
         </div>
       )}
     </div>
-    <ControlUtilityPanel controlId={controlId} controlStatus={controlStatus} substepProgress={substepProgress} onUploadPopulation={() => handleSubstepAction("pop-ingest", "upload")} onRequestWorkstream={() => handleSubstepAction("pop-ingest", "request")} workstreamActive={workstreamActive} />
+    <ControlUtilityPanel controlId={controlId} controlStatus={controlStatus} substepProgress={substepProgress} onUploadPopulation={() => handleSubstepAction("pop-ingest", "upload")} onRequestWorkstream={() => handleSubstepAction("pop-ingest", "request")} workstreamActive={workstreamActive} onUploadEvidence={() => handleSubstepAction("evd-collect", "upload")} onRequestEvidenceWorkstream={() => handleSubstepAction("evd-collect", "request")} />
 
     </div>
   );
