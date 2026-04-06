@@ -1067,7 +1067,7 @@ function OptroHome() {
   return (
     <div className="flex flex-col h-full overflow-hidden" data-testid="optro-home">
       <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background">
-        <div className="w-[80%] mx-auto px-6 py-8">
+        <div className="w-[90%] mx-auto px-6 py-8">
           <div className="mb-6">
             <h1 className="text-xl font-semibold text-foreground mb-1" data-testid="text-optro-welcome">Welcome back</h1>
             <p className="text-sm text-muted-foreground">Here's what needs your attention today.</p>
@@ -1916,17 +1916,19 @@ const workstreamRequestSteps = [
   { label: "Validating file integrity", detail: "Schema check passed — 2,847 records, 12 fields", icon: FileCheck, delay: 800 },
 ];
 
-function AgenticStepTracker({ title, steps, onComplete }: {
+function AgenticStepTracker({ title, steps, onComplete, staticComplete }: {
   title: string;
   steps: { label: string; detail: string; icon: typeof Users; delay: number }[];
   onComplete: () => void;
+  staticComplete?: boolean;
 }) {
-  const [completedCount, setCompletedCount] = useState(0);
-  const completedRef = useRef(false);
+  const [completedCount, setCompletedCount] = useState(staticComplete ? steps.length : 0);
+  const completedRef = useRef(!!staticComplete);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
   useEffect(() => {
+    if (staticComplete) return;
     if (completedCount >= steps.length) {
       if (!completedRef.current) {
         completedRef.current = true;
@@ -1938,7 +1940,7 @@ function AgenticStepTracker({ title, steps, onComplete }: {
     const delay = steps[completedCount].delay;
     const t = setTimeout(() => setCompletedCount(prev => prev + 1), delay);
     return () => clearTimeout(t);
-  }, [completedCount, steps]);
+  }, [completedCount, steps, staticComplete]);
 
   const allDone = completedCount >= steps.length;
 
@@ -2009,13 +2011,14 @@ const evidenceTrackerItems = [
   { label: "IT change management tickets", source: "ServiceNow export", icon: ClipboardCheck, delay: 1000 },
 ];
 
-function EvidenceCollectionTracker({ onComplete }: { onComplete: () => void }) {
-  const [receivedCount, setReceivedCount] = useState(0);
-  const completedRef = useRef(false);
+function EvidenceCollectionTracker({ onComplete, staticComplete }: { onComplete: () => void; staticComplete?: boolean }) {
+  const [receivedCount, setReceivedCount] = useState(staticComplete ? evidenceTrackerItems.length : 0);
+  const completedRef = useRef(!!staticComplete);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
   useEffect(() => {
+    if (staticComplete) return;
     if (receivedCount >= evidenceTrackerItems.length) {
       if (!completedRef.current) {
         completedRef.current = true;
@@ -2027,7 +2030,7 @@ function EvidenceCollectionTracker({ onComplete }: { onComplete: () => void }) {
     const delay = evidenceTrackerItems[receivedCount].delay;
     const t = setTimeout(() => setReceivedCount(prev => prev + 1), delay);
     return () => clearTimeout(t);
-  }, [receivedCount]);
+  }, [receivedCount, staticComplete]);
 
   const allDone = receivedCount >= evidenceTrackerItems.length;
 
@@ -2346,9 +2349,10 @@ type StepNodeContentProps = {
   checkpointAcked?: Set<string>;
   onAckCheckpoint?: (substepId: string) => void;
   workstreamActive?: boolean;
+  completedTrackerSubs?: Set<string>;
 };
 
-function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule, onSubstepAction, autoExpandedSubs, automationConfig, onResumeSubstep, manualTriggered, checkpointAcked, onAckCheckpoint, workstreamActive }: StepNodeContentProps) {
+function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRule, onSubstepAction, autoExpandedSubs, automationConfig, onResumeSubstep, manualTriggered, checkpointAcked, onAckCheckpoint, workstreamActive, completedTrackerSubs }: StepNodeContentProps) {
   const info = stepNodeInfo[step];
   if (!info) return null;
 
@@ -2396,8 +2400,10 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
         const outputs = isDemo ? (demoSubstepOutputs[sub.id] ?? []) : [];
         const isReadinessAssess = sub.id === "rd-assess";
         const hasContent = outputs.length > 0 || isReadinessAssess;
-        const showInlineUpload = isDemo && sub.id === "pop-ingest" && baseStatus === "running";
-        const showEvidenceTracker = isDemo && sub.id === "evd-collect" && baseStatus === "running";
+        const popIngestCompleted = completedTrackerSubs?.has("pop-ingest");
+        const evdCollectCompleted = completedTrackerSubs?.has("evd-collect");
+        const showInlineUpload = isDemo && sub.id === "pop-ingest" && (baseStatus === "running" || (baseStatus === "complete" && popIngestCompleted));
+        const showEvidenceTracker = isDemo && sub.id === "evd-collect" && (baseStatus === "running" || (baseStatus === "complete" && evdCollectCompleted));
         const modeIconInfo = automationModeIcons[subMode];
         const ModeIcon = modeIconInfo.icon;
 
@@ -2460,7 +2466,7 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               <ManualSubstepForm substepId={sub.id} onRun={() => onResumeSubstep?.(sub.id)} />
             )}
 
-            {showInlineUpload && !workstreamActive && (
+            {showInlineUpload && !workstreamActive && !popIngestCompleted && baseStatus === "running" && (
               <div className="pl-12 pr-3 pb-2 pt-1">
                 <div className="flex items-center gap-2">
                   <Button
@@ -2486,19 +2492,23 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               </div>
             )}
 
-            {showInlineUpload && workstreamActive && (
+            {showInlineUpload && (workstreamActive || popIngestCompleted) && (
               <div className="pl-12 pr-3 pb-3 pt-1">
                 <AgenticStepTracker
                   title="Workstream Request"
                   steps={workstreamRequestSteps}
                   onComplete={() => onSubstepAction?.("pop-ingest", "workstream-complete")}
+                  staticComplete={!workstreamActive && popIngestCompleted}
                 />
               </div>
             )}
 
             {showEvidenceTracker && (
               <div className="pl-12 pr-3 pb-3 pt-1">
-                <EvidenceCollectionTracker onComplete={() => onSubstepAction?.("evd-collect", "tracker-complete")} />
+                <EvidenceCollectionTracker
+                  onComplete={() => onSubstepAction?.("evd-collect", "tracker-complete")}
+                  staticComplete={baseStatus === "complete" && evdCollectCompleted}
+                />
               </div>
             )}
 
@@ -2839,7 +2849,7 @@ function ControlDetailsTab({ controlId }: { controlId: string }) {
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto">
-      <div className="w-[80%] mx-auto px-6 py-6 space-y-0">
+      <div className="w-[90%] mx-auto px-6 py-6 space-y-0">
         <div>
           <button
             onClick={() => setControlInfoOpen(!controlInfoOpen)}
@@ -3898,6 +3908,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
   const [checkpointAcked, setCheckpointAcked] = useState<Set<string>>(() => new Set());
   const [manualTriggered, setManualTriggered] = useState<Set<string>>(() => new Set());
   const [workstreamActive, setWorkstreamActive] = useState(false);
+  const [completedTrackerSubs, setCompletedTrackerSubs] = useState<Set<string>>(() => new Set());
 
   const handleAckCheckpoint = useCallback((substepId: string) => {
     setCheckpointAcked(prev => new Set(prev).add(substepId));
@@ -3997,11 +4008,14 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       setActionToast("Initiating workstream request...");
     } else if (substepId === "pop-ingest" && action === "workstream-complete") {
       setWorkstreamActive(false);
+      setCompletedTrackerSubs(prev => new Set(prev).add("pop-ingest"));
       setSubstepProgress(prev => ({ ...prev, population: (prev.population ?? 0) + 1 }));
       setAutoExpandedSubs(prev => new Set(prev).add("pop-ingest"));
       setActionToast("Population data received via workstream — validating...");
     } else if (substepId === "evd-collect" && action === "tracker-complete") {
+      setCompletedTrackerSubs(prev => new Set(prev).add("evd-collect"));
       setSubstepProgress(prev => ({ ...prev, evidence: (prev.evidence ?? 0) + 1 }));
+      setAutoExpandedSubs(prev => new Set(prev).add("evd-collect"));
       setActionToast("Evidence collection complete — ready for confirmation");
     }
     toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
@@ -4358,7 +4372,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       )}
 
       <div className="flex-1 min-h-0 overflow-y-auto">
-        <div className="w-[80%] mx-auto px-6 py-6 space-y-6">
+        <div className="w-[90%] mx-auto px-6 py-6 space-y-6">
           {controlStatus && (
             <>
               <div className="flex items-center gap-2">
@@ -4408,6 +4422,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                   checkpointAcked={checkpointAcked}
                   onAckCheckpoint={handleAckCheckpoint}
                   workstreamActive={workstreamActive}
+                  completedTrackerSubs={completedTrackerSubs}
                 />
               </div>
 
