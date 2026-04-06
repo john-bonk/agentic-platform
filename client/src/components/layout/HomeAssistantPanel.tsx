@@ -242,7 +242,7 @@ function MessageBubble({ message, onResourceNavigate, assistantLabel }: MessageB
         {!isUser && (
           <div className="flex items-center gap-1.5 mb-1">
             <Bot className="w-3 h-3 text-[#266C92]" />
-            <span className="text-xs font-medium text-[#266C92]">{assistantLabel}</span>
+            <span className="text-xs font-medium text-[#266C92]">{message.agentLabel || assistantLabel}</span>
           </div>
         )}
         <div className={`text-sm max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&_strong]:font-semibold ${

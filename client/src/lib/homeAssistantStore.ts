@@ -13,6 +13,7 @@ interface ChatMessage {
   content: string;
   timestamp: string;
   resources?: ResourceReference[];
+  agentLabel?: string;
 }
 
 interface ResourceReference {

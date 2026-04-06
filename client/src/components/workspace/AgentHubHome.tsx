@@ -3761,8 +3761,6 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
   useEffect(() => {
     if (liveComments.length > 0 && !hasAutoExpandedRef.current) {
       hasAutoExpandedRef.current = true;
-      setExpanded(true);
-      setActiveUtilTab("agent");
     }
   }, [liveComments.length]);
 
@@ -4458,12 +4456,13 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
 
   const mirrorToAssistant = useCallback((title: string, body: string, agentStep?: string) => {
     const agentInfo = agentStep ? stepAgentName[agentStep] : undefined;
-    const prefix = agentInfo ? `**${agentInfo.name}**\n\n` : "";
+    const label = agentInfo ? agentInfo.name.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ") : undefined;
     useHomeAssistantStore.getState().addMessage({
       id: `mirror-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       role: "assistant",
-      content: `${prefix}**${title}**\n\n${body}`,
+      content: `**${title}**\n\n${body}`,
       timestamp: new Date().toISOString(),
+      agentLabel: label,
     });
   }, []);
 
