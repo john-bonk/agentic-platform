@@ -75,6 +75,7 @@ import {
   Link2,
   X,
   Pencil,
+  Download,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -2098,7 +2099,7 @@ function EvidenceCollectionTracker({ onComplete, staticComplete }: { onComplete:
 
 const docFilePattern = /\b([\w\-\.]+\.(pdf|csv|xlsx|xls|msg|docx|doc|zip|txt))\b/gi;
 
-function renderDocLinks(text: string, className: string) {
+function renderDocLinks(text: string, className?: string) {
   const parts: (string | JSX.Element)[] = [];
   let lastIdx = 0;
   const regex = new RegExp(docFilePattern.source, "gi");
@@ -2143,59 +2144,59 @@ type SampleTestRow = {
 };
 
 const testingAttributes = [
-  { key: "A", label: "A: Approval" },
-  { key: "B", label: "B: Amount" },
-  { key: "C", label: "C: Date" },
-  { key: "D", label: "D: Authorization" },
+  { key: "A1", label: "A1: Matrix" },
+  { key: "A2", label: "A2: Detection" },
+  { key: "A3", label: "A3: Remediation" },
+  { key: "A4", label: "A4: Review" },
 ];
 
 const demoSampleTestRows: SampleTestRow[] = [
   {
-    id: "s1", label: "#1 — March 2025", subtitle: "Acme Corp, $4,250",
+    id: "s01", label: "S01 — M. Chen", subtitle: "AP-Create + AP-Approve",
     attributes: {
-      A: { result: "Effective", confidence: "High" },
-      B: { result: "Effective", confidence: "High" },
-      C: { result: "Effective", confidence: "High" },
-      D: { result: "Effective", confidence: "High" },
-    },
-    overall: "Effective",
-    details: [
-      { key: "A", title: "Approval signature present", description: "The discrepancy report for March 2025 contains a digital signature from VP of Operations K. Martinez dated 03/20/2025 in the designated approval field.", sourceDoc: "SP_Discrepancy_Report_Mar2025.pdf", sourceLocation: "page 2", result: "Effective", confidence: "High" },
-      { key: "B", title: "Amount matches threshold", description: "The variance amount of $4,250 is within the $5,000 tolerance threshold. PO amount of $12,500 vs invoice amount of $8,250, resulting in a $4,250 variance.", sourceDoc: "SP_Discrepancy_Report_Mar2025.pdf", sourceLocation: "page 1, line 18", result: "Effective", confidence: "High" },
-      { key: "C", title: "Date within testing period", description: "Transaction date of 03/15/2025 falls within the FY2025 testing period. Report header confirms March 2025 reporting period.", sourceDoc: "SP_Discrepancy_Report_Mar2025.pdf", sourceLocation: "page 1, header", result: "Effective", confidence: "High" },
-      { key: "D", title: "Manager authorization documented", description: "The SAP JE Workflow file for March 2025 shows completed manager authorization. Approval chain: Analyst → Manager K. Martinez → Director S. Chen, all completed within SLA.", sourceDoc: "SAP_JE_Workflow_Mar2025.pdf", sourceLocation: "page 1–2", result: "Effective", confidence: "High" },
-    ],
-  },
-  {
-    id: "s2", label: "#2 — July 2025", subtitle: "Global Supply Co, $7,800",
-    attributes: {
-      A: { result: "Ineffective", confidence: "High" },
-      B: { result: "Effective", confidence: "High" },
-      C: { result: "Effective", confidence: "High" },
-      D: { result: "Ineffective", confidence: "Medium" },
+      A1: { result: "Effective", confidence: "High" },
+      A2: { result: "Effective", confidence: "High" },
+      A3: { result: "Ineffective", confidence: "High" },
+      A4: { result: "Effective", confidence: "High" },
     },
     overall: "Ineffective",
     details: [
-      { key: "A", title: "Approval signature present", description: "The discrepancy report for July 2025 is missing the required VP-level digital signature. Only the analyst signature is present — the approval field designated for VP of Operations is blank.", sourceDoc: "SP_Discrepancy_Report_Jul2025.pdf", sourceLocation: "page 2", result: "Ineffective", confidence: "High" },
-      { key: "B", title: "Amount matches threshold", description: "The variance amount of $7,800 exceeds the $5,000 tolerance threshold but has been flagged and escalated per policy. PO amount of $22,000 vs invoice amount of $14,200.", sourceDoc: "SP_Discrepancy_Report_Jul2025.pdf", sourceLocation: "page 1, line 22", result: "Effective", confidence: "High" },
-      { key: "C", title: "Date within testing period", description: "Transaction date of 07/18/2025 falls within the FY2025 testing period. Report header confirms July 2025 reporting period.", sourceDoc: "SP_Discrepancy_Report_Jul2025.pdf", sourceLocation: "page 1, header", result: "Effective", confidence: "High" },
-      { key: "D", title: "Manager authorization documented", description: "The SAP JE Workflow file for July 2025 shows incomplete authorization chain. Analyst approval is present but Manager approval is missing. The workflow appears to have been bypassed using an emergency posting procedure without proper documentation.", sourceDoc: "SAP_JE_Workflow_Jul2025.pdf", sourceLocation: "page 1", result: "Ineffective", confidence: "Medium" },
+      { key: "A1", title: "SoD matrix completeness", description: "The AP-Create + AP-Approve conflict pair is defined in the SoD conflict matrix (P-114 §4.2, row 47). Both functions are mapped to the correct SAP transaction codes (FB01, FK01) and the conflict is categorized as High risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 47", result: "Effective", confidence: "High" },
+      { key: "A2", title: "Conflict identification", description: "Conflict was detected on 2025-02-12 during automated SoD scan. User M. Chen held both AP-Create and AP-Approve roles since 2024-08-14 — a 182-day exposure window. Detection occurred within the quarterly scan cycle.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 1,247", result: "Effective", confidence: "High" },
+      { key: "A3", title: "Remediation timeliness", description: "AP-Approve role was removed on 2025-02-28, 16 calendar days after detection. Policy P-114 §6.1 requires remediation within 5 business days. The 16-day remediation period exceeds the SLA by 11 days.", sourceDoc: "RoleChangeLog_2025.csv", sourceLocation: "change ID RC-2025-0284", result: "Ineffective", confidence: "High" },
+      { key: "A4", title: "Quarterly review execution", description: "Q1 2025 quarterly review (April 15, 2025) confirmed the M. Chen conflict was remediated. Review package signed by S. Chen, D. Kim, and M. Torres. Remediation verified as sustained.", sourceDoc: "Q1_SoD_Review_Package.pdf", sourceLocation: "page 4, item 3", result: "Effective", confidence: "High" },
     ],
   },
   {
-    id: "s3", label: "#3 — November 2025", subtitle: "TechParts Inc, $3,450",
+    id: "s02", label: "S02 — J. Park", subtitle: "GL-Post + GL-Review",
     attributes: {
-      A: { result: "Effective", confidence: "High" },
-      B: { result: "Effective", confidence: "High" },
-      C: { result: "Effective", confidence: "High" },
-      D: { result: "Missing", confidence: "Low" },
+      A1: { result: "Effective", confidence: "High" },
+      A2: { result: "Effective", confidence: "High" },
+      A3: { result: "Effective", confidence: "High" },
+      A4: { result: "Effective", confidence: "High" },
+    },
+    overall: "Effective",
+    details: [
+      { key: "A1", title: "SoD matrix completeness", description: "The GL-Post + GL-Review conflict pair is defined in the SoD conflict matrix (P-114 §4.2, row 82). Both functions are mapped correctly and categorized as Medium risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 82", result: "Effective", confidence: "High" },
+      { key: "A2", title: "Conflict identification", description: "Conflict was detected on 2025-01-10 during automated SoD scan. User J. Park held both roles since 2024-11-01. Detection was timely within the scanning cycle.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 2,891", result: "Effective", confidence: "High" },
+      { key: "A3", title: "Remediation timeliness", description: "GL-Review role was reassigned on 2025-01-15, 5 calendar days after detection. This is within the policy SLA of 5 business days.", sourceDoc: "RoleChangeLog_2025.csv", sourceLocation: "change ID RC-2025-0112", result: "Effective", confidence: "High" },
+      { key: "A4", title: "Quarterly review execution", description: "Q1 2025 quarterly review confirmed remediation. All required attendees present and sign-off documented.", sourceDoc: "Q1_SoD_Review_Package.pdf", sourceLocation: "page 6, item 7", result: "Effective", confidence: "High" },
+    ],
+  },
+  {
+    id: "s03", label: "S03 — L. Wang", subtitle: "AR-Invoice + AR-Receipt",
+    attributes: {
+      A1: { result: "Effective", confidence: "High" },
+      A2: { result: "Effective", confidence: "High" },
+      A3: { result: "Missing", confidence: "Low" },
+      A4: { result: "Ineffective", confidence: "Medium" },
     },
     overall: "Incomplete",
     details: [
-      { key: "A", title: "Approval signature present", description: "The SharePoint discrepancy report for November 2025 contains a digital signature from VP of Operations K. Martinez dated 11/20/2025 in the designated approval field.", sourceDoc: "SP_Discrepancy_Report_Nov2025.pdf", sourceLocation: "page 2", result: "Effective", confidence: "High" },
-      { key: "B", title: "Amount matches threshold", description: "The variance amount of $3,450 exceeds the $3,000 tolerance threshold. PO amount of $8,550 vs invoice amount of $12,000, resulting in a $3,450 variance.", sourceDoc: "SP_Discrepancy_Report_Nov2025.pdf", sourceLocation: "page 1, line 22", result: "Effective", confidence: "High" },
-      { key: "C", title: "Date within testing period", description: "Transaction date of 11/05/2025 falls within the FY2025 testing period. Report header confirms November 2025 reporting period.", sourceDoc: "SP_Discrepancy_Report_Nov2025.pdf", sourceLocation: "page 1, header", result: "Effective", confidence: "High" },
-      { key: "D", title: "Manager authorization documented", description: "The SAP JE Workflow file for November 2025 appears to be a partial export — the file ends abruptly at page 1 and the workflow approval section is cut off. The approval signature on the SharePoint report (Attribute A) suggests authorization occurred, but I cannot independently verify the SAP workflow without the complete file.", sourceDoc: "SAP_JE_Workflow_Nov2025.pdf (incomplete file — truncated at page 1)", sourceLocation: "page 1", result: "Missing", confidence: "Low" },
+      { key: "A1", title: "SoD matrix completeness", description: "The AR-Invoice + AR-Receipt conflict pair is defined in the SoD conflict matrix (P-114 §4.2, row 104). Both functions mapped correctly to SAP transaction codes and categorized as High risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 104", result: "Effective", confidence: "High" },
+      { key: "A2", title: "Conflict identification", description: "Conflict was detected on 2025-03-22 during automated scan. User L. Wang held both roles since 2024-09-15.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 1,503", result: "Effective", confidence: "High" },
+      { key: "A3", title: "Remediation timeliness", description: "No resolution documentation found on file for this conflict. The role assignment remains active as of the testing date. Unable to verify whether remediation was attempted or a risk acceptance was filed.", sourceDoc: "Resolution_S03_LWang.msg", sourceLocation: "no file located", result: "Missing", confidence: "Low" },
+      { key: "A4", title: "Quarterly review execution", description: "Q3 2025 review package references L. Wang conflict as \"pending remediation\" but no action items were documented. The conflict is listed but not addressed with a remediation plan or risk acceptance.", sourceDoc: "Q3_SoD_Review_Package.pdf", sourceLocation: "page 8, appendix B", result: "Ineffective", confidence: "Medium" },
     ],
   },
 ];
@@ -2689,7 +2690,6 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
         const isManualWaiting = subMode === "manual" && stepStatus === "running" && idx === substepProgress && !manualTriggered?.has(sub.id) && (baseStatus === "pending" || baseStatus === "running");
         const subStatus = isManualWaiting ? "manual-waiting" : isCheckpointHeld ? "checkpoint-held" : baseStatus;
         const SubIcon = sub.icon;
-        const isExpandable = baseStatus === "complete";
         const isExpanded = mergedExpanded.has(sub.id);
         const outputs = isDemo ? (demoSubstepOutputs[sub.id] ?? []) : [];
         const isReadinessAssess = sub.id === "rd-assess";
@@ -2699,6 +2699,8 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
         const evdCollectCompleted = completedTrackerSubs?.has("evd-collect");
         const showInlineUpload = isDemo && sub.id === "pop-ingest" && (baseStatus === "running" || (baseStatus === "complete" && popIngestCompleted));
         const showEvidenceTracker = isDemo && sub.id === "evd-collect" && (baseStatus === "running" || (baseStatus === "complete" && evdCollectCompleted));
+        const hasTrackerContent = (showInlineUpload && (workstreamActive || popIngestCompleted)) || showEvidenceTracker;
+        const isExpandable = baseStatus === "complete" || hasTrackerContent;
         const modeIconInfo = automationModeIcons[subMode];
         const ModeIcon = modeIconInfo.icon;
 
@@ -2787,7 +2789,7 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               </div>
             )}
 
-            {showInlineUpload && (workstreamActive || popIngestCompleted) && (
+            {showInlineUpload && (workstreamActive || popIngestCompleted) && (isExpanded || baseStatus === "running") && (
               <div className="pl-12 pr-3 pb-3 pt-1">
                 <AgenticStepTracker
                   title="Workstream Request"
@@ -2798,7 +2800,7 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               </div>
             )}
 
-            {showEvidenceTracker && (
+            {showEvidenceTracker && (isExpanded || baseStatus === "running") && (
               <div className="pl-12 pr-3 pb-3 pt-1">
                 <EvidenceCollectionTracker
                   onComplete={() => onSubstepAction?.("evd-collect", "tracker-complete")}
@@ -2811,7 +2813,7 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               <div className="pl-12 pr-3 pb-3 pt-1 space-y-2">
                 {isReadinessAssess ? (
                   <ReadinessAssessmentContent stepStatus={stepStatus} rows={isDemo ? demoReadinessRows : undefined} />
-                ) : sub.id === "ae-test" && isDemo ? (
+                ) : isTestingGrid ? (
                   <SampleAttributeTestingGrid samples={demoSampleTestRows} />
                 ) : (
                   outputs.map((table, tIdx) => (
@@ -4155,6 +4157,103 @@ type ControlFocusPageProps = {
   onViewReport?: () => void;
 };
 
+function WorkpaperContent({ controlId }: { controlId: string }) {
+  const wpSections = [
+    {
+      title: "1. Control Overview",
+      rows: [
+        ["Control ID", controlId],
+        ["Control Name", "Segregation of Duties"],
+        ["Category", "IT General Controls"],
+        ["Risk Level", "Critical"],
+        ["Control Owner", "Sarah Chen"],
+        ["PBC Owner", "David Kim"],
+        ["Test Period", "FY2025 Interim (Jan–Jun 2025)"],
+        ["Test Approach", "Automated Control Testing — Full Population + Statistical Sample"],
+      ],
+    },
+    {
+      title: "2. Readiness Assessment",
+      rows: [
+        ["Objective", "Ensure SoD conflict matrix is maintained, conflicts are detected and remediated timely, and periodic reviews are performed"],
+        ["Risk Classification", "High / Preventive"],
+        ["Test Plan", "4 attributes tested across statistical sample of 3 conflict instances"],
+        ["Data Sources", "SoD_Matrix_2025.xlsx, UserAccess_Dec2025.csv, RoleChangeLog_2025.csv, Q1–Q3 SoD Review Packages"],
+      ],
+    },
+    {
+      title: "3. Population & Sampling",
+      rows: [
+        ["Population Source", "SoD conflict matrix — 147 defined conflict pairs across 12 business processes"],
+        ["Active Conflicts Identified", "23 users with active SoD conflicts during the test period"],
+        ["Sampling Method", "Statistical — MUS with 95% confidence, 5% tolerable deviation"],
+        ["Sample Size", "3 conflict instances selected (S01 M. Chen, S02 J. Park, S03 L. Wang)"],
+      ],
+    },
+    {
+      title: "4. Evidence Collection",
+      rows: [
+        ["Documents Collected", "12 files across 4 evidence categories"],
+        ["SoD Matrix", "SoD_Matrix_2025.xlsx (147 conflict pairs, last updated 2025-03-01)"],
+        ["User Access Extracts", "UserAccess_Dec2025.csv (4,218 user-role assignments)"],
+        ["Role Change Logs", "RoleChangeLog_2025.csv (892 changes during test period)"],
+        ["Review Packages", "Q1, Q2, Q3 SoD Review Packages (signed by S. Chen, D. Kim, M. Torres)"],
+      ],
+    },
+    {
+      title: "5. Attribute Testing Results",
+      rows: [
+        ["A1: SoD Matrix Completeness", "3/3 Effective — All tested conflict pairs correctly defined and mapped"],
+        ["A2: Conflict Identification", "3/3 Effective — All conflicts detected within quarterly scan cycle"],
+        ["A3: Remediation Timeliness", "1/3 Effective — S01 exceeded 5-day SLA (16 days); S03 no remediation on file"],
+        ["A4: Quarterly Review", "2/3 Effective — S03 conflict listed but not addressed in Q3 review"],
+      ],
+    },
+    {
+      title: "6. Exceptions Identified",
+      rows: [
+        ["Exception 1", "S01 M. Chen — Remediation took 16 days vs. 5-day SLA (A3: Ineffective)"],
+        ["Exception 2", "S03 L. Wang — No remediation documentation; conflict remains open (A3: Missing)"],
+        ["Exception 3", "S03 L. Wang — Quarterly review did not document action plan (A4: Ineffective)"],
+        ["Management Response", "Pending — Escalated to control owner for remediation plan"],
+      ],
+    },
+    {
+      title: "7. Conclusion",
+      rows: [
+        ["Overall Effectiveness", "Ineffective"],
+        ["Confidence Level", "High (83%)"],
+        ["Basis", "2 of 3 samples contain attribute deviations; remediation timeliness (A3) is a systemic gap"],
+        ["Recommendation", "Strengthen remediation tracking process; implement automated SLA monitoring for conflict resolution"],
+        ["Preparer", "Optro Agent — Automated Control Testing"],
+        ["Review Status", "Pending Senior Review"],
+      ],
+    },
+  ];
+
+  return (
+    <>
+      {wpSections.map((section, sIdx) => (
+        <div key={sIdx}>
+          <h3 className="text-xs font-semibold text-foreground mb-2">{section.title}</h3>
+          <div className="border rounded-lg overflow-hidden">
+            <table className="w-full text-xs">
+              <tbody>
+                {section.rows.map(([label, value], rIdx) => (
+                  <tr key={rIdx} className={rIdx % 2 === 0 ? "bg-slate-50 dark:bg-slate-900/30" : "bg-white dark:bg-card"}>
+                    <td className="px-3 py-2 font-medium text-muted-foreground w-[180px] align-top border-r border-slate-100 dark:border-slate-800">{label}</td>
+                    <td className="px-3 py-2 text-foreground">{renderDocLinks(value ?? "")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
 function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResolve, isResolved, onAdvanceStep, onStartWorkflow, onViewReport }: ControlFocusPageProps) {
   const master = masterControlsList.find(c => c.id === controlId);
   const exceptionControlIds = new Set(fieldworkExceptions.map(e => e.controlId));
@@ -4206,6 +4305,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
   const [manualTriggered, setManualTriggered] = useState<Set<string>>(() => new Set());
   const [workstreamActive, setWorkstreamActive] = useState(false);
   const [completedTrackerSubs, setCompletedTrackerSubs] = useState<Set<string>>(() => new Set());
+  const [workpaperOpen, setWorkpaperOpen] = useState(false);
 
   const handleAckCheckpoint = useCallback((substepId: string) => {
     setCheckpointAcked(prev => new Set(prev).add(substepId));
@@ -4305,6 +4405,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       setActionToast("Population data uploaded — validating...");
     } else if (substepId === "pop-ingest" && action === "request") {
       setWorkstreamActive(true);
+      setAutoExpandedSubs(prev => new Set(prev).add("pop-ingest"));
       setActionToast("Initiating workstream request...");
     } else if (substepId === "pop-ingest" && action === "workstream-complete") {
       setWorkstreamActive(false);
@@ -4750,7 +4851,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
 
       {controlStatus && (
         <div className="shrink-0 px-6 py-3 border-t border-slate-200 dark:border-border bg-white dark:bg-card">
-          <div className="w-[80%] max-w-6xl mx-auto flex items-center justify-between">
+          <div className="w-[90%] max-w-6xl mx-auto flex items-center justify-between">
             <Button
               variant="ghost"
               size="sm"
@@ -4770,7 +4871,21 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
                 const currentProg = substepProgress[activeStep] ?? 0;
                 const allSubsDone = currentProg >= totalSubs;
                 if (allSubsDone) {
-                  return (
+                  const isLastStep = activeStep === "testEffectiveness";
+                  return isLastStep ? (
+                    <Button
+                      size="sm"
+                      className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                      onClick={() => {
+                        setWorkpaperOpen(true);
+                        handleStepAction(activeStep, "confirm-step");
+                      }}
+                      data-testid={`button-generate-workpaper-${controlId}`}
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      Generate Workpaper
+                    </Button>
+                  ) : (
                     <Button
                       size="sm"
                       className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
@@ -4854,6 +4969,35 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       )}
     </div>
     <ControlUtilityPanel controlId={controlId} controlStatus={controlStatus} substepProgress={substepProgress} onUploadPopulation={() => handleSubstepAction("pop-ingest", "upload")} onRequestWorkstream={() => handleSubstepAction("pop-ingest", "request")} workstreamActive={workstreamActive} />
+
+    <Dialog open={workpaperOpen} onOpenChange={setWorkpaperOpen}>
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <FileText className="w-4 h-4 text-[#266C92]" />
+            Automated Control Testing Workpaper
+          </DialogTitle>
+          <DialogDescription className="text-xs">
+            {controlId} — Segregation of Duties &middot; FY2025 Interim Testing
+          </DialogDescription>
+        </DialogHeader>
+        <DialogBody className="overflow-y-auto flex-1 space-y-5 text-sm pr-2">
+          <WorkpaperContent controlId={controlId} />
+        </DialogBody>
+        <DialogFooter className="flex items-center justify-between border-t pt-3">
+          <span className="text-[11px] text-muted-foreground">Generated {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setWorkpaperOpen(false)} data-testid="button-workpaper-close">
+              Close
+            </Button>
+            <Button size="sm" className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white" data-testid="button-workpaper-export">
+              <Download className="w-3.5 h-3.5" />
+              Export
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
     </div>
   );
 }
