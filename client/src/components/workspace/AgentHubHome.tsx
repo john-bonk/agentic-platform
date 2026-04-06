@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback, useEffect } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect, lazy, Suspense } from "react";
 import { useSettings } from "@/components/settings-panel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -88,6 +88,7 @@ import {
 } from "@/config/agentHubConfig";
 import { WorkflowSession, ExecutiveReportView, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, fieldworkExceptions, fieldworkNextStepActions, masterControlsList, fieldworkStepOrder, DEMO_CONTROL_ID, type WorkflowSessionConfig, type ControlWorkflowStatus, type FieldworkException } from "./WorkflowSession";
 import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
+const AnnotationOverlay = lazy(() => import("./AnnotationOverlay"));
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
   "direct-realtime": Zap,
@@ -2321,6 +2322,7 @@ function SampleAttributeTestingGrid({ samples }: { samples: SampleTestRow[] }) {
   const [overrideAttr, setOverrideAttr] = useState<string | null>(null);
   const [overrideValues, setOverrideValues] = useState<Record<string, { result: string; rationale: string }>>({});
   const [appliedOverrides, setAppliedOverrides] = useState<Record<string, { result: string; rationale: string }>>({});
+  const [annotationTarget, setAnnotationTarget] = useState<{ sampleId: string; attrKey: string } | null>(null);
 
   const resultColor = (r: string) =>
     r === "Effective" ? "text-emerald-600 dark:text-emerald-400" :
@@ -2386,8 +2388,13 @@ function SampleAttributeTestingGrid({ samples }: { samples: SampleTestRow[] }) {
                   const applied = appliedOverrides[overrideKey];
                   const displayResult = applied ? applied.result : attr?.result;
                   return (
-                    <div key={a.key} className="px-2 py-3 flex flex-col items-center justify-center gap-0.5">
-                      <span className={`text-[11px] font-semibold ${resultColor(displayResult ?? "")}`}>{displayResult}</span>
+                    <div
+                      key={a.key}
+                      className="px-2 py-3 flex flex-col items-center justify-center gap-0.5 cursor-pointer hover:bg-slate-100/60 dark:hover:bg-muted/20 rounded transition-colors"
+                      onClick={(e) => { e.stopPropagation(); setAnnotationTarget({ sampleId: sample.id, attrKey: a.key }); }}
+                      data-testid={`cell-annotate-${sample.id}-${a.key}`}
+                    >
+                      <span className={`text-[11px] font-semibold underline decoration-dotted underline-offset-2 ${resultColor(displayResult ?? "")}`}>{displayResult}</span>
                       <span className={`text-[9px] ${confidenceColor(attr?.confidence ?? "")}`}>{attr?.confidence}</span>
                     </div>
                   );
@@ -2503,6 +2510,17 @@ function SampleAttributeTestingGrid({ samples }: { samples: SampleTestRow[] }) {
           );
         })}
       </div>
+      {annotationTarget && (
+        <Suspense fallback={null}>
+          <AnnotationOverlay
+            samples={samples}
+            initialSampleId={annotationTarget.sampleId}
+            initialAttributeKey={annotationTarget.attrKey}
+            controlId={DEMO_CONTROL_ID}
+            onClose={() => setAnnotationTarget(null)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
