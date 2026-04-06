@@ -2120,7 +2120,7 @@ function renderDocLinks(text: string, className?: string) {
 }
 
 type AttributeResult = {
-  result: "Effective" | "Ineffective" | "Missing";
+  result: "Effective" | "Ineffective" | "Missing" | "N/A";
   confidence: "High" | "Medium" | "Low";
 };
 
@@ -2130,7 +2130,7 @@ type SampleAttributeDetail = {
   description: string;
   sourceDoc: string;
   sourceLocation: string;
-  result: "Effective" | "Ineffective" | "Missing";
+  result: "Effective" | "Ineffective" | "Missing" | "N/A";
   confidence: "High" | "Medium" | "Low";
 };
 
@@ -2145,58 +2145,173 @@ type SampleTestRow = {
 
 const testingAttributes = [
   { key: "A1", label: "A1: Matrix" },
-  { key: "A2", label: "A2: Detection" },
+  { key: "A2", label: "A2: Identification" },
   { key: "A3", label: "A3: Remediation" },
   { key: "A4", label: "A4: Review" },
+  { key: "A5", label: "A5: Exception" },
 ];
 
 const demoSampleTestRows: SampleTestRow[] = [
   {
-    id: "s01", label: "S01 — M. Chen", subtitle: "AP-Create + AP-Approve",
+    id: "s01", label: "S01 — AP-Create × AP-Approve", subtitle: "Finance / U-1204 / Critical",
     attributes: {
       A1: { result: "Effective", confidence: "High" },
       A2: { result: "Effective", confidence: "High" },
       A3: { result: "Ineffective", confidence: "High" },
       A4: { result: "Effective", confidence: "High" },
+      A5: { result: "N/A", confidence: "High" },
     },
     overall: "Ineffective",
     details: [
-      { key: "A1", title: "SoD matrix completeness", description: "The AP-Create + AP-Approve conflict pair is defined in the SoD conflict matrix (P-114 §4.2, row 47). Both functions are mapped to the correct SAP transaction codes (FB01, FK01) and the conflict is categorized as High risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 47", result: "Effective", confidence: "High" },
-      { key: "A2", title: "Conflict identification", description: "Conflict was detected on 2025-02-12 during automated SoD scan. User M. Chen held both AP-Create and AP-Approve roles since 2024-08-14 — a 182-day exposure window. Detection occurred within the quarterly scan cycle.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 1,247", result: "Effective", confidence: "High" },
-      { key: "A3", title: "Remediation timeliness", description: "AP-Approve role was removed on 2025-02-28, 16 calendar days after detection. Policy P-114 §6.1 requires remediation within 5 business days. The 16-day remediation period exceeds the SLA by 11 days.", sourceDoc: "RoleChangeLog_2025.csv", sourceLocation: "change ID RC-2025-0284", result: "Ineffective", confidence: "High" },
-      { key: "A4", title: "Quarterly review execution", description: "Q1 2025 quarterly review (April 15, 2025) confirmed the M. Chen conflict was remediated. Review package signed by S. Chen, D. Kim, and M. Torres. Remediation verified as sustained.", sourceDoc: "Q1_SoD_Review_Package.pdf", sourceLocation: "page 4, item 3", result: "Effective", confidence: "High" },
+      { key: "A1", title: "SoD matrix completeness", description: "AP-Create × AP-Approve conflict pair is defined in the SoD conflict matrix (P-114 §4.2, row 47). Both functions mapped to SAP transaction codes FB01 and FK01. Conflict categorized as Critical risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 47", result: "Effective", confidence: "High" },
+      { key: "A2", title: "Conflict identification accuracy", description: "Conflict detected on 2025-02-12 during automated SoD scan. User U-1204 held both AP-Create and AP-Approve roles since 2024-08-14 — 182-day exposure window. Detection confirmed within quarterly scan cycle.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 1,247", result: "Effective", confidence: "High" },
+      { key: "A3", title: "Remediation timeliness", description: "AP-Approve role removed on 2025-02-28, 16 calendar days after detection. P-114 §6.1 requires remediation within 5 business days. The 16-day remediation period exceeds SLA by 11 days.", sourceDoc: "RoleChangeLog_2025.csv", sourceLocation: "change ID RC-2025-0284", result: "Ineffective", confidence: "High" },
+      { key: "A4", title: "Quarterly review sign-off", description: "Q1 2025 quarterly review (April 15, 2025) confirmed this conflict was remediated. Review package signed by S. Chen, D. Kim, and M. Torres.", sourceDoc: "Q1_SoD_Review_Package.pdf", sourceLocation: "page 4, item 3", result: "Effective", confidence: "High" },
+      { key: "A5", title: "Exception approval", description: "N/A — Conflict was remediated (not accepted). No risk acceptance required.", sourceDoc: "", sourceLocation: "", result: "N/A", confidence: "High" },
     ],
   },
   {
-    id: "s02", label: "S02 — J. Park", subtitle: "GL-Post + GL-Review",
+    id: "s02", label: "S02 — GL-Post × GL-Review", subtitle: "Accounting / U-0887 / Medium",
     attributes: {
       A1: { result: "Effective", confidence: "High" },
       A2: { result: "Effective", confidence: "High" },
       A3: { result: "Effective", confidence: "High" },
       A4: { result: "Effective", confidence: "High" },
+      A5: { result: "N/A", confidence: "High" },
     },
     overall: "Effective",
     details: [
-      { key: "A1", title: "SoD matrix completeness", description: "The GL-Post + GL-Review conflict pair is defined in the SoD conflict matrix (P-114 §4.2, row 82). Both functions are mapped correctly and categorized as Medium risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 82", result: "Effective", confidence: "High" },
-      { key: "A2", title: "Conflict identification", description: "Conflict was detected on 2025-01-10 during automated SoD scan. User J. Park held both roles since 2024-11-01. Detection was timely within the scanning cycle.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 2,891", result: "Effective", confidence: "High" },
-      { key: "A3", title: "Remediation timeliness", description: "GL-Review role was reassigned on 2025-01-15, 5 calendar days after detection. This is within the policy SLA of 5 business days.", sourceDoc: "RoleChangeLog_2025.csv", sourceLocation: "change ID RC-2025-0112", result: "Effective", confidence: "High" },
-      { key: "A4", title: "Quarterly review execution", description: "Q1 2025 quarterly review confirmed remediation. All required attendees present and sign-off documented.", sourceDoc: "Q1_SoD_Review_Package.pdf", sourceLocation: "page 6, item 7", result: "Effective", confidence: "High" },
+      { key: "A1", title: "SoD matrix completeness", description: "GL-Post × GL-Review conflict pair defined in conflict matrix (P-114 §4.2, row 82). Both functions mapped correctly. Categorized as Medium risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 82", result: "Effective", confidence: "High" },
+      { key: "A2", title: "Conflict identification accuracy", description: "Conflict detected on 2025-01-10 during automated scan. User U-0887 held both roles since 2024-11-01. Detection timely within scanning cycle.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 2,891", result: "Effective", confidence: "High" },
+      { key: "A3", title: "Remediation timeliness", description: "GL-Review role reassigned on 2025-01-15, 5 calendar days after detection. Within P-114 §6.1 SLA of 5 business days.", sourceDoc: "RoleChangeLog_2025.csv", sourceLocation: "change ID RC-2025-0112", result: "Effective", confidence: "High" },
+      { key: "A4", title: "Quarterly review sign-off", description: "Q1 2025 quarterly review confirmed remediation sustained. All required attendees present and sign-off documented.", sourceDoc: "Q1_SoD_Review_Package.pdf", sourceLocation: "page 6, item 7", result: "Effective", confidence: "High" },
+      { key: "A5", title: "Exception approval", description: "N/A — Conflict remediated. No risk acceptance required.", sourceDoc: "", sourceLocation: "", result: "N/A", confidence: "High" },
     ],
   },
   {
-    id: "s03", label: "S03 — L. Wang", subtitle: "AR-Invoice + AR-Receipt",
+    id: "s03", label: "S03 — AR-Invoice × AR-Receipt", subtitle: "Revenue / U-2103 / High",
     attributes: {
       A1: { result: "Effective", confidence: "High" },
       A2: { result: "Effective", confidence: "High" },
       A3: { result: "Missing", confidence: "Low" },
       A4: { result: "Ineffective", confidence: "Medium" },
+      A5: { result: "Missing", confidence: "Low" },
     },
     overall: "Incomplete",
     details: [
-      { key: "A1", title: "SoD matrix completeness", description: "The AR-Invoice + AR-Receipt conflict pair is defined in the SoD conflict matrix (P-114 §4.2, row 104). Both functions mapped correctly to SAP transaction codes and categorized as High risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 104", result: "Effective", confidence: "High" },
-      { key: "A2", title: "Conflict identification", description: "Conflict was detected on 2025-03-22 during automated scan. User L. Wang held both roles since 2024-09-15.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 1,503", result: "Effective", confidence: "High" },
-      { key: "A3", title: "Remediation timeliness", description: "No resolution documentation found on file for this conflict. The role assignment remains active as of the testing date. Unable to verify whether remediation was attempted or a risk acceptance was filed.", sourceDoc: "Resolution_S03_LWang.msg", sourceLocation: "no file located", result: "Missing", confidence: "Low" },
-      { key: "A4", title: "Quarterly review execution", description: "Q3 2025 review package references L. Wang conflict as \"pending remediation\" but no action items were documented. The conflict is listed but not addressed with a remediation plan or risk acceptance.", sourceDoc: "Q3_SoD_Review_Package.pdf", sourceLocation: "page 8, appendix B", result: "Ineffective", confidence: "Medium" },
+      { key: "A1", title: "SoD matrix completeness", description: "AR-Invoice × AR-Receipt conflict pair defined in matrix (P-114 §4.2, row 104). Mapped to SAP FV70/F-28. Categorized as High risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 104", result: "Effective", confidence: "High" },
+      { key: "A2", title: "Conflict identification accuracy", description: "Conflict detected on 2025-03-22 during automated scan. User U-2103 held both roles since 2024-09-15.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 1,503", result: "Effective", confidence: "High" },
+      { key: "A3", title: "Remediation timeliness", description: "No resolution documentation on file. Role assignment remains active as of testing date. Unable to verify whether remediation was attempted or risk acceptance filed.", sourceDoc: "Resolution_S03.msg", sourceLocation: "no file located", result: "Missing", confidence: "Low" },
+      { key: "A4", title: "Quarterly review sign-off", description: "Q3 2025 review package lists this conflict as \"pending remediation\" but no action items documented. Conflict acknowledged but not addressed with remediation plan or risk acceptance.", sourceDoc: "Q3_SoD_Review_Package.pdf", sourceLocation: "page 8, appendix B", result: "Ineffective", confidence: "Medium" },
+      { key: "A5", title: "Exception approval", description: "No risk acceptance form on file. Conflict has neither been remediated nor formally accepted with compensating controls.", sourceDoc: "", sourceLocation: "", result: "Missing", confidence: "Low" },
+    ],
+  },
+  {
+    id: "s04", label: "S04 — UserAdmin × FinApprove", subtitle: "IT/Finance / U-0412 / Critical",
+    attributes: {
+      A1: { result: "Effective", confidence: "High" },
+      A2: { result: "Effective", confidence: "High" },
+      A3: { result: "N/A", confidence: "High" },
+      A4: { result: "Effective", confidence: "High" },
+      A5: { result: "Effective", confidence: "High" },
+    },
+    overall: "Effective",
+    details: [
+      { key: "A1", title: "SoD matrix completeness", description: "UserAdmin × FinApprove conflict defined in matrix (P-114 §4.2, row 12). Cross-functional IT/Finance conflict. Categorized as Critical risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 12", result: "Effective", confidence: "High" },
+      { key: "A2", title: "Conflict identification accuracy", description: "Conflict detected on 2025-01-18. User U-0412 held both roles since 2024-06-01. Detection confirmed against approved SoD rule set.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 412", result: "Effective", confidence: "High" },
+      { key: "A3", title: "Remediation timeliness", description: "N/A — Conflict was formally accepted with compensating controls rather than remediated.", sourceDoc: "", sourceLocation: "", result: "N/A", confidence: "High" },
+      { key: "A4", title: "Quarterly review sign-off", description: "Q1 2025 review confirmed the accepted risk and compensating controls remain in place. Sign-off by S. Chen and D. Kim.", sourceDoc: "Q1_SoD_Review_Package.pdf", sourceLocation: "page 8, item 12", result: "Effective", confidence: "High" },
+      { key: "A5", title: "Exception approval", description: "Risk acceptance RF-2025-001 on file. Signed by Controller and CIO. Compensating control: dual-approval workflow for all financial transactions by U-0412.", sourceDoc: "RiskAcceptance_RF-2025-001.pdf", sourceLocation: "page 1–2", result: "Effective", confidence: "High" },
+    ],
+  },
+  {
+    id: "s05", label: "S05 — VendorMaster × AP-Create", subtitle: "Procurement / U-1567 / High",
+    attributes: {
+      A1: { result: "Effective", confidence: "High" },
+      A2: { result: "Effective", confidence: "High" },
+      A3: { result: "Effective", confidence: "High" },
+      A4: { result: "Effective", confidence: "High" },
+      A5: { result: "N/A", confidence: "High" },
+    },
+    overall: "Effective",
+    details: [
+      { key: "A1", title: "SoD matrix completeness", description: "VendorMaster × AP-Create conflict pair defined in matrix (P-114 §4.2, row 53). Mapped to SAP XK01/FB01. Categorized as High risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 53", result: "Effective", confidence: "High" },
+      { key: "A2", title: "Conflict identification accuracy", description: "Conflict detected on 2025-03-01 during automated scan. User U-1567 held both roles since 2025-01-15.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 1,567", result: "Effective", confidence: "High" },
+      { key: "A3", title: "Remediation timeliness", description: "VendorMaster role removed on 2025-03-04, 3 calendar days after detection. Within SLA.", sourceDoc: "RoleChangeLog_2025.csv", sourceLocation: "change ID RC-2025-0341", result: "Effective", confidence: "High" },
+      { key: "A4", title: "Quarterly review sign-off", description: "Q1 2025 review confirmed remediation. Documented in review package.", sourceDoc: "Q1_SoD_Review_Package.pdf", sourceLocation: "page 5, item 5", result: "Effective", confidence: "High" },
+      { key: "A5", title: "Exception approval", description: "N/A — Conflict remediated. No risk acceptance required.", sourceDoc: "", sourceLocation: "", result: "N/A", confidence: "High" },
+    ],
+  },
+  {
+    id: "s08", label: "S08 — GL-Close × GL-Adjust", subtitle: "Accounting / U-0991 / Critical",
+    attributes: {
+      A1: { result: "Effective", confidence: "High" },
+      A2: { result: "Effective", confidence: "High" },
+      A3: { result: "Ineffective", confidence: "High" },
+      A4: { result: "Effective", confidence: "High" },
+      A5: { result: "N/A", confidence: "High" },
+    },
+    overall: "Ineffective",
+    details: [
+      { key: "A1", title: "SoD matrix completeness", description: "GL-Close × GL-Adjust conflict pair defined in matrix (P-114 §4.2, row 91). Both functions mapped to SAP F.05/FB02. Categorized as Critical risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 91", result: "Effective", confidence: "High" },
+      { key: "A2", title: "Conflict identification accuracy", description: "Conflict detected on 2025-04-02 during automated scan. User U-0991 held both roles since 2024-12-01.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 991", result: "Effective", confidence: "High" },
+      { key: "A3", title: "Remediation timeliness", description: "GL-Adjust role removed on 2025-04-10, 8 calendar days after detection. Exceeds P-114 §6.1 SLA of 5 business days by 3 days.", sourceDoc: "RoleChangeLog_2025.csv", sourceLocation: "change ID RC-2025-0489", result: "Ineffective", confidence: "High" },
+      { key: "A4", title: "Quarterly review sign-off", description: "Q2 2025 review confirmed remediation. Sign-off documented by S. Chen and D. Kim.", sourceDoc: "Q2_SoD_Review_Package.pdf", sourceLocation: "page 3, item 2", result: "Effective", confidence: "High" },
+      { key: "A5", title: "Exception approval", description: "N/A — Conflict remediated. No risk acceptance required.", sourceDoc: "", sourceLocation: "", result: "N/A", confidence: "High" },
+    ],
+  },
+  {
+    id: "s12", label: "S12 — PO-Create × PO-Approve", subtitle: "Procurement / U-2450 / High",
+    attributes: {
+      A1: { result: "Effective", confidence: "High" },
+      A2: { result: "Effective", confidence: "High" },
+      A3: { result: "Effective", confidence: "High" },
+      A4: { result: "Effective", confidence: "High" },
+      A5: { result: "N/A", confidence: "High" },
+    },
+    overall: "Effective",
+    details: [
+      { key: "A1", title: "SoD matrix completeness", description: "PO-Create × PO-Approve conflict pair defined in matrix (P-114 §4.2, row 68). Mapped to SAP ME21N/ME28. Categorized as High risk.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 68", result: "Effective", confidence: "High" },
+      { key: "A2", title: "Conflict identification accuracy", description: "Conflict detected on 2025-05-15 during automated scan. User U-2450 held both roles since 2025-02-01.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 2,450", result: "Effective", confidence: "High" },
+      { key: "A3", title: "Remediation timeliness", description: "PO-Approve role removed on 2025-05-17, 2 calendar days after detection. Within SLA.", sourceDoc: "RoleChangeLog_2025.csv", sourceLocation: "change ID RC-2025-0612", result: "Effective", confidence: "High" },
+      { key: "A4", title: "Quarterly review sign-off", description: "Q2 2025 review confirmed remediation sustained.", sourceDoc: "Q2_SoD_Review_Package.pdf", sourceLocation: "page 7, item 9", result: "Effective", confidence: "High" },
+      { key: "A5", title: "Exception approval", description: "N/A — Conflict remediated.", sourceDoc: "", sourceLocation: "", result: "N/A", confidence: "High" },
+    ],
+  },
+  {
+    id: "s14", label: "S14 — AssetMgmt × AssetDisposal", subtitle: "Fixed Assets / U-1823 / Medium",
+    attributes: {
+      A1: { result: "Ineffective", confidence: "High" },
+      A2: { result: "Ineffective", confidence: "Medium" },
+      A3: { result: "Missing", confidence: "Low" },
+      A4: { result: "Effective", confidence: "High" },
+      A5: { result: "Missing", confidence: "Low" },
+    },
+    overall: "Ineffective",
+    details: [
+      { key: "A1", title: "SoD matrix completeness", description: "AssetMgmt × AssetDisposal is listed in matrix but mapped to legacy transaction codes (AS01/AS91) that were deprecated in the 2024 SAP upgrade. Current codes (ABAVN/AS02) are not reflected.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 131", result: "Ineffective", confidence: "High" },
+      { key: "A2", title: "Conflict identification accuracy", description: "Conflict detection date in the SoD scan log (2025-04-18) does not match the role assignment date in UserAccess extract (2025-03-01). 48-day gap suggests the conflict was not detected until the next quarterly scan rather than the weekly automated scan.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 1,823", result: "Ineffective", confidence: "Medium" },
+      { key: "A3", title: "Remediation timeliness", description: "No resolution documentation on file. Conflict resolution docs not among the 12/25 received. Unable to determine remediation status.", sourceDoc: "Resolution_S14.msg", sourceLocation: "no file located", result: "Missing", confidence: "Low" },
+      { key: "A4", title: "Quarterly review sign-off", description: "Q2 2025 review package references this conflict. Listed under \"pending investigation.\" Review sign-off obtained.", sourceDoc: "Q2_SoD_Review_Package.pdf", sourceLocation: "page 10, appendix C", result: "Effective", confidence: "High" },
+      { key: "A5", title: "Exception approval", description: "No risk acceptance form on file. Conflict has neither been remediated nor formally accepted.", sourceDoc: "", sourceLocation: "", result: "Missing", confidence: "Low" },
+    ],
+  },
+  {
+    id: "s21", label: "S21 — PayrollRun × PayrollApprove", subtitle: "HR-Payroll / U-3102 / Critical",
+    attributes: {
+      A1: { result: "Ineffective", confidence: "High" },
+      A2: { result: "Ineffective", confidence: "High" },
+      A3: { result: "N/A", confidence: "High" },
+      A4: { result: "Ineffective", confidence: "High" },
+      A5: { result: "N/A", confidence: "High" },
+    },
+    overall: "Ineffective",
+    details: [
+      { key: "A1", title: "SoD matrix completeness", description: "PayrollRun × PayrollApprove uses role R-LEGACY which is flagged as an orphaned role not in the official role registry. The matrix row exists (row 144) but the role definition is incomplete — no mapped SAP transaction codes.", sourceDoc: "SoD_Matrix_2025.xlsx", sourceLocation: "row 144", result: "Ineffective", confidence: "High" },
+      { key: "A2", title: "Conflict identification accuracy", description: "Conflict was not detected by the automated SoD scan because R-LEGACY is excluded from the scan rule set. Conflict identified only during manual population review in this audit.", sourceDoc: "UserAccess_Dec2025.csv", sourceLocation: "record 3,102", result: "Ineffective", confidence: "High" },
+      { key: "A3", title: "Remediation timeliness", description: "N/A — Conflict was not detected by the control, so remediation SLA does not apply. Newly identified during audit.", sourceDoc: "", sourceLocation: "", result: "N/A", confidence: "High" },
+      { key: "A4", title: "Quarterly review sign-off", description: "Conflict does not appear in any quarterly review package (Q1–Q3). The orphaned role was not visible to the review process.", sourceDoc: "Q3_SoD_Review_Package.pdf", sourceLocation: "not found", result: "Ineffective", confidence: "High" },
+      { key: "A5", title: "Exception approval", description: "N/A — Conflict newly identified. No prior risk acceptance exists.", sourceDoc: "", sourceLocation: "", result: "N/A", confidence: "High" },
     ],
   },
 ];
@@ -2209,11 +2324,13 @@ function SampleAttributeTestingGrid({ samples }: { samples: SampleTestRow[] }) {
 
   const resultColor = (r: string) =>
     r === "Effective" ? "text-emerald-600 dark:text-emerald-400" :
+    r === "N/A" ? "text-slate-400 dark:text-slate-500" :
     r === "Ineffective" ? "text-red-600 dark:text-red-400" :
     "text-red-500 dark:text-red-400";
 
   const resultBg = (r: string) =>
     r === "Effective" ? "bg-emerald-50 dark:bg-emerald-900/10" :
+    r === "N/A" ? "bg-slate-50 dark:bg-slate-900/10" :
     r === "Ineffective" ? "bg-red-50 dark:bg-red-900/10" :
     "bg-amber-50 dark:bg-amber-900/10";
 
@@ -2239,7 +2356,7 @@ function SampleAttributeTestingGrid({ samples }: { samples: SampleTestRow[] }) {
   return (
     <div className="space-y-0" data-testid="sample-attribute-grid">
       <div className="rounded-lg border border-slate-200 dark:border-border overflow-hidden">
-        <div className="grid grid-cols-[minmax(160px,1.5fr)_repeat(4,1fr)_100px] border-b border-slate-200 dark:border-border bg-slate-50 dark:bg-muted/30">
+        <div className="grid grid-cols-[minmax(160px,1.5fr)_repeat(5,1fr)_100px] border-b border-slate-200 dark:border-border bg-slate-50 dark:bg-muted/30">
           <div className="px-3 py-2.5 text-[10px] font-semibold text-foreground uppercase tracking-wider">Sample</div>
           {testingAttributes.map(a => (
             <div key={a.key} className="px-2 py-2.5 text-[10px] font-semibold text-foreground uppercase tracking-wider text-center">{a.label}</div>
@@ -2253,7 +2370,7 @@ function SampleAttributeTestingGrid({ samples }: { samples: SampleTestRow[] }) {
             <div key={sample.id} data-testid={`sample-row-${sample.id}`}>
               <button
                 onClick={() => setExpandedRow(isExpanded ? null : sample.id)}
-                className={`w-full grid grid-cols-[minmax(160px,1.5fr)_repeat(4,1fr)_100px] border-b border-slate-100 dark:border-border/50 hover:bg-slate-50/80 dark:hover:bg-muted/10 transition-colors ${isExpanded ? "bg-slate-50/60 dark:bg-muted/10" : ""}`}
+                className={`w-full grid grid-cols-[minmax(160px,1.5fr)_repeat(5,1fr)_100px] border-b border-slate-100 dark:border-border/50 hover:bg-slate-50/80 dark:hover:bg-muted/10 transition-colors ${isExpanded ? "bg-slate-50/60 dark:bg-muted/10" : ""}`}
                 data-testid={`button-expand-sample-${sample.id}`}
               >
                 <div className="px-3 py-3 flex items-center gap-2 text-left">
@@ -2305,12 +2422,14 @@ function SampleAttributeTestingGrid({ samples }: { samples: SampleTestRow[] }) {
                                 </div>
                               </div>
                               <p className="text-[11px] text-muted-foreground leading-relaxed">{detail.description}</p>
-                              <div className="flex items-center gap-1 mt-1">
-                                <FileText className="w-3 h-3 text-[#266C92] shrink-0" />
-                                <a href="#" onClick={(e) => e.preventDefault()} className="text-[10px] text-[#266C92] underline decoration-dotted underline-offset-2 hover:decoration-solid cursor-pointer" data-testid={`link-source-${sample.id}-${detail.key}`}>
-                                  {detail.sourceDoc}, {detail.sourceLocation}
-                                </a>
-                              </div>
+                              {detail.sourceDoc && (
+                                <div className="flex items-center gap-1 mt-1">
+                                  <FileText className="w-3 h-3 text-[#266C92] shrink-0" />
+                                  <a href="#" onClick={(e) => e.preventDefault()} className="text-[10px] text-[#266C92] underline decoration-dotted underline-offset-2 hover:decoration-solid cursor-pointer" data-testid={`link-source-${sample.id}-${detail.key}`}>
+                                    {detail.sourceDoc}{detail.sourceLocation ? `, ${detail.sourceLocation}` : ""}
+                                  </a>
+                                </div>
+                              )}
                               {applied && !isOverriding && (
                                 <div className="mt-1.5 p-2 rounded bg-amber-50/80 dark:bg-amber-900/10 border border-amber-200/50 dark:border-amber-800/30">
                                   <p className="text-[10px] text-amber-700 dark:text-amber-400"><span className="font-semibold">Override applied:</span> {applied.result} — {applied.rationale}</p>
@@ -2343,6 +2462,7 @@ function SampleAttributeTestingGrid({ samples }: { samples: SampleTestRow[] }) {
                                       <option value="Effective">Effective</option>
                                       <option value="Ineffective">Ineffective</option>
                                       <option value="Missing">Missing</option>
+                                      <option value="N/A">N/A</option>
                                     </select>
                                   </div>
                                   <input
@@ -3057,11 +3177,11 @@ function getControlDetail(controlId: string): ControlDetailInfo | null {
       finApplications: "Okta IAM, SAP ERP",
       testTypes: ["Inspection", "Inquiry"],
       attributes: [
-        { ref: "A", name: "SoD matrix completeness", desc: "Verify the conflict matrix covers all critical function pairs across in-scope systems" },
-        { ref: "B", name: "Conflict identification accuracy", desc: "Confirm that identified conflicts match the approved SoD rule set definitions" },
-        { ref: "C", name: "Remediation timeliness", desc: "Verify that conflict remediation actions are completed within the 30-day SLA" },
-        { ref: "D", name: "Quarterly review sign-off", desc: "Confirm quarterly SoD review is performed and signed off by the control owner" },
-        { ref: "E", name: "Compensating control documentation", desc: "Where conflicts cannot be resolved, verify compensating controls are documented and approved" },
+        { ref: "A1", name: "SoD matrix completeness", desc: "Verify the conflict matrix covers all critical function pairs per P-114 §4.2 across in-scope systems" },
+        { ref: "A2", name: "Conflict identification accuracy", desc: "Confirm that identified user-role conflicts match the approved SoD rule set definitions" },
+        { ref: "A3", name: "Remediation timeliness", desc: "Verify that conflict remediation actions are completed within the 5 business day SLA" },
+        { ref: "A4", name: "Quarterly review sign-off", desc: "Confirm quarterly SoD review is performed and signed off by the control owner" },
+        { ref: "A5", name: "Exception approval", desc: "Where conflicts cannot be resolved, verify risk acceptance is documented and approved" },
       ],
     };
   }
@@ -4177,44 +4297,49 @@ function WorkpaperContent({ controlId }: { controlId: string }) {
       rows: [
         ["Objective", "Ensure SoD conflict matrix is maintained, conflicts are detected and remediated timely, and periodic reviews are performed"],
         ["Risk Classification", "High / Preventive"],
-        ["Test Plan", "4 attributes tested across statistical sample of 3 conflict instances"],
-        ["Data Sources", "SoD_Matrix_2025.xlsx, UserAccess_Dec2025.csv, RoleChangeLog_2025.csv, Q1–Q3 SoD Review Packages"],
+        ["Test Plan", "5 attributes tested across risk-weighted sample of 25 conflict instances"],
+        ["Data Sources", "SoD_Matrix_2025.xlsx, UserAccess_Dec2025.csv, RoleChangeLog_2025.csv, Q1–Q3 SoD Review Packages, RiskAcceptance forms"],
       ],
     },
     {
       title: "3. Population & Sampling",
       rows: [
-        ["Population Source", "SoD conflict matrix — 147 defined conflict pairs across 12 business processes"],
-        ["Active Conflicts Identified", "23 users with active SoD conflicts during the test period"],
-        ["Sampling Method", "Statistical — MUS with 95% confidence, 5% tolerable deviation"],
-        ["Sample Size", "3 conflict instances selected (S01 M. Chen, S02 J. Park, S03 L. Wang)"],
+        ["Population Source", "SoD conflict matrix — 156 defined conflict pairs across 12 business processes"],
+        ["Active Conflicts Identified", "Identified conflicts across 3,421 users via role-permission cross-reference"],
+        ["Sampling Method", "Risk-weighted stratified random (MUS) — 95% confidence, 5% tolerable deviation"],
+        ["Sample Size", "25 conflict instances across 5 strata (Financial Close+AP: 8, AP+AR: 6, IT Admin: 6, Operational: 3, Master Data: 2)"],
+        ["Key Samples", "S01 AP-Create×AP-Approve, S02 GL-Post×GL-Review, S03 AR-Invoice×AR-Receipt, S04 UserAdmin×FinApprove, S05 VendorMaster×AP-Create, ... S25"],
       ],
     },
     {
       title: "4. Evidence Collection",
       rows: [
-        ["Documents Collected", "12 files across 4 evidence categories"],
-        ["SoD Matrix", "SoD_Matrix_2025.xlsx (147 conflict pairs, last updated 2025-03-01)"],
-        ["User Access Extracts", "UserAccess_Dec2025.csv (4,218 user-role assignments)"],
-        ["Role Change Logs", "RoleChangeLog_2025.csv (892 changes during test period)"],
-        ["Review Packages", "Q1, Q2, Q3 SoD Review Packages (signed by S. Chen, D. Kim, M. Torres)"],
+        ["Documents Collected", "68 documents across 6 evidence categories"],
+        ["Access Snapshots", "25/25 user access listing snapshots — UserAccess_Dec2025.csv (3,421 records)"],
+        ["Role Change Logs", "25/25 role assignment change logs — RoleChangeLog_2025.csv (892 changes)"],
+        ["Conflict Resolution Docs", "12/25 resolution documentation received (48% coverage)"],
+        ["Quarterly Reviews", "Q1–Q3 SoD Review Packages received (Q4 pending)"],
+        ["Risk Acceptance Forms", "3 risk acceptance forms — RiskAcceptance_RF-2025-001.pdf, RF-2025-002.pdf, RF-2025-003.pdf"],
+        ["Change Management", "S01, S04 — ServiceNow tickets pending"],
       ],
     },
     {
       title: "5. Attribute Testing Results",
       rows: [
-        ["A1: SoD Matrix Completeness", "3/3 Effective — All tested conflict pairs correctly defined and mapped"],
-        ["A2: Conflict Identification", "3/3 Effective — All conflicts detected within quarterly scan cycle"],
-        ["A3: Remediation Timeliness", "1/3 Effective — S01 exceeded 5-day SLA (16 days); S03 no remediation on file"],
-        ["A4: Quarterly Review", "2/3 Effective — S03 conflict listed but not addressed in Q3 review"],
+        ["A1: SoD Matrix Completeness", "Pass with exceptions — 156/160 function pairs defined; 4 Treasury×IT Admin pairs missing; Workday HR not in scope"],
+        ["A2: Conflict Identification", "22/25 Pass (88%) — 3 failures: S03 no resolution on file, S14 detection date mismatch, S21 orphaned role not detected"],
+        ["A3: Remediation Timeliness", "19/25 Pass (76%) — 6 exceeded 5-day SLA (S01: 16d, S08: 8d, S09: 12d, S14: unknown, S17: 9d, S22: 7d)"],
+        ["A4: Quarterly Review Sign-off", "Q1–Q3 Pass, Q4 evidence not received — 75% coverage"],
+        ["A5: Exception Approval", "3/3 Pass (100%) — All risk acceptance forms documented with compensating controls"],
       ],
     },
     {
       title: "6. Exceptions Identified",
       rows: [
-        ["Exception 1", "S01 M. Chen — Remediation took 16 days vs. 5-day SLA (A3: Ineffective)"],
-        ["Exception 2", "S03 L. Wang — No remediation documentation; conflict remains open (A3: Missing)"],
-        ["Exception 3", "S03 L. Wang — Quarterly review did not document action plan (A4: Ineffective)"],
+        ["EXC-A", "SoD matrix incomplete — 4 function pairs and 1 system (Workday HR) missing from scope (A1)"],
+        ["EXC-B", "Remediation SLA exceeded in 24% of cases (6/25) — avg 7.3 days overrun; Finance dept pattern (A3)"],
+        ["EXC-C", "Q4 quarterly review not performed or evidence not provided (A4)"],
+        ["EXC-D", "S21 PayrollRun×PayrollApprove — Orphaned role R-LEGACY excluded from scan rule set; conflict undetected (A2)"],
         ["Management Response", "Pending — Escalated to control owner for remediation plan"],
       ],
     },
@@ -4222,9 +4347,10 @@ function WorkpaperContent({ controlId }: { controlId: string }) {
       title: "7. Conclusion",
       rows: [
         ["Overall Effectiveness", "Ineffective"],
-        ["Confidence Level", "High (83%)"],
-        ["Basis", "2 of 3 samples contain attribute deviations; remediation timeliness (A3) is a systemic gap"],
-        ["Recommendation", "Strengthen remediation tracking process; implement automated SLA monitoring for conflict resolution"],
+        ["Confidence Level", "Medium-High — 84% evidence collected; Q4 review and 13 resolution docs outstanding"],
+        ["Basis", "3 of 5 attributes failed threshold; remediation timeliness (A3) is a systemic gap across Finance department"],
+        ["Overall Pass Rate", "40% (2/5 attributes passed); Individual sample pass rate: 76% (19/25)"],
+        ["Recommendation", "Strengthen remediation tracking with automated SLA monitoring; update conflict matrix for system coverage; resolve orphaned roles"],
         ["Preparer", "Optro Agent — Automated Control Testing"],
         ["Review Status", "Pending Senior Review"],
       ],
