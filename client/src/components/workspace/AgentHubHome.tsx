@@ -5964,7 +5964,7 @@ function FieldworkComplexHub() {
     <div className="flex flex-col h-full overflow-hidden" data-testid="fieldwork-complex-hub">
       <div className={`flex-1 min-h-0 bg-slate-50 dark:bg-background px-8 py-5 ${hasWorkflow && !auditLogExpanded ? "flex flex-col overflow-hidden" : "overflow-y-auto"}`}>
         {!hasWorkflow ? (
-          <div className="max-w-6xl mx-auto space-y-5" data-testid="fieldwork-hub-empty">
+          <div className="w-[90%] max-w-[1600px] mx-auto space-y-5" data-testid="fieldwork-hub-empty">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Shield className="w-5 h-5 text-[#266C92]" />
@@ -6075,7 +6075,7 @@ function FieldworkComplexHub() {
             </div>
           </div>
         ) : (
-          <div className={`max-w-6xl mx-auto flex flex-col gap-5 ${!auditLogExpanded ? "h-full" : ""}`} data-testid="fieldwork-tracker-view" data-is-complete={isComplete} data-execution-phase={executionPhase} data-control-count={controlStatuses.length}>
+          <div className={`w-[90%] max-w-[1600px] mx-auto flex flex-col gap-5 ${!auditLogExpanded ? "h-full" : ""}`} data-testid="fieldwork-tracker-view" data-is-complete={isComplete} data-execution-phase={executionPhase} data-control-count={controlStatuses.length}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Shield className="w-5 h-5 text-[#266C92]" />
@@ -6295,7 +6295,7 @@ function FieldworkComplexHub() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className={`px-4 pb-4 ${!auditLogExpanded ? "flex-1 min-h-0 overflow-y-auto" : ""}`}>
-                    <div className="grid grid-cols-[1fr_5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem] gap-1 px-2 py-1.5 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
+                    <div className="grid grid-cols-[2fr_5rem_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-1.5 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
                       <span>Control</span>
                       <span>Source</span>
                       <span className="text-center">Readiness</span>
@@ -6322,7 +6322,7 @@ function FieldworkComplexHub() {
                           return (
                             <div
                               key={ctrl.controlId}
-                              className={`grid grid-cols-[1fr_5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
+                              className={`grid grid-cols-[2fr_5rem_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
                               onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                               data-testid={`pipeline-row-${ctrl.controlId}`}
                             >
@@ -6357,7 +6357,7 @@ function FieldworkComplexHub() {
                           return (
                             <div
                               key={ctrl.controlId}
-                              className={`grid grid-cols-[1fr_5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
+                              className={`grid grid-cols-[2fr_5rem_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
                               onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                               data-testid={`pipeline-row-${ctrl.controlId}`}
                             >
