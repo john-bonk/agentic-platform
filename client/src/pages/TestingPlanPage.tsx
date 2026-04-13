@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,14 @@ import {
   Search,
   ClipboardCheck,
   BarChart3,
+  Settings,
+  Info,
+  Sparkles,
+  CalendarClock,
+  TrendingUp,
+  AlertTriangle,
+  Layers,
+  Plus,
 } from "lucide-react";
 import { masterControlsList } from "@/components/workspace/WorkflowSession";
 import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
@@ -57,19 +65,33 @@ const WORKFLOW_STEPS = [
   },
 ];
 
+const SELECTION_FACTORS = [
+  { label: "Audit Period", value: "Q1 2026", icon: CalendarClock },
+  { label: "Risk Threshold", value: "Medium+", icon: TrendingUp },
+  { label: "Prior Exceptions", value: "3 flagged", icon: AlertTriangle },
+  { label: "Coverage Gaps", value: "2 identified", icon: Layers },
+];
+
 export default function TestingPlanPage() {
   const [, setLocation] = useLocation();
   const addProject = useWorkflowSessionStore((s) => s.addProject);
   const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
   const activeProjects = useWorkflowSessionStore((s) => s.activeProjects);
 
+  const [excludedIds, setExcludedIds] = useState<Set<string>>(new Set());
+
+  const activeControls = useMemo(
+    () => masterControlsList.filter((c) => !excludedIds.has(c.id)),
+    [excludedIds]
+  );
+
   const stats = useMemo(() => {
-    const connected = masterControlsList.filter((c) => c.dataSource === "connected").length;
-    const manual = masterControlsList.filter((c) => c.dataSource === "manual").length;
-    const critical = masterControlsList.filter((c) => c.riskLevel === "Critical").length;
+    const connected = activeControls.filter((c) => c.dataSource === "connected").length;
+    const manual = activeControls.filter((c) => c.dataSource === "manual").length;
+    const critical = activeControls.filter((c) => c.riskLevel === "Critical").length;
     const categories = Array.from(new Set(masterControlsList.map((c) => c.category)));
-    return { total: masterControlsList.length, connected, manual, critical, categories };
-  }, []);
+    return { total: activeControls.length, connected, manual, critical, categories };
+  }, [activeControls]);
 
   const groupedControls = useMemo(() => {
     const groups: Record<string, typeof masterControlsList> = {};
@@ -78,6 +100,18 @@ export default function TestingPlanPage() {
       groups[c.category].push(c);
     });
     return groups;
+  }, []);
+
+  const toggleControl = useCallback((id: string) => {
+    setExcludedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   }, []);
 
   const handleConfirmStart = useCallback(async () => {
@@ -121,10 +155,53 @@ export default function TestingPlanPage() {
 
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+
+          <div className="rounded-xl border border-[#266C92]/15 bg-gradient-to-r from-[#266C92]/[0.04] to-transparent p-5" data-testid="selection-callout">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#266C92]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Sparkles className="w-4 h-4 text-[#266C92]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-semibold text-foreground">Dynamically Selected Control Set</span>
+                  <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] border-0">Auto-Configured</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  These {masterControlsList.length} controls were automatically selected based on the current audit period, prior testing results, identified coverage gaps, and risk materiality thresholds defined in your
+                  <button
+                    className="inline-flex items-center gap-0.5 text-[#266C92] hover:underline mx-0.5 font-medium"
+                    onClick={() => {}}
+                    data-testid="link-workflow-config"
+                  >
+                    <Settings className="w-3 h-3" />
+                    workflow configuration
+                  </button>
+                  . Controls with prior exceptions or elevated risk scores are prioritized. You can adjust the selection below before starting.
+                </p>
+                <div className="flex items-center gap-3 mt-3 flex-wrap">
+                  {SELECTION_FACTORS.map((f) => (
+                    <div
+                      key={f.label}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-muted/30 border border-slate-200 dark:border-border text-[10px]"
+                      data-testid={`factor-${f.label.toLowerCase().replace(/\s+/g, "-")}`}
+                    >
+                      <f.icon className="w-3 h-3 text-muted-foreground" />
+                      <span className="text-muted-foreground">{f.label}:</span>
+                      <span className="font-semibold text-foreground">{f.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-4 gap-4" data-testid="stats-grid">
             <div className="p-4 rounded-xl border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10">
               <p className="text-2xl font-bold text-foreground" data-testid="stat-total-controls">{stats.total}</p>
               <p className="text-xs text-muted-foreground mt-0.5">Controls in Scope</p>
+              {excludedIds.size > 0 && (
+                <p className="text-[10px] text-amber-600 dark:text-amber-400 mt-1">{excludedIds.size} removed from default</p>
+              )}
             </div>
             <div className="p-4 rounded-xl border border-slate-200 dark:border-border bg-slate-50/50 dark:bg-muted/10">
               <div className="flex items-center gap-1.5">
@@ -176,55 +253,98 @@ export default function TestingPlanPage() {
           </div>
 
           <div>
-            <h2 className="text-sm font-semibold text-foreground mb-4">Controls in Scope ({stats.total})</h2>
-            <div className="space-y-5">
-              {stats.categories.map((category) => (
-                <div key={category} data-testid={`control-group-${category.replace(/\s+/g, "-").toLowerCase()}`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{category}</span>
-                    <span className="text-[10px] text-muted-foreground">({groupedControls[category]?.length})</span>
-                  </div>
-                  <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
-                    <div className="grid grid-cols-[5rem_1fr_6rem_6rem_8rem] gap-2 px-4 py-2 bg-slate-50 dark:bg-muted/20 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                      <span>ID</span>
-                      <span>Control Name</span>
-                      <span>Risk</span>
-                      <span>Source</span>
-                      <span>System</span>
-                    </div>
-                    {groupedControls[category]?.map((c) => (
-                      <div
-                        key={c.id}
-                        className="grid grid-cols-[5rem_1fr_6rem_6rem_8rem] gap-2 px-4 py-2.5 text-xs items-center border-t border-slate-100 dark:border-border/50"
-                        data-testid={`control-row-${c.id}`}
-                      >
-                        <span className="font-mono text-muted-foreground">{c.id}</span>
-                        <span className="font-medium text-foreground">{c.name}</span>
-                        <Badge
-                          className={`text-[9px] h-4 w-fit ${
-                            c.riskLevel === "Critical"
-                              ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                              : c.riskLevel === "High"
-                              ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                              : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
-                          }`}
-                        >
-                          {c.riskLevel}
-                        </Badge>
-                        <span
-                          className={`text-[10px] ${
-                            c.dataSource === "connected" ? "text-[#266C92]" : "text-slate-500"
-                          }`}
-                        >
-                          {c.dataSource === "connected" ? "⚡ Auto" : "📋 Manual"}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground truncate">{c.system || "—"}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-semibold text-foreground">Controls in Scope</h2>
+                <span className="text-xs text-muted-foreground">({stats.total} of {masterControlsList.length})</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                <Info className="w-3 h-3" />
+                <span>Uncheck to exclude from this run</span>
+              </div>
             </div>
+            <div className="space-y-5">
+              {stats.categories.map((category) => {
+                const catControls = groupedControls[category] || [];
+                const activeInCat = catControls.filter((c) => !excludedIds.has(c.id)).length;
+                return (
+                  <div key={category} data-testid={`control-group-${category.replace(/\s+/g, "-").toLowerCase()}`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{category}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        ({activeInCat}/{catControls.length})
+                      </span>
+                    </div>
+                    <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
+                      <div className="grid grid-cols-[2.5rem_4.5rem_1fr_5.5rem_5.5rem_7rem] gap-2 px-4 py-2 bg-slate-50 dark:bg-muted/20 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        <span></span>
+                        <span>ID</span>
+                        <span>Control Name</span>
+                        <span>Risk</span>
+                        <span>Source</span>
+                        <span>System</span>
+                      </div>
+                      {catControls.map((c) => {
+                        const isIncluded = !excludedIds.has(c.id);
+                        return (
+                          <div
+                            key={c.id}
+                            className={`grid grid-cols-[2.5rem_4.5rem_1fr_5.5rem_5.5rem_7rem] gap-2 px-4 py-2.5 text-xs items-center border-t border-slate-100 dark:border-border/50 transition-opacity ${
+                              !isIncluded ? "opacity-40" : ""
+                            }`}
+                            data-testid={`control-row-${c.id}`}
+                          >
+                            <div className="flex items-center justify-center">
+                              <input
+                                type="checkbox"
+                                checked={isIncluded}
+                                onChange={() => toggleControl(c.id)}
+                                className="w-3.5 h-3.5 rounded border-slate-300 dark:border-slate-600 text-[#266C92] focus:ring-[#266C92] cursor-pointer"
+                                data-testid={`checkbox-${c.id}`}
+                              />
+                            </div>
+                            <span className="font-mono text-muted-foreground">{c.id}</span>
+                            <span className={`font-medium ${isIncluded ? "text-foreground" : "text-muted-foreground line-through"}`}>{c.name}</span>
+                            <Badge
+                              className={`text-[9px] h-4 w-fit ${
+                                c.riskLevel === "Critical"
+                                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                  : c.riskLevel === "High"
+                                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                  : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                              }`}
+                            >
+                              {c.riskLevel}
+                            </Badge>
+                            <span
+                              className={`text-[10px] ${
+                                c.dataSource === "connected" ? "text-[#266C92]" : "text-slate-500"
+                              }`}
+                            >
+                              {c.dataSource === "connected" ? "⚡ Auto" : "📋 Manual"}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground truncate">{c.system || "—"}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {excludedIds.size > 0 && (
+              <div className="mt-4 flex items-center gap-2">
+                <button
+                  onClick={() => setExcludedIds(new Set())}
+                  className="text-[11px] text-[#266C92] hover:underline font-medium flex items-center gap-1"
+                  data-testid="button-reset-selection"
+                >
+                  <Plus className="w-3 h-3" />
+                  Reset to recommended set ({masterControlsList.length})
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -239,14 +359,22 @@ export default function TestingPlanPage() {
           >
             Cancel
           </Button>
-          <Button
-            onClick={handleConfirmStart}
-            className="bg-[#266C92] hover:bg-[#1e5a7a] text-white text-sm px-6"
-            data-testid="button-confirm-start"
-          >
-            Confirm & Start Workflow
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          <div className="flex items-center gap-3">
+            {excludedIds.size > 0 && (
+              <span className="text-[11px] text-amber-600 dark:text-amber-400">
+                {excludedIds.size} control{excludedIds.size > 1 ? "s" : ""} excluded
+              </span>
+            )}
+            <Button
+              onClick={handleConfirmStart}
+              disabled={stats.total === 0}
+              className="bg-[#266C92] hover:bg-[#1e5a7a] text-white text-sm px-6 disabled:opacity-50"
+              data-testid="button-confirm-start"
+            >
+              Confirm & Start Workflow
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
