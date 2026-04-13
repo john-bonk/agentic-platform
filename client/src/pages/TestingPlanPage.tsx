@@ -346,6 +346,21 @@ export default function TestingPlanPage() {
                 </button>
               </div>
             )}
+
+            <div className="mt-5 pt-5 border-t border-slate-200 dark:border-border" data-testid="search-additional-controls">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search for additional controls to include..."
+                  className="w-full h-9 pl-9 pr-4 text-xs rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-muted/10 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-[#266C92]/30 focus:border-[#266C92]/40 transition-colors"
+                  data-testid="input-search-controls"
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-1.5 ml-1">
+                Search the full control library to add controls beyond the auto-selected scope
+              </p>
+            </div>
           </div>
         </div>
       </div>

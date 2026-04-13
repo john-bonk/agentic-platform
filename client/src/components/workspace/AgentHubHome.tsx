@@ -5751,11 +5751,17 @@ function FieldworkComplexHub() {
   const isHubVisible = !showCanvas;
 
   const [actionsExpanded, setActionsExpanded] = useState(false);
-  const [systemsExpanded, setSystemsExpanded] = useState(false);
   const [exceptionsModalOpen, setExceptionsModalOpen] = useState(false);
   const [selectedExceptionId, setSelectedExceptionId] = useState<string | null>(null);
   const [nextStepsExpanded, setNextStepsExpanded] = useState(false);
+  const [auditLogExpanded, setAuditLogExpanded] = useState(false);
   const [hubDetailView, setHubDetailView] = useState<string | null>(null);
+  const [resolveDialogOpen, setResolveDialogOpen] = useState(false);
+  const [resolveDialogTarget, setResolveDialogTarget] = useState<{ controlId: string; blockAtStep: string; title: string } | null>(null);
+  const [resolveMode, setResolveMode] = useState<"upload" | "change-pbc" | null>(null);
+  const [resolveFileName, setResolveFileName] = useState("");
+  const [resolvePbcName, setResolvePbcName] = useState("");
+  const [resolvePbcEmail, setResolvePbcEmail] = useState("");
   const resolvedBlocksList = useMemo(() => {
     if (!fieldworkProject) return [] as string[];
     return (fieldworkRuntime?.blockStates?.["fieldwork-execution"]?.resolvedBlocks as string[] | undefined) ?? [];
@@ -5781,7 +5787,7 @@ function FieldworkComplexHub() {
       const currentStatuses = (store.runtimeStates[sid]?.blockStates?.["fieldwork-execution"]?.statuses as ControlWorkflowStatus[] | undefined) ?? [];
       if (currentStatuses.length === 0) return;
       const currentResolved = new Set((store.runtimeStates[sid]?.blockStates?.["fieldwork-execution"]?.resolvedBlocks as string[] | undefined) ?? []);
-      const next = tickFieldworkStatuses(currentStatuses, currentResolved);
+      const next = tickFieldworkStatuses(currentStatuses, currentResolved, true);
       if (next) {
         store.setBlockState(sid, "fieldwork-execution", "statuses", next);
         const allDone = next.every((s) =>
@@ -6016,84 +6022,56 @@ function FieldworkComplexHub() {
               </Card>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-5">
-              <div className="lg:col-span-2 space-y-4">
-                <Card className="border border-slate-200 dark:border-border">
-                  <CardHeader className="pb-2 pt-3 px-4">
-                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
-                      <Workflow className="w-4 h-4" />
-                      Control Pipeline
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-4 pb-4">
-                    <div className="flex flex-col items-center justify-center py-8 text-center">
-                      <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-muted/20 flex items-center justify-center mb-3">
-                        <Shield className="w-6 h-6 text-muted-foreground/40" />
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-1">No active control pipeline</p>
-                      <p className="text-xs text-muted-foreground/60">Launch a workflow to begin automated control testing</p>
+            <div className="space-y-4">
+              <Card className="border border-slate-200 dark:border-border">
+                <CardHeader className="pb-2 pt-3 px-4">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
+                    <Workflow className="w-4 h-4" />
+                    Control Pipeline
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-4 pb-4">
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-muted/20 flex items-center justify-center mb-3">
+                      <Shield className="w-6 h-6 text-muted-foreground/40" />
                     </div>
-                  </CardContent>
-                </Card>
+                    <p className="text-sm text-muted-foreground mb-1">No active control pipeline</p>
+                    <p className="text-xs text-muted-foreground/60">Launch a workflow to begin automated control testing</p>
+                  </div>
+                </CardContent>
+              </Card>
 
-                <Card className="border border-slate-200 dark:border-border">
-                  <CardHeader className="pb-2 pt-3 px-4">
-                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
-                      <AlertTriangle className="w-4 h-4" />
-                      Actions Required
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-4 pb-4">
-                    <p className="text-xs text-muted-foreground/60 py-4 text-center">No actions pending</p>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="border border-slate-200 dark:border-border">
+                <CardHeader className="pb-2 pt-3 px-4">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
+                    <AlertTriangle className="w-4 h-4" />
+                    Actions Required
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-4 pb-4">
+                  <p className="text-xs text-muted-foreground/60 py-4 text-center">No actions pending</p>
+                </CardContent>
+              </Card>
 
-              <div className="space-y-4">
-                <Card className="border border-slate-200 dark:border-border">
-                  <CardHeader className="pb-2 pt-3 px-4">
-                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
-                      <Database className="w-4 h-4" />
-                      Connected Systems
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="px-4 pb-4">
-                    <div className="space-y-2">
-                      {fieldworkSystemStatus.map((sys) => (
-                        <div key={sys.name} className="flex items-center justify-between py-1">
-                          <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#266C92]" />
-                            <span className="text-xs text-foreground">{sys.name}</span>
-                          </div>
-                          <span className="text-[10px] text-muted-foreground">{sys.type}</span>
-                        </div>
-                      ))}
+              <Card className="border border-slate-200 dark:border-border overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-3">
+                  <Bot className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-semibold text-muted-foreground">Optro Assistant: Audit Log</span>
+                </div>
+                <div className="px-4 py-3 bg-[#266C92]/5 dark:bg-[#266C92]/10 border-t border-slate-100 dark:border-border" data-testid="assistant-welcome-bubble-empty">
+                  <div className="flex items-start gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-[#266C92] flex items-center justify-center shrink-0 mt-0.5">
+                      <Bot className="w-3 h-3 text-white" />
                     </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border border-slate-200 dark:border-border overflow-hidden">
-                  <CardHeader className="pb-2 pt-3 px-4 border-b border-slate-100 dark:border-border">
-                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground">
-                      <Bot className="w-4 h-4" />
-                      Optro Assistant
-                    </CardTitle>
-                  </CardHeader>
-                  <div className="px-4 py-3 bg-[#266C92]/5 dark:bg-[#266C92]/10" data-testid="assistant-welcome-bubble-empty">
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-6 h-6 rounded-full bg-[#266C92] flex items-center justify-center shrink-0 mt-0.5">
-                        <Bot className="w-3 h-3 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-semibold text-[#266C92] dark:text-[#4da3c9] mb-0.5">Optro Assistant</p>
-                        <p className="text-[11px] text-foreground leading-relaxed">
-                          Welcome to Automated Control Testing. Launch a workflow to begin — I'll guide you through control selection, data source mapping, and parallel test execution.
-                        </p>
-                      </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-semibold text-[#266C92] dark:text-[#4da3c9] mb-0.5">Optro Assistant</p>
+                      <p className="text-[11px] text-foreground leading-relaxed">
+                        Welcome to Automated Control Testing. Launch a workflow to begin — I'll guide you through control selection, data source mapping, and parallel test execution.
+                      </p>
                     </div>
                   </div>
-                </Card>
-              </div>
+                </div>
+              </Card>
             </div>
           </div>
         ) : (
@@ -6234,7 +6212,14 @@ function FieldworkComplexHub() {
                         <Button
                           size="sm"
                           className="h-6 text-[10px] bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-                          onClick={() => handleResolveAction(action.controlId)}
+                          onClick={() => {
+                            setResolveDialogTarget({ controlId: action.controlId, blockAtStep: action.blockAtStep, title: action.title });
+                            setResolveMode(null);
+                            setResolveFileName("");
+                            setResolvePbcName("");
+                            setResolvePbcEmail("");
+                            setResolveDialogOpen(true);
+                          }}
                           data-testid={`button-resolve-${action.controlId}`}
                         >
                           <CheckCircle2 className="w-3 h-3 mr-1" />
@@ -6300,234 +6285,207 @@ function FieldworkComplexHub() {
               </Card>
             )}
 
-            <div className="grid lg:grid-cols-3 gap-5 flex-1 min-h-0">
-              <div className="lg:col-span-2 min-h-0 flex flex-col">
-                {controlStatuses.length > 0 && (
-                  <Card className="border border-slate-200 dark:border-border flex flex-col min-h-0 flex-1" data-testid="fieldwork-pipeline-card">
-                    <CardHeader className="pb-2 pt-3 px-4 shrink-0">
-                      <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                        <Workflow className="w-4 h-4 text-[#266C92]" />
-                        Control Pipeline
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-y-auto">
-                      <div className="grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
-                        <span>Control</span>
-                        <span>Source</span>
-                        <span className="text-center" title="Readiness">Rdy</span>
-                        <span className="text-center" title="Population Acquisition">Pop</span>
-                        <span className="text-center" title="Sampling">Smp</span>
-                        <span className="text-center" title="Evidence">Evd</span>
-                        <span className="text-center" title="Testing">Tst</span>
-                        <span className="text-center" title="Test Effectiveness">Eff</span>
-                        <span className="text-center" title="Effectiveness Result">Res</span>
-                      </div>
-
-                      <div>
-                      {manualControls.length > 0 && (
-                        <div className="mb-2">
-                          <div className="flex items-center gap-2 px-2 py-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                              PBC Workflow ({manualComplete}/{manualControls.length})
-                            </span>
-                          </div>
-                          {manualControls.map((ctrl) => {
-                            const isBlocked = Object.values(ctrl.steps).some(s => s === "blocked");
-                            const isIneffective = ctrl.steps.testEffectiveness === "complete" && exceptionControlIds.has(ctrl.controlId);
-                            return (
-                              <div
-                                key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
-                                onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
-                                data-testid={`pipeline-row-${ctrl.controlId}`}
-                              >
-                                <div className="flex items-center gap-1.5 min-w-0">
-                                  <span className={`text-[10px] font-mono font-semibold ${isBlocked || isIneffective ? "text-red-500" : "text-foreground"}`}>{ctrl.controlId}</span>
-                                  <span className="text-xs text-foreground truncate">{ctrl.name}</span>
-                                </div>
-                                <span className={`text-[10px] font-medium truncate ${isBlocked ? "text-red-500" : "text-muted-foreground"}`}>{isBlocked ? "Blocked" : "PBC"}</span>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.readiness)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.testEffectiveness)}</div>
-                                <div className="flex justify-center">{effectivenessDot(ctrl)}</div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      {autoControls.length > 0 && (
-                        <div>
-                          <div className="flex items-center gap-2 px-2 py-1.5 border-t border-slate-100 dark:border-border">
-                            <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                              Automated ({autoComplete}/{autoControls.length})
-                            </span>
-                          </div>
-                          {autoControls.map((ctrl) => {
-                            const isIneffective = ctrl.steps.testEffectiveness === "complete" && exceptionControlIds.has(ctrl.controlId);
-                            return (
-                              <div
-                                key={ctrl.controlId}
-                                className={`grid grid-cols-[1fr_5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem_1.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
-                                onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
-                                data-testid={`pipeline-row-${ctrl.controlId}`}
-                              >
-                                <div className="flex items-center gap-1.5 min-w-0">
-                                  <span className={`text-[10px] font-mono font-semibold ${isIneffective ? "text-red-600 dark:text-red-400" : "text-[#266C92]"}`}>{ctrl.controlId}</span>
-                                  <span className="text-xs text-foreground truncate">{ctrl.name}</span>
-                                </div>
-                                <span className="text-[10px] text-muted-foreground font-medium truncate">Connected</span>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.readiness)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
-                                <div className="flex justify-center">{stepDot(ctrl.steps.testEffectiveness)}</div>
-                                <div className="flex justify-center">{effectivenessDot(ctrl)}</div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      </div>
-                    </CardContent>
-                    <div className="flex items-center gap-3 text-[9px] text-muted-foreground px-4 py-2 border-t border-slate-100 dark:border-border shrink-0">
-                      <div className="flex items-center gap-1"><CheckCircle2 className="w-2.5 h-2.5 text-[#266C92]" /><span>Complete</span></div>
-                      <div className="flex items-center gap-1"><Loader2 className="w-2.5 h-2.5 text-[#266C92] animate-spin" /><span>Running</span></div>
-                      <div className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-slate-400" /><span>Waiting</span></div>
-                      <div className="flex items-center gap-1"><AlertCircle className="w-2.5 h-2.5 text-red-500" /><span>Blocked</span></div>
-                      <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full border border-slate-300 dark:border-slate-600" /><span>Pending</span></div>
-                      {isComplete && (
-                        <>
-                          <div className="flex items-center gap-1"><ShieldCheck className="w-2.5 h-2.5 text-[#266C92]" /><span>Effective</span></div>
-                          <div className="flex items-center gap-1"><AlertTriangle className="w-2.5 h-2.5 text-red-500" /><span>Ineffective</span></div>
-                        </>
-                      )}
-                    </div>
-                  </Card>
-                )}
-
-                {controlStatuses.length === 0 && (
-                  <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-config-status">
-                    <CardContent className="p-5">
-                      <div className="flex items-center gap-3 mb-4">
-                        <Workflow className="w-4 h-4 text-[#266C92]" />
-                        <span className="text-sm font-semibold text-foreground">Workflow Configuration</span>
-                        <Badge className="text-xs bg-[#266C92] text-white ml-auto">
-                          Step {activeIndex + 1} of {totalBlocks}
-                        </Badge>
-                      </div>
-                      <div className="flex gap-1 mb-3">
-                        {["Controls", "Data Sources", "PBC Mapping", "Execution", "Next Steps"].map((label, i) => (
-                          <div key={label} className="flex-1 flex flex-col items-center gap-1">
-                            <div className={`w-full h-1 rounded-full transition-all ${completedIndices.has(i) ? "bg-[#266C92]" : i === activeIndex ? "bg-[#266C92]/40" : "bg-slate-200 dark:bg-slate-700"}`} />
-                            <span className={`text-[9px] ${completedIndices.has(i) ? "text-[#266C92] font-medium" : i === activeIndex ? "text-foreground font-medium" : "text-muted-foreground"}`}>{label}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Open the workflow to continue configuring control selection, data sources, and PBC owner mapping before execution begins.
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-
-              <div className="min-h-0 flex flex-col gap-4">
-                <Card className="border border-slate-200 dark:border-border shrink-0" data-testid="fieldwork-systems-card">
-                  <button
-                    onClick={() => setSystemsExpanded(!systemsExpanded)}
-                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50/50 dark:hover:bg-muted/5 transition-colors"
-                    data-testid="button-toggle-systems"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Server className="w-4 h-4 text-[#266C92]" />
-                      <span className="text-sm font-semibold text-foreground">Connected Systems</span>
-                      <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]">{fieldworkSystemStatus.length}</Badge>
-                    </div>
-                    <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${systemsExpanded ? "" : "-rotate-90"}`} />
-                  </button>
-                  {systemsExpanded && (
-                    <CardContent className="px-4 pb-3 pt-0 border-t border-slate-100 dark:border-border">
-                      <div className="space-y-1">
-                        {fieldworkSystemStatus.map((sys) => (
-                          <div key={sys.name} className="flex items-center gap-2 py-1.5 px-2 rounded hover:bg-slate-50 dark:hover:bg-muted/20" data-testid={`system-row-${sys.name}`}>
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#266C92] shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-foreground truncate">{sys.name}</p>
-                              <p className="text-[9px] text-muted-foreground">{sys.type} · {sys.controls} controls</p>
-                            </div>
-                            <span className="text-[9px] text-muted-foreground shrink-0">{sys.lastSync}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  )}
-                </Card>
-
-                <Card className="border border-slate-200 dark:border-border overflow-hidden flex flex-col flex-1 min-h-0" data-testid="fieldwork-activity-card">
-                  <CardHeader className="pb-2 pt-3 px-4 border-b border-slate-100 dark:border-border shrink-0">
+            <div className="flex-1 min-h-0 flex flex-col gap-4">
+              {controlStatuses.length > 0 && (
+                <Card className="border border-slate-200 dark:border-border flex flex-col min-h-0 flex-1" data-testid="fieldwork-pipeline-card">
+                  <CardHeader className="pb-2 pt-3 px-4 shrink-0">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                      <Bot className="w-4 h-4 text-[#266C92]" />
-                      Optro Assistant
+                      <Workflow className="w-4 h-4 text-[#266C92]" />
+                      Control Pipeline
                     </CardTitle>
                   </CardHeader>
-                  <div className="flex-1 min-h-0 overflow-y-auto">
-                    <div className="px-4 py-3 bg-[#266C92]/5 dark:bg-[#266C92]/10 border-b border-slate-100 dark:border-border" data-testid="assistant-welcome-bubble">
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-6 h-6 rounded-full bg-[#266C92] flex items-center justify-center shrink-0 mt-0.5">
-                          <Bot className="w-3 h-3 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[10px] font-semibold text-[#266C92] dark:text-[#4da3c9] mb-0.5">Optro Assistant</p>
-                          <p className="text-[11px] text-foreground leading-relaxed">
-                            {isComplete
-                              ? `Testing complete across all ${totalControls} controls. ${detectedExceptions.length} exception${detectedExceptions.length !== 1 ? "s" : ""} identified — review the findings and next steps below.`
-                              : executionPhase === "running"
-                                ? `Fieldwork execution is underway — ${completedControls} of ${totalControls} controls tested so far.${detectedExceptions.length > 0 ? ` ${detectedExceptions.length} exception${detectedExceptions.length !== 1 ? "s" : ""} detected from completed tests.` : ""} I'll continue running the remaining controls in parallel.`
-                                : executionPhase
-                                  ? `Execution is ${executionPhase}. Open the workflow to continue.`
-                                  : "I've set up the Automated Control Testing workflow. We'll walk through control selection, data sources, and PBC mapping before kicking off parallel execution across all selected controls."}
-                          </p>
-                        </div>
-                      </div>
+                  <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-y-auto">
+                    <div className="grid grid-cols-[1fr_5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem] gap-1 px-2 py-1.5 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
+                      <span>Control</span>
+                      <span>Source</span>
+                      <span className="text-center">Readiness</span>
+                      <span className="text-center">Population</span>
+                      <span className="text-center">Sampling</span>
+                      <span className="text-center">Evidence</span>
+                      <span className="text-center">Testing</span>
+                      <span className="text-center">Effective</span>
+                      <span className="text-center">Result</span>
                     </div>
 
-                    <div className="divide-y divide-slate-100 dark:divide-border">
-                      {fieldworkActivityFeed.map((entry) => (
-                        <div
-                          key={entry.id}
-                          className={`px-4 py-2.5 border-l-2 ${
-                            entry.type === "action-needed"
-                              ? "border-l-red-400"
-                              : entry.type === "warning"
-                                ? "border-l-red-400"
-                                : entry.type === "success"
-                                  ? "border-l-[#266C92]"
-                                  : "border-l-slate-200 dark:border-l-slate-700"
-                          }`}
-                          data-testid={`activity-${entry.id}`}
-                        >
-                          <p className="text-[11px] text-foreground leading-relaxed">{entry.message}</p>
-                          <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
-                            <Bot className="w-2.5 h-2.5" />
-                            <span>{entry.agent}</span>
-                            <span>·</span>
-                            <span>{entry.timestamp}</span>
-                          </div>
+                    <div>
+                    {manualControls.length > 0 && (
+                      <div className="mb-2">
+                        <div className="flex items-center gap-2 px-2 py-1.5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                            PBC Workflow ({manualComplete}/{manualControls.length})
+                          </span>
+                        </div>
+                        {manualControls.map((ctrl) => {
+                          const isBlocked = Object.values(ctrl.steps).some(s => s === "blocked");
+                          const isIneffective = ctrl.steps.testEffectiveness === "complete" && exceptionControlIds.has(ctrl.controlId);
+                          return (
+                            <div
+                              key={ctrl.controlId}
+                              className={`grid grid-cols-[1fr_5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
+                              onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
+                              data-testid={`pipeline-row-${ctrl.controlId}`}
+                            >
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <span className={`text-[10px] font-mono font-semibold ${isBlocked || isIneffective ? "text-red-500" : "text-foreground"}`}>{ctrl.controlId}</span>
+                                <span className="text-xs text-foreground truncate">{ctrl.name}</span>
+                              </div>
+                              <span className={`text-[10px] font-medium truncate ${isBlocked ? "text-red-500" : "text-muted-foreground"}`}>{isBlocked ? "Blocked" : "PBC"}</span>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.readiness)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.testEffectiveness)}</div>
+                              <div className="flex justify-center">{effectivenessDot(ctrl)}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {autoControls.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 px-2 py-1.5 border-t border-slate-100 dark:border-border">
+                          <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                            Automated ({autoComplete}/{autoControls.length})
+                          </span>
+                        </div>
+                        {autoControls.map((ctrl) => {
+                          const isIneffective = ctrl.steps.testEffectiveness === "complete" && exceptionControlIds.has(ctrl.controlId);
+                          return (
+                            <div
+                              key={ctrl.controlId}
+                              className={`grid grid-cols-[1fr_5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem] gap-1 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
+                              onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
+                              data-testid={`pipeline-row-${ctrl.controlId}`}
+                            >
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <span className={`text-[10px] font-mono font-semibold ${isIneffective ? "text-red-600 dark:text-red-400" : "text-[#266C92]"}`}>{ctrl.controlId}</span>
+                                <span className="text-xs text-foreground truncate">{ctrl.name}</span>
+                              </div>
+                              <span className="text-[10px] text-muted-foreground font-medium truncate">Connected</span>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.readiness)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.population)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.sampling)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.evidence)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.testing)}</div>
+                              <div className="flex justify-center">{stepDot(ctrl.steps.testEffectiveness)}</div>
+                              <div className="flex justify-center">{effectivenessDot(ctrl)}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    </div>
+                  </CardContent>
+                  <div className="flex items-center gap-3 text-[9px] text-muted-foreground px-4 py-2 border-t border-slate-100 dark:border-border shrink-0">
+                    <div className="flex items-center gap-1"><CheckCircle2 className="w-2.5 h-2.5 text-[#266C92]" /><span>Complete</span></div>
+                    <div className="flex items-center gap-1"><Loader2 className="w-2.5 h-2.5 text-[#266C92] animate-spin" /><span>Running</span></div>
+                    <div className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-slate-400" /><span>Waiting</span></div>
+                    <div className="flex items-center gap-1"><AlertCircle className="w-2.5 h-2.5 text-red-500" /><span>Blocked</span></div>
+                    <div className="flex items-center gap-1"><div className="w-2.5 h-2.5 rounded-full border border-slate-300 dark:border-slate-600" /><span>Pending</span></div>
+                    {isComplete && (
+                      <>
+                        <div className="flex items-center gap-1"><ShieldCheck className="w-2.5 h-2.5 text-[#266C92]" /><span>Effective</span></div>
+                        <div className="flex items-center gap-1"><AlertTriangle className="w-2.5 h-2.5 text-red-500" /><span>Ineffective</span></div>
+                      </>
+                    )}
+                  </div>
+                </Card>
+              )}
+
+              {controlStatuses.length === 0 && (
+                <Card className="border border-slate-200 dark:border-border" data-testid="fieldwork-config-status">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Workflow className="w-4 h-4 text-[#266C92]" />
+                      <span className="text-sm font-semibold text-foreground">Workflow Configuration</span>
+                      <Badge className="text-xs bg-[#266C92] text-white ml-auto">
+                        Step {activeIndex + 1} of {totalBlocks}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-1 mb-3">
+                      {["Controls", "Data Sources", "PBC Mapping", "Execution", "Next Steps"].map((label, i) => (
+                        <div key={label} className="flex-1 flex flex-col items-center gap-1">
+                          <div className={`w-full h-1 rounded-full transition-all ${completedIndices.has(i) ? "bg-[#266C92]" : i === activeIndex ? "bg-[#266C92]/40" : "bg-slate-200 dark:bg-slate-700"}`} />
+                          <span className={`text-[9px] ${completedIndices.has(i) ? "text-[#266C92] font-medium" : i === activeIndex ? "text-foreground font-medium" : "text-muted-foreground"}`}>{label}</span>
                         </div>
                       ))}
                     </div>
-                  </div>
+                    <p className="text-xs text-muted-foreground">
+                      Open the workflow to continue configuring control selection, data sources, and PBC owner mapping before execution begins.
+                    </p>
+                  </CardContent>
                 </Card>
-              </div>
+              )}
             </div>
+
+            <Card className="border border-slate-200 dark:border-border overflow-hidden shrink-0" data-testid="fieldwork-activity-card">
+              <button
+                onClick={() => setAuditLogExpanded(!auditLogExpanded)}
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50/50 dark:hover:bg-muted/5 transition-colors"
+                data-testid="button-toggle-audit-log"
+              >
+                <div className="flex items-center gap-2">
+                  <Bot className="w-4 h-4 text-[#266C92]" />
+                  <span className="text-sm font-semibold text-foreground">Optro Assistant: Audit Log</span>
+                  <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] dark:bg-[#266C92]/20 dark:text-[#4da3c9]">{fieldworkActivityFeed.length} entries</Badge>
+                </div>
+                <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${auditLogExpanded ? "" : "-rotate-90"}`} />
+              </button>
+              {auditLogExpanded && (
+                <div className="border-t border-slate-100 dark:border-border">
+                  <div className="px-4 py-3 bg-[#266C92]/5 dark:bg-[#266C92]/10 border-b border-slate-100 dark:border-border" data-testid="assistant-welcome-bubble">
+                    <div className="flex items-start gap-2.5">
+                      <div className="w-6 h-6 rounded-full bg-[#266C92] flex items-center justify-center shrink-0 mt-0.5">
+                        <Bot className="w-3 h-3 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-semibold text-[#266C92] dark:text-[#4da3c9] mb-0.5">Optro Assistant</p>
+                        <p className="text-[11px] text-foreground leading-relaxed">
+                          {isComplete
+                            ? `Testing complete across all ${totalControls} controls. ${detectedExceptions.length} exception${detectedExceptions.length !== 1 ? "s" : ""} identified — review the findings and next steps below.`
+                            : executionPhase === "running"
+                              ? `Fieldwork execution is underway — ${completedControls} of ${totalControls} controls tested so far.${detectedExceptions.length > 0 ? ` ${detectedExceptions.length} exception${detectedExceptions.length !== 1 ? "s" : ""} detected from completed tests.` : ""} I'll continue running the remaining controls in parallel.`
+                              : executionPhase
+                                ? `Execution is ${executionPhase}. Open the workflow to continue.`
+                                : "I've set up the Automated Control Testing workflow. We'll walk through control selection, data sources, and PBC mapping before kicking off parallel execution across all selected controls."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="divide-y divide-slate-100 dark:divide-border max-h-64 overflow-y-auto">
+                    {fieldworkActivityFeed.map((entry) => (
+                      <div
+                        key={entry.id}
+                        className={`px-4 py-2.5 border-l-2 ${
+                          entry.type === "action-needed"
+                            ? "border-l-red-400"
+                            : entry.type === "warning"
+                              ? "border-l-red-400"
+                              : entry.type === "success"
+                                ? "border-l-[#266C92]"
+                                : "border-l-slate-200 dark:border-l-slate-700"
+                        }`}
+                        data-testid={`activity-${entry.id}`}
+                      >
+                        <p className="text-[11px] text-foreground leading-relaxed">{entry.message}</p>
+                        <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
+                          <Bot className="w-2.5 h-2.5" />
+                          <span>{entry.agent}</span>
+                          <span>·</span>
+                          <span>{entry.timestamp}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </Card>
 
           </div>
         )}
@@ -6646,6 +6604,153 @@ function FieldworkComplexHub() {
               </div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={resolveDialogOpen} onOpenChange={(open) => { setResolveDialogOpen(open); if (!open) { setResolveDialogTarget(null); setResolveMode(null); } }}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <AlertCircle className="w-4 h-4 text-red-500" />
+              Resolve & Resume
+            </DialogTitle>
+            <DialogDescription>
+              {resolveDialogTarget ? (
+                <>
+                  <span className="font-mono text-[#266C92]">{resolveDialogTarget.controlId}</span> — {resolveDialogTarget.title}
+                </>
+              ) : "Provide the required inputs to unblock and resume this control's workflow."}
+            </DialogDescription>
+          </DialogHeader>
+          {resolveDialogTarget && (
+            <div className="space-y-4 py-2">
+              <div className="flex items-center gap-2 mb-1">
+                <Badge className="text-[9px] h-4 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                  Blocked at {resolveDialogTarget.blockAtStep}
+                </Badge>
+              </div>
+
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {resolveDialogTarget.blockAtStep === "population"
+                  ? "The population file is required before the workflow can proceed. You can upload the file directly or reassign the PBC provider."
+                  : "Evidence files are required before the workflow can proceed. You can upload the evidence directly or reassign the PBC provider."}
+              </p>
+
+              <div className="space-y-2">
+                <button
+                  onClick={() => setResolveMode("upload")}
+                  className={`w-full flex items-start gap-3 p-3 rounded-lg border transition-all text-left ${resolveMode === "upload" ? "border-[#266C92] bg-[#266C92]/5" : "border-slate-200 dark:border-border hover:border-[#266C92]/30"}`}
+                  data-testid="resolve-option-upload"
+                >
+                  <Upload className="w-4 h-4 text-[#266C92] shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-semibold text-foreground">
+                      {resolveDialogTarget.blockAtStep === "population" ? "Upload Population File" : "Upload Evidence Directly"}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      {resolveDialogTarget.blockAtStep === "population"
+                        ? "Upload the population data file to resume automated processing"
+                        : "Upload evidence files to resume testing on this control"}
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setResolveMode("change-pbc")}
+                  className={`w-full flex items-start gap-3 p-3 rounded-lg border transition-all text-left ${resolveMode === "change-pbc" ? "border-[#266C92] bg-[#266C92]/5" : "border-slate-200 dark:border-border hover:border-[#266C92]/30"}`}
+                  data-testid="resolve-option-change-pbc"
+                >
+                  <Users className="w-4 h-4 text-[#266C92] shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-semibold text-foreground">Change PBC Provider</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Reassign the PBC request to a different provider</p>
+                  </div>
+                </button>
+              </div>
+
+              {resolveMode === "upload" && (
+                <div className="space-y-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div
+                    className="border-2 border-dashed border-slate-200 dark:border-border rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-[#266C92]/40 hover:bg-[#266C92]/[0.02] transition-colors"
+                    onClick={() => setResolveFileName(resolveDialogTarget.blockAtStep === "population" ? "population_data_Q1_2026.xlsx" : "evidence_package_Q1_2026.zip")}
+                    data-testid="resolve-upload-zone"
+                  >
+                    <Upload className="w-6 h-6 text-muted-foreground/40 mb-2" />
+                    {resolveFileName ? (
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-3.5 h-3.5 text-[#266C92]" />
+                        <span className="text-xs font-medium text-[#266C92]">{resolveFileName}</span>
+                        <CheckCircle2 className="w-3 h-3 text-[#266C92]" />
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-xs font-medium text-foreground">Click to select file</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">.xlsx, .csv, .pdf, .zip supported</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {resolveMode === "change-pbc" && (
+                <div className="space-y-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div>
+                    <label className="text-[11px] font-medium text-foreground mb-1 block">New PBC Provider Name</label>
+                    <input
+                      type="text"
+                      value={resolvePbcName}
+                      onChange={(e) => setResolvePbcName(e.target.value)}
+                      placeholder="e.g. Sarah Chen"
+                      className="w-full h-8 px-3 text-xs rounded-md border border-slate-200 dark:border-border bg-white dark:bg-muted/10 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-[#266C92]/30 focus:border-[#266C92]/40"
+                      data-testid="resolve-pbc-name"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-medium text-foreground mb-1 block">Email Address</label>
+                    <input
+                      type="email"
+                      value={resolvePbcEmail}
+                      onChange={(e) => setResolvePbcEmail(e.target.value)}
+                      placeholder="e.g. s.chen@company.com"
+                      className="w-full h-8 px-3 text-xs rounded-md border border-slate-200 dark:border-border bg-white dark:bg-muted/10 text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-[#266C92]/30 focus:border-[#266C92]/40"
+                      data-testid="resolve-pbc-email"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {resolveMode && (
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => { setResolveDialogOpen(false); setResolveDialogTarget(null); setResolveMode(null); }}
+                    data-testid="resolve-cancel"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="text-xs bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                    disabled={resolveMode === "upload" ? !resolveFileName : (!resolvePbcName || !resolvePbcEmail)}
+                    onClick={() => {
+                      if (resolveDialogTarget) {
+                        handleResolveAction(resolveDialogTarget.controlId);
+                      }
+                      setResolveDialogOpen(false);
+                      setResolveDialogTarget(null);
+                      setResolveMode(null);
+                    }}
+                    data-testid="resolve-confirm"
+                  >
+                    <CheckCircle2 className="w-3 h-3 mr-1" />
+                    {resolveMode === "upload" ? "Upload & Resume" : "Reassign & Resume"}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

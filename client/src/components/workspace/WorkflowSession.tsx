@@ -2410,9 +2410,9 @@ export const fieldworkBlockRules: FieldworkBlockRule[] = [
   },
   {
     controlId: "CTL-019",
-    blockAtStep: "sampling",
-    title: "Payroll Data Access Pending",
-    description: "Payroll Processing sampling paused — HR payroll system requires additional authorization grant before sample selection can proceed. Approve access request to continue.",
+    blockAtStep: "evidence",
+    title: "Payroll Evidence Access Pending",
+    description: "Payroll Processing evidence collection paused — HR payroll system requires additional authorization grant before evidence can be gathered. Upload evidence directly or change PBC provider to continue.",
     severity: "medium",
   },
 ];
@@ -2421,11 +2421,11 @@ export const DEMO_CONTROL_ID = "CTL-003";
 
 export const fieldworkStepOrder: (keyof ControlWorkflowStatus["steps"])[] = ["readiness", "population", "sampling", "evidence", "testing", "testEffectiveness"];
 
-export function tickFieldworkStatuses(prev: ControlWorkflowStatus[], resolvedBlockIds?: Set<string>): ControlWorkflowStatus[] | null {
+export function tickFieldworkStatuses(prev: ControlWorkflowStatus[], resolvedBlockIds?: Set<string>, autoProgressDemo?: boolean): ControlWorkflowStatus[] | null {
   let anyChange = false;
   const resolved = resolvedBlockIds ?? new Set<string>();
   const next = prev.map((ctrl) => {
-    if (ctrl.controlId === DEMO_CONTROL_ID) return ctrl;
+    if (ctrl.controlId === DEMO_CONTROL_ID && !autoProgressDemo) return ctrl;
     const steps = { ...ctrl.steps };
     const isAuto = ctrl.dataSource === "connected";
     const blockRule = fieldworkBlockRules.find(r => r.controlId === ctrl.controlId);
@@ -2487,7 +2487,7 @@ function FieldworkExecutionBlock({ onComplete, sessionId }: { onComplete: () => 
       system: c.system,
       owner: c.owner,
       steps: {
-        readiness: (c.id === DEMO_CONTROL_ID ? "running" : "pending") as "running" | "pending",
+        readiness: "pending" as const,
         population: "pending" as const, sampling: "pending" as const, evidence: "pending" as const, testing: "pending" as const, testEffectiveness: "pending" as const,
       },
       overallProgress: 0,
