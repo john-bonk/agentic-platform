@@ -6607,8 +6607,8 @@ function FieldworkComplexHub() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={resolveDialogOpen} onOpenChange={(open) => { setResolveDialogOpen(open); if (!open) { setResolveDialogTarget(null); setResolveMode(null); } }}>
-        <DialogContent className="sm:max-w-lg">
+      <Dialog open={resolveDialogOpen} onOpenChange={(open) => { setResolveDialogOpen(open); if (!open) { setResolveDialogTarget(null); setResolveMode(null); setResolveFileName(""); setResolvePbcName(""); setResolvePbcEmail(""); } }}>
+        <DialogContent className="sm:max-w-lg p-6">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base">
               <AlertCircle className="w-4 h-4 text-red-500" />
@@ -6741,6 +6741,9 @@ function FieldworkComplexHub() {
                       setResolveDialogOpen(false);
                       setResolveDialogTarget(null);
                       setResolveMode(null);
+                      setResolveFileName("");
+                      setResolvePbcName("");
+                      setResolvePbcEmail("");
                     }}
                     data-testid="resolve-confirm"
                   >
