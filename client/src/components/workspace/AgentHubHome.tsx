@@ -5962,7 +5962,7 @@ function FieldworkComplexHub() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden" data-testid="fieldwork-complex-hub">
-      <div className={`flex-1 min-h-0 bg-slate-50 dark:bg-background px-8 py-5 ${hasWorkflow ? "flex flex-col overflow-hidden" : "overflow-y-auto"}`}>
+      <div className={`flex-1 min-h-0 bg-slate-50 dark:bg-background px-8 py-5 overflow-y-auto`}>
         {!hasWorkflow ? (
           <div className="max-w-6xl mx-auto space-y-5" data-testid="fieldwork-hub-empty">
             <div className="flex items-center justify-between">
@@ -6075,7 +6075,7 @@ function FieldworkComplexHub() {
             </div>
           </div>
         ) : (
-          <div className="max-w-6xl mx-auto flex flex-col h-full gap-5" data-testid="fieldwork-tracker-view" data-is-complete={isComplete} data-execution-phase={executionPhase} data-control-count={controlStatuses.length}>
+          <div className="max-w-6xl mx-auto flex flex-col gap-5" data-testid="fieldwork-tracker-view" data-is-complete={isComplete} data-execution-phase={executionPhase} data-control-count={controlStatuses.length}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Shield className="w-5 h-5 text-[#266C92]" />
@@ -6285,16 +6285,16 @@ function FieldworkComplexHub() {
               </Card>
             )}
 
-            <div className="flex-1 min-h-0 flex flex-col gap-4">
+            <div className="flex flex-col gap-4">
               {controlStatuses.length > 0 && (
-                <Card className="border border-slate-200 dark:border-border flex flex-col min-h-0 flex-1" data-testid="fieldwork-pipeline-card">
+                <Card className="border border-slate-200 dark:border-border flex flex-col" data-testid="fieldwork-pipeline-card">
                   <CardHeader className="pb-2 pt-3 px-4 shrink-0">
                     <CardTitle className="text-sm font-semibold flex items-center gap-2">
                       <Workflow className="w-4 h-4 text-[#266C92]" />
                       Control Pipeline
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-y-auto">
+                  <CardContent className="px-4 pb-4">
                     <div className="grid grid-cols-[1fr_5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem_3.5rem] gap-1 px-2 py-1.5 text-[8px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
                       <span>Control</span>
                       <span>Source</span>
