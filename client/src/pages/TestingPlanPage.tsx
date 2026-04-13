@@ -91,7 +91,7 @@ export default function TestingPlanPage() {
   }, [setLocation]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-background flex flex-col" data-testid="testing-plan-page">
+    <div className="h-screen bg-white dark:bg-background flex flex-col overflow-hidden" data-testid="testing-plan-page">
       <div className="border-b border-slate-200 dark:border-border bg-white dark:bg-background sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -149,12 +149,16 @@ export default function TestingPlanPage() {
           <div>
             <h2 className="text-sm font-semibold text-foreground mb-4">Agentic Workflow — Per Control Pipeline</h2>
             <div className="relative">
-              <div className="absolute left-[19px] top-8 bottom-4 w-px bg-slate-200 dark:bg-border" />
               <div className="space-y-3">
-                {WORKFLOW_STEPS.map((step) => (
+                {WORKFLOW_STEPS.map((step, idx) => (
                   <div key={step.step} className="flex items-start gap-4 relative" data-testid={`workflow-step-${step.step}`}>
-                    <div className="w-10 h-10 rounded-full bg-[#266C92]/10 border border-[#266C92]/20 flex items-center justify-center flex-shrink-0 z-[1]">
-                      <step.icon className="w-4 h-4 text-[#266C92]" />
+                    <div className="relative flex-shrink-0">
+                      {idx < WORKFLOW_STEPS.length - 1 && (
+                        <div className="absolute left-1/2 top-10 bottom-[-12px] w-px -translate-x-1/2 bg-slate-200 dark:bg-border" />
+                      )}
+                      <div className="w-10 h-10 rounded-full bg-[#266C92]/10 border border-[#266C92]/20 flex items-center justify-center relative z-[1] bg-white dark:bg-background">
+                        <step.icon className="w-4 h-4 text-[#266C92]" />
+                      </div>
                     </div>
                     <div className="pt-1.5 flex-1">
                       <div className="flex items-center gap-2">
