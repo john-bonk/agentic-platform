@@ -45,3 +45,4 @@ export { default as RecentPage } from "./RecentPage";
 export { default as FavoritesPage } from "./FavoritesPage";
 export { default as RiskCalculationPage } from "./RiskCalculationPage";
 export { default as AIGovernancePage } from "./AIGovernancePage";
+export { default as TestingPlanPage } from "./TestingPlanPage";
