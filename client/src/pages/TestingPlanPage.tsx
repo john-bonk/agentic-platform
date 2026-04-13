@@ -162,15 +162,11 @@ export default function TestingPlanPage() {
                 <Sparkles className="w-4 h-4 text-[#266C92]" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-semibold text-foreground">Dynamically Selected Control Set</span>
-                  <Badge className="text-[9px] h-4 bg-[#266C92]/10 text-[#266C92] border-0">Auto-Configured</Badge>
-                </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   These {masterControlsList.length} controls were automatically selected based on the current audit period, prior testing results, identified coverage gaps, and risk materiality thresholds defined in your
                   <button
                     className="inline-flex items-center gap-0.5 text-[#266C92] hover:underline mx-0.5 font-medium"
-                    onClick={() => {}}
+                    onClick={() => setLocation("/wizard")}
                     data-testid="link-workflow-config"
                   >
                     <Settings className="w-3 h-3" />
