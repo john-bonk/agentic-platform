@@ -166,7 +166,12 @@ export default function TestingPlanPage() {
                   These {masterControlsList.length} controls were automatically selected based on the current audit period, prior testing results, identified coverage gaps, and risk materiality thresholds defined in your
                   <button
                     className="inline-flex items-center gap-0.5 text-[#266C92] hover:underline mx-0.5 font-medium"
-                    onClick={() => setLocation("/wizard")}
+                    onClick={() => {
+                      setLocation("/");
+                      setTimeout(() => {
+                        window.dispatchEvent(new CustomEvent("agent-hub:launch-workflow", { detail: { workflowId: "control-testing" } }));
+                      }, 100);
+                    }}
                     data-testid="link-workflow-config"
                   >
                     <Settings className="w-3 h-3" />
