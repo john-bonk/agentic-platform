@@ -6295,7 +6295,7 @@ function FieldworkComplexHub() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className={`px-4 pb-4 ${!auditLogExpanded ? "flex-1 min-h-0 overflow-y-auto" : ""}`}>
-                    <div className="grid grid-cols-[2fr_5rem_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-1.5 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
+                    <div className="grid grid-cols-[3fr_5rem_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-1.5 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
                       <span>Control</span>
                       <span>Source</span>
                       <span className="text-center">Readiness</span>
@@ -6322,7 +6322,7 @@ function FieldworkComplexHub() {
                           return (
                             <div
                               key={ctrl.controlId}
-                              className={`grid grid-cols-[2fr_5rem_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
+                              className={`grid grid-cols-[3fr_5rem_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isBlocked || isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
                               onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                               data-testid={`pipeline-row-${ctrl.controlId}`}
                             >
@@ -6357,7 +6357,7 @@ function FieldworkComplexHub() {
                           return (
                             <div
                               key={ctrl.controlId}
-                              className={`grid grid-cols-[2fr_5rem_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
+                              className={`grid grid-cols-[3fr_5rem_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${isIneffective ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15" : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"}`}
                               onClick={() => setHubDetailView(`control:${ctrl.controlId}`)}
                               data-testid={`pipeline-row-${ctrl.controlId}`}
                             >
