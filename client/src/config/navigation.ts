@@ -251,11 +251,11 @@ export const globalRiskNewTabNavSections: SideNavSection[] = [
 export const agentHubNavSections: SideNavSection[] = [
   {
     id: "agent-hub-projects",
-    title: "Projects",
+    title: "Workflows",
     collapsible: false,
     defaultExpanded: true,
     items: [
-      { id: "ah-new-project", label: "+ New Project", path: "/#new-project", icon: "plus" },
+      { id: "ah-new-project", label: "+ New Workflow", path: "/#new-project", icon: "plus" },
     ],
   },
   {

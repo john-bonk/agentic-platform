@@ -1054,10 +1054,12 @@ function OptroHome() {
       <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background">
         <div className="w-[90%] mx-auto px-6 py-8">
           <div className="mb-6">
-            <h1 className="text-xl font-semibold text-foreground mb-1" data-testid="text-optro-welcome">Welcome back</h1>
+            <h1 className="text-xl font-semibold text-foreground mb-1" data-testid="text-optro-welcome">Welcome to Optro</h1>
             <p className="text-sm text-muted-foreground">Here's what needs your attention today.</p>
           </div>
 
+          {/* Stats bar hidden for future iteration */}
+          {false && (
           <div className="grid grid-cols-4 gap-3 mb-6" data-testid="optro-stats-bar">
             <div className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card">
               <div className="flex items-center gap-2 mb-1.5">
@@ -1092,6 +1094,7 @@ function OptroHome() {
               <span className="text-[10px] text-muted-foreground ml-1.5">in audit trail</span>
             </div>
           </div>
+          )}
 
           <div className="space-y-2 mb-6" data-testid="optro-task-list">
             <div className="flex items-center gap-2 mb-1 px-1">
@@ -1182,7 +1185,8 @@ function OptroHome() {
             })()}
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-5 mb-6">
+          {/* Pending Approvals, Agent Workflows, and Audit Trail hidden for future iteration */}
+          {false && (<><div className="grid lg:grid-cols-2 gap-5 mb-6">
             <div className="space-y-3" data-testid="optro-pending-approvals">
               <div className="flex items-center gap-2 px-1">
                 <ClipboardCheck className="w-3.5 h-3.5 text-slate-400" />
@@ -1301,6 +1305,7 @@ function OptroHome() {
               </div>
             )}
           </div>
+          </>)}
         </div>
       </div>
     </div>
