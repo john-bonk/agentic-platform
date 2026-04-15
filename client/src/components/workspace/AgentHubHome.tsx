@@ -2833,8 +2833,8 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
         const hasContent = outputs.length > 0 || isReadinessAssess || isTestingGrid;
         const popIngestCompleted = completedTrackerSubs?.has("pop-ingest");
         const evdCollectCompleted = completedTrackerSubs?.has("evd-collect");
-        const showInlineUpload = isDemo && sub.id === "pop-ingest" && (baseStatus === "running" || (baseStatus === "complete" && popIngestCompleted));
-        const showEvidenceUpload = isDemo && sub.id === "evd-collect" && (baseStatus === "running" || (baseStatus === "complete" && evdCollectCompleted));
+        const showInlineUpload = sub.id === "pop-ingest" && (baseStatus === "running" || baseStatus === "blocked" || (baseStatus === "complete" && popIngestCompleted));
+        const showEvidenceUpload = sub.id === "evd-collect" && (baseStatus === "running" || baseStatus === "blocked" || (baseStatus === "complete" && evdCollectCompleted));
         const showEvidenceTracker = showEvidenceUpload;
         const hasTrackerContent = (showInlineUpload && (workstreamActive || popIngestCompleted)) || showEvidenceTracker;
         const isExpandable = baseStatus === "complete" || hasTrackerContent;
@@ -2900,7 +2900,7 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               <ManualSubstepForm substepId={sub.id} onRun={() => onResumeSubstep?.(sub.id)} />
             )}
 
-            {showInlineUpload && !workstreamActive && !popIngestCompleted && baseStatus === "running" && (
+            {showInlineUpload && !workstreamActive && !popIngestCompleted && (baseStatus === "running" || baseStatus === "blocked") && (
               <div className="pl-12 pr-3 pb-2 pt-1">
                 <div className="flex items-center gap-2">
                   <Button
@@ -2937,7 +2937,7 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
               </div>
             )}
 
-            {showEvidenceUpload && !evidenceWorkstreamActive && !evdCollectCompleted && baseStatus === "running" && (
+            {showEvidenceUpload && !evidenceWorkstreamActive && !evdCollectCompleted && (baseStatus === "running" || baseStatus === "blocked") && (
               <div className="pl-12 pr-3 pb-2 pt-1">
                 <div className="flex items-center gap-2">
                   <Button
@@ -4870,6 +4870,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
         `Population data file uploaded for ${controlId}. The agent will now validate the file schema, check completeness against the control period, and scan for anomalies.\n\nProcessing...`,
         "population"
       );
+      if (onResolve) onResolve(controlId);
     } else if (substepId === "pop-ingest" && action === "request") {
       setWorkstreamActive(true);
       setAutoExpandedSubs(prev => new Set(prev).add("pop-ingest"));
@@ -4896,6 +4897,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
         `Evidence package uploaded for ${controlId}. The agent will now classify documents, extract key fields, and cross-reference against the sample data.\n\nProcessing...`,
         "evidence"
       );
+      if (onResolve) onResolve(controlId);
     } else if (substepId === "evd-collect" && action === "request") {
       setEvidenceWorkstreamActive(true);
       setAutoExpandedSubs(prev => new Set(prev).add("evd-collect"));
@@ -4919,7 +4921,7 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
       setActionToast("Evidence collection complete — ready for confirmation");
     }
     toastTimerRef.current = setTimeout(() => setActionToast(null), 3000);
-  }, [mirrorToAssistant, controlId]);
+  }, [mirrorToAssistant, controlId, onResolve]);
 
   const assistantActionHandler = useCallback((actionId: string) => {
     if (actionId === "pop-upload") handleSubstepAction("pop-ingest", "upload");
