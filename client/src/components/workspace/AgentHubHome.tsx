@@ -2902,19 +2902,6 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
 
             {showInlineUpload && !workstreamActive && !popIngestCompleted && (baseStatus === "running" || baseStatus === "blocked") && (
               <div className="pl-12 pr-3 pb-2 pt-1">
-                {baseStatus === "blocked" && isBlockedAtThisStep && (
-                  <div className="mb-3 p-3 rounded-lg bg-red-50/50 dark:bg-red-900/10 border border-red-200/60 dark:border-red-800/30">
-                    <div className="flex items-start gap-2 mb-2">
-                      <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-red-700 dark:text-red-400">Population File Required</p>
-                        <p className="text-[11px] text-red-600/80 dark:text-red-400/70 mt-0.5 leading-relaxed">
-                          {blockRule?.description ?? "The population file is needed before the workflow can proceed. Upload the file directly or request it from the control owner."}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
@@ -2952,33 +2939,6 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
 
             {showEvidenceUpload && !evidenceWorkstreamActive && !evdCollectCompleted && (baseStatus === "running" || baseStatus === "blocked") && (
               <div className="pl-12 pr-3 pb-2 pt-1">
-                {baseStatus === "blocked" && isBlockedAtThisStep && (
-                  <div className="mb-3 p-3 rounded-lg bg-red-50/50 dark:bg-red-900/10 border border-red-200/60 dark:border-red-800/30">
-                    <div className="flex items-start gap-2 mb-2">
-                      <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-red-700 dark:text-red-400">Evidence Upload Required</p>
-                        <p className="text-[11px] text-red-600/80 dark:text-red-400/70 mt-0.5 leading-relaxed">
-                          {blockRule?.description ?? "Evidence files are needed before testing can proceed. Upload the required documents or request collection via workstream."}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="space-y-1.5 ml-5.5 mb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                        <span className="text-[10px] text-red-700 dark:text-red-400">SoD conflict matrix — 3 departments (Finance, Operations, IT)</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                        <span className="text-[10px] text-red-700 dark:text-red-400">Access provisioning approval screenshots (25 samples)</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                        <span className="text-[10px] text-red-700 dark:text-red-400">Quarterly SoD review sign-off documentation (Q1–Q4)</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
@@ -4740,11 +4700,19 @@ function ControlFocusPage({ controlId, controlStatus, onBack, backLabel, onResol
 
   const initSubstepProgress = useMemo(() => {
     const prog: Record<string, number> = {};
+    const br = fieldworkBlockRules.find(r => r.controlId === controlId);
     fieldworkStepOrder.forEach(step => {
       if (!controlStatus) { prog[step] = 0; return; }
       const status = controlStatus.steps[step as keyof typeof controlStatus.steps];
       const info = stepNodeInfo[step];
-      prog[step] = status === "complete" ? (info?.substeps.length ?? 0) : 0;
+      if (status === "complete") {
+        prog[step] = info?.substeps.length ?? 0;
+      } else if (status === "blocked" && br && br.blockAtStep === step && br.blockAtSubstep && info) {
+        const blockedIdx = info.substeps.findIndex(s => s.id === br.blockAtSubstep);
+        prog[step] = blockedIdx >= 0 ? blockedIdx : 0;
+      } else {
+        prog[step] = 0;
+      }
     });
     return prog;
   }, []);

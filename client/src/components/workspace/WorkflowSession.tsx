@@ -2258,6 +2258,7 @@ export interface ControlWorkflowStatus {
 export interface FieldworkBlockRule {
   controlId: string;
   blockAtStep: keyof ControlWorkflowStatus["steps"];
+  blockAtSubstep?: string;
   title: string;
   description: string;
   severity: "high" | "medium";
@@ -2397,6 +2398,7 @@ export const fieldworkBlockRules: FieldworkBlockRule[] = [
   {
     controlId: "CTL-003",
     blockAtStep: "evidence",
+    blockAtSubstep: "evd-collect",
     title: "SoD Matrix Upload Required",
     description: "Segregation of Duties evidence collection paused — manual SoD matrix upload needed for 3 departments. Control owner must provide the current access conflict report.",
     severity: "high",
@@ -2404,6 +2406,7 @@ export const fieldworkBlockRules: FieldworkBlockRule[] = [
   {
     controlId: "CTL-007",
     blockAtStep: "population",
+    blockAtSubstep: "pop-ingest",
     title: "PBC Response Overdue",
     description: "Revenue Recognition population extraction paused — PBC request to Jun Li has been pending for 3 business days. Escalation or manual data submission required to proceed.",
     severity: "high",
