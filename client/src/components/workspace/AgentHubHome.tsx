@@ -2792,6 +2792,11 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
   const isDemo = controlId === DEMO_CONTROL_ID;
   const allSubsDone = substepProgress >= info.substeps.length;
 
+  const blockedSubIdx = isBlockedAtThisStep && blockRule?.blockAtSubstep
+    ? info.substeps.findIndex(s => s.id === blockRule.blockAtSubstep)
+    : -1;
+  const effectiveProgress = blockedSubIdx >= 0 ? Math.max(substepProgress, blockedSubIdx) : substepProgress;
+
   const stepAutoConfig = automationConfig?.[step];
   const stepMode: AutomationMode = stepAutoConfig?.mode ?? "full";
 
@@ -2813,13 +2818,13 @@ function StepNodeContent({ step, stepStatus, controlId, substepProgress, blockRu
     <div className="space-y-2" data-testid={`step-node-${step}`}>
       {info.substeps.map((sub, idx) => {
         const subMode: AutomationMode = stepAutoConfig?.substeps?.[sub.id] ?? stepMode;
-        const baseStatus = stepStatus === "complete" || idx < substepProgress
+        const baseStatus = stepStatus === "complete" || idx < effectiveProgress
           ? "complete"
-          : stepStatus === "blocked" && idx === substepProgress
+          : stepStatus === "blocked" && idx === effectiveProgress
             ? "blocked"
-            : idx === substepProgress && stepStatus === "waiting"
+            : idx === effectiveProgress && stepStatus === "waiting"
               ? "waiting"
-              : idx === substepProgress && (stepStatus === "running")
+              : idx === effectiveProgress && (stepStatus === "running")
                 ? "running"
                 : "pending";
         const isCheckpointHeld = baseStatus === "complete" && subMode === "checkpoint" && !(checkpointAcked?.has(sub.id));
