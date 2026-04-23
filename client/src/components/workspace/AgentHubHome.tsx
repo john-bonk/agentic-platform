@@ -936,6 +936,8 @@ const auditTrailEntries = [
 ];
 
 function OptroHome() {
+  const settings = useSettings();
+  const showLandingWidgets = settings.showLandingWidgets;
   const addProject = useWorkflowSessionStore((s) => s.addProject);
   const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
   const setPendingCanvasView = useWorkflowSessionStore((s) => s.setPendingCanvasView);
@@ -1058,6 +1060,7 @@ function OptroHome() {
             <p className="text-sm text-muted-foreground">Here's what needs your attention today.</p>
           </div>
 
+          {showLandingWidgets && (
           <div className="grid grid-cols-4 gap-3 mb-6" data-testid="optro-stats-bar">
             <div className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card">
               <div className="flex items-center gap-2 mb-1.5">
@@ -1092,6 +1095,7 @@ function OptroHome() {
               <span className="text-[10px] text-muted-foreground ml-1.5">in audit trail</span>
             </div>
           </div>
+          )}
 
           <div className="space-y-2 mb-6" data-testid="optro-task-list">
             <div className="flex items-center gap-2 mb-1 px-1">
@@ -1182,6 +1186,7 @@ function OptroHome() {
             })()}
           </div>
 
+          {showLandingWidgets && (<>
           <div className="grid lg:grid-cols-2 gap-5 mb-6">
             <div className="space-y-3" data-testid="optro-pending-approvals">
               <div className="flex items-center gap-2 px-1">
@@ -1301,6 +1306,7 @@ function OptroHome() {
               </div>
             )}
           </div>
+          </>)}
         </div>
       </div>
     </div>
