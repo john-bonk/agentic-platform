@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useCallback, useEffect, lazy, Suspense } from "react";
 import { useLocation } from "wouter";
 import { useSettings } from "@/components/settings-panel";
+import { useToast } from "@/hooks/use-toast";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +33,7 @@ import {
   Pause,
   Bot,
   ArrowRight,
+  ArrowLeft,
   CircleDot,
   FileText,
   AlertCircle,
@@ -905,7 +907,7 @@ const fieldworkSystemStatus = [
 ];
 
 
-const agentWorkflows = [
+const soxAgentWorkflows = [
   { id: "aw-1", name: "SOX Control Testing", agent: "Control Testing Agent", category: "direct-realtime" as AgentCategory, status: "active" as AgentStatus, progress: 0, lastActivity: "Ready to launch", humanAction: false },
   { id: "aw-2", name: "Risk Score Monitoring", agent: "Risk Monitor", category: "continuous" as AgentCategory, status: "active" as AgentStatus, progress: 100, lastActivity: "Just now", humanAction: false },
   { id: "aw-3", name: "Control Effectiveness Tracking", agent: "Effectiveness Agent", category: "continuous" as AgentCategory, status: "active" as AgentStatus, progress: 100, lastActivity: "5 min ago", humanAction: true },
@@ -917,14 +919,14 @@ const agentWorkflows = [
   { id: "aw-9", name: "Policy Change — SOX Scope Update", agent: "Compliance Scanner", category: "emergent" as AgentCategory, status: "pending-review" as AgentStatus, progress: 100, lastActivity: "1 hr ago", humanAction: true },
 ];
 
-const pendingApprovals = [
+const soxPendingApprovals = [
   { id: "pa-1", title: "Approve Testing Exception — CTL-005", agent: "Testing Agent", type: "Exception Triage", timestamp: "5 min ago", severity: "high" as const },
   { id: "pa-2", title: "Review Monthly Testing Report", agent: "Reporting Agent", type: "Report Review", timestamp: "2 days ago", severity: "medium" as const },
   { id: "pa-3", title: "Confirm SOX Scope Change Impact", agent: "Compliance Scanner", type: "Policy Change", timestamp: "1 hr ago", severity: "high" as const },
   { id: "pa-4", title: "Validate 3 Ineffective Controls", agent: "Effectiveness Agent", type: "Control Review", timestamp: "5 min ago", severity: "medium" as const },
 ];
 
-const auditTrailEntries = [
+const soxAuditTrailEntries = [
   { id: "at-1", timestamp: "Just now", agent: "Risk Monitor", action: "Updated 4 risk scores based on KRI feed changes", type: "auto" as const },
   { id: "at-2", timestamp: "2 min ago", agent: "Validation Agent", action: "Verified evidence integrity for 12 samples — all passed hash check", type: "auto" as const },
   { id: "at-3", timestamp: "5 min ago", agent: "Testing Agent", action: "Flagged CTL-005 exception — 2 journal entries missing dual approval", type: "escalation" as const },
@@ -935,9 +937,362 @@ const auditTrailEntries = [
   { id: "at-8", timestamp: "2 hrs ago", agent: "Reporting Agent", action: "Generated monthly testing status report — pending human review", type: "approval" as const },
 ];
 
-function OptroHome() {
-  const settings = useSettings();
-  const showLandingWidgets = settings.showLandingWidgets;
+// === Solution Hierarchy: Per-solution stub data ===
+type SolutionAgentWorkflow = (typeof soxAgentWorkflows)[number];
+type SolutionPendingApproval = (typeof soxPendingApprovals)[number];
+type SolutionAuditTrailEntry = (typeof soxAuditTrailEntries)[number];
+
+type SolutionTaskItemDef = {
+  id: string;
+  title: string;
+  description: string;
+  icon: typeof Shield;
+  iconColor: string;
+  iconBg: string;
+  priority: "high" | "medium" | "low";
+  primary?: boolean;
+  actionLabel?: string;
+};
+
+type SolutionDef = {
+  id: string;
+  label: string;
+  shortLabel: string;
+  tagline: string;
+  description: string;
+  icon: typeof Shield;
+  iconColor: string;
+  iconBg: string;
+  welcomeSubtitle: string;
+  taskItems: SolutionTaskItemDef[];
+  pendingApprovals: SolutionPendingApproval[];
+  agentWorkflows: SolutionAgentWorkflow[];
+  auditTrailEntries: SolutionAuditTrailEntry[];
+};
+
+// SOX uses the existing module-level data; others use tailored stubs.
+const soxTaskItems: SolutionTaskItemDef[] = [
+  {
+    id: "task-control-testing",
+    title: "Test Controls for SOX Audit",
+    description: "Launch automated control testing across connected systems and PBC workflows for the current audit period.",
+    icon: Shield,
+    iconColor: "text-slate-500 dark:text-slate-400",
+    iconBg: "bg-slate-100 dark:bg-slate-800/30",
+    primary: true,
+    actionLabel: "Start",
+    priority: "high",
+  },
+  { id: "task-review-exceptions", title: "Review Open Exceptions", description: "3 control exceptions from prior testing cycle awaiting management response and remediation plans.", icon: AlertTriangle, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "task-evidence-requests", title: "Follow Up on Evidence Requests", description: "5 PBC evidence requests are pending — 2 overdue by more than 3 business days.", icon: FileText, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "task-risk-assessment", title: "Complete Risk Assessment Updates", description: "Quarterly risk assessment scoring due for 4 process areas. Last updated 87 days ago.", icon: BarChart3, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+  { id: "task-walkthrough-scheduling", title: "Schedule Control Walkthroughs", description: "Annual walkthrough cycle begins next month — 12 control owners need scheduling confirmation.", icon: Users, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+  { id: "task-report-preparation", title: "Prepare Committee Report", description: "Audit committee meeting in 3 weeks — draft testing status report and exception summary.", icon: ListChecks, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+];
+
+// === Third-Party Risk Management ===
+const tprmTaskItems: SolutionTaskItemDef[] = [
+  { id: "tprm-task-onboarding", title: "Onboard New Vendor — DataBridge Analytics", description: "Run automated due diligence across SOC 2, financial health, and security posture before contract signature.", icon: Shield, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", primary: true, actionLabel: "Start", priority: "high" },
+  { id: "tprm-task-tier1-reassess", title: "Reassess 8 Tier-1 Vendors", description: "Annual reassessment due for critical vendors — auto-pull updated SOC 2 reports and re-score risk tiers.", icon: AlertTriangle, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "tprm-task-soc2-gaps", title: "Resolve SOC 2 Coverage Gaps", description: "12 vendors missing current attestation — 4 expired in the last 30 days.", icon: FileText, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "tprm-task-contract-renewals", title: "Review Upcoming Contract Renewals", description: "9 vendor contracts up for renewal in the next 60 days — security addenda need refresh.", icon: ListChecks, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+  { id: "tprm-task-incidents", title: "Triage Vendor Incident Disclosures", description: "3 vendors disclosed Q1 incidents requiring impact assessment and remediation tracking.", icon: AlertCircle, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+  { id: "tprm-task-inventory-refresh", title: "Refresh Vendor Inventory Mapping", description: "Reconcile procurement system records against the TPRM registry — 14 net-new vendors detected.", icon: Database, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+];
+
+const tprmAgentWorkflows: SolutionAgentWorkflow[] = [
+  { id: "tprm-aw-1", name: "Vendor Onboarding Pipeline", agent: "Onboarding Agent", category: "direct-realtime", status: "active", progress: 0, lastActivity: "Ready to launch", humanAction: false },
+  { id: "tprm-aw-2", name: "SOC 2 Attestation Monitoring", agent: "Compliance Watch", category: "continuous", status: "active", progress: 100, lastActivity: "3 min ago", humanAction: false },
+  { id: "tprm-aw-3", name: "Vendor Risk Score Updates", agent: "Risk Scoring Agent", category: "continuous", status: "active", progress: 100, lastActivity: "Just now", humanAction: true },
+  { id: "tprm-aw-4", name: "Concentration Risk Tracking", agent: "Portfolio Agent", category: "continuous", status: "active", progress: 100, lastActivity: "10 min ago", humanAction: false },
+  { id: "tprm-aw-5", name: "Annual Tier-1 Reassessment", agent: "Reassessment Agent", category: "scheduled", status: "active", progress: 38, lastActivity: "Started 2 days ago", humanAction: false },
+  { id: "tprm-aw-6", name: "Quarterly Vendor KPI Pull", agent: "Performance Agent", category: "scheduled", status: "completed", progress: 100, lastActivity: "Yesterday", humanAction: true },
+  { id: "tprm-aw-7", name: "Contract Renewal Workflow", agent: "Contracts Coordinator", category: "scheduled", status: "active", progress: 52, lastActivity: "1 hr ago", humanAction: false },
+  { id: "tprm-aw-8", name: "Vendor Incident — DataBridge", agent: "Incident Response Agent", category: "emergent", status: "active", progress: 60, lastActivity: "20 min ago", humanAction: true },
+  { id: "tprm-aw-9", name: "Subprocessor Change Detected", agent: "Compliance Scanner", category: "emergent", status: "pending-review", progress: 100, lastActivity: "45 min ago", humanAction: true },
+];
+
+const tprmPendingApprovals: SolutionPendingApproval[] = [
+  { id: "tprm-pa-1", title: "Approve DataBridge Onboarding Risk Tier", agent: "Onboarding Agent", type: "Tier Assignment", timestamp: "8 min ago", severity: "high" },
+  { id: "tprm-pa-2", title: "Review CloudOps Incident Disclosure", agent: "Incident Response Agent", type: "Incident Triage", timestamp: "20 min ago", severity: "high" },
+  { id: "tprm-pa-3", title: "Confirm New Subprocessor — Acme Logistics", agent: "Compliance Scanner", type: "Subprocessor Change", timestamp: "45 min ago", severity: "medium" },
+  { id: "tprm-pa-4", title: "Sign Off on Quarterly Vendor KPI Report", agent: "Performance Agent", type: "Report Review", timestamp: "Yesterday", severity: "medium" },
+];
+
+const tprmAuditTrailEntries: SolutionAuditTrailEntry[] = [
+  { id: "tprm-at-1", timestamp: "Just now", agent: "Risk Scoring Agent", action: "Re-scored 6 vendors after fresh SOC 2 ingestion", type: "auto" },
+  { id: "tprm-at-2", timestamp: "3 min ago", agent: "Compliance Watch", action: "Flagged 2 vendors with expired SOC 2 attestations", type: "escalation" },
+  { id: "tprm-at-3", timestamp: "10 min ago", agent: "Portfolio Agent", action: "Updated concentration risk view — payments stack threshold reached", type: "escalation" },
+  { id: "tprm-at-4", timestamp: "20 min ago", agent: "Incident Response Agent", action: "Opened incident workflow for DataBridge service degradation", type: "escalation" },
+  { id: "tprm-at-5", timestamp: "45 min ago", agent: "Compliance Scanner", action: "Detected new subprocessor disclosure — Acme Logistics", type: "auto" },
+  { id: "tprm-at-6", timestamp: "1 hr ago", agent: "Contracts Coordinator", action: "Distributed updated security addendum to 5 renewing vendors", type: "auto" },
+  { id: "tprm-at-7", timestamp: "Yesterday", agent: "Performance Agent", action: "Generated quarterly vendor KPI report — pending human review", type: "approval" },
+  { id: "tprm-at-8", timestamp: "2 days ago", agent: "Reassessment Agent", action: "Initiated annual reassessment for 8 Tier-1 vendors", type: "auto" },
+];
+
+// === Risk Assessments ===
+const riskAssessTaskItems: SolutionTaskItemDef[] = [
+  { id: "ra-task-launch", title: "Launch Quarterly Enterprise Risk Refresh", description: "Distribute scored survey to 12 locations with auto-assessed items pre-populated for the Q2 cycle.", icon: BarChart3, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", primary: true, actionLabel: "Start", priority: "high" },
+  { id: "ra-task-overdue", title: "Chase 4 Overdue Survey Responses", description: "Singapore, Frankfurt, Vancouver, and Dublin responses overdue by more than 5 business days.", icon: AlertTriangle, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "ra-task-emerging", title: "Review Emerging Risk Signals", description: "8 new external signals merged into the heat map — 2 above the materiality threshold.", icon: AlertCircle, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "ra-task-validate", title: "Validate Auto-Scored Risk Items", description: "42 items auto-scored by the agent need spot-check approval before the heat map is finalized.", icon: ShieldCheck, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+  { id: "ra-task-mitigation", title: "Refresh Mitigation Plans for Top 5 Risks", description: "Plans drafted last quarter need owner attestation and updated target dates.", icon: ListChecks, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+  { id: "ra-task-board", title: "Prepare Board Risk Summary", description: "Quarterly board read-out due in 2 weeks — draft narrative and trend visuals.", icon: FileText, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+];
+
+const riskAssessAgentWorkflows: SolutionAgentWorkflow[] = [
+  { id: "ra-aw-1", name: "Enterprise Risk Assessment", agent: "Assessment Agent", category: "direct-realtime", status: "active", progress: 0, lastActivity: "Ready to launch", humanAction: false },
+  { id: "ra-aw-2", name: "External Risk Signal Synthesis", agent: "Intelligence Agent", category: "continuous", status: "active", progress: 100, lastActivity: "Just now", humanAction: false },
+  { id: "ra-aw-3", name: "KRI Threshold Monitoring", agent: "KRI Agent", category: "continuous", status: "active", progress: 100, lastActivity: "4 min ago", humanAction: true },
+  { id: "ra-aw-4", name: "Heat Map Drift Detection", agent: "Heat Map Agent", category: "continuous", status: "active", progress: 100, lastActivity: "12 min ago", humanAction: false },
+  { id: "ra-aw-5", name: "Quarterly Risk Refresh", agent: "Refresh Coordinator", category: "scheduled", status: "active", progress: 24, lastActivity: "Started yesterday", humanAction: false },
+  { id: "ra-aw-6", name: "Annual Risk Appetite Review", agent: "Appetite Agent", category: "scheduled", status: "idle", progress: 0, lastActivity: "Scheduled: May 1", humanAction: false },
+  { id: "ra-aw-7", name: "Survey Distribution & Tracking", agent: "Distribution Agent", category: "scheduled", status: "active", progress: 67, lastActivity: "30 min ago", humanAction: false },
+  { id: "ra-aw-8", name: "Geo-Risk Spike — APAC", agent: "Geo Risk Agent", category: "emergent", status: "active", progress: 80, lastActivity: "15 min ago", humanAction: true },
+  { id: "ra-aw-9", name: "Regulatory Change — EU AI Act", agent: "Regulatory Scanner", category: "emergent", status: "pending-review", progress: 100, lastActivity: "2 hrs ago", humanAction: true },
+];
+
+const riskAssessPendingApprovals: SolutionPendingApproval[] = [
+  { id: "ra-pa-1", title: "Approve APAC Geo-Risk Score Adjustment", agent: "Geo Risk Agent", type: "Score Override", timestamp: "15 min ago", severity: "high" },
+  { id: "ra-pa-2", title: "Confirm KRI Breach Response — Liquidity", agent: "KRI Agent", type: "Threshold Breach", timestamp: "4 min ago", severity: "high" },
+  { id: "ra-pa-3", title: "Validate Auto-Scored Operational Risks", agent: "Assessment Agent", type: "Score Validation", timestamp: "1 hr ago", severity: "medium" },
+  { id: "ra-pa-4", title: "Review EU AI Act Impact Brief", agent: "Regulatory Scanner", type: "Regulatory Change", timestamp: "2 hrs ago", severity: "medium" },
+];
+
+const riskAssessAuditTrailEntries: SolutionAuditTrailEntry[] = [
+  { id: "ra-at-1", timestamp: "Just now", agent: "Intelligence Agent", action: "Synthesized 8 new external signals into the risk universe", type: "auto" },
+  { id: "ra-at-2", timestamp: "4 min ago", agent: "KRI Agent", action: "Liquidity coverage KRI breached amber threshold", type: "escalation" },
+  { id: "ra-at-3", timestamp: "12 min ago", agent: "Heat Map Agent", action: "Detected drift in 3 cells of the inherent risk heat map", type: "auto" },
+  { id: "ra-at-4", timestamp: "15 min ago", agent: "Geo Risk Agent", action: "Recommended +1 step adjustment for APAC operations risk", type: "escalation" },
+  { id: "ra-at-5", timestamp: "30 min ago", agent: "Distribution Agent", action: "Sent reminder to 4 overdue survey respondents", type: "auto" },
+  { id: "ra-at-6", timestamp: "1 hr ago", agent: "Assessment Agent", action: "Auto-scored 42 operational risk items — pending validation", type: "approval" },
+  { id: "ra-at-7", timestamp: "2 hrs ago", agent: "Regulatory Scanner", action: "Drafted EU AI Act impact brief for 6 affected processes", type: "approval" },
+  { id: "ra-at-8", timestamp: "Yesterday", agent: "Refresh Coordinator", action: "Launched Q2 quarterly risk refresh across 12 locations", type: "auto" },
+];
+
+// === Pre-IPO ===
+const preIpoTaskItems: SolutionTaskItemDef[] = [
+  { id: "ipo-task-readiness", title: "Run Pre-IPO Readiness Diagnostic", description: "Score readiness across SOX, financial reporting, governance, and disclosure controls in a single pass.", icon: Target, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", primary: true, actionLabel: "Start", priority: "high" },
+  { id: "ipo-task-gaps", title: "Address 14 Open Readiness Gaps", description: "Material weakness candidates in revenue recognition, equity, and IT general controls require owner action.", icon: AlertTriangle, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "ipo-task-disclosure", title: "Build S-1 Disclosure Controls Inventory", description: "Map every disclosure control to its owner, evidence source, and quarterly testing cadence.", icon: ListChecks, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "ipo-task-walkthroughs", title: "Schedule Pre-IPO Walkthroughs", description: "Coordinate 22 process walkthroughs with the external auditor for Q3 readiness review.", icon: Users, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+  { id: "ipo-task-policy", title: "Approve Updated Insider Trading Policy", description: "Legal-revised policy ready for board approval — pre-IPO trading window controls included.", icon: ShieldCheck, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+  { id: "ipo-task-ic-charter", title: "Finalize Audit Committee Charter", description: "Charter draft aligned to NYSE listing requirements awaits committee chair sign-off.", icon: FileText, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+];
+
+const preIpoAgentWorkflows: SolutionAgentWorkflow[] = [
+  { id: "ipo-aw-1", name: "Pre-IPO Readiness Diagnostic", agent: "Readiness Agent", category: "direct-realtime", status: "active", progress: 0, lastActivity: "Ready to launch", humanAction: false },
+  { id: "ipo-aw-2", name: "SOX Scoping for Public Co", agent: "Scoping Agent", category: "continuous", status: "active", progress: 100, lastActivity: "Just now", humanAction: false },
+  { id: "ipo-aw-3", name: "Material Weakness Watchlist", agent: "MW Tracker", category: "continuous", status: "active", progress: 100, lastActivity: "5 min ago", humanAction: true },
+  { id: "ipo-aw-4", name: "Auditor Coordination Hub", agent: "Auditor Liaison Agent", category: "continuous", status: "active", progress: 100, lastActivity: "20 min ago", humanAction: false },
+  { id: "ipo-aw-5", name: "Quarterly Readiness Re-score", agent: "Readiness Agent", category: "scheduled", status: "active", progress: 45, lastActivity: "Started 3 days ago", humanAction: false },
+  { id: "ipo-aw-6", name: "Annual Disclosure Inventory Refresh", agent: "Disclosure Agent", category: "scheduled", status: "idle", progress: 0, lastActivity: "Scheduled: Jul 15", humanAction: false },
+  { id: "ipo-aw-7", name: "S-1 Working Group Status", agent: "Working Group Agent", category: "scheduled", status: "active", progress: 72, lastActivity: "1 hr ago", humanAction: false },
+  { id: "ipo-aw-8", name: "Revenue Recognition Gap — ASC 606", agent: "Gap Analysis Agent", category: "emergent", status: "active", progress: 50, lastActivity: "30 min ago", humanAction: true },
+  { id: "ipo-aw-9", name: "Stock Comp Restatement Risk", agent: "Equity Agent", category: "emergent", status: "pending-review", progress: 100, lastActivity: "3 hrs ago", humanAction: true },
+];
+
+const preIpoPendingApprovals: SolutionPendingApproval[] = [
+  { id: "ipo-pa-1", title: "Confirm ASC 606 Remediation Owner", agent: "Gap Analysis Agent", type: "Gap Owner", timestamp: "30 min ago", severity: "high" },
+  { id: "ipo-pa-2", title: "Approve Stock Comp Restatement Plan", agent: "Equity Agent", type: "Restatement Plan", timestamp: "3 hrs ago", severity: "high" },
+  { id: "ipo-pa-3", title: "Review Material Weakness Trend Brief", agent: "MW Tracker", type: "Weakness Review", timestamp: "5 min ago", severity: "medium" },
+  { id: "ipo-pa-4", title: "Sign Off on Updated SOX Public-Co Scope", agent: "Scoping Agent", type: "Scope Change", timestamp: "Yesterday", severity: "medium" },
+];
+
+const preIpoAuditTrailEntries: SolutionAuditTrailEntry[] = [
+  { id: "ipo-at-1", timestamp: "Just now", agent: "Scoping Agent", action: "Recalculated SOX scope under public-co thresholds — 6 new key controls", type: "auto" },
+  { id: "ipo-at-2", timestamp: "5 min ago", agent: "MW Tracker", action: "Promoted 1 control deficiency to material weakness candidate", type: "escalation" },
+  { id: "ipo-at-3", timestamp: "20 min ago", agent: "Auditor Liaison Agent", action: "Synced 14 PBC requests with Big Four engagement portal", type: "auto" },
+  { id: "ipo-at-4", timestamp: "30 min ago", agent: "Gap Analysis Agent", action: "Drafted ASC 606 remediation plan for 3 revenue streams", type: "escalation" },
+  { id: "ipo-at-5", timestamp: "1 hr ago", agent: "Working Group Agent", action: "Logged S-1 working group standup notes — 4 new action items", type: "auto" },
+  { id: "ipo-at-6", timestamp: "3 hrs ago", agent: "Equity Agent", action: "Flagged stock comp expense calculation for restatement review", type: "escalation" },
+  { id: "ipo-at-7", timestamp: "Yesterday", agent: "Disclosure Agent", action: "Compiled draft S-1 disclosure controls inventory — 86 controls", type: "approval" },
+  { id: "ipo-at-8", timestamp: "2 days ago", agent: "Readiness Agent", action: "Re-scored pre-IPO readiness — 14 open gaps remain", type: "approval" },
+];
+
+// === Evidence Collection ===
+const evidenceTaskItems: SolutionTaskItemDef[] = [
+  { id: "ev-task-bulk", title: "Run Bulk Evidence Collection Sweep", description: "Pull this period's evidence from connected systems and dispatch PBC requests for the rest in one sweep.", icon: Upload, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", primary: true, actionLabel: "Start", priority: "high" },
+  { id: "ev-task-overdue", title: "Resolve 9 Overdue PBC Requests", description: "Requests outstanding for more than 5 business days — auto-drafted reminders ready to send.", icon: AlertTriangle, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "ev-task-classify", title: "Validate Auto-Classified Documents", description: "127 newly ingested documents classified by the agent need spot-check approval before testing.", icon: FileCheck, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "ev-task-extract-review", title: "Review Field Extraction Confidence", description: "23 documents extracted at low confidence — review before AI consumes for testing.", icon: Search, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+  { id: "ev-task-source-onboard", title: "Onboard New Evidence Source — Workday", description: "Connector approved by IT — finalize field mapping and sync schedule.", icon: Database, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+  { id: "ev-task-retention", title: "Apply Updated Evidence Retention Policy", description: "New 7-year retention rule needs to be propagated to all evidence vault folders.", icon: ShieldCheck, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+];
+
+const evidenceAgentWorkflows: SolutionAgentWorkflow[] = [
+  { id: "ev-aw-1", name: "Bulk Evidence Sweep", agent: "Collection Agent", category: "direct-realtime", status: "active", progress: 0, lastActivity: "Ready to launch", humanAction: false },
+  { id: "ev-aw-2", name: "Connected System Sync", agent: "Connector Agent", category: "continuous", status: "active", progress: 100, lastActivity: "Just now", humanAction: false },
+  { id: "ev-aw-3", name: "Document Classification", agent: "Classifier Agent", category: "continuous", status: "active", progress: 100, lastActivity: "2 min ago", humanAction: true },
+  { id: "ev-aw-4", name: "Field Extraction Pipeline", agent: "Extraction Agent", category: "continuous", status: "active", progress: 100, lastActivity: "6 min ago", humanAction: false },
+  { id: "ev-aw-5", name: "Quarterly PBC Wave", agent: "PBC Coordinator", category: "scheduled", status: "active", progress: 58, lastActivity: "Started 2 days ago", humanAction: false },
+  { id: "ev-aw-6", name: "Evidence Retention Sweep", agent: "Retention Agent", category: "scheduled", status: "idle", progress: 0, lastActivity: "Scheduled: Apr 30", humanAction: false },
+  { id: "ev-aw-7", name: "Source Reliability Scoring", agent: "Reliability Agent", category: "scheduled", status: "completed", progress: 100, lastActivity: "Yesterday", humanAction: true },
+  { id: "ev-aw-8", name: "Source Outage — Okta IAM", agent: "Connector Agent", category: "emergent", status: "active", progress: 65, lastActivity: "15 min ago", humanAction: true },
+  { id: "ev-aw-9", name: "PBC Backlog — Finance Team", agent: "PBC Coordinator", category: "emergent", status: "pending-review", progress: 100, lastActivity: "1 hr ago", humanAction: true },
+];
+
+const evidencePendingApprovals: SolutionPendingApproval[] = [
+  { id: "ev-pa-1", title: "Approve Re-routed Okta Pulls", agent: "Connector Agent", type: "Source Failover", timestamp: "15 min ago", severity: "high" },
+  { id: "ev-pa-2", title: "Triage Finance Team PBC Backlog", agent: "PBC Coordinator", type: "Backlog Triage", timestamp: "1 hr ago", severity: "high" },
+  { id: "ev-pa-3", title: "Validate Low-Confidence Extractions", agent: "Extraction Agent", type: "Extraction QA", timestamp: "6 min ago", severity: "medium" },
+  { id: "ev-pa-4", title: "Sign Off on Source Reliability Scores", agent: "Reliability Agent", type: "Score Review", timestamp: "Yesterday", severity: "medium" },
+];
+
+const evidenceAuditTrailEntries: SolutionAuditTrailEntry[] = [
+  { id: "ev-at-1", timestamp: "Just now", agent: "Connector Agent", action: "Synced 412 records from SAP ERP — 0 failures", type: "auto" },
+  { id: "ev-at-2", timestamp: "2 min ago", agent: "Classifier Agent", action: "Auto-classified 127 newly uploaded documents", type: "approval" },
+  { id: "ev-at-3", timestamp: "6 min ago", agent: "Extraction Agent", action: "Extracted 380 fields — 23 flagged as low confidence", type: "approval" },
+  { id: "ev-at-4", timestamp: "15 min ago", agent: "Connector Agent", action: "Detected Okta IAM connector outage — failover engaged", type: "escalation" },
+  { id: "ev-at-5", timestamp: "30 min ago", agent: "PBC Coordinator", action: "Sent 28 PBC reminder emails for outstanding requests", type: "auto" },
+  { id: "ev-at-6", timestamp: "1 hr ago", agent: "PBC Coordinator", action: "Identified Finance Team PBC backlog (12 items overdue)", type: "escalation" },
+  { id: "ev-at-7", timestamp: "Yesterday", agent: "Reliability Agent", action: "Generated source reliability scorecard — pending review", type: "approval" },
+  { id: "ev-at-8", timestamp: "2 days ago", agent: "Collection Agent", action: "Completed quarterly bulk sweep — 4,318 evidence artifacts", type: "auto" },
+];
+
+const solutionConfigs: Record<string, SolutionDef> = {
+  "sox-control-testing": {
+    id: "sox-control-testing",
+    label: "SOX Control Testing",
+    shortLabel: "SOX",
+    tagline: "Automated control testing for the SOX audit cycle",
+    description: "Run automated, agentic control testing across connected systems with PBC workflows for the manual remainder.",
+    icon: Shield,
+    iconColor: "text-[#266C92]",
+    iconBg: "bg-[#266C92]/10",
+    welcomeSubtitle: "Here's what needs your attention today.",
+    taskItems: soxTaskItems,
+    pendingApprovals: soxPendingApprovals,
+    agentWorkflows: soxAgentWorkflows,
+    auditTrailEntries: soxAuditTrailEntries,
+  },
+  "third-party-risk": {
+    id: "third-party-risk",
+    label: "Third-Party Risk Management",
+    shortLabel: "TPRM",
+    tagline: "Vendor onboarding, monitoring, and concentration risk",
+    description: "Automate vendor onboarding due diligence, ongoing SOC 2 monitoring, and incident-driven reassessments.",
+    icon: GitBranch,
+    iconColor: "text-violet-600 dark:text-violet-400",
+    iconBg: "bg-violet-100 dark:bg-violet-900/20",
+    welcomeSubtitle: "Vendor risk activity awaiting your attention.",
+    taskItems: tprmTaskItems,
+    pendingApprovals: tprmPendingApprovals,
+    agentWorkflows: tprmAgentWorkflows,
+    auditTrailEntries: tprmAuditTrailEntries,
+  },
+  "risk-assessments": {
+    id: "risk-assessments",
+    label: "Risk Assessments",
+    shortLabel: "Risk",
+    tagline: "Enterprise risk surveys, scoring, and heat maps",
+    description: "Coordinate enterprise risk surveys, auto-score operational items, and surface drift in heat maps as it happens.",
+    icon: BarChart3,
+    iconColor: "text-amber-600 dark:text-amber-400",
+    iconBg: "bg-amber-100 dark:bg-amber-900/20",
+    welcomeSubtitle: "Risk movement and assessment work for this cycle.",
+    taskItems: riskAssessTaskItems,
+    pendingApprovals: riskAssessPendingApprovals,
+    agentWorkflows: riskAssessAgentWorkflows,
+    auditTrailEntries: riskAssessAuditTrailEntries,
+  },
+  "pre-ipo": {
+    id: "pre-ipo",
+    label: "Pre-IPO",
+    shortLabel: "IPO",
+    tagline: "Public-company readiness across SOX, controls, and disclosures",
+    description: "Track readiness across SOX scope-up, disclosure controls, material weakness candidates, and auditor coordination.",
+    icon: Target,
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/20",
+    welcomeSubtitle: "Where the readiness program stands today.",
+    taskItems: preIpoTaskItems,
+    pendingApprovals: preIpoPendingApprovals,
+    agentWorkflows: preIpoAgentWorkflows,
+    auditTrailEntries: preIpoAuditTrailEntries,
+  },
+  "evidence-collection": {
+    id: "evidence-collection",
+    label: "Evidence Collection",
+    shortLabel: "Evidence",
+    tagline: "Connected pulls, PBC requests, classification, and extraction",
+    description: "Collect, classify, and extract evidence at scale — from connected systems and PBC requests in a single pipeline.",
+    icon: FileSpreadsheet,
+    iconColor: "text-sky-600 dark:text-sky-400",
+    iconBg: "bg-sky-100 dark:bg-sky-900/20",
+    welcomeSubtitle: "What the evidence pipeline needs from you right now.",
+    taskItems: evidenceTaskItems,
+    pendingApprovals: evidencePendingApprovals,
+    agentWorkflows: evidenceAgentWorkflows,
+    auditTrailEntries: evidenceAuditTrailEntries,
+  },
+};
+
+const solutionOrder: string[] = [
+  "sox-control-testing",
+  "third-party-risk",
+  "risk-assessments",
+  "pre-ipo",
+  "evidence-collection",
+];
+
+function SolutionsHome() {
+  const setCurrentSolution = useWorkflowSessionStore((s) => s.setCurrentSolution);
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden" data-testid="solutions-home">
+      <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background">
+        <div className="w-[90%] mx-auto px-6 py-8">
+          <div className="mb-6">
+            <h1 className="text-xl font-semibold text-foreground mb-1" data-testid="text-optro-welcome">Welcome to Optro</h1>
+            <p className="text-sm text-muted-foreground">Pick a solution area to get started.</p>
+          </div>
+
+          <div className="space-y-2 mb-6" data-testid="solutions-list">
+            <div className="flex items-center gap-2 mb-1 px-1">
+              <Layers className="w-3.5 h-3.5 text-slate-400" />
+              <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Solutions</h2>
+            </div>
+            {solutionOrder.map((id) => {
+              const s = solutionConfigs[id];
+              if (!s) return null;
+              const SIcon = s.icon;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setCurrentSolution(s.id)}
+                  className="group w-full flex items-start gap-4 p-4 rounded-lg border bg-white dark:bg-card text-left transition-all border-[#266C92]/30 hover:border-[#266C92] hover:shadow-sm cursor-pointer"
+                  data-testid={`solution-card-${s.id}`}
+                >
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${s.iconBg}`}>
+                    <SIcon className={`w-4.5 h-4.5 ${s.iconColor}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <h3 className="text-sm font-medium text-foreground">{s.label}</h3>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{s.description}</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 mt-2 opacity-50 group-hover:opacity-100 transition-opacity" />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OptroHome({ solutionId = "sox-control-testing" }: { solutionId?: string }) {
+  const solution = solutionConfigs[solutionId] ?? solutionConfigs["sox-control-testing"];
+  const setCurrentSolution = useWorkflowSessionStore((s) => s.setCurrentSolution);
+  const isSox = solution.id === "sox-control-testing";
+  const { toast } = useToast();
+  const stubLaunch = useCallback(() => {
+    toast({ title: `${solution.label} workflow coming soon`, description: "This solution is stubbed for now — wiring is on the way." });
+  }, [toast, solution.label]);
   const addProject = useWorkflowSessionStore((s) => s.addProject);
   const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
   const setPendingCanvasView = useWorkflowSessionStore((s) => s.setPendingCanvasView);
@@ -979,65 +1334,29 @@ function OptroHome() {
     setLocation("/testing-plan");
   }, [setLocation]);
 
-  const taskItems = [
-    {
-      id: "task-control-testing",
-      title: "Test Controls for SOX Audit",
-      description: "Launch automated control testing across connected systems and PBC workflows for the current audit period.",
-      icon: Shield,
-      iconColor: "text-slate-500 dark:text-slate-400",
-      iconBg: "bg-slate-100 dark:bg-slate-800/30",
-      action: launchControlTestingDirect,
-      actionLabel: "Start",
-      configAction: launchControlTestingFromCard,
-      priority: "high" as const,
-    },
-    {
-      id: "task-review-exceptions",
-      title: "Review Open Exceptions",
-      description: "3 control exceptions from prior testing cycle awaiting management response and remediation plans.",
-      icon: AlertTriangle,
-      iconColor: "text-slate-500 dark:text-slate-400",
-      iconBg: "bg-slate-100 dark:bg-slate-800/30",
-      priority: "medium" as const,
-    },
-    {
-      id: "task-evidence-requests",
-      title: "Follow Up on Evidence Requests",
-      description: "5 PBC evidence requests are pending — 2 overdue by more than 3 business days.",
-      icon: FileText,
-      iconColor: "text-slate-500 dark:text-slate-400",
-      iconBg: "bg-slate-100 dark:bg-slate-800/30",
-      priority: "medium" as const,
-    },
-    {
-      id: "task-risk-assessment",
-      title: "Complete Risk Assessment Updates",
-      description: "Quarterly risk assessment scoring due for 4 process areas. Last updated 87 days ago.",
-      icon: BarChart3,
-      iconColor: "text-slate-500 dark:text-slate-400",
-      iconBg: "bg-slate-100 dark:bg-slate-800/30",
-      priority: "low" as const,
-    },
-    {
-      id: "task-walkthrough-scheduling",
-      title: "Schedule Control Walkthroughs",
-      description: "Annual walkthrough cycle begins next month — 12 control owners need scheduling confirmation.",
-      icon: Users,
-      iconColor: "text-slate-500 dark:text-slate-400",
-      iconBg: "bg-slate-100 dark:bg-slate-800/30",
-      priority: "low" as const,
-    },
-    {
-      id: "task-report-preparation",
-      title: "Prepare Committee Report",
-      description: "Audit committee meeting in 3 weeks — draft testing status report and exception summary.",
-      icon: ListChecks,
-      iconColor: "text-slate-500 dark:text-slate-400",
-      iconBg: "bg-slate-100 dark:bg-slate-800/30",
-      priority: "low" as const,
-    },
-  ];
+  const agentWorkflows = solution.agentWorkflows;
+  const pendingApprovals = solution.pendingApprovals;
+  const auditTrailEntries = solution.auditTrailEntries;
+
+  const taskItems = solution.taskItems.map((t) => {
+    const isPrimary = !!t.primary;
+    const action = isPrimary
+      ? (isSox ? launchControlTestingDirect : stubLaunch)
+      : undefined;
+    const configAction = isPrimary && isSox ? launchControlTestingFromCard : undefined;
+    return {
+      id: t.id,
+      title: t.title,
+      description: t.description,
+      icon: t.icon,
+      iconColor: t.iconColor,
+      iconBg: t.iconBg,
+      action,
+      actionLabel: t.actionLabel,
+      configAction,
+      priority: t.priority,
+    };
+  });
 
   const activeAgentCount = agentWorkflows.filter(w => w.status === "active").length;
   const pendingCount = pendingApprovals.length;
@@ -1056,11 +1375,21 @@ function OptroHome() {
       <div className="flex-1 min-h-0 overflow-y-auto bg-slate-50 dark:bg-background">
         <div className="w-[90%] mx-auto px-6 py-8">
           <div className="mb-6">
+            <button
+              type="button"
+              onClick={() => setCurrentSolution(null)}
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-2 transition-colors"
+              data-testid="button-back-to-solutions"
+            >
+              <ArrowLeft className="w-3 h-3" />
+              <span>All solutions</span>
+              <span className="text-slate-300 dark:text-slate-600">/</span>
+              <span className="text-foreground font-medium">{solution.label}</span>
+            </button>
             <h1 className="text-xl font-semibold text-foreground mb-1" data-testid="text-optro-welcome">Welcome to Optro</h1>
-            <p className="text-sm text-muted-foreground">Here's what needs your attention today.</p>
+            <p className="text-sm text-muted-foreground">{solution.welcomeSubtitle}</p>
           </div>
 
-          {showLandingWidgets && (
           <div className="grid grid-cols-4 gap-3 mb-6" data-testid="optro-stats-bar">
             <div className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card">
               <div className="flex items-center gap-2 mb-1.5">
@@ -1095,7 +1424,6 @@ function OptroHome() {
               <span className="text-[10px] text-muted-foreground ml-1.5">in audit trail</span>
             </div>
           </div>
-          )}
 
           <div className="space-y-2 mb-6" data-testid="optro-task-list">
             <div className="flex items-center gap-2 mb-1 px-1">
@@ -1186,7 +1514,7 @@ function OptroHome() {
             })()}
           </div>
 
-          {showLandingWidgets && (<>
+          {(<>
           <div className="grid lg:grid-cols-2 gap-5 mb-6">
             <div className="space-y-3" data-testid="optro-pending-approvals">
               <div className="flex items-center gap-2 px-1">
@@ -7014,6 +7342,7 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
   const isSimple = settings.agentHubViewMode !== "complex";
   const scenario = settings.agentHubScenario || "fieldwork-automation";
   const currentSessionId = useWorkflowSessionStore((s) => s.currentSessionId);
+  const currentSolutionId = useWorkflowSessionStore((s) => s.currentSolutionId);
   const [envView, setEnvView] = useState<string | null>(null);
 
   useEffect(() => {
@@ -7045,7 +7374,10 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
     if (currentSessionId === "control-testing") {
       return <FieldworkComplexHub />;
     }
-    return <OptroHome />;
+    if (!currentSolutionId) {
+      return <SolutionsHome />;
+    }
+    return <OptroHome solutionId={currentSolutionId} />;
   }
 
   return <ComplexAgentHub workspaceId={workspaceId} welcomeMessage={welcomeMessage} scenario={scenario} />;

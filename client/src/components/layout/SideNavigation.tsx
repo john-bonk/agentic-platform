@@ -487,7 +487,7 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
-  const { currentSessionId, setCurrentSession } = useWorkflowSessionStore();
+  const { currentSessionId, setCurrentSession, setCurrentSolution } = useWorkflowSessionStore();
 
   const isActive = (path: string) => {
     if (path.includes("#")) {
@@ -617,7 +617,7 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
                   className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${isHomeActive && !currentSessionId ? "bg-teal-50 dark:bg-primary/10" : ""}`}
                   data-testid="nav-collapsed-home"
                   title="Home"
-                  onClick={() => setCurrentSession(null)}
+                  onClick={() => { setCurrentSession(null); setCurrentSolution(null); }}
                 >
                   <Home className={`w-3 h-3 ${isHomeActive && !currentSessionId ? "text-teal-600 dark:text-primary" : "text-gray-500 dark:text-muted-foreground"}`} />
                 </button>
@@ -775,7 +775,7 @@ export function SideNavigation({ sections, moduleGroups, title, className = "", 
                 label="Home" 
                 path={currentWorkspace.isCustom ? "/custom-workspace" : "/"} 
                 isActive={isHomeActive && !currentSessionId}
-                onClick={() => { setCurrentSession(null); if (window.location.hash) { window.location.hash = ""; window.history.replaceState(null, "", window.location.pathname); } }}
+                onClick={() => { setCurrentSession(null); setCurrentSolution(null); if (window.location.hash) { window.location.hash = ""; window.history.replaceState(null, "", window.location.pathname); } }}
               />
               <QuickAccessItem 
                 icon={Clock} 

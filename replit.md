@@ -29,6 +29,7 @@ Preferred communication style: Simple, everyday language.
 -   **Form Management**: React Hook Form with Zod for robust form validation.
 -   **Theming**: `ThemeProvider` context for dark/light mode, persisted in local storage.
 -   **Settings**: A `SettingsPanel` with local storage persistence and `CustomEvent` for synchronization.
+-   **Solutions Hierarchy**: A top-level "Welcome to Optro" landing (`SolutionsHome`) lists 5 solution areas (SOX Control Testing, Third-Party Risk Management, Risk Assessments, Pre-IPO, Evidence Collection). Selecting a solution sets `currentSolutionId` in the workflow session store and renders a solution-tailored copy of `OptroHome`. Only `sox-control-testing` is fully wired; the other four use stubbed task lists, agent workflows, pending approvals, and audit trails — their primary "Start" buttons surface a "coming soon" toast.
 
 **Routing**: Wouter library for lightweight, client-side routing.
 

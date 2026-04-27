@@ -31,7 +31,6 @@ interface SettingsState {
   agentHubEnabled: boolean;
   agentHubScenario: "risk-assessment" | "fieldwork-automation";
   agentHubViewMode: "simple" | "complex";
-  showLandingWidgets: boolean;
 }
 
 const defaultSettings: SettingsState = {
@@ -44,7 +43,6 @@ const defaultSettings: SettingsState = {
   agentHubEnabled: true,
   agentHubScenario: "fieldwork-automation",
   agentHubViewMode: "complex",
-  showLandingWidgets: false,
 };
 
 const STORAGE_KEY = "dashboard-settings";
@@ -169,17 +167,6 @@ export function SettingsPanel() {
                 checked={settings.showBrowser}
                 onCheckedChange={(checked) => updateSetting("showBrowser", checked)}
                 data-testid="switch-show-browser"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="show-widgets" className="text-sm text-muted-foreground">
-                Show widgets
-              </Label>
-              <Switch
-                id="show-widgets"
-                checked={settings.showLandingWidgets}
-                onCheckedChange={(checked) => updateSetting("showLandingWidgets", checked)}
-                data-testid="switch-show-widgets"
               />
             </div>
           </div>
