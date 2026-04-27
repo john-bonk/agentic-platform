@@ -1265,8 +1265,8 @@ function SolutionsHome() {
                   className="group w-full flex items-start gap-4 p-4 rounded-lg border bg-white dark:bg-card text-left transition-all border-[#266C92]/30 hover:border-[#266C92] hover:shadow-sm cursor-pointer"
                   data-testid={`solution-card-${s.id}`}
                 >
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${s.iconBg}`}>
-                    <SIcon className={`w-4.5 h-4.5 ${s.iconColor}`} />
+                  <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800/30 flex items-center justify-center shrink-0 mt-0.5">
+                    <SIcon className="w-4.5 h-4.5 text-slate-500 dark:text-slate-400" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
@@ -1358,11 +1358,6 @@ function OptroHome({ solutionId = "sox-control-testing" }: { solutionId?: string
     };
   });
 
-  const activeAgentCount = agentWorkflows.filter(w => w.status === "active").length;
-  const pendingCount = pendingApprovals.length;
-  const continuousCount = agentWorkflows.filter(w => w.category === "continuous" && w.status === "active").length;
-  const escalationCount = auditTrailEntries.filter(e => e.type === "escalation").length;
-
   const groupedWorkflows = [
     { key: "direct-realtime" as AgentCategory, label: "Direct Action", icon: Zap, workflows: agentWorkflows.filter(w => w.category === "direct-realtime") },
     { key: "continuous" as AgentCategory, label: "Continuous", icon: Activity, workflows: agentWorkflows.filter(w => w.category === "continuous") },
@@ -1383,46 +1378,8 @@ function OptroHome({ solutionId = "sox-control-testing" }: { solutionId?: string
             >
               <ArrowLeft className="w-3 h-3" />
               <span>All solutions</span>
-              <span className="text-slate-300 dark:text-slate-600">/</span>
-              <span className="text-foreground font-medium">{solution.label}</span>
             </button>
-            <h1 className="text-xl font-semibold text-foreground mb-1" data-testid="text-optro-welcome">Welcome to Optro</h1>
-            <p className="text-sm text-muted-foreground">{solution.welcomeSubtitle}</p>
-          </div>
-
-          <div className="grid grid-cols-4 gap-3 mb-6" data-testid="optro-stats-bar">
-            <div className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card">
-              <div className="flex items-center gap-2 mb-1.5">
-                <Bot className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-[11px] text-muted-foreground font-medium">Active Agents</span>
-              </div>
-              <span className="text-xl font-bold text-foreground">{activeAgentCount}</span>
-              <span className="text-[10px] text-muted-foreground ml-1.5">of {agentWorkflows.length}</span>
-            </div>
-            <div className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card">
-              <div className="flex items-center gap-2 mb-1.5">
-                <ClipboardCheck className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-[11px] text-muted-foreground font-medium">Pending Approvals</span>
-              </div>
-              <span className="text-xl font-bold text-foreground">{pendingCount}</span>
-              <span className="text-[10px] text-muted-foreground ml-1.5">awaiting review</span>
-            </div>
-            <div className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card">
-              <div className="flex items-center gap-2 mb-1.5">
-                <Activity className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-[11px] text-muted-foreground font-medium">Continuous</span>
-              </div>
-              <span className="text-xl font-bold text-foreground">{continuousCount}</span>
-              <span className="text-[10px] text-muted-foreground ml-1.5">monitoring</span>
-            </div>
-            <div className="p-3 rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card">
-              <div className="flex items-center gap-2 mb-1.5">
-                <Fingerprint className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-[11px] text-muted-foreground font-medium">Escalations</span>
-              </div>
-              <span className="text-xl font-bold text-foreground">{escalationCount}</span>
-              <span className="text-[10px] text-muted-foreground ml-1.5">in audit trail</span>
-            </div>
+            <h1 className="text-xl font-semibold text-foreground" data-testid="text-optro-welcome">{solution.label}</h1>
           </div>
 
           <div className="space-y-2 mb-6" data-testid="optro-task-list">
