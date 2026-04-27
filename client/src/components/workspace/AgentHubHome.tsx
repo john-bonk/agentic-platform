@@ -96,6 +96,7 @@ import {
 } from "@/config/agentHubConfig";
 import { WorkflowSession, ExecutiveReportView, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, fieldworkExceptions, fieldworkNextStepActions, masterControlsList, fieldworkStepOrder, DEMO_CONTROL_ID, type WorkflowSessionConfig, type ControlWorkflowStatus, type FieldworkException } from "./WorkflowSession";
 import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
+import TPRMSession from "./TPRMSession";
 const AnnotationOverlay = lazy(() => import("./AnnotationOverlay"));
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
@@ -1289,6 +1290,7 @@ function OptroHome({ solutionId = "sox-control-testing" }: { solutionId?: string
   const solution = solutionConfigs[solutionId] ?? solutionConfigs["sox-control-testing"];
   const setCurrentSolution = useWorkflowSessionStore((s) => s.setCurrentSolution);
   const isSox = solution.id === "sox-control-testing";
+  const isTprm = solution.id === "third-party-risk";
   const { toast } = useToast();
   const stubLaunch = useCallback(() => {
     toast({ title: `${solution.label} workflow coming soon`, description: "This solution is stubbed for now — wiring is on the way." });
@@ -1334,6 +1336,10 @@ function OptroHome({ solutionId = "sox-control-testing" }: { solutionId?: string
     setLocation("/testing-plan");
   }, [setLocation]);
 
+  const launchTprmAssessmentDirect = useCallback(() => {
+    setLocation("/tprm-planning");
+  }, [setLocation]);
+
   const agentWorkflows = solution.agentWorkflows;
   const pendingApprovals = solution.pendingApprovals;
   const auditTrailEntries = solution.auditTrailEntries;
@@ -1341,7 +1347,7 @@ function OptroHome({ solutionId = "sox-control-testing" }: { solutionId?: string
   const taskItems = solution.taskItems.map((t) => {
     const isPrimary = !!t.primary;
     const action = isPrimary
-      ? (isSox ? launchControlTestingDirect : stubLaunch)
+      ? (isSox ? launchControlTestingDirect : isTprm ? launchTprmAssessmentDirect : stubLaunch)
       : undefined;
     const configAction = isPrimary && isSox ? launchControlTestingFromCard : undefined;
     return {
@@ -7170,6 +7176,23 @@ interface AgentHubHomeProps {
 export const workflowSessionConfigs: Record<string, { create: () => WorkflowSessionConfig; label: string; icon: string }> = {
   "risk-assessment": { create: getRiskAssessmentConfig, label: "Risk Assessment", icon: "trending-up" },
   "control-testing": { create: getFieldworkAutomationConfig, label: "Automated Control Testing", icon: "shield" },
+  "tprm-assessment": {
+    create: () => ({
+      id: "tprm-assessment",
+      title: "Third-Party Risk Assessment",
+      blocks: [
+        {
+          id: "pipeline",
+          title: "Vendor Pipeline",
+          description: "Parallel vendor assessments across the 9-step TPRM workflow",
+          type: "automated",
+          render: () => <></>,
+        },
+      ],
+    }),
+    label: "Third-Party Risk Assessment",
+    icon: "git-branch",
+  },
 };
 
 const workflowRowToSession: Record<string, string> = {
@@ -7330,6 +7353,9 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
   if (scenario === "fieldwork-automation") {
     if (currentSessionId === "control-testing") {
       return <FieldworkComplexHub />;
+    }
+    if (currentSessionId === "tprm-assessment") {
+      return <TPRMSession />;
     }
     if (!currentSolutionId) {
       return <SolutionsHome />;

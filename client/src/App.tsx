@@ -60,6 +60,7 @@ import {
   RiskCalculationPage,
   AIGovernancePage,
   TestingPlanPage,
+  TPRMPlanningPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 import { BrowserChrome } from "@/components/layout/BrowserChrome";
@@ -168,6 +169,7 @@ function Router() {
       <Route path="/prototype-meta" component={PrototypeMetaPage} />
       <Route path="/ai-governance" component={AIGovernancePage} />
       <Route path="/testing-plan" component={TestingPlanPage} />
+      <Route path="/tprm-planning" component={TPRMPlanningPage} />
       
       {/* 404 - Must be last */}
       <Route component={NotFound} />

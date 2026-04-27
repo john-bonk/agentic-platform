@@ -98,3 +98,14 @@ An integrated intelligence layer provides context-aware responses and report gen
 
 **Data Storage**:
 -   Drizzle ORM (for future PostgreSQL integration)
+
+# Workflow Archetype
+
+Optro's agentic GRC solutions follow a shared **workflow archetype** that codifies how a "solution" turns a population of objects into completed assessments. Two solutions are fully built on the archetype today:
+
+-   **SOX Control Testing** — object: `Control`, session id `control-testing`, planning route `/testing-plan`, session view `FieldworkComplexHub`.
+-   **Third-Party Risk Management (TPRM)** — object: `Vendor`, session id `tprm-assessment`, planning route `/tprm-planning`, session view `TPRMSession`. Domain data lives in `client/src/lib/tprmData.ts` (9 vendors, 9-step / 4-phase workflow with substep-level AI / AUTO / HITL action tags). Launcher: `client/src/lib/tprmLauncher.ts`.
+
+The shared archetype contract — `SubstepActionType`, `ArchetypeStep`, `ArchetypeSubstep`, `ArchetypePhase`, `ArchetypeConfig`, `StepRunStatus`, `ACTION_TYPE_META`, `getStepProgress` — lives in `client/src/lib/workflowArchetype.ts`. TPRM publishes its config as `tprmArchetypeConfig: ArchetypeConfig` and serves as the reference implementation.
+
+For the full archetype contract and a step-by-step recipe for adding a new solution that consumes it, see `docs/workflow-archetype.md`.
