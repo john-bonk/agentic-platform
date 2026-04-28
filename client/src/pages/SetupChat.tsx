@@ -1,20 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   useSetupStore,
+  type ComplianceScope,
+  type ConnectionId,
+  type DefaultTrigger,
   type Industry,
+  type SolutionId,
 } from "@/lib/setupStore";
 import {
   ACCENT,
@@ -25,18 +16,17 @@ import {
   TOTAL_STEPS,
   TRIGGER_OPTIONS,
 } from "@/lib/setupConfig";
-import {
-  ArrowRight,
-  Check,
-  Sparkles,
-} from "lucide-react";
+import { ArrowUp, Sparkles } from "lucide-react";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Conversational copy — phrased like an actual chat, not a form prompt.
+// ─────────────────────────────────────────────────────────────────────────────
 const STEP_PROMPTS: Record<number, string> = {
-  1: "Welcome to Optro. Let's get your workspace set up — should take about a minute. First, tell me about your organization.",
-  2: "Now let's connect your data sources. I'll use these to automate evidence collection and pull context for analysis.",
-  3: "Which solutions do you want to activate? You can always add more later.",
-  4: "Just a few defaults to set — these can all be changed per workflow at any time.",
-  5: "All set. Here's what I've configured for your workspace.",
+  1: "Hi — I'm Optro. Let's get your workspace set up. First, what's your organization called, and what should I know about your industry and compliance scope?",
+  2: "Got it. Now, which data sources should I connect? I'll use these for evidence collection and context. Tap any to toggle, or skip and I'll come back to it.",
+  3: "Which solutions do you want active? You can always add more later.",
+  4: "Just a few defaults — all changeable per workflow.",
+  5: "All set. Here's what I've configured.",
 };
 
 interface SetupChatProps {
@@ -45,10 +35,16 @@ interface SetupChatProps {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Bubble primitives
+// Bubble + chip primitives
 // ─────────────────────────────────────────────────────────────────────────────
 
-function OptroBubble({ children, animate = false }: { children: React.ReactNode; animate?: boolean }) {
+function OptroBubble({
+  children,
+  animate = false,
+}: {
+  children: React.ReactNode;
+  animate?: boolean;
+}) {
   return (
     <div
       className={`flex items-start gap-3 ${animate ? "animate-in fade-in slide-in-from-bottom-2 duration-300" : ""}`}
@@ -61,7 +57,10 @@ function OptroBubble({ children, animate = false }: { children: React.ReactNode;
         <Sparkles className="w-3.5 h-3.5" style={{ color: ACCENT }} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-mono uppercase tracking-[0.18em] mb-1" style={{ color: ACCENT }}>
+        <p
+          className="text-[10px] font-mono uppercase tracking-[0.18em] mb-1"
+          style={{ color: ACCENT }}
+        >
           Optro
         </p>
         <div className="text-sm text-foreground leading-relaxed">{children}</div>
@@ -86,7 +85,74 @@ function UserBubble({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Active-step input area: visually attached to the most recent Optro bubble.
+function TypingIndicator() {
+  return (
+    <div
+      className="flex items-start gap-3 animate-in fade-in duration-200"
+      data-testid="typing-indicator"
+    >
+      <div
+        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+        style={{ background: `${ACCENT}14` }}
+      >
+        <Sparkles className="w-3.5 h-3.5" style={{ color: ACCENT }} />
+      </div>
+      <div className="flex items-center gap-1 mt-3 ml-0.5">
+        <span
+          className="w-1.5 h-1.5 rounded-full animate-bounce"
+          style={{ background: ACCENT, animationDelay: "0ms" }}
+        />
+        <span
+          className="w-1.5 h-1.5 rounded-full animate-bounce"
+          style={{ background: ACCENT, animationDelay: "150ms" }}
+        />
+        <span
+          className="w-1.5 h-1.5 rounded-full animate-bounce"
+          style={{ background: ACCENT, animationDelay: "300ms" }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground mb-1.5">
+      {children}
+    </p>
+  );
+}
+
+// Subtle pill chip — the only selectable primitive used in chat mode.
+function Chip({
+  active,
+  onClick,
+  children,
+  testId,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  testId?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      data-testid={testId}
+      className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+        active
+          ? "border-transparent text-white shadow-sm"
+          : "bg-transparent border-border text-foreground/70 hover:border-foreground/40 hover:text-foreground"
+      }`}
+      style={active ? { background: ACCENT } : undefined}
+    >
+      {children}
+    </button>
+  );
+}
+
+// Active-step chip area — visually attached to the most recent Optro bubble.
 function ActiveInputs({ children }: { children: React.ReactNode }) {
   return (
     <div
@@ -99,12 +165,12 @@ function ActiveInputs({ children }: { children: React.ReactNode }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Per-step renderers — the answer summary (when step is past) and the inputs
-// (when step is active).
+// Main component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function SetupChat({ onFinish, onSkipConfirmed }: SetupChatProps) {
   const [skipPrompt, setSkipPrompt] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
   const {
     currentStep,
     data,
@@ -118,12 +184,6 @@ export default function SetupChat({ onFinish, onSkipConfirmed }: SetupChatProps)
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const goNext = () => setStep(Math.min(currentStep + 1, TOTAL_STEPS));
-  const handleFinish = () => {
-    complete();
-    setTimeout(onFinish, 240);
-  };
-
   const connectionCount = useMemo(
     () => Object.values(data.connections).filter(Boolean).length,
     [data.connections],
@@ -132,15 +192,72 @@ export default function SetupChat({ onFinish, onSkipConfirmed }: SetupChatProps)
     () => SOLUTIONS.filter((s) => data.solutions[s.id]),
     [data.solutions],
   );
+  const anySolutionSelected = activeSolutions.length > 0;
 
-  // Auto-scroll to bottom whenever the step advances or the active inputs change.
+  // advance() simulates a brief "Optro is typing" beat between turns —
+  // sells the chat feel and gives the user time to register their answer
+  // landing in the transcript before the next prompt appears.
+  const advance = (next: number) => {
+    setIsThinking(true);
+    setTimeout(() => {
+      setStep(next);
+      setIsThinking(false);
+    }, 650);
+  };
+
+  const handleSend = () => {
+    if (currentStep < TOTAL_STEPS) {
+      advance(currentStep + 1);
+    } else {
+      complete();
+      setTimeout(onFinish, 240);
+    }
+  };
+
+  // Auto-scroll to bottom on step change OR when the typing indicator toggles.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     requestAnimationFrame(() => {
       el.scrollTop = el.scrollHeight;
     });
-  }, [currentStep]);
+  }, [currentStep, isThinking]);
+
+  // Per-step send-disabled rules.
+  const sendDisabled = (() => {
+    switch (currentStep) {
+      case 1:
+        return !data.orgName.trim();
+      case 3:
+        return !anySolutionSelected;
+      default:
+        return false;
+    }
+  })();
+
+  // Composer label: short on most steps (just an arrow), explicit on step 5.
+  const sendLabel = currentStep === TOTAL_STEPS ? "Open Solutions" : null;
+
+  // Composer helper text — inline, conversational, replaces the wizard's
+  // bordered helper rows.
+  const composerHelper = (() => {
+    switch (currentStep) {
+      case 2:
+        return connectionCount === 0
+          ? "Skip and I'll come back to this."
+          : `${connectionCount} connected — send when ready`;
+      case 3:
+        return anySolutionSelected
+          ? `${activeSolutions.length} selected`
+          : "Tap at least one solution to continue";
+      case 4:
+        return "Defaults set — change per workflow anytime";
+      case 5:
+        return "Ready to go";
+      default:
+        return "";
+    }
+  })();
 
   // Summaries shown as the user's "answer" once a step is in the past.
   const stepAnswer = (step: number): React.ReactNode => {
@@ -149,336 +266,225 @@ export default function SetupChat({ onFinish, onSkipConfirmed }: SetupChatProps)
         const parts = [
           data.orgName.trim() || "—",
           data.industry,
-          data.complianceScope.length > 0 ? data.complianceScope.join(", ") : "No compliance scope",
+          data.complianceScope.length > 0
+            ? data.complianceScope.join(", ")
+            : "no compliance scope",
         ];
         return parts.join(" · ");
       }
       case 2: {
-        if (connectionCount === 0) return "Skipped for now — I'll connect data sources later.";
+        if (connectionCount === 0) return "Skip for now.";
         const names = CONNECTIONS.filter((c) => data.connections[c.id]).map((c) => c.name);
-        return `Connected ${connectionCount}: ${names.join(", ")}`;
+        return `Connected: ${names.join(", ")}`;
       }
       case 3: {
-        if (activeSolutions.length === 0) return "No solutions activated yet.";
+        if (activeSolutions.length === 0) return "None.";
         return `Activated: ${activeSolutions.map((s) => s.name).join(", ")}`;
       }
       case 4: {
-        const trigger = TRIGGER_OPTIONS.find((o) => o.value === data.defaultTrigger)?.label ?? "—";
+        const trigger =
+          TRIGGER_OPTIONS.find((o) => o.value === data.defaultTrigger)?.label ?? "—";
         const approver =
           data.hitlApprover === "any-admin"
             ? "Any Admin"
             : data.hitlApprover === "assigned-reviewer"
               ? "Assigned reviewer"
               : "Per workflow";
-        return `Trigger: ${trigger.replace(" (direct action)", "")} · Approver: ${approver} · Audit: ${data.auditLogging ? "On" : "Off"}`;
+        return `${trigger.replace(" (direct action)", "")} · ${approver} · audit ${data.auditLogging ? "on" : "off"}`;
       }
       default:
         return null;
     }
   };
 
-  // Inputs panel for the active step.
-  const activeInputs = (): React.ReactNode => {
+  // Inline chip strips for the active step. NO cards, NO labeled form rows,
+  // NO Connect/toggle buttons — just subtle selectable chips.
+  const activeChips = (): React.ReactNode => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-4 max-w-[480px]">
-            <div className="space-y-1.5">
-              <Label htmlFor="chat-org-name" className="text-xs">Org name</Label>
-              <Input
-                id="chat-org-name"
-                autoFocus
-                value={data.orgName}
-                onChange={(e) => updateData("orgName", e.target.value)}
-                placeholder="Acme, Inc."
-                data-testid="input-org-name"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Industry</Label>
-              <Select
-                value={data.industry}
-                onValueChange={(v) => updateData("industry", v as Industry)}
-              >
-                <SelectTrigger data-testid="select-industry">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {INDUSTRIES.map((i) => (
-                    <SelectItem key={i} value={i} data-testid={`option-industry-${i.replace(/\s+/g, "-").toLowerCase()}`}>
-                      {i}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Compliance scope</Label>
-              <div className="flex flex-wrap gap-2">
-                {COMPLIANCE_SCOPES.map((scope) => {
-                  const active = data.complianceScope.includes(scope);
-                  return (
-                    <button
-                      key={scope}
-                      type="button"
-                      onClick={() => toggleCompliance(scope)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                        active
-                          ? "text-white border-transparent"
-                          : "bg-background text-muted-foreground border-border hover:border-foreground/30"
-                      }`}
-                      style={active ? { background: ACCENT } : undefined}
-                      data-testid={`pill-compliance-${scope.replace(/\s+/g, "-").toLowerCase()}`}
-                    >
-                      {scope}
-                    </button>
-                  );
-                })}
+          <div className="space-y-4 max-w-[560px]">
+            <div>
+              <FieldLabel>Industry</FieldLabel>
+              <div className="flex flex-wrap gap-1.5">
+                {INDUSTRIES.map((i) => (
+                  <Chip
+                    key={i}
+                    active={data.industry === i}
+                    onClick={() => updateData("industry", i as Industry)}
+                    testId={`chip-industry-${i.replace(/\s+/g, "-").toLowerCase()}`}
+                  >
+                    {i}
+                  </Chip>
+                ))}
               </div>
             </div>
-            <Button
-              onClick={goNext}
-              disabled={!data.orgName.trim()}
-              className="text-white disabled:opacity-50"
-              style={{ background: ACCENT }}
-              data-testid="button-step-continue"
-            >
-              Send <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+            <div>
+              <FieldLabel>Compliance scope · multi-select</FieldLabel>
+              <div className="flex flex-wrap gap-1.5">
+                {COMPLIANCE_SCOPES.map((scope) => (
+                  <Chip
+                    key={scope}
+                    active={data.complianceScope.includes(scope)}
+                    onClick={() => toggleCompliance(scope as ComplianceScope)}
+                    testId={`chip-compliance-${scope.replace(/\s+/g, "-").toLowerCase()}`}
+                  >
+                    {scope}
+                  </Chip>
+                ))}
+              </div>
+            </div>
+            <p className="text-[11px] text-muted-foreground italic">
+              Type your org name in the message bar below.
+            </p>
           </div>
         );
 
       case 2:
         return (
-          <div className="space-y-3 max-w-[520px]">
-            {CONNECTIONS.map(({ id, name, description, Icon }) => {
-              const connected = data.connections[id];
-              return (
-                <div
-                  key={id}
-                  className="flex items-center gap-3 p-3 rounded-lg border bg-card"
-                  data-testid={`connection-tile-${id}`}
+          <div className="space-y-2 max-w-[560px]">
+            <div className="flex flex-wrap gap-1.5">
+              {CONNECTIONS.map((c) => (
+                <Chip
+                  key={c.id}
+                  active={!!data.connections[c.id]}
+                  onClick={() => toggleConnection(c.id as ConnectionId)}
+                  testId={`chip-connection-${c.id}`}
                 >
-                  <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{name}</p>
-                    <p className="text-xs text-muted-foreground">{description}</p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant={connected ? "outline" : "default"}
-                    size="sm"
-                    onClick={() => toggleConnection(id)}
-                    className={
-                      connected
-                        ? "border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950"
-                        : "text-white"
-                    }
-                    style={!connected ? { background: ACCENT } : undefined}
-                    data-testid={`button-connect-${id}`}
-                  >
-                    {connected ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 mr-1.5" />
-                        Connected
-                      </>
-                    ) : (
-                      "Connect"
-                    )}
-                  </Button>
-                </div>
-              );
-            })}
-            <div className="flex items-center gap-3 pt-1">
-              <Button
-                onClick={goNext}
-                className="text-white"
-                style={{ background: ACCENT }}
-                data-testid="button-step-continue"
-              >
-                {connectionCount > 0 ? "Send" : "Skip for now"}
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-              <span className="text-xs text-muted-foreground">
-                You can change connections later in Admin
-              </span>
+                  {c.name}
+                </Chip>
+              ))}
             </div>
+            <p className="text-[11px] text-muted-foreground">
+              GRC platform · document store · HRIS · ERP. Tap to toggle.
+            </p>
           </div>
         );
 
-      case 3: {
-        const anySelected = Object.values(data.solutions).some(Boolean);
+      case 3:
         return (
-          <div className="space-y-4 max-w-[560px]">
-            <div className="grid grid-cols-2 gap-2.5">
-              {SOLUTIONS.map(({ id, name, description }) => {
-                const active = data.solutions[id];
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => toggleSolution(id)}
-                    className={`text-left p-3 rounded-lg border transition-all ${
-                      active
-                        ? "bg-[var(--accent-soft)] border-[var(--accent-color)]/30"
-                        : "bg-card border-border hover:border-foreground/20"
-                    }`}
-                    style={
-                      {
-                        ["--accent-color" as never]: ACCENT,
-                        ["--accent-soft" as never]: `${ACCENT}10`,
-                      } as React.CSSProperties
-                    }
-                    data-testid={`card-solution-${id}`}
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <p className="text-sm font-medium leading-tight">{name}</p>
-                      <Switch
-                        checked={active}
-                        tabIndex={-1}
-                        className="pointer-events-none"
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">{description}</p>
-                  </button>
-                );
-              })}
+          <div className="space-y-2 max-w-[560px]">
+            <div className="flex flex-wrap gap-1.5">
+              {SOLUTIONS.map((s) => (
+                <Chip
+                  key={s.id}
+                  active={!!data.solutions[s.id]}
+                  onClick={() => toggleSolution(s.id as SolutionId)}
+                  testId={`chip-solution-${s.id}`}
+                >
+                  {s.name}
+                </Chip>
+              ))}
             </div>
-            <Button
-              onClick={goNext}
-              disabled={!anySelected}
-              className="text-white disabled:opacity-50"
-              style={{ background: ACCENT }}
-              data-testid="button-step-continue"
-            >
-              Send <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+            <p className="text-[11px] text-muted-foreground">
+              Pick at least one. You can add more later.
+            </p>
           </div>
         );
-      }
 
       case 4:
         return (
-          <div className="space-y-5 max-w-[520px]">
-            <div className="space-y-1.5">
-              <Label className="text-xs">How should workflows start by default?</Label>
-              <div className="grid grid-cols-1 gap-1.5">
-                {TRIGGER_OPTIONS.map((opt) => {
-                  const active = data.defaultTrigger === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => updateData("defaultTrigger", opt.value)}
-                      className={`text-left text-sm px-3 py-2 rounded-md border transition-colors ${
-                        active
-                          ? "border-[var(--accent-color)] bg-[var(--accent-soft)]"
-                          : "border-border hover:border-foreground/20"
-                      }`}
-                      style={
-                        {
-                          ["--accent-color" as never]: ACCENT,
-                          ["--accent-soft" as never]: `${ACCENT}10`,
-                        } as React.CSSProperties
-                      }
-                      data-testid={`option-trigger-${opt.value}`}
-                    >
-                      {opt.label}
-                    </button>
-                  );
-                })}
+          <div className="space-y-4 max-w-[560px]">
+            <div>
+              <FieldLabel>Default trigger</FieldLabel>
+              <div className="flex flex-wrap gap-1.5">
+                {TRIGGER_OPTIONS.map((opt) => (
+                  <Chip
+                    key={opt.value}
+                    active={data.defaultTrigger === opt.value}
+                    onClick={() => updateData("defaultTrigger", opt.value as DefaultTrigger)}
+                    testId={`chip-trigger-${opt.value}`}
+                  >
+                    {opt.label.replace(" (direct action)", "")}
+                  </Chip>
+                ))}
               </div>
             </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-xs">Who approves flagged findings by default?</Label>
-              <Select
-                value={data.hitlApprover}
-                onValueChange={(v) => updateData("hitlApprover", v as typeof data.hitlApprover)}
-              >
-                <SelectTrigger data-testid="select-hitl-approver">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="any-admin">Any Admin</SelectItem>
-                  <SelectItem value="assigned-reviewer">Assigned reviewer</SelectItem>
-                  <SelectItem value="per-workflow">I'll configure per workflow</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center justify-between gap-4 py-1">
-              <div>
-                <Label className="block text-xs">Log all agentic actions to audit trail?</Label>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Recommended for SOX and regulated workloads.
-                </p>
+            <div>
+              <FieldLabel>HITL approver</FieldLabel>
+              <div className="flex flex-wrap gap-1.5">
+                <Chip
+                  active={data.hitlApprover === "any-admin"}
+                  onClick={() => updateData("hitlApprover", "any-admin")}
+                  testId="chip-approver-any-admin"
+                >
+                  Any Admin
+                </Chip>
+                <Chip
+                  active={data.hitlApprover === "assigned-reviewer"}
+                  onClick={() => updateData("hitlApprover", "assigned-reviewer")}
+                  testId="chip-approver-assigned-reviewer"
+                >
+                  Assigned reviewer
+                </Chip>
+                <Chip
+                  active={data.hitlApprover === "per-workflow"}
+                  onClick={() => updateData("hitlApprover", "per-workflow")}
+                  testId="chip-approver-per-workflow"
+                >
+                  Per workflow
+                </Chip>
               </div>
-              <Switch
-                checked={data.auditLogging}
-                onCheckedChange={(v) => updateData("auditLogging", v)}
-                data-testid="switch-audit-logging"
-              />
             </div>
-
-            <Button
-              onClick={goNext}
-              className="text-white"
-              style={{ background: ACCENT }}
-              data-testid="button-step-finish"
-            >
-              Finish setup <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+            <div>
+              <FieldLabel>Audit logging</FieldLabel>
+              <div className="flex flex-wrap gap-1.5">
+                <Chip
+                  active={data.auditLogging}
+                  onClick={() => updateData("auditLogging", true)}
+                  testId="chip-audit-on"
+                >
+                  On
+                </Chip>
+                <Chip
+                  active={!data.auditLogging}
+                  onClick={() => updateData("auditLogging", false)}
+                  testId="chip-audit-off"
+                >
+                  Off
+                </Chip>
+              </div>
+            </div>
           </div>
         );
 
       case 5:
         return (
-          <div className="space-y-4 max-w-[520px]">
-            <Card>
-              <CardContent className="p-4 space-y-3">
-                <SummaryRow label="Organization" value={data.orgName || "—"} />
-                <SummaryRow
-                  label="Solutions activated"
-                  value={
-                    activeSolutions.length === 0 ? (
-                      <span className="text-muted-foreground">None</span>
-                    ) : (
-                      <div className="flex flex-wrap gap-1.5 justify-end">
-                        {activeSolutions.map((s) => (
-                          <Badge
-                            key={s.id}
-                            variant="secondary"
-                            className="text-[10px] font-medium"
-                            style={{ background: `${ACCENT}14`, color: ACCENT }}
-                            data-testid={`summary-solution-${s.id}`}
-                          >
-                            {s.name}
-                          </Badge>
-                        ))}
-                      </div>
-                    )
-                  }
-                />
-                <SummaryRow label="Connections added" value={`${connectionCount} connected`} />
-                <SummaryRow
-                  label="Default trigger"
-                  value={
-                    TRIGGER_OPTIONS.find((o) => o.value === data.defaultTrigger)?.label ?? "—"
-                  }
-                />
-              </CardContent>
-            </Card>
-            <Button
-              onClick={handleFinish}
-              className="text-white"
-              style={{ background: ACCENT }}
-              data-testid="button-open-solutions"
-            >
-              Open Solutions <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+          <div className="space-y-1.5 text-sm max-w-[560px]" data-testid="chat-summary">
+            <SummaryLine
+              label="Org"
+              value={`${data.orgName || "—"} · ${data.industry}`}
+            />
+            <SummaryLine
+              label="Compliance"
+              value={
+                data.complianceScope.length > 0
+                  ? data.complianceScope.join(", ")
+                  : "—"
+              }
+            />
+            <SummaryLine
+              label="Connections"
+              value={
+                connectionCount > 0
+                  ? CONNECTIONS.filter((c) => data.connections[c.id])
+                      .map((c) => c.name)
+                      .join(", ")
+                  : "None yet"
+              }
+            />
+            <SummaryLine
+              label="Solutions"
+              value={
+                activeSolutions.length > 0
+                  ? activeSolutions.map((s) => s.name).join(", ")
+                  : "None yet"
+              }
+            />
+            <SummaryLine
+              label="Defaults"
+              value={`${TRIGGER_OPTIONS.find((o) => o.value === data.defaultTrigger)?.label.replace(" (direct action)", "") ?? "—"} · audit ${data.auditLogging ? "on" : "off"}`}
+            />
           </div>
         );
 
@@ -487,11 +493,12 @@ export default function SetupChat({ onFinish, onSkipConfirmed }: SetupChatProps)
     }
   };
 
-  // Render the conversation: every prior step as Q + A, plus the active step Q + inputs.
+  // Render the conversation: every prior step as Optro Q + user A,
+  // plus the active step Q + chips (or typing indicator while transitioning).
   const transcript: React.ReactNode[] = [];
   for (let s = 1; s <= currentStep; s++) {
     transcript.push(
-      <OptroBubble key={`q-${s}`} animate={s === currentStep}>
+      <OptroBubble key={`q-${s}`} animate={s === currentStep && !isThinking}>
         {STEP_PROMPTS[s]}
       </OptroBubble>,
     );
@@ -501,10 +508,17 @@ export default function SetupChat({ onFinish, onSkipConfirmed }: SetupChatProps)
   }
 
   const showSkip = currentStep < TOTAL_STEPS;
+  const showComposerInput = currentStep === 1;
+  const composerKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !sendDisabled) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
   return (
     <div className="absolute inset-0 flex flex-col bg-white dark:bg-background">
-      {/* Top-right meta cluster — mirrors the wizard's StepFrame for cross-mode parity. */}
+      {/* Top-right meta cluster — mirrors the wizard's StepFrame for parity. */}
       <div className="absolute top-6 right-8 flex flex-col items-end gap-2 z-10">
         <span
           className="text-xs font-mono text-muted-foreground tabular-nums"
@@ -525,7 +539,7 @@ export default function SetupChat({ onFinish, onSkipConfirmed }: SetupChatProps)
               </button>
             ) : (
               <div className="flex items-center gap-2 text-muted-foreground">
-                <span>Skip for now? You can always return via the Setup icon.</span>
+                <span>Skip for now? You can return via the Setup icon.</span>
                 <button
                   type="button"
                   onClick={onSkipConfirmed}
@@ -549,27 +563,87 @@ export default function SetupChat({ onFinish, onSkipConfirmed }: SetupChatProps)
         )}
       </div>
 
+      {/* Scrollable transcript */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-8 pt-24 pb-10"
+        className="flex-1 overflow-y-auto px-8 pt-24 pb-6"
         data-testid="chat-scroll-area"
       >
         <div className="max-w-[720px] mx-auto space-y-6">
           {transcript}
-          <ActiveInputs key={`active-${currentStep}`}>{activeInputs()}</ActiveInputs>
+          {isThinking ? (
+            <TypingIndicator />
+          ) : (
+            <ActiveInputs key={`active-${currentStep}`}>{activeChips()}</ActiveInputs>
+          )}
+        </div>
+      </div>
+
+      {/* Fixed-bottom composer — the chat-app primitive that most distinguishes
+          this mode from the wizard's centered card. */}
+      <div className="border-t border-border bg-white dark:bg-background px-8 py-3">
+        <div className="max-w-[720px] mx-auto flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            {showComposerInput ? (
+              <input
+                type="text"
+                value={data.orgName}
+                onChange={(e) => updateData("orgName", e.target.value)}
+                onKeyDown={composerKeyDown}
+                placeholder="Type your organization name…"
+                autoFocus
+                disabled={isThinking}
+                data-testid="composer-input"
+                className="w-full bg-transparent text-sm placeholder:text-muted-foreground focus:outline-none disabled:opacity-50"
+              />
+            ) : (
+              <span
+                className="text-xs text-muted-foreground"
+                data-testid="composer-helper"
+              >
+                {composerHelper}
+              </span>
+            )}
+          </div>
+
+          {sendLabel ? (
+            <button
+              type="button"
+              onClick={handleSend}
+              disabled={sendDisabled || isThinking}
+              data-testid="composer-send"
+              className="text-xs font-medium px-4 h-9 rounded-full text-white disabled:opacity-40 transition-opacity inline-flex items-center gap-1.5"
+              style={{ background: ACCENT }}
+            >
+              {sendLabel}
+              <ArrowUp className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSend}
+              disabled={sendDisabled || isThinking}
+              data-testid="composer-send"
+              aria-label="Send"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-white disabled:opacity-40 transition-opacity flex-shrink-0"
+              style={{ background: ACCENT }}
+            >
+              <ArrowUp className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function SummaryRow({ label, value }: { label: string; value: React.ReactNode }) {
+function SummaryLine({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-4">
-      <span className="text-[11px] uppercase tracking-wider text-muted-foreground pt-0.5">
+    <div className="flex items-baseline gap-2">
+      <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-muted-foreground w-24 flex-shrink-0">
         {label}
       </span>
-      <div className="text-sm text-right max-w-[60%]">{value}</div>
+      <span className="text-foreground">{value}</span>
     </div>
   );
 }
