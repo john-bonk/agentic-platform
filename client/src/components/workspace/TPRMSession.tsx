@@ -462,7 +462,36 @@ function SubstepOutput({ output }: { output: NonNullable<typeof tprmSteps[number
         </div>
       )}
       {output.kind === "narrative" && (
-        <p className="text-[11px] text-foreground/80 leading-relaxed">{output.body}</p>
+        <>
+          <p className="text-[11px] text-foreground/80 leading-relaxed">{output.body}</p>
+          {output.items && output.items.length > 0 && (
+            <div className="mt-2 pt-2 border-t border-slate-100 dark:border-border/50 space-y-0.5">
+              {output.items.map((it, k) => (
+                <div key={k} className="grid grid-cols-[8rem_1fr_auto] gap-2 text-[10px]">
+                  <span className="text-muted-foreground">{it.label}</span>
+                  <span className="text-foreground">{it.value ?? ""}</span>
+                  {it.status && (
+                    <span
+                      className={`text-[9px] font-semibold ${
+                        it.status === "ok"
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : it.status === "warn"
+                            ? "text-amber-600 dark:text-amber-400"
+                            : it.status === "gap"
+                              ? "text-red-600 dark:text-red-400"
+                              : it.status === "info"
+                                ? "text-[#266C92] dark:text-sky-400"
+                                : "text-muted-foreground"
+                      }`}
+                    >
+                      {it.status.toUpperCase()}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
       {(output.kind === "annotation" || output.kind === "list" || output.kind === "request") && (
         <div className="space-y-0.5">
@@ -479,7 +508,9 @@ function SubstepOutput({ output }: { output: NonNullable<typeof tprmSteps[number
                         ? "text-amber-600 dark:text-amber-400"
                         : it.status === "gap"
                           ? "text-red-600 dark:text-red-400"
-                          : "text-muted-foreground"
+                          : it.status === "info"
+                            ? "text-[#266C92] dark:text-sky-400"
+                            : "text-muted-foreground"
                   }`}
                 >
                   {it.status.toUpperCase()}

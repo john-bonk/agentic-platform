@@ -50,6 +50,7 @@ import {
   ComingSoonPage,
   AdminOverviewPage,
   AdminConsolePage,
+  SetupPage,
   AdminWorkspacesPage,
   AdminPermissionsPage,
   AdminDataPage,
@@ -166,6 +167,9 @@ function Router() {
       <Route path="/admin/permissions" component={AdminPermissionsPage} />
       <Route path="/admin/data" component={AdminDataPage} />
       <Route path="/admin-console" component={AdminConsolePage} />
+
+      {/* Onboarding wizard */}
+      <Route path="/setup" component={SetupPage} />
       
       {/* Prototype Meta View */}
       <Route path="/prototype-meta" component={PrototypeMetaPage} />

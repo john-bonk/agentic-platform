@@ -18,7 +18,7 @@ import {
 
 export type IconNavItem = 
   | { type: "image"; src: string; alt: string; active: boolean; path?: string; modulePrefix?: string }
-  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity" | "bar-chart-3" | "shield" | "database" | "sliders"; alt: string; active: boolean; path?: string; modulePrefix?: string };
+  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity" | "bar-chart-3" | "shield" | "database" | "sliders" | "sparkles"; alt: string; active: boolean; path?: string; modulePrefix?: string };
 
 export interface SideNavItem {
   id: string;
@@ -503,9 +503,44 @@ export const modules: ModuleConfig[] = [
 ];
 
 /**
- * Left Icon Navbar Items (derived from modules)
+ * Left Icon Navbar Items
+ *
+ * Hand-picked subset (3 icons) — Setup, Home, Admin Console — to keep the
+ * sidebar focused on the prototype's core flows. Other module configs above
+ * are preserved so internal navigation that relies on them keeps working,
+ * but they are intentionally not surfaced as sidebar icons.
+ *
+ * ORDER: Setup, Home, Admin Console (top to bottom).
  */
-export const iconNavItems: IconNavItem[] = modules.map(m => m.icon);
+const setupIcon: IconNavItem = {
+  type: "lucide",
+  icon: "sparkles",
+  alt: "Setup",
+  active: false,
+  path: "/setup",
+  modulePrefix: "/setup",
+};
+
+export const iconNavItems: IconNavItem[] = [
+  setupIcon,
+  modules[0].icon,           // Home
+  modules[6].icon,           // Admin Console
+];
+
+/**
+ * Returns the index into `iconNavItems` (the trimmed sidebar) that should be
+ * highlighted for a given path. Returns -1 when the current route doesn't
+ * correspond to any sidebar entry (e.g. /prototype-meta, /workflows internals,
+ * intelligence pages — these still render but don't light up the rail).
+ */
+export function getActiveIconIndex(path: string): number {
+  if (path === "/prototype-meta") return -1;
+  if (path.startsWith("/setup")) return 0;
+  if (path.startsWith("/admin-console")) return 2;
+  // Anything else that resolves to the Home module highlights Home.
+  if (getActiveModuleIndex(path) === 0) return 1;
+  return -1;
+}
 
 /**
  * Side Navigation Sections (default - Home)

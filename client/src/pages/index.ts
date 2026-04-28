@@ -36,6 +36,7 @@ export { default as VulnerabilityScanPage } from "./VulnerabilityScanPage";
 export { default as ComingSoonPage } from "./ComingSoonPage";
 export { default as AdminOverviewPage } from "./AdminOverviewPage";
 export { default as AdminConsolePage } from "./AdminConsolePage";
+export { default as SetupPage } from "./SetupPage";
 export { default as AdminWorkspacesPage } from "./AdminWorkspacesPage";
 export { default as AdminPermissionsPage } from "./AdminPermissionsPage";
 export { default as AdminDataPage } from "./AdminDataPage";

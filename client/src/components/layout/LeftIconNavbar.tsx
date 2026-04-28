@@ -10,9 +10,10 @@
  */
 
 import { Link, useLocation } from "wouter";
-import { LayoutGrid, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish, Workflow, Activity, BarChart3, Shield, Cog, Database, SlidersHorizontal } from "lucide-react";
-import { type IconNavItem, getActiveModuleIndex } from "@/config/navigation";
+import { LayoutGrid, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish, Workflow, Activity, BarChart3, Shield, Cog, Database, SlidersHorizontal, Sparkles } from "lucide-react";
+import { type IconNavItem, getActiveIconIndex } from "@/config/navigation";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
+import { useSetupStore } from "@/lib/setupStore";
 
 interface LeftIconNavbarProps {
   items: IconNavItem[];
@@ -24,6 +25,7 @@ interface LeftIconNavbarProps {
 export function LeftIconNavbar({ items, logoPath, className = "", homeOnly }: LeftIconNavbarProps) {
   const [location] = useLocation();
   const { currentWorkspace } = useWorkspaceStore();
+  const setupComplete = useSetupStore((s) => s.isComplete);
   
   // Admin workspace only shows Home icon
   const isAdminWorkspace = currentWorkspace.persona === "Admin";
@@ -62,6 +64,8 @@ export function LeftIconNavbar({ items, logoPath, className = "", homeOnly }: Le
         return <Database className={`w-4 h-4 ${colorClass}`} />;
       case "sliders":
         return <SlidersHorizontal className={`w-4 h-4 ${colorClass}`} />;
+      case "sparkles":
+        return <Sparkles className={`w-4 h-4 ${colorClass}`} />;
       case "refresh-ccw":
         return (
           <div className="relative w-4 h-4 flex items-center justify-center">
@@ -74,8 +78,8 @@ export function LeftIconNavbar({ items, logoPath, className = "", homeOnly }: Le
     }
   };
 
-  // Get the index of the currently active module based on path
-  const activeModuleIndex = getActiveModuleIndex(location);
+  // Get the index of the currently active sidebar icon (or -1 if none).
+  const activeModuleIndex = getActiveIconIndex(location);
 
   return (
     <aside
@@ -98,32 +102,42 @@ export function LeftIconNavbar({ items, logoPath, className = "", homeOnly }: Le
         </Link>
 
         {items.map((item, index) => {
-          // Admin workspace or homeOnly mode: only show Home icon (index 0)
-          // Exception: the global Admin Console toolkit is always visible.
-          if ((isAdminWorkspace || homeOnly) && index !== 0 && item.modulePrefix !== "/admin-console") {
-            return null;
-          }
-          
-          // Only the module at activeModuleIndex is active
+          // The trimmed 3-icon nav (Setup / Home / Admin) is already
+          // minimal, so every entry stays visible across all layers — agent
+          // hub, special new-tab views, admin workspace, and standard
+          // modules. The legacy `homeOnly` prop is now a no-op.
+          void homeOnly;
+          const isHomeIcon = item.modulePrefix === "/";
+
           const active = index === activeModuleIndex;
-          
-          // Navigate home based on workspace type
-          const itemPath = index === 0 ? homePath : item.path;
-          
+
+          // Home icon adapts to the active workspace (admin → /admin, etc.).
+          const itemPath = isHomeIcon ? homePath : item.path;
+
+          const isSetupIcon = item.modulePrefix === "/setup";
+          const showDot = isSetupIcon && !setupComplete && !active;
+
           const content = (
             <div
-              className={`w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-colors ${
+              className={`relative w-10 h-10 rounded flex items-center justify-center cursor-pointer transition-colors ${
                 active ? "bg-teal-500" : "hover:bg-gray-800"
               }`}
               data-testid={`navbar-icon-${index}`}
+              title={item.alt}
             >
               {item.type === "lucide" ? (
                 renderLucideIcon(item.icon, active)
               ) : (
-                <img 
-                  className={`w-4 h-4 ${!active ? "opacity-60" : ""}`} 
-                  alt={item.alt} 
-                  src={item.src} 
+                <img
+                  className={`w-4 h-4 ${!active ? "opacity-60" : ""}`}
+                  alt={item.alt}
+                  src={item.src}
+                />
+              )}
+              {showDot && (
+                <span
+                  className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-teal-400"
+                  data-testid="dot-setup-incomplete"
                 />
               )}
             </div>

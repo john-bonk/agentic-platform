@@ -66,7 +66,8 @@ export function AppLayout({
   const { activeProjects, currentSessionId } = useWorkflowSessionStore();
   
   const isHomeModule = currentModule.id === "home";
-  const isAgentHub = settings.agentHubEnabled && isHomeModule && isAgentHubSupported(currentWorkspace.id);
+  const isSetupRoute = location.startsWith("/setup");
+  const isAgentHub = !isSetupRoute && settings.agentHubEnabled && isHomeModule && isAgentHubSupported(currentWorkspace.id);
   const workspaceNav = isHomeModule && !isAgentHub
     ? getWorkspaceHomeNav(currentWorkspace.persona, currentWorkspace.moduleConfig) 
     : null;
