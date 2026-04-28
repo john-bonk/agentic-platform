@@ -18,7 +18,7 @@ import {
 
 export type IconNavItem = 
   | { type: "image"; src: string; alt: string; active: boolean; path?: string; modulePrefix?: string }
-  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity" | "bar-chart-3" | "shield" | "database"; alt: string; active: boolean; path?: string; modulePrefix?: string };
+  | { type: "lucide"; icon: "refresh-ccw" | "home" | "settings" | "folder" | "list" | "git-branch" | "rabbit" | "fish" | "workflow" | "activity" | "bar-chart-3" | "shield" | "database" | "sliders"; alt: string; active: boolean; path?: string; modulePrefix?: string };
 
 export interface SideNavItem {
   id: string;
@@ -481,6 +481,25 @@ export const modules: ModuleConfig[] = [
       },
     ],
   },
+  {
+    id: "admin-console",
+    name: "Admin",
+    icon: { type: "lucide", icon: "sliders", alt: "Admin", active: false, path: "/admin-console", modulePrefix: "/admin-console" },
+    sideNavSections: [
+      {
+        id: "admin-console-sections",
+        title: "Admin",
+        defaultExpanded: true,
+        collapsible: true,
+        items: [
+          { id: "admin-users", label: "Users & Permissions", path: "/admin-console#users" },
+          { id: "admin-sources", label: "Connected Sources", path: "/admin-console#sources" },
+          { id: "admin-ai", label: "AI & Agent Config", path: "/admin-console#ai" },
+          { id: "admin-audit", label: "Audit Log", path: "/admin-console#audit" },
+        ],
+      },
+    ],
+  },
 ];
 
 /**
@@ -519,6 +538,10 @@ export function getModuleFromPath(path: string): ModuleConfig {
   // Workflow module: any path starting with /workflow (includes /workflows and /workflow/:id)
   if (path.startsWith("/workflow")) {
     return modules[5]; // Workflows
+  }
+  // Admin Console module
+  if (path.startsWith("/admin-console")) {
+    return modules[6]; // Admin Console
   }
   // Default to Home
   return modules[0];
@@ -575,6 +598,11 @@ export function getActiveModuleIndex(path: string): number {
   // Workflow module: any path starting with /workflow
   if (path.startsWith("/workflow")) {
     return 5; // Workflows module
+  }
+  
+  // Admin Console module
+  if (path.startsWith("/admin-console")) {
+    return 6; // Admin Console module
   }
   
   // Check if path matches Home module paths

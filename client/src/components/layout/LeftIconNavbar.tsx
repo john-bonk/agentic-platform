@@ -10,7 +10,7 @@
  */
 
 import { Link, useLocation } from "wouter";
-import { LayoutGrid, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish, Workflow, Activity, BarChart3, Shield, Cog, Database } from "lucide-react";
+import { LayoutGrid, Settings, Folder, RefreshCcw, Check, HelpCircle, List, GitBranch, Rabbit, Fish, Workflow, Activity, BarChart3, Shield, Cog, Database, SlidersHorizontal } from "lucide-react";
 import { type IconNavItem, getActiveModuleIndex } from "@/config/navigation";
 import { useWorkspaceStore } from "@/lib/workspaceStore";
 
@@ -60,6 +60,8 @@ export function LeftIconNavbar({ items, logoPath, className = "", homeOnly }: Le
         return <Shield className={`w-4 h-4 ${colorClass}`} />;
       case "database":
         return <Database className={`w-4 h-4 ${colorClass}`} />;
+      case "sliders":
+        return <SlidersHorizontal className={`w-4 h-4 ${colorClass}`} />;
       case "refresh-ccw":
         return (
           <div className="relative w-4 h-4 flex items-center justify-center">
@@ -97,7 +99,8 @@ export function LeftIconNavbar({ items, logoPath, className = "", homeOnly }: Le
 
         {items.map((item, index) => {
           // Admin workspace or homeOnly mode: only show Home icon (index 0)
-          if ((isAdminWorkspace || homeOnly) && index !== 0) {
+          // Exception: the global Admin Console toolkit is always visible.
+          if ((isAdminWorkspace || homeOnly) && index !== 0 && item.modulePrefix !== "/admin-console") {
             return null;
           }
           
