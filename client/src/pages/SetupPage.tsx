@@ -16,106 +16,25 @@ import {
 } from "@/components/ui/select";
 import {
   useSetupStore,
-  type ComplianceScope,
-  type ConnectionId,
-  type DefaultTrigger,
   type Industry,
-  type SolutionId,
+  type SetupMode,
 } from "@/lib/setupStore";
+import {
+  ACCENT,
+  COMPLIANCE_SCOPES,
+  CONNECTIONS,
+  INDUSTRIES,
+  SOLUTIONS,
+  TOTAL_STEPS,
+  TRIGGER_OPTIONS,
+} from "@/lib/setupConfig";
 import {
   ArrowRight,
   Check,
-  Database,
-  FolderOpen,
-  Users as UsersIcon,
-  Briefcase,
+  ListChecks,
+  MessageSquare,
 } from "lucide-react";
-
-const INDUSTRIES: Industry[] = [
-  "Financial Services",
-  "Technology",
-  "Healthcare",
-  "Manufacturing",
-  "Other",
-];
-
-const COMPLIANCE_SCOPES: ComplianceScope[] = [
-  "SOX",
-  "TPRM",
-  "ISO 27001",
-  "HIPAA",
-  "PCI",
-  "Other",
-];
-
-const CONNECTIONS: {
-  id: ConnectionId;
-  name: string;
-  description: string;
-  Icon: typeof Database;
-}[] = [
-  {
-    id: "grc",
-    name: "GRC Platform",
-    description: "Import controls, risks, and frameworks",
-    Icon: Briefcase,
-  },
-  {
-    id: "documents",
-    name: "Document Store",
-    description: "SharePoint, Google Drive, or file upload",
-    Icon: FolderOpen,
-  },
-  {
-    id: "hris",
-    name: "HRIS",
-    description: "Sync team and org structure",
-    Icon: UsersIcon,
-  },
-  {
-    id: "erp",
-    name: "ERP / Procurement",
-    description: "Vendor and spend data",
-    Icon: Database,
-  },
-];
-
-const SOLUTIONS: { id: SolutionId; name: string; description: string }[] = [
-  {
-    id: "sox-control-testing",
-    name: "SOX Control Testing",
-    description: "Automated end-to-end control testing",
-  },
-  {
-    id: "tprm",
-    name: "TPRM",
-    description: "Vendor risk assessment and monitoring",
-  },
-  {
-    id: "risk-assessments",
-    name: "Risk Assessments",
-    description: "Identify, score, and treat risks",
-  },
-  {
-    id: "pre-ipo-readiness",
-    name: "Pre-IPO Readiness",
-    description: "Track readiness across workstreams",
-  },
-  {
-    id: "evidence-collection",
-    name: "Evidence Collection",
-    description: "Automate evidence request and intake",
-  },
-];
-
-const TRIGGER_OPTIONS: { value: DefaultTrigger; label: string }[] = [
-  { value: "manual", label: "Manual (direct action)" },
-  { value: "scheduled", label: "Scheduled" },
-  { value: "per-workflow", label: "I'll configure per workflow" },
-];
-
-const TOTAL_STEPS = 5;
-const ACCENT = "#266C92";
+import SetupChat from "./SetupChat";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Step transition wrapper — fade + 8px translate, ~400ms total.
@@ -250,6 +169,46 @@ function StepHeader({ index, total, title, subtitle }: StepHeaderProps) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Mode toggle — segmented control between Wizard and Chat experiences.
+// Always visible at top-center across both modes so the user can flip freely.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function ModeToggle({ mode, onChange }: { mode: SetupMode; onChange: (m: SetupMode) => void }) {
+  const options: { value: SetupMode; label: string; Icon: typeof ListChecks }[] = [
+    { value: "wizard", label: "Wizard", Icon: ListChecks },
+    { value: "chat", label: "Chat", Icon: MessageSquare },
+  ];
+  return (
+    <div
+      className="absolute top-6 left-1/2 -translate-x-1/2 z-20 inline-flex items-center p-0.5 rounded-full border bg-card/90 backdrop-blur shadow-sm"
+      data-testid="setup-mode-toggle"
+    >
+      {options.map(({ value, label, Icon }) => {
+        const active = mode === value;
+        return (
+          <button
+            key={value}
+            type="button"
+            onClick={() => onChange(value)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              active
+                ? "text-white"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            style={active ? { background: ACCENT } : undefined}
+            data-testid={`button-mode-${value}`}
+            aria-pressed={active}
+          >
+            <Icon className="w-3.5 h-3.5" />
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Main page
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -257,8 +216,10 @@ export default function SetupPage() {
   const [, setLocation] = useLocation();
   const {
     currentStep,
+    mode,
     data,
     setStep,
+    setMode,
     updateData,
     toggleConnection,
     toggleSolution,
@@ -657,14 +618,19 @@ export default function SetupPage() {
   return (
     <AppLayout showSideNav={false}>
       <div className="relative w-full h-full">
-        <StepFrame
-          step={currentStep}
-          total={TOTAL_STEPS}
-          showSkip={showSkip}
-          onSkipConfirmed={exitToHome}
-        >
-          {renderStep()}
-        </StepFrame>
+        <ModeToggle mode={mode} onChange={setMode} />
+        {mode === "wizard" ? (
+          <StepFrame
+            step={currentStep}
+            total={TOTAL_STEPS}
+            showSkip={showSkip}
+            onSkipConfirmed={exitToHome}
+          >
+            {renderStep()}
+          </StepFrame>
+        ) : (
+          <SetupChat onFinish={exitToHome} onSkipConfirmed={exitToHome} />
+        )}
       </div>
     </AppLayout>
   );

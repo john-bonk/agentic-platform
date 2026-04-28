@@ -55,11 +55,15 @@ const initialData: SetupData = {
   auditLogging: true,
 };
 
+export type SetupMode = "wizard" | "chat";
+
 interface SetupState {
   isComplete: boolean;
   currentStep: number;
+  mode: SetupMode;
   data: SetupData;
   setStep: (step: number) => void;
+  setMode: (mode: SetupMode) => void;
   updateData: <K extends keyof SetupData>(key: K, value: SetupData[K]) => void;
   toggleConnection: (id: ConnectionId) => void;
   toggleSolution: (id: SolutionId) => void;
@@ -71,8 +75,10 @@ interface SetupState {
 export const useSetupStore = create<SetupState>((set) => ({
   isComplete: false,
   currentStep: 1,
+  mode: "wizard",
   data: initialData,
   setStep: (step) => set({ currentStep: step }),
+  setMode: (mode) => set({ mode }),
   updateData: (key, value) =>
     set((s) => ({ data: { ...s.data, [key]: value } })),
   toggleConnection: (id) =>
