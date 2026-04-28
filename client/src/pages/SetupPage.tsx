@@ -14,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useWorkspaceStore } from "@/lib/workspaceStore";
 import {
   useSetupStore,
   type ComplianceScope,
@@ -30,7 +29,6 @@ import {
   FolderOpen,
   Users as UsersIcon,
   Briefcase,
-  Lock,
 } from "lucide-react";
 
 const INDUSTRIES: Industry[] = [
@@ -252,46 +250,11 @@ function StepHeader({ index, total, title, subtitle }: StepHeaderProps) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Locked / read-only banner for Reviewer / Viewer roles
-// ─────────────────────────────────────────────────────────────────────────────
-
-function LockedView({ onExit }: { onExit: () => void }) {
-  return (
-    <div className="absolute inset-0 flex items-center justify-center px-8 bg-white dark:bg-background">
-      <div className="w-full max-w-[420px] text-center space-y-6">
-        <div
-          className="mx-auto w-12 h-12 rounded-full flex items-center justify-center"
-          style={{ background: `${ACCENT}14` }}
-        >
-          <Lock className="w-5 h-5" style={{ color: ACCENT }} />
-        </div>
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">Setup is read-only</h1>
-          <p className="text-sm text-muted-foreground">
-            Only Admins can complete workspace setup. Ask your administrator to
-            finish onboarding, or continue exploring the workspace as configured.
-          </p>
-        </div>
-        <Button
-          onClick={onExit}
-          className="w-full text-white"
-          style={{ background: ACCENT }}
-          data-testid="button-locked-exit"
-        >
-          Open Solutions
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Main page
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function SetupPage() {
   const [, setLocation] = useLocation();
-  const { currentWorkspace } = useWorkspaceStore();
   const {
     currentStep,
     data,
@@ -302,8 +265,6 @@ export default function SetupPage() {
     toggleCompliance,
     complete,
   } = useSetupStore();
-
-  const isAdmin = currentWorkspace.persona === "Admin";
 
   const goNext = () => setStep(Math.min(currentStep + 1, TOTAL_STEPS));
   const exitToHome = () => setLocation("/");
@@ -690,17 +651,6 @@ export default function SetupPage() {
         return null;
     }
   };
-
-  // Read-only state for non-admins
-  if (!isAdmin) {
-    return (
-      <AppLayout showSideNav={false}>
-        <div className="relative w-full h-full">
-          <LockedView onExit={exitToHome} />
-        </div>
-      </AppLayout>
-    );
-  }
 
   const showSkip = currentStep < TOTAL_STEPS;
 
