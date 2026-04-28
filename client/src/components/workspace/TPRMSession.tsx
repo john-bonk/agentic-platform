@@ -26,10 +26,14 @@ import {
   ListChecks,
   Play,
   ExternalLink,
+  Radio,
+  X,
+  Pencil,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { usePersistedBlockState, useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 import {
@@ -82,11 +86,25 @@ function ActionTypeBadge({ actionType }: { actionType: SubstepActionType }) {
   );
 }
 
-const actionTypeColors: Record<SubstepActionType, { color: string; title: string }> = {
-  ai: { color: "text-violet-500 dark:text-violet-400", title: "AI" },
-  auto: { color: "text-sky-500 dark:text-sky-400", title: "Automated" },
-  hitl: { color: "text-amber-500 dark:text-amber-400", title: "Human-in-the-loop" },
-};
+/**
+ * SOX-canonical inline mode marker — small Lucide icon next to the substep description.
+ * - `auto` → Zap (emerald)
+ * - `ai`   → Bot (blue)
+ * - `hitl` → Fingerprint (amber)
+ *
+ * Mirrors `automationModeIcons` in AgentHubHome around line 2868.
+ */
+function ActionTypeIcon({ actionType }: { actionType: SubstepActionType }) {
+  const meta = ACTION_TYPE_META[actionType];
+  const Icon = meta.icon;
+  return (
+    <Icon
+      className={`w-3 h-3 shrink-0 ${meta.iconColor}`}
+      data-testid={`action-icon-${actionType}`}
+      aria-label={meta.title}
+    />
+  );
+}
 
 // Decide overall vendor outcome for "Effective"-equivalent badge in header / tracker
 function getVendorOutcome(vendor: VendorRecord, status: VendorRunStatus | undefined): {
@@ -426,6 +444,8 @@ function VendorOverviewTab({ vendor }: { vendor: VendorRecord }) {
 interface VendorStepNodeContentProps {
   step: typeof tprmSteps[number];
   stepStatus: StepRunStatus;
+  vendorId: string;
+  onResolveHitl: (vendorId: string, stepId: string, decision: "approve" | "modify" | "reject") => void;
 }
 
 function SubstepOutput({ output }: { output: NonNullable<typeof tprmSteps[number]["substeps"][number]["output"]> }) {
@@ -473,7 +493,7 @@ function SubstepOutput({ output }: { output: NonNullable<typeof tprmSteps[number
   );
 }
 
-function VendorStepNodeContent({ step, stepStatus }: VendorStepNodeContentProps) {
+function VendorStepNodeContent({ step, stepStatus, vendorId, onResolveHitl }: VendorStepNodeContentProps) {
   const [expandedSubs, setExpandedSubs] = useState<Set<string>>(() => new Set());
 
   // Mirror SOX semantics: when step is complete, all substeps complete; when running, first substep running, rest pending; when waiting, the HITL substep is waiting.
@@ -511,7 +531,6 @@ function VendorStepNodeContent({ step, stepStatus }: VendorStepNodeContentProps)
         const hasOutput = !!sub.output;
         const isExpandable = baseStatus === "complete" && hasOutput;
         const isExpanded = expandedSubs.has(sub.id);
-        const modeInfo = actionTypeColors[sub.actionType];
 
         return (
           <div key={sub.id} className="transition-colors" data-testid={`substep-${sub.id}`}>
@@ -532,29 +551,24 @@ function VendorStepNodeContent({ step, stepStatus }: VendorStepNodeContentProps)
               data-testid={`substep-toggle-${sub.id}`}
             >
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[9px] text-muted-foreground font-mono w-6 text-right">
-                  {step.ordinal}.{idx + 1}
+                {/* SOX canon: substep number is just `{idx+1}` (plain integer), not `{ordinal}.{idx+1}` */}
+                <span className="text-[9px] text-muted-foreground font-mono w-4 text-right">
+                  {idx + 1}
                 </span>
                 <SubStepIndicator status={baseStatus} />
+                {/* SOX canon: inline mode icon (Zap/Bot/Fingerprint) sits with the indicator, NOT a coloured pill */}
+                <ActionTypeIcon actionType={sub.actionType} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`text-xs font-medium ${
-                      baseStatus === "complete" || baseStatus === "running"
-                        ? "text-foreground"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    {sub.description}
-                  </span>
-                  <ActionTypeBadge actionType={sub.actionType} />
-                  {sub.isHitlGate && (
-                    <span className={`inline-flex items-center text-[9px] font-medium ${modeInfo.color} opacity-80`} title="HITL gate">
-                      Gate
-                    </span>
-                  )}
-                </div>
+                <span
+                  className={`text-xs font-medium ${
+                    baseStatus === "complete" || baseStatus === "running"
+                      ? "text-foreground"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {sub.description}
+                </span>
                 {sub.detail && (
                   <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{sub.detail}</p>
                 )}
@@ -571,6 +585,56 @@ function VendorStepNodeContent({ step, stepStatus }: VendorStepNodeContentProps)
                 <SubstepOutput output={sub.output} />
               </div>
             )}
+
+            {/* SOX-canon inline HITL checkpoint card — sits directly under the gate substep when waiting */}
+            {baseStatus === "waiting" && sub.isHitlGate && (
+              <div
+                className="ml-12 mr-3 mb-1 mt-1 rounded-lg border border-amber-200 dark:border-amber-800/40 bg-amber-50/70 dark:bg-amber-900/15 p-3"
+                data-testid={`hitl-checkpoint-${sub.id}`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span className="text-[11px] font-semibold text-amber-800 dark:text-amber-300">
+                    Reviewer checkpoint — record disposition before proceeding
+                  </span>
+                </div>
+                <p className="text-[11px] text-amber-900/80 dark:text-amber-200/80 leading-relaxed mb-3">
+                  Approve to resume the workflow, Modify to apply reviewer overrides and resume,
+                  or Reject to block this step pending remediation.
+                </p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Button
+                    size="sm"
+                    className="h-7 text-[11px] gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
+                    onClick={() => onResolveHitl(vendorId, step.id, "approve")}
+                    data-testid={`hitl-approve-${step.id}`}
+                  >
+                    <CheckCircle2 className="w-3 h-3" />
+                    Approve
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-[11px] gap-1.5"
+                    onClick={() => onResolveHitl(vendorId, step.id, "modify")}
+                    data-testid={`hitl-modify-${step.id}`}
+                  >
+                    <Pencil className="w-3 h-3" />
+                    Modify
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-[11px] gap-1.5 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+                    onClick={() => onResolveHitl(vendorId, step.id, "reject")}
+                    data-testid={`hitl-reject-${step.id}`}
+                  >
+                    <AlertCircle className="w-3 h-3" />
+                    Reject
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         );
       })}
@@ -580,17 +644,6 @@ function VendorStepNodeContent({ step, stepStatus }: VendorStepNodeContentProps)
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-3.5 h-3.5 text-[#266C92]" />
             <p className="text-xs text-[#266C92] font-medium">Step completed — outcome: {step.outcome}</p>
-          </div>
-        </div>
-      )}
-
-      {stepStatus === "waiting" && (
-        <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/30">
-          <div className="flex items-center gap-2">
-            <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
-              Waiting for human-in-the-loop reviewer disposition. Use the action buttons below to record a decision.
-            </p>
           </div>
         </div>
       )}
@@ -680,6 +733,132 @@ function VendorAuditTrailTab({ status }: { status: VendorRunStatus | undefined }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Monitoring Live Panel — "alive" feel for the Continuous Monitoring step.
+// Pulsing live dot, signal-source health badges, and a ticker that surfaces
+// new monitoring entries on a 1.6s rolling cadence (synthetic in-memory).
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MONITORING_SOURCES: { id: string; label: string }[] = [
+  { id: "adverse-news", label: "Adverse News" },
+  { id: "soc2-watch", label: "SOC 2 Watch" },
+  { id: "breach-feed", label: "Breach Feed" },
+  { id: "ownership", label: "Ownership Changes" },
+  { id: "renewals", label: "Contract Renewals" },
+];
+
+function MonitoringLivePanel({ vendor, fired }: { vendor: VendorRecord; fired: boolean }) {
+  // Synthetic ticker entries — seed from vendor.monitoring records, then keep rolling.
+  type Tick = { id: string; ts: string; source: string; description: string; severity: "info" | "warn" | "critical" };
+
+  const seedEntries: Tick[] = useMemo(
+    () =>
+      vendor.monitoring.map((m) => ({
+        id: m.id,
+        ts: m.timestamp,
+        source: m.source,
+        description: m.description,
+        severity: fired ? "warn" : "info",
+      })),
+    [vendor.id, vendor.monitoring, fired]
+  );
+
+  const [ticks, setTicks] = useState<Tick[]>(seedEntries);
+  const [pulseTick, setPulseTick] = useState(0);
+
+  // Refresh seed if vendor changes
+  useEffect(() => {
+    setTicks(seedEntries);
+  }, [vendor.id, seedEntries]);
+
+  // Pulse + rolling ticker
+  useEffect(() => {
+    const pulse = setInterval(() => setPulseTick((t) => t + 1), 1600);
+    return () => clearInterval(pulse);
+  }, []);
+
+  useEffect(() => {
+    const synthetic: Omit<Tick, "id" | "ts">[] = [
+      { source: "Adverse News", description: "No new alerts in last polling window.", severity: "info" },
+      { source: "SOC 2 Watch", description: "Certificate scan complete — no expiry change.", severity: "info" },
+      { source: "Breach Feed", description: "Cross-checked against HaveIBeenPwned & Recorded Future. Clean.", severity: "info" },
+      { source: "Ownership", description: "EDGAR scrape complete — no ownership change detected.", severity: "info" },
+      { source: "Renewals", description: "Contract renewal in 124 days — no action required yet.", severity: "info" },
+    ];
+    if (fired) {
+      synthetic.push(
+        { source: "SOC 2 Watch", description: "SOC 2 expires in 18 days — re-assessment scheduled.", severity: "warn" },
+        { source: "Adverse News", description: "Material adverse event flagged — partial re-assessment triggered.", severity: "critical" }
+      );
+    }
+
+    const timer = setInterval(() => {
+      setTicks((prev) => {
+        const next = synthetic[Math.floor(Math.random() * synthetic.length)];
+        const ts = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        const entry: Tick = { id: `tick-${Date.now()}`, ts, ...next };
+        return [entry, ...prev].slice(0, 10);
+      });
+    }, 2400);
+    return () => clearInterval(timer);
+  }, [fired]);
+
+  return (
+    <div className="rounded-lg border border-slate-200 dark:border-border bg-white dark:bg-card overflow-hidden" data-testid="monitoring-live-panel">
+      <div className="px-4 py-2.5 border-b border-slate-100 dark:border-border bg-slate-50/80 dark:bg-muted/10 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Radio className="w-3.5 h-3.5 text-emerald-500" />
+          <span className="text-xs font-semibold text-foreground">Continuous Monitoring — Live</span>
+          <span className="relative flex h-2 w-2" key={pulseTick}>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          </span>
+        </div>
+        <span className="text-[10px] text-muted-foreground">Polling every 60s · {MONITORING_SOURCES.length} sources</span>
+      </div>
+
+      <div className="px-4 py-2.5 border-b border-slate-100 dark:border-border flex items-center gap-1.5 flex-wrap">
+        {MONITORING_SOURCES.map((s) => (
+          <Badge
+            key={s.id}
+            className="text-[9px] h-5 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/30"
+            data-testid={`monitoring-source-${s.id}`}
+          >
+            <span className="w-1 h-1 rounded-full bg-emerald-500 mr-1" />
+            {s.label}
+          </Badge>
+        ))}
+      </div>
+
+      <div className="max-h-64 overflow-y-auto divide-y divide-slate-100 dark:divide-border">
+        {ticks.length === 0 ? (
+          <div className="px-4 py-3 text-[11px] text-muted-foreground italic">Waiting for first signal…</div>
+        ) : (
+          ticks.map((t) => (
+            <div
+              key={t.id}
+              className={`px-4 py-2 border-l-2 ${
+                t.severity === "critical"
+                  ? "border-l-red-400 bg-red-50/40 dark:bg-red-900/10"
+                  : t.severity === "warn"
+                    ? "border-l-amber-400 bg-amber-50/40 dark:bg-amber-900/10"
+                    : "border-l-emerald-400/60"
+              }`}
+              data-testid={`monitoring-tick-${t.id}`}
+            >
+              <div className="flex items-baseline gap-2">
+                <span className="text-[10px] font-mono text-muted-foreground shrink-0 w-20">{t.ts}</span>
+                <span className="text-[10px] font-semibold text-foreground/80 shrink-0">{t.source}:</span>
+                <p className="text-[11px] text-foreground/90 leading-relaxed">{t.description}</p>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Vendor Focus Page — analog of SOX ControlFocusPage (header / tabs / stepper / step content / footer)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -752,7 +931,7 @@ function VendorFocusPage({
             data-testid="button-vendor-focus-back"
           >
             <ChevronLeft className="w-4 h-4" />
-            <span>Pipeline</span>
+            <span>Overview</span>
           </button>
           <div className="w-px h-5 bg-slate-200 dark:bg-border" />
           <div className="flex items-center gap-2">
@@ -935,37 +1114,21 @@ function VendorFocusPage({
                 </div>
 
                 <div data-testid={`vendor-step-block-${activeStep.id}`}>
-                  <VendorStepNodeContent step={activeStep} stepStatus={activeStepStatus} />
+                  <VendorStepNodeContent
+                    step={activeStep}
+                    stepStatus={activeStepStatus}
+                    vendorId={vendor.id}
+                    onResolveHitl={onResolveHitl}
+                  />
                 </div>
 
-                {/* Agent role / outcome footer info */}
-                <div className="rounded-lg border border-slate-200 dark:border-border bg-slate-50/40 dark:bg-muted/10 p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Bot className="w-3.5 h-3.5 text-[#266C92]" />
-                    <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Agent Role</span>
-                  </div>
-                  <p className="text-[11px] text-foreground/80 leading-relaxed">{activeStep.agentRole}</p>
-                </div>
-
-                {/* Monitoring trigger — only on monitoring step for fired vendor */}
-                {activeStep.id === "monitoring" && status.fired && vendor.monitoring.length > 0 && (
-                  <div className="rounded-lg border border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/10 p-3" data-testid="monitoring-events">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Activity className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                      <span className="text-xs font-semibold text-foreground">Monitoring trigger events</span>
-                    </div>
-                    <ul className="space-y-1.5">
-                      {vendor.monitoring.map((m) => (
-                        <li key={m.id} className="text-[11px] text-foreground/90">
-                          <span className="text-muted-foreground">[{m.timestamp}] {m.source}:</span> {m.description}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                {/* Live monitoring panel — only shown on the Monitoring step. Mirrors SOX "alive" feel. */}
+                {activeStep.id === "monitoring" && (
+                  <MonitoringLivePanel vendor={vendor} fired={!!status.fired} />
                 )}
 
-                {/* Final outcome banner */}
-                {isComplete && outcome && (
+                {/* Final risk decision banner — SOX canon: only render on the LAST step (terminal view). */}
+                {isComplete && outcome && isLastStep && (
                   <div
                     className={`p-4 rounded-xl border ${
                       outcome.tone === "rejected"
@@ -1020,37 +1183,12 @@ function VendorFocusPage({
                 </Button>
 
                 <div className="flex items-center gap-2">
+                  {/* SOX canon: HITL Approve / Modify / Reject is recorded inline under the gate substep,
+                      NOT in the footer. The footer keeps Prev / Confirm / Next only. */}
                   {activeStepStatus === "waiting" && stepHasHitlGate && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-8 text-xs gap-1.5 text-red-600 hover:text-red-700 border-red-200"
-                        onClick={() => onResolveHitl(vendor.id, activeStep.id, "reject")}
-                        data-testid={`hitl-reject-${activeStep.id}`}
-                      >
-                        <AlertCircle className="w-3.5 h-3.5" />
-                        Reject
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-8 text-xs gap-1.5"
-                        onClick={() => onResolveHitl(vendor.id, activeStep.id, "modify")}
-                        data-testid={`hitl-modify-${activeStep.id}`}
-                      >
-                        Modify
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="h-8 text-xs gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-                        onClick={() => onResolveHitl(vendor.id, activeStep.id, "approve")}
-                        data-testid={`hitl-approve-${activeStep.id}`}
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        Approve & Continue
-                      </Button>
-                    </>
+                    <span className="text-[11px] text-amber-700 dark:text-amber-300 italic" data-testid="footer-waiting-note">
+                      Awaiting reviewer disposition above ↑
+                    </span>
                   )}
 
                   {activeStepStatus === "running" && !stepHasHitlGate && (
@@ -1112,8 +1250,15 @@ function TPRMHub({
 }) {
   const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
   const setCurrentSolution = useWorkflowSessionStore((s) => s.setCurrentSolution);
-  const [actionsExpanded, setActionsExpanded] = useState(true);
+  // SOX canon: Actions Required is collapsed by default to keep the pipeline + tracker fully visible on first load.
+  const [actionsExpanded, setActionsExpanded] = useState(false);
   const [auditLogExpanded, setAuditLogExpanded] = useState(false);
+  // SOX canon: Open Exceptions stat card is clickable when count > 0 and opens an exceptions dialog.
+  const [exceptionsModalOpen, setExceptionsModalOpen] = useState(false);
+
+  // Full-pane scroll mode is engaged when ANY of the collapsible sections is expanded — that way
+  // the tracker is "pushed down" by expansion rather than the pipeline shrinking inside a fixed viewport.
+  const fullPaneScroll = actionsExpanded || auditLogExpanded;
 
   const totalVendors = statuses.length;
   const completedVendors = statuses.filter((v) =>
@@ -1193,8 +1338,8 @@ function TPRMHub({
 
   return (
     <div className="flex flex-col h-full overflow-hidden" data-testid="tprm-hub">
-      <div className={`flex-1 min-h-0 bg-slate-50 dark:bg-background px-8 py-5 ${!auditLogExpanded ? "flex flex-col overflow-hidden" : "overflow-y-auto"}`}>
-        <div className={`w-[90%] max-w-[1600px] mx-auto flex flex-col gap-5 ${!auditLogExpanded ? "h-full" : ""}`} data-testid="tprm-tracker-view">
+      <div className={`flex-1 min-h-0 bg-slate-50 dark:bg-background px-8 py-5 ${fullPaneScroll ? "overflow-y-auto" : "flex flex-col overflow-hidden"}`}>
+        <div className={`w-[90%] max-w-[1600px] mx-auto flex flex-col gap-5 ${fullPaneScroll ? "" : "h-full"}`} data-testid="tprm-tracker-view">
           {/* Header — mirror SOX FieldworkComplexHub header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -1283,19 +1428,31 @@ function TPRMHub({
               </CardContent>
             </Card>
             <Card
-              className={`border ${exceptionsOpen > 0 ? "border-red-200 dark:border-red-800/30" : "border-slate-200 dark:border-border"}`}
+              className={`border ${exceptionsOpen > 0 ? "border-red-200 dark:border-red-800/30 cursor-pointer hover:border-red-300 dark:hover:border-red-700/50 transition-colors" : "border-slate-200 dark:border-border"}`}
+              onClick={() => exceptionsOpen > 0 && setExceptionsModalOpen(true)}
               data-testid="tprm-exceptions-card"
+              role={exceptionsOpen > 0 ? "button" : undefined}
+              tabIndex={exceptionsOpen > 0 ? 0 : undefined}
+              onKeyDown={(e) => {
+                if (exceptionsOpen > 0 && (e.key === "Enter" || e.key === " ")) {
+                  e.preventDefault();
+                  setExceptionsModalOpen(true);
+                }
+              }}
             >
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 mb-1">
                   <AlertTriangle className={`w-3.5 h-3.5 ${exceptionsOpen > 0 ? "text-red-500" : "text-slate-400"}`} />
                   <span className="text-[11px] text-muted-foreground font-medium">Open Exceptions</span>
+                  {exceptionsOpen > 0 && (
+                    <ChevronRight className="w-3 h-3 text-red-500 ml-auto" />
+                  )}
                 </div>
                 <div className="flex items-baseline gap-1.5">
                   <span className={`text-xl font-bold ${exceptionsOpen > 0 ? "text-red-600 dark:text-red-400" : "text-foreground"}`}>
                     {exceptionsOpen}
                   </span>
-                  <span className="text-[10px] text-muted-foreground">{exceptionsOpen > 0 ? "from assessments" : "none open"}</span>
+                  <span className="text-[10px] text-muted-foreground">{exceptionsOpen > 0 ? "click to review" : "none open"}</span>
                 </div>
               </CardContent>
             </Card>
@@ -1379,15 +1536,15 @@ function TPRMHub({
           )}
 
           {/* Pipeline card — exact SOX grid pattern, grouped by track */}
-          <div className={`flex flex-col gap-4 ${!auditLogExpanded ? "flex-1 min-h-0" : ""}`}>
-            <Card className={`border border-slate-200 dark:border-border flex flex-col ${!auditLogExpanded ? "flex-1 min-h-0" : ""}`} data-testid="tprm-pipeline-card">
+          <div className={`flex flex-col gap-4 ${fullPaneScroll ? "" : "flex-1 min-h-0"}`}>
+            <Card className={`border border-slate-200 dark:border-border flex flex-col ${fullPaneScroll ? "" : "flex-1 min-h-0"}`} data-testid="tprm-pipeline-card">
               <CardHeader className="pb-2 pt-3 px-4 shrink-0">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Workflow className="w-4 h-4 text-[#266C92]" />
                   Vendor Assessment Pipeline
                 </CardTitle>
               </CardHeader>
-              <CardContent className={`px-4 pb-4 ${!auditLogExpanded ? "flex-1 min-h-0 overflow-y-auto" : ""}`}>
+              <CardContent className={`px-4 pb-4 ${fullPaneScroll ? "" : "flex-1 min-h-0 overflow-y-auto"}`}>
                 {/* Header row — Vendor | Source | 9 step columns | Result */}
                 <div className="grid grid-cols-[3fr_5rem_repeat(9,1fr)_1fr] gap-2 px-2 py-1.5 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
                   <span>Vendor</span>
@@ -1633,6 +1790,106 @@ function TPRMHub({
           )}
         </div>
       </div>
+
+      {/* Open Exceptions Dialog — opened from the clickable Open Exceptions stat card. Mirrors SOX exceptions modal. */}
+      <Dialog open={exceptionsModalOpen} onOpenChange={setExceptionsModalOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col" data-testid="dialog-tprm-exceptions">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-500" />
+              Open Exceptions ({exceptionsOpen})
+            </DialogTitle>
+            <DialogDescription>
+              Findings from completed assessments that require remediation.
+              Owners and deadlines have been assigned per the routing engine.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            {(() => {
+              const rows = masterVendorList
+                .filter((v) => statuses.some((s) => s.vendorId === v.id))
+                .filter((v) => v.exceptionRecords.open > 0);
+              if (rows.length === 0) {
+                return (
+                  <div className="text-center py-8">
+                    <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">No open exceptions</p>
+                  </div>
+                );
+              }
+              return (
+                <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
+                  <div className="grid grid-cols-[8rem_1fr_5rem_5rem_6rem] gap-2 px-3 py-2 bg-slate-50 dark:bg-muted/20 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-slate-200 dark:border-border">
+                    <span>Vendor</span>
+                    <span>Finding</span>
+                    <span className="text-center">Severity</span>
+                    <span className="text-center">Open</span>
+                    <span>Owner</span>
+                  </div>
+                  <div className="divide-y divide-slate-100 dark:divide-border/50">
+                    {rows.map((v) => {
+                      // Derive a synthetic severity from risk tier + criticality (no severity in schema yet).
+                      const severity: "critical" | "high" | "medium" =
+                        v.riskTier === "Tier 3" || v.criticality === "Critical"
+                          ? "critical"
+                          : v.riskTier === "Tier 2" || v.criticality === "High"
+                            ? "high"
+                            : "medium";
+                      // Owner derived from the primary contact / TPRM lead convention.
+                      const owner = v.primaryContact?.name?.split(" ").slice(0, 2).join(" ") || "TPRM Lead";
+                      // Summary: prefer the most recent monitoring event description if present, else fall back.
+                      const summary =
+                        v.monitoring[0]?.description ||
+                        `${v.exceptionRecords.open} outstanding remediation item${v.exceptionRecords.open !== 1 ? "s" : ""} from latest assessment.`;
+                      return (
+                        <div
+                          key={v.id}
+                          role="button"
+                          tabIndex={0}
+                          className="grid grid-cols-[8rem_1fr_5rem_5rem_6rem] gap-2 px-3 py-2.5 text-[11px] items-center hover:bg-slate-50/60 dark:hover:bg-muted/10 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#266C92]/40 focus:bg-slate-50 dark:focus:bg-muted/20"
+                          onClick={() => {
+                            setExceptionsModalOpen(false);
+                            onVendorClick(v.id);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              setExceptionsModalOpen(false);
+                              onVendorClick(v.id);
+                            }
+                          }}
+                          data-testid={`exception-row-${v.id}`}
+                        >
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="font-mono text-[10px] font-semibold text-[#266C92]">{v.id}</span>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-foreground truncate font-medium">{v.vendorName}</p>
+                            <p className="text-[10px] text-muted-foreground truncate">{summary}</p>
+                          </div>
+                          <div className="text-center">
+                            <Badge className={`text-[9px] h-4 ${
+                              severity === "critical"
+                                ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                : severity === "high"
+                                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                  : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                            } border-0 capitalize`}>
+                              {severity}
+                            </Badge>
+                          </div>
+                          <span className="text-center font-mono text-foreground font-semibold">{v.exceptionRecords.open}</span>
+                          <span className="text-foreground/80 truncate">{owner}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

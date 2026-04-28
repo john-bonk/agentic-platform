@@ -459,6 +459,18 @@ export const tprmSteps: ArchetypeStep[] = [
         id: "hr-1",
         actionType: "ai",
         description: "Render reviewer brief: score, dimension breakdown, top findings, suggested disposition, comparable vendors for reference",
+        output: {
+          kind: "narrative",
+          label: "Reviewer Brief",
+          body: "Composite risk score 72 (Tier 2). Top dimensions: Security 68 (gap: SOC 2 expires in 18d), Privacy 74 (DPA executed), Resilience 81. Three findings open, one critical (BC/DR plan not provided). Suggested disposition: Mitigate — require updated SOC 2 + BC/DR plan before contract execution. Comparable vendors at this risk profile (Workday FY24, Snowflake FY24) routed to Mitigate with median 14d remediation cycle.",
+          items: [
+            { label: "Composite score", value: "72 / 100", status: "warn" },
+            { label: "Findings (open)", value: "3 — 1 critical, 2 medium", status: "warn" },
+            { label: "Confidence", value: "High (0.91)", status: "ok" },
+            { label: "Suggested disposition", value: "Mitigate", status: "info" },
+            { label: "Comparable vendors", value: "Workday FY24 · Snowflake FY24", status: "info" },
+          ],
+        },
       },
       {
         id: "hr-2",

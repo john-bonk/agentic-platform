@@ -108,4 +108,4 @@ Optro's agentic GRC solutions follow a shared **workflow archetype** that codifi
 
 The shared archetype contract — `SubstepActionType`, `ArchetypeStep`, `ArchetypeSubstep`, `ArchetypePhase`, `ArchetypeConfig`, `StepRunStatus`, `ACTION_TYPE_META`, `getStepProgress` — lives in `client/src/lib/workflowArchetype.ts`. TPRM publishes its config as `tprmArchetypeConfig: ArchetypeConfig` and serves as the reference implementation.
 
-For the full archetype contract and a step-by-step recipe for adding a new solution that consumes it, see `docs/workflow-archetype.md`.
+For the full archetype contract and a step-by-step recipe for adding a new solution that consumes it, see `docs/workflow-archetype.md`. Section 5 ("UI Pattern Specification") of that doc is the canonical visual/UX spec — color tokens, bulk tracker layout, scroll modality, focus page layout, substep + HITL gate spec, final Risk Decision banner, monitoring panel, and explicit anti-patterns. Any new workflow must conform to that section so the only thing that changes is the underlying domain data.

@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import type { LucideIcon } from "lucide-react";
+import { Bot, Fingerprint, Zap, type LucideIcon } from "lucide-react";
 
 export type SubstepActionType = "ai" | "auto" | "hitl";
 
@@ -90,27 +90,55 @@ export interface ArchetypeConfig {
   description: string;
 }
 
+/**
+ * ACTION_TYPE_META — canonical metadata for the three substep automation modes.
+ *
+ * Visual contract (mirrors SOX `automationModeIcons` in AgentHubHome.tsx around line 2868):
+ *   - `auto`  → Zap icon, emerald tint, used for fully automated substeps
+ *   - `ai`    → Bot icon, blue tint, used for AI-only substeps with no checkpoint
+ *   - `hitl`  → Fingerprint icon, amber tint, used for human-in-the-loop gates
+ *
+ * Use `icon` + `iconColor` for the in-line marker that sits next to a substep description
+ * (the SOX canon uses an icon-only marker, NOT a coloured pill). Use `label`/`shortLabel`/`tone`
+ * for the Audit Trail table and other places where text labels read better than icons.
+ */
 export const ACTION_TYPE_META: Record<
   SubstepActionType,
-  { label: string; shortLabel: string; tone: string }
+  {
+    label: string;
+    shortLabel: string;
+    tone: string;
+    icon: LucideIcon;
+    iconColor: string;
+    title: string;
+  }
 > = {
   ai: {
     label: "AI",
     shortLabel: "AI",
     tone:
-      "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
+      "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+    icon: Bot,
+    iconColor: "text-blue-400 dark:text-blue-500",
+    title: "AI substep",
   },
   auto: {
     label: "Automated",
     shortLabel: "AUTO",
     tone:
-      "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
+      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+    icon: Zap,
+    iconColor: "text-emerald-400 dark:text-emerald-500",
+    title: "Fully automated substep",
   },
   hitl: {
     label: "Human-in-the-loop",
     shortLabel: "HITL",
     tone:
       "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+    icon: Fingerprint,
+    iconColor: "text-amber-500 dark:text-amber-400",
+    title: "Human-in-the-loop substep",
   },
 };
 
