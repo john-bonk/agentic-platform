@@ -67,6 +67,7 @@ import {
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 import { BrowserChrome } from "@/components/layout/BrowserChrome";
+import { PasswordGate } from "@/components/layout/PasswordGate";
 import { useSettings } from "@/components/settings-panel";
 
 function Router() {
@@ -206,9 +207,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="app-theme">
         <TooltipProvider>
-          <WouterRouter base={base}>
-            <AppContent />
-          </WouterRouter>
+          <PasswordGate>
+            <WouterRouter base={base}>
+              <AppContent />
+            </WouterRouter>
+          </PasswordGate>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
