@@ -35,7 +35,9 @@ export function BrowserChrome({ children, visible, tabs: externalTabs }: Browser
   const mainTab: BrowserTab = {
     id: "main",
     label: currentWorkspace.name,
-    faviconUrl: "/figmaAssets/auditboard-logo.png",
+    // Vite injects BASE_URL = "/" in dev and "/agentic-platform/" in the GH
+    // Pages production build, so the asset resolves under both deployments.
+    faviconUrl: `${import.meta.env.BASE_URL}figmaAssets/auditboard-logo.png`,
     isActive: activeTabId === "main",
   };
 

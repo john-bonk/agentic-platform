@@ -669,9 +669,15 @@ export const headerUtilityIcons = [
 
 /**
  * App Configuration
+ *
+ * `import.meta.env.BASE_URL` resolves to "/" in dev and "/agentic-platform/"
+ * in the GH Pages production build (set by `base` in vite.config.ts). All
+ * asset paths that originate from `/public/` need this prefix so they
+ * resolve correctly under both modes.
  */
+const ASSET_BASE = import.meta.env.BASE_URL;
 export const appConfig = {
   name: "AuditBoard Intelligence",
   shortName: "AuditBoard",
-  logoPath: "/figmaAssets/auditboard-logo.png",
+  logoPath: `${ASSET_BASE}figmaAssets/auditboard-logo.png`,
 };

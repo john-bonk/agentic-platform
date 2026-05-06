@@ -22,7 +22,9 @@ interface BrowserTabState {
   resetTabs: () => void;
 }
 
-const FAVICON_URL = "/figmaAssets/auditboard-logo.png";
+// Vite injects BASE_URL = "/" in dev and "/agentic-platform/" in the GH Pages
+// production build, so this resolves correctly under both deployments.
+const FAVICON_URL = `${import.meta.env.BASE_URL}figmaAssets/auditboard-logo.png`;
 const MAIN_TAB_ID = "main";
 
 function makeTabId(route: string): string {

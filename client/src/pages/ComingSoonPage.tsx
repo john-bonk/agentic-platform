@@ -26,7 +26,7 @@ export default function ComingSoonPage() {
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-[#266C92] flex items-center justify-center">
             <img
-              src="/figmaAssets/auditboard-logo.png"
+              src={`${import.meta.env.BASE_URL}figmaAssets/auditboard-logo.png`}
               alt="AuditBoard"
               className="w-10 h-auto brightness-0 invert"
             />
