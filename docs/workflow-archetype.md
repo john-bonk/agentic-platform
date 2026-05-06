@@ -1,11 +1,15 @@
-# Workflow Archetype
+# Workflow Archetype — implementation recipe
+
+> **Doc role.** This doc is the **engineering implementation recipe** — file structure, wiring conventions, gotchas. For the architectural taxonomy + the prompt-fillable registration schema, see [`solution-framework.md`](./solution-framework.md). For the pixel-level visual reference and TPRM drift audit, see [`ui-pattern-canon.md`](./ui-pattern-canon.md).
 
 Optro implements its agentic GRC solutions on top of a shared **workflow archetype** — a reusable pattern that defines how a "solution" turns a population of objects into completed assessments. The first two solutions on the archetype are:
 
 - **SOX Control Testing** — object: `Control`
 - **Third-Party Risk Management (TPRM)** — object: `Vendor`
 
-This document describes the archetype contract and the step-by-step process for adding a new solution that uses it.
+The next batch of solutions (**Risk Assessments** → object: `Entity`; **Pre-IPO** → object: `Control` (in IPO scope); **Evidence Collection** → object: `Evidence Request`; **Issue Management** → object: `Issue`) will be authored against the same archetype.
+
+This document describes the archetype contract and the engineer-facing process for adding a new solution.
 
 ---
 
@@ -79,7 +83,7 @@ The same module exports:
 
 ## 2. How SOX and TPRM consume the archetype
 
-Both solutions consume the same conceptual contract but render slightly different UIs because SOX predates the formal archetype and uses its own evidence-collection metaphors.
+Both solutions consume the same conceptual contract. **SOX Control Testing is the visual/interaction canon** — its `ControlFocusPage` (drilled to CTL-003) is the reference implementation for the per-object Focus page that every solution must mirror. TPRM was built next and *mostly* mirrors canon, but has known drift points that are tracked in [`docs/ui-pattern-canon.md`](./ui-pattern-canon.md) Part 2 (the TPRM Drift Audit).
 
 | Aspect | SOX (`control-testing`) | TPRM (`tprm-assessment`) |
 |--------|-------------------------|--------------------------|
@@ -88,11 +92,12 @@ Both solutions consume the same conceptual contract but render slightly differen
 | Steps | 6 (readiness → testEffectiveness) | 9 (intake → monitoring) |
 | Tracks | manual / connected | automated / human-review |
 | Planning page | `TestingPlanPage` | `TPRMPlanningPage` |
-| Session | `FieldworkComplexHub` | `TPRMSession` |
-| Domain data | `WorkflowSession.tsx` | `lib/tprmData.ts` |
+| Hub | `FieldworkComplexHub` | `TPRMHub` |
+| Focus page (the canon contract) | `ControlFocusPage` (`AgentHubHome.tsx` ≈ line 4912) | `VendorFocusPage` (`TPRMSession.tsx` ≈ line 898) |
+| Domain data | `WorkflowSession.tsx` (inline) | `lib/tprmData.ts` |
 | Launcher | `controlTestingLauncher.ts` | `lib/tprmLauncher.ts` |
 
-TPRM **also** publishes its config as `tprmArchetypeConfig: ArchetypeConfig`, fully consuming the shared types. This is the reference implementation for any future solution.
+TPRM publishes its config as `tprmArchetypeConfig: ArchetypeConfig`, fully consuming the shared types — that part is the reference for the data shape. For the visual + interaction grammar, **`ControlFocusPage` is the reference**, and any deviation is drift to be reconciled against the canon doc.
 
 ---
 
@@ -139,11 +144,24 @@ Mirror `TestingPlanPage` / `TPRMPlanningPage`:
 
 ### e. Session view — `client/src/components/workspace/<Solution>Session.tsx`
 
-Mirror `TPRMSession.tsx`:
+Mirror `ControlFocusPage` in `AgentHubHome.tsx` (the canon). The visual + interaction grammar is defined in [`ui-pattern-canon.md`](./ui-pattern-canon.md) Part 1. The architectural contract — what tab slots are required, what's optional, what runs where — is in [`solution-framework.md`](./solution-framework.md) Part 2.6.
 
-- A bulk pipeline tracker grid: rows × steps with status icons.
-- A focus view per object with three tabs: Overview (full schema), Assessment (steps grouped into phases, expandable into substeps with `ActionTypeBadge` + outputs + HITL Approve/Modify/Reject), and Audit Trail.
-- Auto-tick simulation using your `tick<Solution>Statuses` function.
+Headline contract:
+
+- A bulk pipeline tracker grid: rows × steps with status icons (= the **Hub**, § 1.4 of the canon doc).
+- A focus view per object with:
+  - **3 required tab slots**: Details/Overview · [Workflow verb] · Audit Log.
+  - **N optional object-type-specific tabs** declared in the registration (between Workflow and Audit Log). Examples: Control declares `Issues` + `Automations`; Vendor declares none today; Entity (Risk Assessments) will declare `KRIs` + `Heat Map`.
+  - The Workflow-tab label is dynamic (`Testing` / `Assessment` / `Review` / `Diligence` / `Readiness`).
+  - When the workflow declares `cycles`, the framework auto-renders a chevron dropdown on the Workflow tab (e.g. *Testing (Interim)* / *Assessment (Annual)*).
+- The workflow tab body is a **stepper sub-band** (pills with progress fill, including a `—` glyph for track-skipped steps) → **collapsible Run-Context band** with 8 invariant slots → **step content area** that renders `<StepNodeContent>` substeps with inline action affordances → **footer** with `Previous Step` / terminal CTA / `Next Step`.
+- Substeps render with **icon-only** action-type markers (`Zap`/`Bot`/`Fingerprint`), never colored pills.
+- HITL gates surface **inline under the gate substep** as an amber Approve/Modify/Reject card. The footer never holds these buttons.
+- A **right-side utility panel** is always present with **4 tabs**: Optro Agent · Comments · Notes · Attachments. (The History tab from earlier versions has been promoted to the top-level Audit Log tab.)
+- Every confirmation emits a **bottom-center toast** *and* mirrors to the home assistant via `useHomeAssistantStore.addMessage()`.
+- Auto-tick simulation using your `tick<Solution>Statuses` function feeds the stepper.
+
+> If you find yourself building a 4th *required* tab (e.g. forcing an "Issues" or "Automations" tab on every solution), stop — Issues and Automations are *Control-specific* optional tabs. The required tab spine is exactly three (Details / Workflow / Audit Log).
 
 ### f. Wire into `AgentHubHome.tsx`
 
@@ -177,185 +195,20 @@ Make sure the solution shows up in `solutionConfigs` (in `AgentHubHome.tsx`) wit
 
 ---
 
-## 5. UI Pattern Specification (canon)
+## 5. Companion docs (where the design system lives)
 
-This section is the **single source of truth** for how a workflow that conforms to the archetype should *look*. Both SOX (`AgentHubHome.tsx` → `FieldworkComplexHub` + `ControlFocusPage`) and TPRM (`TPRMSession.tsx` → `TPRMHub` + `VendorFocusPage`) implement these patterns identically. Future workflows must mirror this section exactly so the only thing that changes is the underlying domain data.
+The platform's design system spans three docs that work together. This implementation recipe is one of them:
 
-### 5.1 Color tokens
+- **[`solution-framework.md`](./solution-framework.md)** — *the headlining architectural contract*. Defines the 7-level taxonomy (Org Workspace → Solutions → Workflows → Object Types → Pipeline → Focus → Artifact), the required component spine, the per-solution flex points, and the **fillable `SolutionDefinition` registration schema**. This is what you fill in to add a new solution; the framework promises a working canon-compliant UI in return.
+- **[`ui-pattern-canon.md`](./ui-pattern-canon.md)** — *the pixel-level visual reference + live drift audit*. Layer-by-layer specification of every component referenced in the architecture, anchored to SOX Control Testing (CTL-003). Part 2 contains the re-graded TPRM drift audit with severity ranking and recommended retrofit order.
+- **`workflow-archetype.md`** *(this doc)* — *the engineering implementation recipe*. File structure, wiring conventions, persistence patterns, and gotchas.
 
-| Token | Tailwind class | Use |
-|-------|---------------|-----|
-| Primary brand | `#266C92` (literal) and `text-[#266C92]`, `bg-[#266C92]/5..20` | All workflow chrome, active step pill, success indicators |
-| Auto / fully-automated | `text-emerald-400 dark:text-emerald-500`, `bg-emerald-100/50/etc.` | `auto` substep marker, monitoring "Live" pulse, source health |
-| AI | `text-blue-400 dark:text-blue-500`, `bg-blue-100/etc.` | `ai` substep marker |
-| HITL / human checkpoint | `text-amber-500 dark:text-amber-400`, `bg-amber-50/200/etc.` | `hitl` substep marker, inline checkpoint card, "Awaiting Reviewer" pill |
-| Blocked / rejected | `text-red-500/600`, `bg-red-50/60/etc.`, `border-red-200/300` | Blocked steps, exceptions card, rejected outcomes |
-| Re-assess / monitoring fired | `text-violet-500/700`, `bg-violet-100/etc.` | Re-assess outcome badge |
+### Why the docs are split this way
 
-**Substep mode markers are icon-only** (mirroring SOX `automationModeIcons` near `AgentHubHome.tsx:2868`):
+A previous single-doc version conflated "the architecture" with "the visuals" with "the implementation recipe", and it accidentally promoted TPRM's tab structure (`Overview / Assessment / Audit Trail`) to canon. The corrected model is:
 
-| `actionType` | Icon | Color |
-|--------------|------|-------|
-| `auto` | `Zap` | emerald |
-| `ai` | `Bot` | blue |
-| `hitl` | `Fingerprint` | amber |
+- **3 required tab slots**: Details/Overview · [Workflow verb] · Audit Log. Platform-uniform.
+- **N optional object-type-specific tabs**: declared per object type in the registration (e.g. Control declares `Issues` + `Automations`; Vendor declares none).
+- **A cycle dropdown on the Workflow tab**: optional per-workflow.
 
-These come from `ACTION_TYPE_META` in `client/src/lib/workflowArchetype.ts` — use the `icon` + `iconColor` fields, not a coloured pill. Pills (`label`/`shortLabel`/`tone`) remain available for the Audit Trail table where text labels read better.
-
-### 5.2 Bulk Tracker layout (Hub view)
-
-Implementation references: `AgentHubHome.tsx` lines ~6385–6802 (SOX), `TPRMSession.tsx` `TPRMHub` (TPRM).
-
-The Hub is a vertically stacked column with `gap-5` between blocks:
-
-1. **Header row** — solution icon (`#266C92`), title + subtitle, optional Complete badge, "Open Workflow" / "Back to TPRM" external-link button, kebab/fast-forward menu.
-2. **4-stat grid** — `grid grid-cols-4 gap-3`. Each card is `border border-slate-200 dark:border-border` with `CardContent p-3`. The 4 cards are conventionally:
-   - Scope count
-   - Automated coverage %
-   - Closed / completed count
-   - **Open Exceptions** (see 5.3 — special, clickable)
-3. **Actions Required** — collapsible card. **Default collapsed** (`useState(false)`). Header row shows `AlertCircle amber` + `Actions Required` + amber count badge + chevron. When expanded, body lists items with vendor/control id, label badge, brief, primary action (`Open …`) + optional secondary (`Quick Approve`).
-4. **Pipeline card** — header with `Workflow` icon + title; body is a grid `grid-cols-[3fr_5rem_repeat(<stepCount>,1fr)_1fr]` (Object | Source | step columns | Result). Rows are grouped by track (e.g. "Human-Review Workflow (n/m)" + "Automated (n/m)") with `border-l-2 border-l-transparent hover:border-l-[#266C92]` row hover. **Legend** at the bottom of the card lists every dot meaning + every result icon.
-5. **Audit Log** — collapsible card. Default collapsed. When expanded, shows the assistant welcome bubble (`Bot` icon, `bg-[#266C92]/5`, `Optro Assistant` header + status sentence) followed by a `divide-y` list of activity entries with `border-l-2` colored by entry type (success `#266C92`, warning `red-400`, action-needed `amber-400`).
-6. **Next Steps card** — only when fully complete. `border-[#266C92]/20 bg-[#266C92]/[0.03]` card with `ListChecks` header and a list of follow-ups.
-
-### 5.3 Scroll modality
-
-There are **two scroll modes** for the Hub:
-
-| Condition | Outer wrapper | Inner column | Pipeline card body |
-|-----------|---------------|--------------|--------------------|
-| All collapsibles closed (default) | `flex flex-col overflow-hidden` (fixed viewport) | `h-full` | `flex-1 min-h-0 overflow-y-auto` (scrolls inside) |
-| Any of (Actions Required \| Audit Log) expanded | `overflow-y-auto` (full-pane scroll) | _no `h-full`_ | _no inner scroll_ |
-
-In `TPRMHub` this is gated by a single derived flag:
-```ts
-const fullPaneScroll = actionsExpanded || auditLogExpanded;
-```
-The same flag drives all three classes. **Never** let the tracker shrink under an expanding section — push the page instead. The Open Exceptions modal is rendered outside the scroll wrapper as a `<Dialog>`.
-
-### 5.4 Open Exceptions card
-
-- Card is `cursor-pointer hover:border-red-300` and gets `role="button"` + `tabIndex={0}` + Enter/Space handler **only when `count > 0`**.
-- Header row gets a trailing `ChevronRight` in red when active.
-- Subtitle text changes from `none open` → `click to review`.
-- Click opens an `<Dialog>` with `max-w-3xl max-h-[80vh]` showing a table of `[Object id | Finding summary | Severity | Open count | Owner]`. Rows are clickable: close the dialog and navigate into the focus view for that object.
-
-### 5.5 Focus Page layout (per-object drill-in)
-
-Implementation references: `AgentHubHome.tsx` `ControlFocusPage` (SOX), `TPRMSession.tsx` `VendorFocusPage` (TPRM).
-
-Vertical column inside `flex h-full overflow-hidden`:
-
-1. **Header bar** — `shrink-0 h-12 px-4 flex items-center gap-3 border-b`. Contains:
-   - **Back button** with `ChevronLeft` and the literal text `"Overview"` (not "Pipeline").
-   - Vertical separator `w-px h-5 bg-slate-200`.
-   - Solution icon + object id + em-dash + object name + tier badge.
-   - Outcome badge pinned to the right (`ml-auto`).
-2. **Tab bar** — three tabs: `Overview` (object schema), `Assessment` (default — the steps), `Audit Trail`. Active tab is a `border-b-2 border-[#266C92] text-[#266C92]` underline.
-3. **Horizontal stepper** — only on Assessment tab. Progress line (`h-1 rounded-full bg-slate-200`) with a filled `bg-[#266C92]` overlay sized by completed/total. Each step is a clickable pill with status icon (`CheckCircle2`, `Loader2`, `Clock` amber, `AlertCircle` red, `—`) + short label. Active pill is `bg-[#266C92] text-white`.
-4. **Object Details strip** — collapsible (`ChevronDown` toggle, default open). Two-column grid of `[uppercase label][value]` pairs.
-5. **Step content area** — `flex-1 min-h-0 overflow-y-auto` with a centered `w-[90%] mx-auto px-6 py-6 space-y-6` container:
-   - Step title row — title + status badge + `Phase n · Phase Label` + step counter sentence.
-   - **`StepNodeContent`** rendering the substeps (see 5.6).
-   - **Live monitoring panel** if `step.id === "monitoring"` (see 5.9).
-   - **Risk Decision banner** *only* when `isComplete && isLastStep` (see 5.8).
-6. **Footer** — `shrink-0 px-6 py-3 border-t`. Left side: `Previous Step` (ghost). Right side: **Confirm & Continue** (or `Generate … Report` on the last step) when running, **Next Step** when complete. **No Approve / Modify / Reject buttons in the footer** — those live inline (see 5.7).
-
-### 5.6 Substep row spec
-
-Each substep row inside `StepNodeContent` is a `button` (or div if not expandable) with a left cluster + body + chevron:
-
-```
-[ #N ] [ status indicator ] [ mode icon ]   <description text>           [ chevron ]
-                                            <optional muted detail line>
-```
-
-- **Number** — plain integer `{idx + 1}`. **Not** `{step.ordinal}.{idx + 1}`. Width `w-4 text-right font-mono text-[9px] text-muted-foreground`.
-- **Status indicator** — `SubStepIndicator` (`w-3.5 h-3.5`): `CheckCircle2` `#266C92` complete, `Loader2 animate-spin` `#266C92` running, `Clock` amber waiting, `AlertCircle` red blocked, hollow circle pending.
-- **Mode icon** — `ActionTypeIcon` (`w-3 h-3 shrink-0` + `iconColor` from `ACTION_TYPE_META`). Icon-only. **No coloured pill**.
-- **Row background** — running `bg-[#266C92]/[0.04]`, waiting `bg-amber-50/40 border border-amber-200/60`, blocked `bg-red-50/30`, complete-with-output `hover:bg-slate-50/80 cursor-pointer`, pending `opacity-50`.
-- **Expanded output** — when complete + has output, render `<SubstepOutput>` in a `pl-12 pr-3 pb-3 pt-1` container (12-pad indent matches the 32-px left cluster).
-
-### 5.7 HITL gate spec
-
-When a substep has `isHitlGate: true` and the step is in `"waiting"` status, render an **inline amber checkpoint card directly under the gate substep** (mirroring SOX `subStatus === "checkpoint-held"` block around `AgentHubHome.tsx:3178-3198`):
-
-```
-ml-12 mr-3 mb-1 mt-1 rounded-lg
-border border-amber-200 dark:border-amber-800/40
-bg-amber-50/70 dark:bg-amber-900/15
-p-3
-```
-
-Body:
-- Header line — `Clock w-3.5 amber-600` + `Reviewer checkpoint — record disposition before proceeding` (`text-[11px] font-semibold text-amber-800`).
-- Description paragraph — `text-[11px] text-amber-900/80`.
-- Three buttons in a `flex items-center gap-2 flex-wrap`:
-  - **Approve** — `bg-[#266C92] hover:bg-[#1e5a7a] text-white`, `CheckCircle2` icon. Fires `onResolveHitl(id, stepId, "approve")`.
-  - **Modify** — `variant="outline"`, `Pencil` icon. Fires `onResolveHitl(id, stepId, "modify")`.
-  - **Reject** — `variant="outline" text-red-600 border-red-200`, `AlertCircle` icon. Fires `onResolveHitl(id, stepId, "reject")`.
-
-The footer keeps only **Previous Step / Confirm & Continue / Next Step** during HITL waiting; the right side shows an italic `Awaiting reviewer disposition above ↑` note instead of buttons.
-
-### 5.8 Final Risk Decision banner
-
-The terminal "Risk Decision: \<Outcome>" banner is rendered **inside the step content area** but **only when `isComplete && isLastStep`**. The container is `p-4 rounded-xl border` with tone-keyed palette:
-
-| Tone | Border | Background | Text | Icon |
-|------|--------|------------|------|------|
-| approved | `border-[#266C92]/20` | `bg-[#266C92]/5` | `text-[#266C92]` | `ShieldCheck` |
-| conditional | `border-amber-200` | `bg-amber-50/50` | `text-amber-700` | `ShieldCheck amber-600` |
-| rejected | `border-red-200` | `bg-red-50/50` | `text-red-600` | `AlertTriangle red-500` |
-| monitor / re-assess | `border-violet-200` | `bg-violet-50/50` | `text-violet-700` | `Activity violet-500` |
-
-Never show this on intermediate steps — it would imply finality before the workflow is done.
-
-### 5.9 Live monitoring panel (`MonitoringLivePanel`)
-
-Only render on the step whose `id === "monitoring"` (or the equivalent terminal continuous-monitoring step in your workflow). The panel signals "this is alive":
-
-1. **Header** — `Radio` icon emerald + title + a pulsing dot `<span class="animate-ping ... bg-emerald-400 opacity-75">` overlay on a solid `bg-emerald-500` 2-px circle. Right side: polling cadence + source count.
-2. **Source health row** — small `Badge`s (`bg-emerald-50 text-emerald-700`) for each monitoring source ("Adverse News", "SOC 2 Watch", "Breach Feed", "Ownership", "Renewals"…). Each badge has a 1-px emerald dot prefix.
-3. **Ticker** — `max-h-64 overflow-y-auto divide-y` list. New entries are inserted on a 2.4-second interval. Each entry has `border-l-2` color-keyed by severity (`emerald-400/60` info, `amber-400 bg-amber-50/40` warn, `red-400 bg-red-50/40` critical), monospace timestamp, source label, description.
-
-### 5.10 Reviewer Brief artifact
-
-The Review (HITL judgment) step has a substep that renders a structured `Reviewer Brief` artifact on expand. Define this on the substep itself in your `<solution>Data.ts`:
-
-```ts
-{
-  id: "hr-1",
-  actionType: "ai",
-  description: "Render reviewer brief: …",
-  output: {
-    kind: "narrative",
-    label: "Reviewer Brief",
-    body: "Composite risk score 72 …",
-    items: [
-      { label: "Composite score", value: "72 / 100", status: "warn" },
-      { label: "Findings (open)", value: "3 — 1 critical, 2 medium", status: "warn" },
-      { label: "Confidence", value: "High (0.91)", status: "ok" },
-      { label: "Suggested disposition", value: "Mitigate", status: "info" },
-      { label: "Comparable vendors", value: "…", status: "info" },
-    ],
-  },
-}
-```
-
-`SubstepOutput` already knows how to render `kind: "narrative"` with both a body paragraph and an items grid; no extra UI work is needed.
-
-### 5.11 Anti-patterns to avoid
-
-These were drift risks we intentionally removed from TPRM. Do not re-introduce them in any workflow that conforms to this archetype:
-
-- ❌ Substep numbering in `{ordinal}.{idx+1}` form — use plain `{idx+1}`.
-- ❌ Coloured AI/AUTO/HITL pills next to the substep description — use the canonical Lucide icon (`Bot`/`Zap`/`Fingerprint`).
-- ❌ Footer-level Approve/Modify/Reject buttons — those belong inline under the gate substep.
-- ❌ "Risk Decision" banner on intermediate steps — terminal step only.
-- ❌ "Pipeline" back link text on the focus page — use "Overview".
-- ❌ Standalone `Agent Role` block on the per-step view — the agent role is implicit from the substeps.
-- ❌ Open Exceptions card that is non-interactive when count > 0 — must open the exceptions dialog.
-- ❌ Tracker that shrinks when Actions Required expands — switch to full-pane scroll instead.
-- ❌ Static monitoring view — the monitoring step must feel alive (pulsing dot + ticker).
-- ❌ Default `actionsExpanded: true` — collapsed by default per SOX canon.
+If you're adding a new solution, **start with `solution-framework.md` Part 5** and fill out the `SolutionDefinition`. The framework + canon docs together define everything else.

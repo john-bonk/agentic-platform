@@ -13,7 +13,7 @@
  * 4. Update navigation config in src/config/navigation.ts
  */
 
-import { Switch, Route } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -63,6 +63,7 @@ import {
   AIGovernancePage,
   TestingPlanPage,
   TPRMPlanningPage,
+  AuditAssessmentPlanningPage,
 } from "@/pages";
 import { HomeAssistantPanel } from "@/components/layout/HomeAssistantPanel";
 import { BrowserChrome } from "@/components/layout/BrowserChrome";
@@ -176,6 +177,7 @@ function Router() {
       <Route path="/ai-governance" component={AIGovernancePage} />
       <Route path="/testing-plan" component={TestingPlanPage} />
       <Route path="/tprm-planning" component={TPRMPlanningPage} />
+      <Route path="/audit-assessment-planning" component={AuditAssessmentPlanningPage} />
       
       {/* 404 - Must be last */}
       <Route component={NotFound} />
@@ -196,11 +198,17 @@ function AppContent() {
 }
 
 function App() {
+  // GH Pages serves the SPA at /agentic-platform/* so Wouter needs that base.
+  // Vite injects BASE_URL based on the `base` config in vite.config.ts; in dev
+  // this resolves to "/" and the routes work as before.
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="app-theme">
         <TooltipProvider>
-          <AppContent />
+          <WouterRouter base={base}>
+            <AppContent />
+          </WouterRouter>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>

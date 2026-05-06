@@ -8,6 +8,31 @@ import {
   UserCheck,
   AlertTriangle,
   Activity,
+  // Substep content icons (canon parity — one icon per substep, rendered muted next to the label)
+  Database,
+  Search,
+  FileCheck,
+  Layers,
+  Send,
+  Upload,
+  Shield,
+  ShieldCheck,
+  ScrollText,
+  CircleDollarSign,
+  FileText,
+  Newspaper,
+  GitMerge,
+  Scale,
+  ListChecks,
+  Sparkles,
+  Mail,
+  Bell,
+  Radio,
+  Target,
+  RefreshCcw,
+  Pencil,
+  CalendarRange,
+  Clock,
 } from "lucide-react";
 import type {
   ArchetypeConfig,
@@ -125,6 +150,8 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "intake-1",
         actionType: "auto",
+        label: "Source Ingestion",
+        icon: Inbox,
         description: "Ingest vendor record from source (procurement system, MCP feed, manual CSV, or API)",
         output: {
           kind: "list",
@@ -139,6 +166,8 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "intake-2",
         actionType: "ai",
+        label: "Dedup & Shadow-IT",
+        icon: GitMerge,
         description: "Deduplicate against existing vendor inventory and surface potential shadow IT matches",
         output: {
           kind: "annotation",
@@ -152,16 +181,22 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "intake-3",
         actionType: "auto",
+        label: "Metadata Enrichment",
+        icon: Database,
         description: "Enrich record with available procurement metadata (spend, contract date, category)",
       },
       {
         id: "intake-4",
         actionType: "ai",
+        label: "Missing-Fields Check",
+        icon: AlertTriangle,
         description: "Identify any missing required fields and flag for completion",
       },
       {
         id: "intake-5",
         actionType: "auto",
+        label: "Vendor Object Creation",
+        icon: FileCheck,
         description: "Create Vendor object in system with normalized schema",
       },
     ],
@@ -182,6 +217,8 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "tier-1",
         actionType: "ai",
+        label: "Dimension Evaluation",
+        icon: Layers,
         description:
           "Evaluate vendor against configured tiering dimensions: data access scope, system criticality, regulatory exposure, spend threshold, geographic risk",
         output: {
@@ -199,22 +236,30 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "tier-2",
         actionType: "ai",
+        label: "Tier Assignment",
+        icon: GitBranch,
         description: "Apply tiering ruleset and assign Tier 1 / Tier 2 / Tier 3 risk classification",
       },
       {
         id: "tier-3",
         actionType: "auto",
+        label: "Rationale Logging",
+        icon: ScrollText,
         description: "Log tiering rationale with dimension-by-dimension breakdown",
       },
       {
         id: "tier-4",
         actionType: "auto",
+        label: "Re-tier Trigger Check",
+        icon: RefreshCcw,
         description:
           "Check for trigger conditions that would require re-tiering (new data access, contract change, acquisition signal)",
       },
       {
         id: "tier-5",
         actionType: "auto",
+        label: "Track Routing",
+        icon: Target,
         description:
           "Set workflow routing — Tier 1 routes to automated track; Tier 2/3 routes to human review track",
       },
@@ -235,6 +280,8 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "out-1",
         actionType: "auto",
+        label: "Sanctions Check",
+        icon: Shield,
         description: "Query sanctions and watchlist databases (OFAC, EU, UN)",
         output: {
           kind: "list",
@@ -249,6 +296,8 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "out-2",
         actionType: "auto",
+        label: "Cyber Posture Score",
+        icon: ShieldCheck,
         description: "Retrieve cyber risk posture score from configured cyber risk platform",
         output: {
           kind: "score",
@@ -260,26 +309,36 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "out-3",
         actionType: "auto",
+        label: "Adverse News Pull",
+        icon: Newspaper,
         description: "Pull adverse news and media signals from configured news feed",
       },
       {
         id: "out-4",
         actionType: "auto",
+        label: "Financial Health Check",
+        icon: CircleDollarSign,
         description: "Check financial health indicators from financial data provider if configured",
       },
       {
         id: "out-5",
         actionType: "auto",
+        label: "Trust Center Retrieval",
+        icon: FileText,
         description: "Retrieve public trust center documents (SOC 2, ISO certifications, published policies)",
       },
       {
         id: "out-6",
         actionType: "ai",
+        label: "Signal Reconciliation",
+        icon: GitMerge,
         description: "Reconcile conflicting signals across sources and flag data absence as a risk indicator",
       },
       {
         id: "out-7",
         actionType: "ai",
+        label: "Outside-In Summary",
+        icon: Sparkles,
         description: "Produce structured outside-in risk summary with source attribution",
         output: {
           kind: "narrative",
@@ -306,16 +365,41 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "doc-1",
         actionType: "auto",
+        label: "Document Ingestion",
+        icon: Upload,
         description: "Ingest available vendor-provided documents (SOC 2, ISO cert, pen test, DPA, MSA, security policy)",
+        // Universal block-resolution affordances. Mirrors canon's pop-ingest /
+        // evd-collect pattern (AgentHubHome.tsx ≈ 3200): when the agent stalls
+        // waiting for vendor docs, the user can dispatch a DPQ or upload directly.
+        inlineAffordances: [
+          {
+            id: "request",
+            label: "Send DPQ",
+            variant: "outline",
+            icon: Send,
+            showWhen: ["running", "blocked"],
+          },
+          {
+            id: "upload",
+            label: "Upload Documents",
+            variant: "primary",
+            icon: Upload,
+            showWhen: ["running", "blocked"],
+          },
+        ],
       },
       {
         id: "doc-2",
         actionType: "ai",
+        label: "Findings Extraction",
+        icon: Search,
         description: "Extract key findings, scope statements, and control assertions from each document",
       },
       {
         id: "doc-3",
         actionType: "ai",
+        label: "Framework Mapping",
+        icon: Layers,
         description: "Map extracted findings to internal control framework or policy requirements",
         output: {
           kind: "annotation",
@@ -331,22 +415,46 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "doc-4",
         actionType: "ai",
+        label: "Gap Identification",
+        icon: AlertTriangle,
         description: "Identify coverage gaps, expired certificates, and scope exclusions",
       },
       {
         id: "doc-5",
         actionType: "ai",
+        label: "Coverage Annotation",
+        icon: ListChecks,
         description: "Annotate each control framework requirement with: covered / gap / expired / out-of-scope",
       },
       {
         id: "doc-6",
         actionType: "auto",
+        label: "Vendor Doc Request",
+        icon: Send,
         description: "For documents not yet received: generate structured document request and dispatch via secure vendor portal",
+        inlineAffordances: [
+          {
+            id: "request",
+            label: "Resend DPQ",
+            variant: "outline",
+            icon: Send,
+            showWhen: ["running", "blocked"],
+          },
+          {
+            id: "upload",
+            label: "Upload Docs Directly",
+            variant: "primary",
+            icon: Upload,
+            showWhen: ["running", "blocked"],
+          },
+        ],
       },
       {
         id: "doc-7",
         actionType: "hitl",
         isHitlGate: true,
+        label: "Critical-Doc Escalation",
+        icon: AlertTriangle,
         description: "If critical documents missing after request window: surface for human escalation decision",
       },
     ],
@@ -366,18 +474,24 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "score-1",
         actionType: "ai",
+        label: "Outside-In Aggregation",
+        icon: Globe,
         description:
           "Aggregate outside-in intelligence signals into quantitative risk dimensions (cyber posture, financial stability, news/adverse events, regulatory exposure)",
       },
       {
         id: "score-2",
         actionType: "ai",
+        label: "Doc-Findings Aggregation",
+        icon: FileSearch,
         description:
           "Aggregate document analysis findings into control coverage dimensions (security controls, data protection, operational resilience, compliance)",
       },
       {
         id: "score-3",
         actionType: "ai",
+        label: "Composite Score",
+        icon: Gauge,
         description: "Compute weighted composite risk score using configured scoring model",
         output: {
           kind: "score",
@@ -389,16 +503,22 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "score-4",
         actionType: "ai",
+        label: "Risk Scorecard",
+        icon: ListChecks,
         description: "Produce structured risk scorecard: dimension scores, confidence levels, supporting evidence links, key findings",
       },
       {
         id: "score-5",
         actionType: "ai",
+        label: "Narrative Summary",
+        icon: ScrollText,
         description: "Generate audit-ready narrative summary: score rationale, top risk drivers, finding-by-finding breakdown",
       },
       {
         id: "score-6",
         actionType: "auto",
+        label: "Audit Trail Logging",
+        icon: Database,
         description: "Log full scoring model inputs, weights, and outputs for auditability",
       },
     ],
@@ -418,27 +538,37 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "tri-1",
         actionType: "ai",
+        label: "Threshold Evaluation",
+        icon: Scale,
         description: "Evaluate risk score and confidence level against auto-close thresholds",
       },
       {
         id: "tri-2",
         actionType: "auto",
+        label: "Tier 1 Auto-Close",
+        icon: ShieldCheck,
         description: "For Tier 1 vendors meeting auto-close criteria: mark assessment complete, generate closure summary, update vendor record",
       },
       {
         id: "tri-3",
         actionType: "ai",
+        label: "Reviewer Brief",
+        icon: ScrollText,
         description: "For all other vendors: prepare structured reviewer brief with score breakdown, key findings, confidence level, and suggested disposition",
       },
       {
         id: "tri-4",
         actionType: "auto",
+        label: "Reviewer Routing",
+        icon: Target,
         description: "Route to assigned reviewer based on vendor tier, risk domain, and configured routing rules",
       },
       {
         id: "tri-5",
         actionType: "hitl",
         isHitlGate: true,
+        label: "Routing Confirmation",
+        icon: ClipboardCheck,
         description: "Reviewer receives structured brief and confirms routing or overrides disposition",
       },
     ],
@@ -458,6 +588,8 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "hr-1",
         actionType: "ai",
+        label: "Reviewer Brief",
+        icon: ScrollText,
         description: "Render reviewer brief: score, dimension breakdown, top findings, suggested disposition, comparable vendors for reference",
         output: {
           kind: "narrative",
@@ -476,21 +608,29 @@ export const tprmSteps: ArchetypeStep[] = [
         id: "hr-2",
         actionType: "hitl",
         isHitlGate: true,
+        label: "Treatment Decision",
+        icon: UserCheck,
         description: "Reviewer reviews brief and makes risk treatment decision: Accept / Mitigate / Transfer / Avoid",
       },
       {
         id: "hr-3",
         actionType: "hitl",
+        label: "Decision Rationale",
+        icon: Pencil,
         description: "Reviewer documents rationale for decision (free text, required)",
       },
       {
         id: "hr-4",
         actionType: "auto",
+        label: "Audit Trail Capture",
+        icon: Database,
         description: "Capture decision, rationale, reviewer identity, and timestamp in vendor record and audit trail",
       },
       {
         id: "hr-5",
         actionType: "auto",
+        label: "Vendor Record Update",
+        icon: FileCheck,
         description: "Update vendor risk status, treatment decision, and next review date in system",
       },
     ],
@@ -510,38 +650,52 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "exc-1",
         actionType: "ai",
+        label: "Exception Drafting",
+        icon: AlertTriangle,
         description: "Generate structured exception records for each identified gap or finding (description, severity, owner, deadline)",
       },
       {
         id: "exc-2",
         actionType: "hitl",
         isHitlGate: true,
+        label: "Owner Assignment",
+        icon: UserCheck,
         description: "Reviewer confirms exception records and assigns owners",
       },
       {
         id: "exc-3",
         actionType: "auto",
+        label: "Vendor Remediation Dispatch",
+        icon: Send,
         description: "Dispatch vendor-facing remediation request via configured channel",
       },
       {
         id: "exc-4",
         actionType: "auto",
+        label: "Response Tracking",
+        icon: Clock,
         description: "Track vendor response status and monitor for evidence of remediation submission",
       },
       {
         id: "exc-5",
         actionType: "ai",
+        label: "Evidence Validation",
+        icon: FileCheck,
         description: "Validate submitted remediation evidence against the original finding requirement",
       },
       {
         id: "exc-6",
         actionType: "auto",
+        label: "Closure & Re-Assessment",
+        icon: RefreshCcw,
         description: "On validated closure: update exception record, trigger partial or full re-assessment as configured",
       },
       {
         id: "exc-7",
         actionType: "hitl",
         isHitlGate: true,
+        label: "Dispute Escalation",
+        icon: AlertTriangle,
         description: "On disputed or inadequate remediation: surface for human escalation",
       },
     ],
@@ -562,38 +716,52 @@ export const tprmSteps: ArchetypeStep[] = [
       {
         id: "mon-1",
         actionType: "auto",
+        label: "Signal Polling",
+        icon: Radio,
         description: "Continuously poll configured signal sources for vendor-specific trigger events",
       },
       {
         id: "mon-2",
         actionType: "ai",
+        label: "Materiality Eval",
+        icon: Scale,
         description: "Evaluate each signal for materiality: re-tier, partial re-assessment, or full re-assessment?",
       },
       {
         id: "mon-3",
         actionType: "auto",
+        label: "Immaterial Signal Log",
+        icon: Database,
         description: "On immaterial signal: log to vendor record and update risk profile metadata",
       },
       {
         id: "mon-4",
         actionType: "auto",
+        label: "Re-Assessment Trigger",
+        icon: RefreshCcw,
         description:
           "On material signal (cert expiry, breach disclosure, adverse news threshold): trigger targeted re-assessment of relevant workflow steps",
       },
       {
         id: "mon-5",
         actionType: "ai",
+        label: "Renewal Readiness",
+        icon: CalendarRange,
         description: "On contract renewal approaching: generate renewal readiness summary and flag for review",
       },
       {
         id: "mon-6",
         actionType: "hitl",
         isHitlGate: true,
+        label: "Manager Alert",
+        icon: Bell,
         description: "Alert TPRM manager with structured briefing on what changed, why it matters, and recommended action",
       },
       {
         id: "mon-7",
         actionType: "auto",
+        label: "Audit Trail Logging",
+        icon: ScrollText,
         description: "Log all monitoring events, evaluations, and triggered actions to vendor audit trail",
       },
     ],
@@ -930,6 +1098,41 @@ export const masterVendorList: VendorRecord[] = [
   },
 ];
 
+// Block rules — universal pattern for workflow stoppages.
+// Mirrors SOX canon's `fieldworkBlockRules` (WorkflowSession.tsx ≈ 2397). Each
+// rule causes the named vendor's step to enter `blocked` status when the agent
+// reaches it. The Hub's Action Required panel surfaces the block; the focus
+// view renders the substep's `inlineAffordances` so the user can resolve inline.
+export interface TprmBlockRule {
+  vendorId: string;
+  blockAtStep: string;
+  blockAtSubstep?: string;
+  title: string;
+  description: string;
+  severity: "high" | "medium";
+}
+
+export const tprmBlockRules: TprmBlockRule[] = [
+  {
+    vendorId: "VEN-006",
+    blockAtStep: "doc-analysis",
+    blockAtSubstep: "doc-1",
+    title: "Pen Test Report Pending",
+    description:
+      "SilverPay Processing has an outstanding pen test (full report) request — agent is waiting on the vendor portal submission. Send a follow-up DPQ or upload the report directly.",
+    severity: "high",
+  },
+  {
+    vendorId: "VEN-008",
+    blockAtStep: "doc-analysis",
+    blockAtSubstep: "doc-6",
+    title: "Subprocessor List Not Received",
+    description:
+      "MeridianBank API has not returned the subprocessor list update — the document request was dispatched 12 days ago. Resend the DPQ or upload the list directly.",
+    severity: "medium",
+  },
+];
+
 export interface VendorRunStatus {
   vendorId: string;
   vendorName: string;
@@ -963,7 +1166,7 @@ export function seedVendorRunStatus(vendor: VendorRecord): VendorRunStatus {
 
 export function tickVendorStatuses(
   prev: VendorRunStatus[],
-  resolvedHitlSet: Set<string>
+  resolvedSet: Set<string>
 ): VendorRunStatus[] | null {
   let anyChange = false;
   const next = prev.map((v) => {
@@ -1000,9 +1203,20 @@ export function tickVendorStatuses(
 
       const hitlStep = stepDef.substeps.some((s) => s.isHitlGate);
       const blockKey = `${v.vendorId}:${stepId}`;
+      const blockRule = tprmBlockRules.find(
+        (r) => r.vendorId === v.vendorId && r.blockAtStep === stepId
+      );
 
       if (steps[stepId] === "pending") {
-        if (hitlStep && !isAutoTrack && !resolvedHitlSet.has(blockKey)) {
+        // Block rule fires before HITL — represents external dependencies that
+        // halt the agent before any human review can take place.
+        if (blockRule && !resolvedSet.has(blockKey)) {
+          steps[stepId] = "blocked";
+          advanced = true;
+          anyChange = true;
+          break;
+        }
+        if (hitlStep && !isAutoTrack && !resolvedSet.has(blockKey)) {
           steps[stepId] = "waiting";
           advanced = true;
           anyChange = true;
@@ -1014,8 +1228,17 @@ export function tickVendorStatuses(
         break;
       }
 
+      if (steps[stepId] === "blocked") {
+        if (resolvedSet.has(blockKey)) {
+          steps[stepId] = "running";
+          advanced = true;
+          anyChange = true;
+        }
+        break;
+      }
+
       if (steps[stepId] === "waiting") {
-        if (resolvedHitlSet.has(blockKey)) {
+        if (resolvedSet.has(blockKey)) {
           steps[stepId] = "running";
           advanced = true;
           anyChange = true;

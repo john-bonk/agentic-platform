@@ -11,6 +11,21 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // GitHub Pages SPA fallback — companion to 404.html. The 404 page
+      // packs the deep route into ?p=… ; here we unpack and pushState back
+      // into the real URL before the SPA boots so deep-links survive refresh.
+      (function () {
+        if (window.location.search && /[?&]p=/.test(window.location.search)) {
+          var q = window.location.search.slice(1).split("&").reduce(function (a, v) {
+            var kv = v.split("="); a[kv[0]] = decodeURIComponent(kv.slice(1).join("=") || ""); return a;
+          }, {});
+          var path = (q.p || "/").replace(/~and~/g, "&");
+          var search = q.q ? "?" + q.q.replace(/~and~/g, "&") : "";
+          window.history.replaceState(null, "", window.location.pathname.replace(/\/$/, "") + path + search + window.location.hash);
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

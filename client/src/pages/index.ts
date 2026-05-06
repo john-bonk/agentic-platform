@@ -49,3 +49,4 @@ export { default as RiskCalculationPage } from "./RiskCalculationPage";
 export { default as AIGovernancePage } from "./AIGovernancePage";
 export { default as TestingPlanPage } from "./TestingPlanPage";
 export { default as TPRMPlanningPage } from "./TPRMPlanningPage";
+export { default as AuditAssessmentPlanningPage } from "./AuditAssessmentPlanningPage";

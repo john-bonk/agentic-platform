@@ -84,6 +84,7 @@ import {
   LayoutDashboard,
   FileSpreadsheet,
   Plus,
+  ClipboardList,
 } from "lucide-react";
 import headerBgImage from "@/assets/header-background.png";
 import {
@@ -97,6 +98,7 @@ import {
 import { WorkflowSession, ExecutiveReportView, getRiskAssessmentConfig, getFieldworkAutomationConfig, tickFieldworkStatuses, fieldworkBlockRules, fieldworkExceptions, fieldworkNextStepActions, masterControlsList, fieldworkStepOrder, DEMO_CONTROL_ID, type WorkflowSessionConfig, type ControlWorkflowStatus, type FieldworkException } from "./WorkflowSession";
 import { useWorkflowSessionStore } from "@/lib/workflowSessionStore";
 import TPRMSession from "./TPRMSession";
+import AuditAssessmentSession from "./AuditAssessmentSession";
 const AnnotationOverlay = lazy(() => import("./AnnotationOverlay"));
 
 const categoryIcons: Record<AgentCategory, typeof Zap> = {
@@ -1031,6 +1033,47 @@ const tprmAuditTrailEntries: SolutionAuditTrailEntry[] = [
   { id: "tprm-at-8", timestamp: "2 days ago", agent: "Reassessment Agent", action: "Initiated annual reassessment for 8 Tier-1 vendors", type: "auto" },
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Audit Assessment — solution-home content (mirrors tprmTaskItems shape)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const auditAssessmentTaskItems: SolutionTaskItemDef[] = [
+  { id: "audit-task-fy26", title: "Run FY26 Audit — North America Operations", description: "Execute the FY26 entity audit pipeline for the largest BU. Connected-system pulls, scoring, reviewer disposition, and audit-committee distribution end-to-end.", icon: ClipboardList, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", primary: true, actionLabel: "Start", priority: "high" },
+  { id: "audit-task-emea-followup", title: "Close FY24 EMEA Sales Finding", description: "Open high finding on channel-partner side agreements requires evidence and remediation owner sign-off before FY26 fieldwork.", icon: AlertTriangle, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "high" },
+  { id: "audit-task-apac-fcpa", title: "APAC Manufacturing — FCPA Evidence", description: "Third-party intermediary documentation gaps from FY24 require expanded evidence collection ahead of fieldwork.", icon: FileText, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "audit-task-treasury-sox", title: "Treasury — Sync with SOX 404 Window", description: "FY26 audit cycle for Treasury must align with SOX 404 testing dates. Coordinate planning with the SOX team.", icon: ListChecks, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "medium" },
+  { id: "audit-task-legal-reaudit", title: "Legal & Compliance — Targeted Re-audit", description: "Re-audit triggered by FY24 whistleblower hotline finding. Scope limited to process areas; reviewer assigned.", icon: AlertCircle, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+  { id: "audit-task-marketing-ce", title: "Marketing — Continuous-Monitoring Refresh", description: "Low-risk entity on continuous-monitoring track. Pulse review only; no fieldwork required.", icon: Database, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", priority: "low" },
+];
+
+const auditAssessmentAgentWorkflows: SolutionAgentWorkflow[] = [
+  { id: "audit-aw-1", name: "FY26 Audit Pipeline", agent: "Audit Lead Agent", category: "direct-realtime", status: "active", progress: 0, lastActivity: "Ready to launch", humanAction: false },
+  { id: "audit-aw-2", name: "Continuous Entity Monitoring", agent: "Monitoring Agent", category: "continuous", status: "active", progress: 100, lastActivity: "5 min ago", humanAction: false },
+  { id: "audit-aw-3", name: "Open Finding Tracker", agent: "Findings Agent", category: "continuous", status: "active", progress: 100, lastActivity: "Just now", humanAction: true },
+  { id: "audit-aw-4", name: "Quarterly Audit Plan Sync", agent: "Planning Agent", category: "scheduled", status: "active", progress: 60, lastActivity: "Yesterday", humanAction: false },
+  { id: "audit-aw-5", name: "Audit Committee Reporting", agent: "Reporting Agent", category: "scheduled", status: "active", progress: 22, lastActivity: "2 days ago", humanAction: true },
+  { id: "audit-aw-6", name: "Annual Risk Universe Refresh", agent: "Risk Universe Agent", category: "scheduled", status: "active", progress: 100, lastActivity: "Last week", humanAction: false },
+  { id: "audit-aw-7", name: "Regulatory Change Watch", agent: "Reg Watch Agent", category: "emergent", status: "active", progress: 100, lastActivity: "30 min ago", humanAction: true },
+];
+
+const auditAssessmentPendingApprovals: SolutionPendingApproval[] = [
+  { id: "audit-pa-1", title: "Approve NA Ops FY26 Scope Definition", agent: "Planning Agent", type: "Scope Approval", timestamp: "12 min ago", severity: "high" },
+  { id: "audit-pa-2", title: "Sign Off on Treasury Reviewer Disposition", agent: "Review Agent", type: "Reviewer Disposition", timestamp: "30 min ago", severity: "high" },
+  { id: "audit-pa-3", title: "Confirm Legal & Compliance Re-audit Scope", agent: "Audit Lead Agent", type: "Re-audit Authorization", timestamp: "1 hr ago", severity: "medium" },
+  { id: "audit-pa-4", title: "Director Sign-off — IT Infrastructure Audit Report", agent: "Submission Agent", type: "Director Sign-off", timestamp: "Yesterday", severity: "medium" },
+];
+
+const auditAssessmentAuditTrailEntries: SolutionAuditTrailEntry[] = [
+  { id: "audit-at-1", timestamp: "Just now", agent: "Findings Agent", action: "Refreshed open-findings dashboard — 3 entities with carry-forward findings", type: "auto" },
+  { id: "audit-at-2", timestamp: "5 min ago", agent: "Monitoring Agent", action: "Continuous-monitoring signal: Marketing Department — no material changes", type: "auto" },
+  { id: "audit-at-3", timestamp: "12 min ago", agent: "Planning Agent", action: "Submitted FY26 NA Ops scope for review", type: "approval" },
+  { id: "audit-at-4", timestamp: "30 min ago", agent: "Reg Watch Agent", action: "Detected updated SOX 404 testing-window guidance — Treasury cycle adjusted", type: "escalation" },
+  { id: "audit-at-5", timestamp: "1 hr ago", agent: "Review Agent", action: "Rendered reviewer brief for Treasury Function — awaiting disposition", type: "approval" },
+  { id: "audit-at-6", timestamp: "Yesterday", agent: "Submission Agent", action: "Compiled IT Infrastructure final report — director sign-off pending", type: "approval" },
+  { id: "audit-at-7", timestamp: "2 days ago", agent: "Reporting Agent", action: "Generated FY24 audit-committee summary deck", type: "auto" },
+  { id: "audit-at-8", timestamp: "Last week", agent: "Risk Universe Agent", action: "Refreshed entity risk universe against FY26 enterprise risk register", type: "auto" },
+];
+
 // === Risk Assessments ===
 const riskAssessTaskItems: SolutionTaskItemDef[] = [
   { id: "ra-task-launch", title: "Launch Quarterly Enterprise Risk Refresh", description: "Distribute scored survey to 12 locations with auto-assessed items pre-populated for the Q2 cycle.", icon: BarChart3, iconColor: "text-slate-500 dark:text-slate-400", iconBg: "bg-slate-100 dark:bg-slate-800/30", primary: true, actionLabel: "Start", priority: "high" },
@@ -1227,11 +1270,27 @@ const solutionConfigs: Record<string, SolutionDef> = {
     agentWorkflows: evidenceAgentWorkflows,
     auditTrailEntries: evidenceAuditTrailEntries,
   },
+  "audit-assessment": {
+    id: "audit-assessment",
+    label: "Audit Assessment",
+    shortLabel: "Audit",
+    tagline: "End-to-end entity audits — readiness through audit-committee distribution",
+    description: "Coordinate end-to-end entity audits — readiness, evidence, scoring, review, reporting, and distribution.",
+    icon: ClipboardList,
+    iconColor: "text-indigo-600 dark:text-indigo-400",
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/20",
+    welcomeSubtitle: "Audit work, findings, and entity reviews waiting on you.",
+    taskItems: auditAssessmentTaskItems,
+    pendingApprovals: auditAssessmentPendingApprovals,
+    agentWorkflows: auditAssessmentAgentWorkflows,
+    auditTrailEntries: auditAssessmentAuditTrailEntries,
+  },
 };
 
 const solutionOrder: string[] = [
   "sox-control-testing",
   "third-party-risk",
+  "audit-assessment",
   "risk-assessments",
   "pre-ipo",
   "evidence-collection",
@@ -1291,6 +1350,7 @@ function OptroHome({ solutionId = "sox-control-testing" }: { solutionId?: string
   const setCurrentSolution = useWorkflowSessionStore((s) => s.setCurrentSolution);
   const isSox = solution.id === "sox-control-testing";
   const isTprm = solution.id === "third-party-risk";
+  const isAudit = solution.id === "audit-assessment";
   const { toast } = useToast();
   const stubLaunch = useCallback(() => {
     toast({ title: `${solution.label} workflow coming soon`, description: "This solution is stubbed for now — wiring is on the way." });
@@ -1340,6 +1400,10 @@ function OptroHome({ solutionId = "sox-control-testing" }: { solutionId?: string
     setLocation("/tprm-planning");
   }, [setLocation]);
 
+  const launchAuditAssessmentDirect = useCallback(() => {
+    setLocation("/audit-assessment-planning");
+  }, [setLocation]);
+
   const agentWorkflows = solution.agentWorkflows;
   const pendingApprovals = solution.pendingApprovals;
   const auditTrailEntries = solution.auditTrailEntries;
@@ -1347,7 +1411,13 @@ function OptroHome({ solutionId = "sox-control-testing" }: { solutionId?: string
   const taskItems = solution.taskItems.map((t) => {
     const isPrimary = !!t.primary;
     const action = isPrimary
-      ? (isSox ? launchControlTestingDirect : isTprm ? launchTprmAssessmentDirect : stubLaunch)
+      ? (isSox
+          ? launchControlTestingDirect
+          : isTprm
+            ? launchTprmAssessmentDirect
+            : isAudit
+              ? launchAuditAssessmentDirect
+              : stubLaunch)
       : undefined;
     const configAction = isPrimary && isSox ? launchControlTestingFromCard : undefined;
     return {
@@ -2865,7 +2935,9 @@ function SubStepIndicator({ status }: { status: string }) {
   return <div className="w-3.5 h-3.5 rounded-full border-[1.5px] border-slate-300 dark:border-slate-600" />;
 }
 
-const automationModeIcons: Record<AutomationMode, { icon: typeof Zap; color: string; title: string }> = {
+// Exported so TPRM (and other solutions) can render the same automation-mode pill
+// without duplicating the canon visual contract. See solution-framework.md § 3.10.
+export const automationModeIcons: Record<AutomationMode, { icon: typeof Zap; color: string; title: string }> = {
   full: { icon: Zap, color: "text-emerald-400 dark:text-emerald-500", title: "Full Automation" },
   checkpoint: { icon: Flag, color: "text-amber-400 dark:text-amber-500", title: "Checkpoint" },
   manual: { icon: Fingerprint, color: "text-blue-400 dark:text-blue-500", title: "Manual" },
@@ -4395,11 +4467,13 @@ function ControlUtilityPanel({ controlId, controlStatus, substepProgress, onUplo
   );
 }
 
-type AutomationMode = "full" | "checkpoint" | "manual";
+// Exported so TPRM (and other solutions) can render the canon automation-mode
+// pill / config selector without duplicating canon's visual contract.
+export type AutomationMode = "full" | "checkpoint" | "manual";
 
-type AutomationConfig = Record<string, { mode: AutomationMode; substeps: Record<string, AutomationMode> }>;
+export type AutomationConfig = Record<string, { mode: AutomationMode; substeps: Record<string, AutomationMode> }>;
 
-const automationModeLabels: Record<AutomationMode, { label: string; short: string; description: string; color: string; bg: string; mutedIcon: string }> = {
+export const automationModeLabels: Record<AutomationMode, { label: string; short: string; description: string; color: string; bg: string; mutedIcon: string }> = {
   full: { label: "Full Automation", short: "Auto", description: "Runs automatically, pausing only for missing inputs", color: "text-[#266C92] dark:text-[#4da3c9]", bg: "bg-[#266C92]/10 dark:bg-[#266C92]/15 border-[#266C92]/20 dark:border-[#266C92]/25", mutedIcon: "text-[#266C92]/70" },
   checkpoint: { label: "Checkpoint", short: "Check", description: "Pauses at each boundary for confirmation", color: "text-[#6B7280] dark:text-slate-400", bg: "bg-slate-100 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700", mutedIcon: "text-slate-500/70" },
   manual: { label: "Manual", short: "Manual", description: "Must be explicitly triggered to proceed", color: "text-[#4B5563] dark:text-slate-300", bg: "bg-slate-50 dark:bg-slate-800/25 border-slate-200/80 dark:border-slate-700/60", mutedIcon: "text-slate-400/70" },
@@ -4417,7 +4491,9 @@ function buildDefaultAutomationConfig(): AutomationConfig {
   return config;
 }
 
-function AutomationModeSelector({ value, onChange, size = "default", scopeId }: { value: AutomationMode; onChange: (m: AutomationMode) => void; size?: "default" | "small"; scopeId?: string }) {
+// Exported so TPRM and other solutions can use the canon mode selector inside
+// their own per-solution config dialogs without duplicating the visual contract.
+export function AutomationModeSelector({ value, onChange, size = "default", scopeId }: { value: AutomationMode; onChange: (m: AutomationMode) => void; size?: "default" | "small"; scopeId?: string }) {
   const modes: AutomationMode[] = ["full", "checkpoint", "manual"];
   const idSuffix = scopeId ? `-${scopeId}` : "";
   return (
@@ -7193,6 +7269,23 @@ export const workflowSessionConfigs: Record<string, { create: () => WorkflowSess
     label: "Third-Party Risk Assessment",
     icon: "git-branch",
   },
+  "audit-assessment": {
+    create: () => ({
+      id: "audit-assessment",
+      title: "Audit Assessment",
+      blocks: [
+        {
+          id: "pipeline",
+          title: "Entity Pipeline",
+          description: "Parallel entity audits across the 9-step audit workflow",
+          type: "automated",
+          render: () => <></>,
+        },
+      ],
+    }),
+    label: "Audit Assessment",
+    icon: "clipboard-list",
+  },
 };
 
 const workflowRowToSession: Record<string, string> = {
@@ -7356,6 +7449,9 @@ export function AgentHubHome({ workspaceId, welcomeMessage }: AgentHubHomeProps)
     }
     if (currentSessionId === "tprm-assessment") {
       return <TPRMSession />;
+    }
+    if (currentSessionId === "audit-assessment") {
+      return <AuditAssessmentSession />;
     }
     if (!currentSolutionId) {
       return <SolutionsHome />;

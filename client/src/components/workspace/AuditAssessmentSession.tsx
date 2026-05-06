@@ -51,19 +51,19 @@ import {
   type SubstepActionType,
 } from "@/lib/workflowArchetype";
 import {
-  masterVendorList,
-  tprmArchetypeConfig,
-  tprmPhases,
-  tprmSteps,
-  tprmStepIds,
-  tprmBlockRules,
-  tickVendorStatuses,
-  seedVendorRunStatus,
-  type VendorRecord,
-  type VendorRunStatus,
-  type TprmBlockRule,
-} from "@/lib/tprmData";
-import { TPRM_SESSION_ID } from "@/lib/tprmLauncher";
+  masterEntityList,
+  auditAssessmentArchetypeConfig,
+  auditAssessmentPhases,
+  auditAssessmentSteps,
+  auditAssessmentStepIds,
+  auditAssessmentBlockRules,
+  tickEntityStatuses,
+  seedEntityRunStatus,
+  type EntityRecord,
+  type EntityRunStatus,
+  type AuditAssessmentBlockRule,
+} from "@/lib/auditAssessmentData";
+import { AUDIT_ASSESSMENT_SESSION_ID } from "@/lib/auditAssessmentLauncher";
 // Canon utilities — reused so the automation-mode pill, mode selector, and config
 // modal share visual contract with SOX (canon). See docs/ui-pattern-canon.md § 1.5.6.
 import {
@@ -72,7 +72,7 @@ import {
   automationModeLabels,
   type AutomationMode,
 } from "./AgentHubHome";
-import { tprmWorkflow } from "@/solutions/tprm";
+import { auditAssessmentWorkflow } from "@/solutions/audit-assessment";
 import { useHomeAssistantStore } from "@/lib/homeAssistantStore";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -128,35 +128,40 @@ function ActionTypeIcon({ actionType }: { actionType: SubstepActionType }) {
   );
 }
 
-// Decide overall vendor outcome for "Effective"-equivalent badge in header / tracker
-function getVendorOutcome(vendor: VendorRecord, status: VendorRunStatus | undefined): {
+// Decide overall entity outcome for "Effective"-equivalent badge in header / tracker
+function getEntityOutcome(entity: EntityRecord, status: EntityRunStatus | undefined): {
   label: string;
-  tone: "approved" | "conditional" | "rejected" | "monitor" | "in-progress" | "pending";
+  tone: "satisfactory" | "conditional" | "unsatisfactory" | "re-audit" | "in-progress" | "pending";
 } | null {
   if (!status) return null;
-  const allDone = tprmStepIds.every(
-    (s) => status.steps[s] === "complete" || status.steps[s] === "skipped" || (s === "monitoring" && !status.fired)
+  const allDone = auditAssessmentStepIds.every(
+    (s) => status.steps[s] === "complete" || status.steps[s] === "skipped"
   );
   if (!allDone) {
-    const anyRunning = tprmStepIds.some((s) => status.steps[s] === "running" || status.steps[s] === "waiting");
+    const anyRunning = auditAssessmentStepIds.some((s) => status.steps[s] === "running" || status.steps[s] === "waiting");
     return anyRunning ? { label: "In Progress", tone: "in-progress" } : { label: "Pending", tone: "pending" };
   }
-  if (status.fired) return { label: "Re-Assess", tone: "monitor" };
-  if (vendor.exceptionRecords.open > 0) return { label: "Conditional", tone: "conditional" };
-  if (vendor.riskTreatment === "Avoid") return { label: "Rejected", tone: "rejected" };
-  if (vendor.riskTreatment === "Mitigate") return { label: "Conditional", tone: "conditional" };
-  return { label: "Approved", tone: "approved" };
+  // `fired` indicates a continuous-monitoring re-audit signal.
+  if (status.fired) return { label: "Re-audit Required", tone: "re-audit" };
+  // Open prior findings degrade the conclusion to Partial when the agent's
+  // run-context shows them carrying forward into the cycle.
+  const openFindings = entity.priorFindings.filter((f) => f.status === "open").length;
+  if (openFindings > 0 && entity.conclusion === "Pending") return { label: "Partial", tone: "conditional" };
+  if (entity.conclusion === "Unsatisfactory") return { label: "Unsatisfactory", tone: "unsatisfactory" };
+  if (entity.conclusion === "Re-audit required") return { label: "Re-audit Required", tone: "re-audit" };
+  if (entity.conclusion === "Partial") return { label: "Partial", tone: "conditional" };
+  return { label: "Satisfactory", tone: "satisfactory" };
 }
 
-function outcomeBadgeClasses(tone: NonNullable<ReturnType<typeof getVendorOutcome>>["tone"]) {
+function outcomeBadgeClasses(tone: NonNullable<ReturnType<typeof getEntityOutcome>>["tone"]) {
   switch (tone) {
-    case "approved":
+    case "satisfactory":
       return "bg-[#266C92]/10 text-[#266C92]";
     case "conditional":
       return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300";
-    case "rejected":
+    case "unsatisfactory":
       return "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400";
-    case "monitor":
+    case "re-audit":
       return "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300";
     case "in-progress":
       return "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300";
@@ -166,44 +171,48 @@ function outcomeBadgeClasses(tone: NonNullable<ReturnType<typeof getVendorOutcom
 }
 
 function tierBadgeClasses(tier: string) {
-  if (tier === "Tier 3") return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
-  if (tier === "Tier 2") return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+  if (tier === "Critical") return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+  if (tier === "High") return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
+  if (tier === "Medium") return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
   return "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400";
 }
 
-// Vendor run-context — direct analog of SOX getTestDetailInfo / Test Details strip.
+// Entity run-context — direct analog of SOX getTestDetailInfo / Test Details strip.
 // Drift-fix #2.5: previously this returned static record metadata (Risk Tier, Annual
 // Spend, etc.). The framework run-context schema requires the *current run* attributes:
 // who is executing, who is reviewing, what request kicked it off, time/scope/due.
 // Static record data lives on the Details/Overview tab.
-function getVendorRunContext(vendor: VendorRecord, cycleId: string): [string, string][] {
-  const labels = tprmWorkflow.runContextSchema.slots.map((slot) => slot.label);
-  const values = tprmWorkflow.runContextSchema.resolveValues(vendor.id, cycleId);
+function getEntityRunContext(entity: EntityRecord, cycleId: string): [string, string][] {
+  const labels = auditAssessmentWorkflow.runContextSchema.slots.map((slot) => slot.label);
+  const values = auditAssessmentWorkflow.runContextSchema.resolveValues(entity.id, cycleId);
   return labels.map((label, i) => [label, String(values[i] ?? "—")]);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Vendor Overview Tab — analog of ControlDetailsTab (collapsible sections)
+// Entity Overview Tab — analog of ControlDetailsTab (collapsible sections)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function VendorOverviewTab({ vendor }: { vendor: VendorRecord }) {
+function EntityOverviewTab({ entity }: { entity: EntityRecord }) {
   const [identityOpen, setIdentityOpen] = useState(true);
   const [classificationOpen, setClassificationOpen] = useState(true);
   const [statusOpen, setStatusOpen] = useState(true);
   const [dataOpen, setDataOpen] = useState(true);
 
+  const openFindings = entity.priorFindings.filter((f) => f.status === "open").length;
+  const closedFindings = entity.priorFindings.filter((f) => f.status === "remediated").length;
+
   return (
     <div className="flex-1 min-h-0 overflow-y-auto">
       <div className="w-[90%] mx-auto px-6 py-6 space-y-0">
-        {/* Vendor Identity */}
+        {/* Entity Information */}
         <div>
           <button
             onClick={() => setIdentityOpen(!identityOpen)}
             className="flex items-center gap-1.5 py-4"
-            data-testid="toggle-vendor-identity"
+            data-testid="toggle-entity-identity"
           >
             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${identityOpen ? "" : "-rotate-90"}`} />
-            <span className="text-sm font-semibold text-foreground">Vendor Information</span>
+            <span className="text-sm font-semibold text-foreground">Entity Information</span>
           </button>
           {identityOpen && (
             <div className="flex gap-12 pb-6">
@@ -211,29 +220,26 @@ function VendorOverviewTab({ vendor }: { vendor: VendorRecord }) {
                 <div className="space-y-1">
                   <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Description</p>
                   <p className="text-xs text-foreground">
-                    <span className="text-[#266C92] font-medium">{vendor.id}</span> {vendor.vendorName}
+                    <span className="text-[#266C92] font-medium">{entity.id}</span> {entity.entityName}
                   </p>
                   <p className="text-xs text-muted-foreground leading-relaxed mt-1.5">
-                    {vendor.legalEntity} · {vendor.vendorType} vendor providing {vendor.spendCategory.toLowerCase()} services to the organization. Primary contact: {vendor.primaryContact.name} ({vendor.primaryContact.email}).
+                    {entity.entityType} in {entity.region}. Executive owner: {entity.ownerExec.name} ({entity.ownerExec.title}, {entity.ownerExec.email}).
                   </p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Spend Category</p>
-                  <p className="text-xs text-foreground mt-0.5">{vendor.spendCategory}</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Notes</p>
-                  <p className="text-xs text-foreground/90 leading-relaxed mt-0.5">{vendor.notes || "—"}</p>
+                  <p className="text-xs text-foreground/90 leading-relaxed mt-0.5">{entity.notes || "—"}</p>
                 </div>
               </div>
               <div className="w-52 shrink-0 space-y-3.5">
                 {([
-                  ["Vendor ID", vendor.id],
-                  ["Legal Entity", vendor.legalEntity],
-                  ["Vendor Type", vendor.vendorType],
-                  ["Primary Contact", vendor.primaryContact.name],
-                  ["Contact Email", vendor.primaryContact.email],
-                  ["Annual Contract Value", vendor.annualContractValue],
+                  ["Entity ID", entity.id],
+                  ["Entity Type", entity.entityType],
+                  ["Region", entity.region],
+                  ["Executive Owner", entity.ownerExec.name],
+                  ["Title", entity.ownerExec.title],
+                  ["Headcount", entity.headcount.toLocaleString()],
+                  ["Annual Revenue", entity.annualRevenue],
                 ] as [string, string][]).map(([label, value]) => (
                   <div key={label}>
                     <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">{label}</p>
@@ -247,12 +253,12 @@ function VendorOverviewTab({ vendor }: { vendor: VendorRecord }) {
 
         <div className="border-t border-slate-200 dark:border-border" />
 
-        {/* Classification */}
+        {/* Risk Classification */}
         <div>
           <button
             onClick={() => setClassificationOpen(!classificationOpen)}
             className="flex items-center gap-1.5 py-4"
-            data-testid="toggle-vendor-classification"
+            data-testid="toggle-entity-classification"
           >
             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${classificationOpen ? "" : "-rotate-90"}`} />
             <span className="text-sm font-semibold text-foreground">Risk Classification</span>
@@ -264,23 +270,25 @@ function VendorOverviewTab({ vendor }: { vendor: VendorRecord }) {
                   <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Risk Tier</p>
                   <p
                     className={`text-xs mt-0.5 font-medium ${
-                      vendor.riskTier === "Tier 3"
+                      entity.riskTier === "Critical"
                         ? "text-red-600 dark:text-red-400"
-                        : vendor.riskTier === "Tier 2"
-                          ? "text-amber-600 dark:text-amber-400"
-                          : "text-foreground"
+                        : entity.riskTier === "High"
+                          ? "text-red-600 dark:text-red-400"
+                          : entity.riskTier === "Medium"
+                            ? "text-amber-600 dark:text-amber-400"
+                            : "text-foreground"
                     }`}
                   >
-                    {vendor.riskTier}
+                    {entity.riskTier}
                   </p>
                 </div>
                 <div>
                   <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Regulatory Exposure</p>
                   <ul className="mt-1 space-y-0.5 ml-4">
-                    {vendor.regulatoryExposure.length === 0 ? (
+                    {entity.regulatoryExposure.length === 0 ? (
                       <li className="text-xs text-muted-foreground">None</li>
                     ) : (
-                      vendor.regulatoryExposure.map((r) => (
+                      entity.regulatoryExposure.map((r) => (
                         <li key={r} className="text-xs text-foreground">
                           <span className="text-[#266C92] font-medium">{r}</span>
                         </li>
@@ -291,11 +299,9 @@ function VendorOverviewTab({ vendor }: { vendor: VendorRecord }) {
               </div>
               <div className="w-52 shrink-0 space-y-3.5">
                 {([
-                  ["Data Access Scope", vendor.dataAccess],
-                  ["System Criticality", vendor.criticality],
-                  ["Track", vendor.track === "automated" ? "Automated" : "Human-Review"],
-                  ["Risk Score", `${vendor.riskScore}/100`],
-                  ["Risk Treatment", vendor.riskTreatment],
+                  ["Inherent Risk", entity.inherentRisk],
+                  ["Residual Risk", entity.residualRisk],
+                  ["Track", entity.track === "continuous" ? "Continuous Monitoring" : "Full Audit"],
                 ] as [string, string][]).map(([label, value]) => (
                   <div key={label}>
                     <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">{label}</p>
@@ -309,51 +315,52 @@ function VendorOverviewTab({ vendor }: { vendor: VendorRecord }) {
 
         <div className="border-t border-slate-200 dark:border-border" />
 
-        {/* Assessment Status */}
+        {/* Audit Status */}
         <div>
           <button
             onClick={() => setStatusOpen(!statusOpen)}
             className="flex items-center gap-1.5 py-4"
-            data-testid="toggle-vendor-status"
+            data-testid="toggle-entity-status"
           >
             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${statusOpen ? "" : "-rotate-90"}`} />
-            <span className="text-sm font-semibold text-foreground">Assessment Status</span>
+            <span className="text-sm font-semibold text-foreground">Audit Status</span>
           </button>
           {statusOpen && (
             <div className="flex gap-12 pb-6">
               <div className="flex-1 space-y-5">
                 <div>
                   <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Status</p>
-                  <p className="text-xs text-foreground mt-0.5">{vendor.assessmentStatus}</p>
+                  <p className="text-xs text-foreground mt-0.5">{entity.auditStatus}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Assessment History</p>
+                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Audit History</p>
                   <p className="text-xs text-foreground mt-0.5">
-                    Last assessment: <span className="font-medium">{vendor.lastAssessmentDate}</span>
+                    Last audit: <span className="font-medium">{entity.lastAuditDate}</span>
                   </p>
                   <p className="text-xs text-foreground mt-0.5">
-                    Next due: <span className="font-medium">{vendor.nextAssessmentDue}</span>
+                    Next due: <span className="font-medium">{entity.nextAuditDue}</span>
                   </p>
                 </div>
-                {vendor.exceptionRecords.open + vendor.exceptionRecords.closed > 0 && (
+                {(openFindings + closedFindings) > 0 && (
                   <div>
-                    <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Exception Records</p>
+                    <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">Prior Findings</p>
                     <p className="text-xs text-foreground mt-0.5">
-                      <span className={vendor.exceptionRecords.open > 0 ? "text-red-600 dark:text-red-400 font-medium" : ""}>
-                        {vendor.exceptionRecords.open} open
+                      <span className={openFindings > 0 ? "text-red-600 dark:text-red-400 font-medium" : ""}>
+                        {openFindings} open
                       </span>{" "}
-                      · {vendor.exceptionRecords.closed} closed
+                      · {closedFindings} remediated
                     </p>
                   </div>
                 )}
               </div>
               <div className="w-52 shrink-0 space-y-3.5">
                 {([
-                  ["Assessment Status", vendor.assessmentStatus],
-                  ["Last Assessment", vendor.lastAssessmentDate],
-                  ["Next Due", vendor.nextAssessmentDue],
-                  ["Open Exceptions", String(vendor.exceptionRecords.open)],
-                  ["Closed Exceptions", String(vendor.exceptionRecords.closed)],
+                  ["Audit Status", entity.auditStatus],
+                  ["Conclusion", entity.conclusion],
+                  ["Last Audit", entity.lastAuditDate],
+                  ["Next Due", entity.nextAuditDue],
+                  ["Open Findings", String(openFindings)],
+                  ["Remediated", String(closedFindings)],
                 ] as [string, string][]).map(([label, value]) => (
                   <div key={label}>
                     <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">{label}</p>
@@ -367,87 +374,85 @@ function VendorOverviewTab({ vendor }: { vendor: VendorRecord }) {
 
         <div className="border-t border-slate-200 dark:border-border" />
 
-        {/* Connected Data */}
+        {/* Scope & Prior Findings */}
         <div>
           <button
             onClick={() => setDataOpen(!dataOpen)}
             className="flex items-center gap-1.5 py-4"
-            data-testid="toggle-vendor-data"
+            data-testid="toggle-entity-data"
           >
             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${dataOpen ? "" : "-rotate-90"}`} />
-            <span className="text-sm font-semibold text-foreground">Documents & Connected Data</span>
+            <span className="text-sm font-semibold text-foreground">Scope & Prior Findings</span>
           </button>
           {dataOpen && (
-            <div className="pb-6 space-y-3">
-              <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b border-slate-200 dark:border-border bg-slate-50/80 dark:bg-muted/20">
-                      <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground w-44">Document Type</th>
-                      <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground w-32">Date</th>
-                      <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground w-32">Expiry</th>
-                      <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {vendor.documents.length === 0 && (
-                      <tr>
-                        <td colSpan={4} className="px-4 py-3 text-muted-foreground italic">No documents on file</td>
-                      </tr>
-                    )}
-                    {vendor.documents.map((doc, i) => (
-                      <tr key={i} className="border-b last:border-b-0 border-slate-100 dark:border-border/50">
-                        <td className="px-4 py-3 text-foreground font-medium align-top">{doc.type}</td>
-                        <td className="px-4 py-3 text-foreground align-top">{doc.date}</td>
-                        <td className="px-4 py-3 text-foreground align-top">{doc.expiry || "—"}</td>
-                        <td className="px-4 py-3 align-top">
-                          <Badge
-                            className={`text-[10px] h-4 ${
-                              doc.status === "current"
-                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                : doc.status === "expired"
-                                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                                  : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                            } border-0`}
-                          >
-                            {doc.status}
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <div className="pb-6 space-y-4">
+              <div>
+                <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1">Audit Scope</p>
+                <ul className="space-y-1 ml-4 list-disc">
+                  {entity.auditScope.length === 0 ? (
+                    <li className="text-xs text-muted-foreground">No scope areas defined.</li>
+                  ) : (
+                    entity.auditScope.map((s) => (
+                      <li key={s} className="text-xs text-foreground">{s}</li>
+                    ))
+                  )}
+                </ul>
               </div>
 
               <div>
-                <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1">Outside-In Intel Sources</p>
-                <p className="text-xs text-foreground">{vendor.intelSources.join(", ") || "None configured"}</p>
-              </div>
-
-              {vendor.outstandingRequests.length > 0 && (
-                <div>
-                  <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1">Outstanding Requests</p>
-                  <ul className="space-y-1">
-                    {vendor.outstandingRequests.map((r, i) => (
-                      <li key={i} className="text-xs text-foreground flex items-center gap-2">
-                        <span className="font-medium">{r.type}</span>
-                        <span className="text-muted-foreground">— due {r.due}</span>
-                        <Badge
-                          className={`text-[9px] h-4 ${
-                            r.status === "overdue"
-                              ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                              : r.status === "submitted"
-                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                          } border-0`}
-                        >
-                          {r.status}
-                        </Badge>
-                      </li>
-                    ))}
-                  </ul>
+                <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1">Prior Findings</p>
+                <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-border bg-slate-50/80 dark:bg-muted/20">
+                        <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground w-24">Finding</th>
+                        <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground w-24">Severity</th>
+                        <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground w-36">Area</th>
+                        <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground">Summary</th>
+                        <th className="text-left px-4 py-2.5 font-semibold text-muted-foreground w-28">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {entity.priorFindings.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-3 text-muted-foreground italic">No prior findings carried forward.</td>
+                        </tr>
+                      )}
+                      {entity.priorFindings.map((f) => (
+                        <tr key={f.id} className="border-b last:border-b-0 border-slate-100 dark:border-border/50">
+                          <td className="px-4 py-3 text-foreground font-mono text-[11px] align-top">{f.id}</td>
+                          <td className="px-4 py-3 align-top">
+                            <Badge
+                              className={`text-[10px] h-4 ${
+                                f.severity === "high"
+                                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                  : f.severity === "medium"
+                                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                    : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                              } border-0 capitalize`}
+                            >
+                              {f.severity}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-foreground align-top">{f.area}</td>
+                          <td className="px-4 py-3 text-foreground/80 align-top">{f.summary}</td>
+                          <td className="px-4 py-3 align-top">
+                            <Badge
+                              className={`text-[10px] h-4 ${
+                                f.status === "open"
+                                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                  : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                              } border-0 capitalize`}
+                            >
+                              {f.status}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              )}
+              </div>
             </div>
           )}
         </div>
@@ -457,21 +462,21 @@ function VendorOverviewTab({ vendor }: { vendor: VendorRecord }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Vendor StepNodeContent — analog of SOX StepNodeContent (substep rows)
+// Entity StepNodeContent — analog of SOX StepNodeContent (substep rows)
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface VendorStepNodeContentProps {
-  step: typeof tprmSteps[number];
+interface EntityStepNodeContentProps {
+  step: typeof auditAssessmentSteps[number];
   stepStatus: StepRunStatus;
-  vendorId: string;
+  entityId: string;
   /** Number of substeps already complete in this step (canon parity — drives progressive reveal). */
   substepProgress: number;
   /** Per-substep automation mode — drives the mode icon next to each substep label. */
   automationConfig?: { mode: AutomationMode; substeps: Record<string, AutomationMode> };
-  onResolveHitl: (vendorId: string, stepId: string, decision: "approve" | "modify" | "reject") => void;
+  onResolveHitl: (entityId: string, stepId: string, decision: "approve" | "modify" | "reject") => void;
   /** Universal block-resolution handler. Fires when the user clicks any inline
    * affordance under a substep. Mirrors canon's `onSubstepAction` semantics. */
-  onResolveBlocker?: (vendorId: string, stepId: string, substepId: string, affordanceId: string) => void;
+  onResolveBlocker?: (entityId: string, stepId: string, substepId: string, affordanceId: string) => void;
   onSubstepAction?: (substepId: string, action: string) => void;
   autoExpandedSubs?: Set<string>;
   manualTriggered?: Set<string>;
@@ -480,7 +485,7 @@ interface VendorStepNodeContentProps {
   onAckCheckpoint?: (substepId: string) => void;
 }
 
-function SubstepOutput({ output }: { output: NonNullable<typeof tprmSteps[number]["substeps"][number]["output"]> }) {
+function SubstepOutput({ output }: { output: NonNullable<typeof auditAssessmentSteps[number]["substeps"][number]["output"]> }) {
   return (
     <div className="rounded-md border border-slate-200 dark:border-border bg-white dark:bg-card p-2.5">
       <div className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground mb-1.5 flex items-center gap-1">
@@ -562,13 +567,13 @@ function SubstepOutput({ output }: { output: NonNullable<typeof tprmSteps[number
  * same substep state machine (pending/running/waiting/blocked/complete + checkpoint-held + manual-waiting),
  * same inline affordances pattern, same bottom-of-step status messages.
  *
- * The ONLY divergences from canon are the data source (tprmSteps[].substeps vs stepNodeInfo[step].substeps)
+ * The ONLY divergences from canon are the data source (auditAssessmentSteps[].substeps vs stepNodeInfo[step].substeps)
  * and the inline-affordance set (per the framework's per-substep `inlineAffordances` declarations).
  */
-function VendorStepNodeContent({
+function EntityStepNodeContent({
   step,
   stepStatus,
-  vendorId,
+  entityId,
   substepProgress,
   automationConfig,
   onResolveHitl,
@@ -579,7 +584,7 @@ function VendorStepNodeContent({
   checkpointAcked,
   onResumeSubstep,
   onAckCheckpoint,
-}: VendorStepNodeContentProps) {
+}: EntityStepNodeContentProps) {
   const [expandedSubs, setExpandedSubs] = useState<Set<string>>(() => new Set());
 
   const stepMode: AutomationMode = automationConfig?.mode ?? "full";
@@ -775,7 +780,7 @@ function VendorStepNodeContent({
                           className={`h-7 text-[11px] gap-1.5 ${isPrimary ? "bg-[#266C92] hover:bg-[#1e5a7a] text-white" : ""}`}
                           onClick={(e) => {
                             e.stopPropagation();
-                            onResolveBlocker?.(vendorId, step.id, sub.id, aff.id);
+                            onResolveBlocker?.(entityId, step.id, sub.id, aff.id);
                           }}
                           data-testid={`affordance-${sub.id}-${aff.id}`}
                         >
@@ -810,7 +815,7 @@ function VendorStepNodeContent({
                   <Button
                     size="sm"
                     className="h-7 text-[11px] gap-1.5 bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-                    onClick={() => onResolveHitl(vendorId, step.id, "approve")}
+                    onClick={() => onResolveHitl(entityId, step.id, "approve")}
                     data-testid={`hitl-approve-${step.id}`}
                   >
                     <CheckCircle2 className="w-3 h-3" />
@@ -820,7 +825,7 @@ function VendorStepNodeContent({
                     size="sm"
                     variant="outline"
                     className="h-7 text-[11px] gap-1.5"
-                    onClick={() => onResolveHitl(vendorId, step.id, "modify")}
+                    onClick={() => onResolveHitl(entityId, step.id, "modify")}
                     data-testid={`hitl-modify-${step.id}`}
                   >
                     <Pencil className="w-3 h-3" />
@@ -830,7 +835,7 @@ function VendorStepNodeContent({
                     size="sm"
                     variant="outline"
                     className="h-7 text-[11px] gap-1.5 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
-                    onClick={() => onResolveHitl(vendorId, step.id, "reject")}
+                    onClick={() => onResolveHitl(entityId, step.id, "reject")}
                     data-testid={`hitl-reject-${step.id}`}
                   >
                     <AlertCircle className="w-3 h-3" />
@@ -909,21 +914,21 @@ function VendorStepNodeContent({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Vendor Audit Trail — chronological substep history
+// Entity Audit Trail — chronological substep history
 // ─────────────────────────────────────────────────────────────────────────────
 
-function VendorAuditTrailTab({ status }: { status: VendorRunStatus | undefined }) {
+function EntityAuditTrailTab({ status }: { status: EntityRunStatus | undefined }) {
   const events = useMemo(() => {
     if (!status) return [];
     const out: { ts: string; actor: string; action: string; type: SubstepActionType }[] = [];
     let n = 0;
-    tprmSteps.forEach((step) => {
+    auditAssessmentSteps.forEach((step) => {
       const st = status.steps[step.id];
       if (st === "complete") {
         step.substeps.forEach((ss) => {
           out.push({
             ts: `T-${(60 - n).toString().padStart(2, "0")}m`,
-            actor: ss.actionType === "hitl" ? "Reviewer" : "TPRM Agent",
+            actor: ss.actionType === "hitl" ? "Reviewer" : "Audit Agent",
             action: ss.description,
             type: ss.actionType,
           });
@@ -933,7 +938,7 @@ function VendorAuditTrailTab({ status }: { status: VendorRunStatus | undefined }
         out.push({
           ts: `T-${(60 - n).toString().padStart(2, "0")}m`,
           actor: "Routing Engine",
-          action: `Skipped ${step.title} (Tier 1 auto-track)`,
+          action: `Skipped ${step.title} (Low auto-track)`,
           type: "auto",
         });
         n += 1;
@@ -994,29 +999,22 @@ const MONITORING_SOURCES: { id: string; label: string }[] = [
   { id: "renewals", label: "Contract Renewals" },
 ];
 
-function MonitoringLivePanel({ vendor, fired }: { vendor: VendorRecord; fired: boolean }) {
-  // Synthetic ticker entries — seed from vendor.monitoring records, then keep rolling.
+function MonitoringLivePanel({ entity, fired }: { entity: EntityRecord; fired: boolean }) {
+  // Synthetic ticker entries — Audit has no per-entity monitoring records, so we
+  // seed empty and let the synthetic-tick effect populate. This component is
+  // dead code for the audit workflow today (no step has id "monitoring") but
+  // is preserved structurally for future continuous-audit triggers.
   type Tick = { id: string; ts: string; source: string; description: string; severity: "info" | "warn" | "critical" };
 
-  const seedEntries: Tick[] = useMemo(
-    () =>
-      vendor.monitoring.map((m) => ({
-        id: m.id,
-        ts: m.timestamp,
-        source: m.source,
-        description: m.description,
-        severity: fired ? "warn" : "info",
-      })),
-    [vendor.id, vendor.monitoring, fired]
-  );
+  const seedEntries: Tick[] = useMemo(() => [], [entity.id, fired]);
 
   const [ticks, setTicks] = useState<Tick[]>(seedEntries);
   const [pulseTick, setPulseTick] = useState(0);
 
-  // Refresh seed if vendor changes
+  // Refresh seed if entity changes
   useEffect(() => {
     setTicks(seedEntries);
-  }, [vendor.id, seedEntries]);
+  }, [entity.id, seedEntries]);
 
   // Pulse + rolling ticker
   useEffect(() => {
@@ -1107,26 +1105,26 @@ function MonitoringLivePanel({ vendor, fired }: { vendor: VendorRecord; fired: b
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Vendor Focus Page — analog of SOX ControlFocusPage (header / tabs / stepper / step content / footer)
+// Entity Focus Page — analog of SOX ControlFocusPage (header / tabs / stepper / step content / footer)
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Drift-fix #2.7 — VendorAssessmentEmptyState
+// Drift-fix #2.7 — EntityAuditEmptyState
 // Mirrors canon's "Test with Agent" cold-start panel.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function VendorAssessmentEmptyState({
-  vendor,
+function EntityAuditEmptyState({
+  entity,
   automationConfig,
   onStart,
   onConfigure,
 }: {
-  vendor: VendorRecord;
-  automationConfig: VendorAutomationConfig;
+  entity: EntityRecord;
+  automationConfig: EntityAutomationConfig;
   onStart: () => void;
   onConfigure: () => void;
 }) {
-  const stepModes: AutomationMode[] = tprmSteps.map((s) => automationConfig[s.id]?.mode ?? "full");
+  const stepModes: AutomationMode[] = auditAssessmentSteps.map((s) => automationConfig[s.id]?.mode ?? "full");
   const allSame = stepModes.every((m) => m === stepModes[0]);
   const globalLabel = allSame ? automationModeLabels[stepModes[0]].label : null;
   const GlobalIcon = allSame ? automationModeIcons[stepModes[0]].icon : null;
@@ -1135,19 +1133,19 @@ function VendorAssessmentEmptyState({
   const manualCount = stepModes.filter((m) => m === "manual").length;
 
   return (
-    <div className="flex-1 min-h-0 flex items-center justify-center" data-testid="vendor-assessment-empty">
+    <div className="flex-1 min-h-0 flex items-center justify-center" data-testid="entity-assessment-empty">
       <div className="text-center max-w-md space-y-5">
         <div className="mx-auto w-14 h-14 rounded-2xl bg-[#266C92]/10 flex items-center justify-center">
           <Bot className="w-7 h-7 text-[#266C92]" />
         </div>
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-foreground">Vendor Risk Assessment</h3>
+          <h3 className="text-lg font-semibold text-foreground">Entity Audit</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Run the agent-assisted assessment workflow for{" "}
+            Run the agent-assisted audit workflow for{" "}
             <span className="font-medium text-foreground">
-              {vendor.id} — {vendor.vendorName}
+              {entity.id} — {entity.entityName}
             </span>
-            . The agent will guide you through intake, tiering, outside-in intelligence, document analysis, scoring, triage, review, exception handling, and continuous monitoring.
+            . The agent will guide you through readiness, evidence collection, scoring, reviewer disposition, stakeholder commentary, report composition, workpaper notes, submission, and distribution.
           </p>
         </div>
 
@@ -1201,7 +1199,7 @@ function VendorAssessmentEmptyState({
               size="default"
               className="h-10 px-6 text-sm gap-2 bg-[#266C92] hover:bg-[#1e5a7a] text-white shadow-sm"
               onClick={onStart}
-              data-testid="button-start-assessment"
+              data-testid="button-start-audit"
             >
               <Play className="w-4 h-4" />
               Run Assessment
@@ -1221,7 +1219,7 @@ function VendorAssessmentEmptyState({
 
         <div className="pt-4 border-t border-slate-200 dark:border-border">
           <div className="flex items-center justify-center flex-wrap gap-x-4 gap-y-2">
-            {tprmSteps.map((step) => (
+            {auditAssessmentSteps.map((step) => (
               <div key={step.id} className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
                 <span className="text-[10px] text-muted-foreground">{step.shortLabel}</span>
@@ -1235,26 +1233,26 @@ function VendorAssessmentEmptyState({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Drift-fix #2.16 — VendorRiskMemoContent (terminal artifact for the Outputs step).
-// Analog of canon's WorkpaperContent. Sections come from tprmWorkflow.terminalArtifact.
+// Drift-fix #2.16 — EntityAuditReportContent (terminal artifact for the Outputs step).
+// Analog of canon's WorkpaperContent. Sections come from auditAssessmentWorkflow.terminalArtifact.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function VendorRiskMemoContent({ vendor }: { vendor: VendorRecord }) {
+function EntityAuditReportContent({ entity }: { entity: EntityRecord }) {
   const [collapsed, setCollapsed] = useState(false);
-  const sections = tprmWorkflow.terminalArtifact.sectionsBuilder(vendor.id);
+  const sections = auditAssessmentWorkflow.terminalArtifact.sectionsBuilder(entity.id);
 
   return (
-    <div data-testid="vendor-risk-memo" className="space-y-4">
+    <div data-testid="entity-risk-memo" className="space-y-4">
       <div className="border border-slate-200 dark:border-border rounded-xl bg-white dark:bg-card overflow-hidden">
         <button
           onClick={() => setCollapsed((c) => !c)}
           className="w-full flex items-center justify-between px-5 py-3 bg-slate-50/80 dark:bg-muted/20 border-b border-slate-200 dark:border-border hover:bg-slate-100/80 dark:hover:bg-muted/30 transition-colors"
-          data-testid="toggle-risk-memo-collapse"
+          data-testid="toggle-audit-report-collapse"
         >
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 text-[#266C92]" />
             <span className="text-sm font-semibold text-foreground">
-              Vendor Risk Memo — {vendor.id} {vendor.vendorName}
+              Audit Report — {entity.id} {entity.entityName}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -1263,7 +1261,7 @@ function VendorRiskMemoContent({ vendor }: { vendor: VendorRecord }) {
               size="sm"
               className="h-7 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
               onClick={(e) => e.stopPropagation()}
-              data-testid="button-export-risk-memo"
+              data-testid="button-export-audit-report"
             >
               <Download className="w-3.5 h-3.5" />
               Export
@@ -1309,7 +1307,7 @@ function VendorRiskMemoContent({ vendor }: { vendor: VendorRecord }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Drift-fix #2.10 — VendorUtilityPanel (right-side rail).
+// Drift-fix #2.10 — EntityUtilityPanel (right-side rail).
 // 4 tabs: Optro Agent · Comments · Notes · Attachments.
 // (History is now the top-level Audit Log tab — see ui-pattern-canon.md § 1.7.)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1323,35 +1321,35 @@ const utilityToolbarItems: { id: UtilityPanelTab | "close"; icon: typeof Bot; la
   { id: "attachments", icon: Copy, label: "Attachments" },
 ];
 
-function VendorUtilityPanel({
-  vendor,
+function EntityUtilityPanel({
+  entity,
   status,
   activeStepId,
 }: {
-  vendor: VendorRecord;
-  status: VendorRunStatus | undefined;
+  entity: EntityRecord;
+  status: EntityRunStatus | undefined;
   activeStepId?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<UtilityPanelTab>("agent");
 
-  const activeStep = activeStepId ? tprmSteps.find((s) => s.id === activeStepId) : undefined;
-  const agentName = activeStep ? tprmWorkflow.agentNameByStep[activeStep.id] : "TPRM AGENT";
+  const activeStep = activeStepId ? auditAssessmentSteps.find((s) => s.id === activeStepId) : undefined;
+  const agentName = activeStep ? auditAssessmentWorkflow.agentNameByStep[activeStep.id] : "Audit AGENT";
   const agentDisplay = agentName
     .split(" ")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(" ");
 
-  // Generate a small list of agent comments tied to completed steps for this vendor.
+  // Generate a small list of agent comments tied to completed steps for this entity.
   const agentComments = useMemo(() => {
     if (!status) return [];
     const out: { id: string; stepId: string; title: string; body: string; timestamp: string }[] = [];
     let n = 0;
-    for (const step of tprmSteps) {
+    for (const step of auditAssessmentSteps) {
       const st = status.steps[step.id];
       if (st === "complete") {
         out.push({
-          id: `cmt-${vendor.id}-${step.id}`,
+          id: `cmt-${entity.id}-${step.id}`,
           stepId: step.id,
           title: `${step.title} — Complete`,
           body: step.outcome,
@@ -1360,7 +1358,7 @@ function VendorUtilityPanel({
         n += 3;
       } else if (st === "waiting" || st === "blocked") {
         out.push({
-          id: `cmt-${vendor.id}-${step.id}-w`,
+          id: `cmt-${entity.id}-${step.id}-w`,
           stepId: step.id,
           title: `${step.title} — ${st === "blocked" ? "Blocked" : "Awaiting Reviewer"}`,
           body: step.description,
@@ -1370,13 +1368,13 @@ function VendorUtilityPanel({
       }
     }
     return out.reverse();
-  }, [status, vendor.id]);
+  }, [status, entity.id]);
 
   if (!expanded) {
     return (
       <div
         className="shrink-0 w-12 border-l border-slate-200 dark:border-border bg-white dark:bg-card flex flex-col items-center py-3 gap-1"
-        data-testid="vendor-utility-panel-collapsed"
+        data-testid="entity-utility-panel-collapsed"
       >
         {utilityToolbarItems.map((item) => {
           const Icon = item.icon;
@@ -1402,7 +1400,7 @@ function VendorUtilityPanel({
   return (
     <div
       className="shrink-0 w-96 border-l border-slate-200 dark:border-border bg-white dark:bg-card flex flex-col"
-      data-testid="vendor-utility-panel-expanded"
+      data-testid="entity-utility-panel-expanded"
     >
       <div className="shrink-0 h-12 px-3 flex items-center justify-between gap-2 border-b border-slate-200 dark:border-border">
         <div className="flex items-center gap-1">
@@ -1445,7 +1443,7 @@ function VendorUtilityPanel({
               </div>
               <div>
                 <p className="text-[10px] font-semibold text-[#266C92]">{agentDisplay}</p>
-                <p className="text-[10px] text-muted-foreground">Active on {activeStep?.title ?? vendor.vendorName}</p>
+                <p className="text-[10px] text-muted-foreground">Active on {activeStep?.title ?? entity.entityName}</p>
               </div>
             </div>
             {agentComments.length === 0 ? (
@@ -1474,34 +1472,33 @@ function VendorUtilityPanel({
         {activeTab === "notes" && (
           <div className="text-center py-8" data-testid="utility-panel-notes">
             <Pencil className="w-6 h-6 mx-auto text-muted-foreground/40 mb-2" />
-            <p className="text-[11px] text-muted-foreground">No notes for {vendor.vendorName}.</p>
+            <p className="text-[11px] text-muted-foreground">No notes for {entity.entityName}.</p>
           </div>
         )}
         {activeTab === "attachments" && (
           <div className="space-y-2" data-testid="utility-panel-attachments">
-            {vendor.documents.length === 0 ? (
-              <p className="text-[11px] text-muted-foreground text-center py-6">No attachments yet.</p>
+            {entity.priorFindings.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground text-center py-6">No prior findings on file.</p>
             ) : (
-              vendor.documents.map((d, i) => (
+              entity.priorFindings.map((f, i) => (
                 <div key={i} className="border border-slate-200 dark:border-border rounded-lg p-3 flex items-center gap-2">
                   <FileText className="w-3.5 h-3.5 text-[#266C92] shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-medium text-foreground truncate">{d.type}</p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {d.date}
-                      {d.expiry ? ` · expires ${d.expiry}` : ""}
+                    <p className="text-[11px] font-medium text-foreground truncate">
+                      {f.id} — {f.area}
                     </p>
+                    <p className="text-[10px] text-muted-foreground truncate">{f.summary}</p>
                   </div>
                   <Badge
                     className={`text-[9px] ${
-                      d.status === "current"
-                        ? "bg-emerald-50 text-emerald-700"
-                        : d.status === "expired"
-                          ? "bg-red-50 text-red-700"
-                          : "bg-amber-50 text-amber-700"
+                      f.severity === "high"
+                        ? "bg-red-50 text-red-700"
+                        : f.severity === "medium"
+                          ? "bg-amber-50 text-amber-700"
+                          : "bg-slate-50 text-slate-600"
                     } border-0`}
                   >
-                    {d.status}
+                    {f.status}
                   </Badge>
                 </div>
               ))
@@ -1514,14 +1511,14 @@ function VendorUtilityPanel({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Drift-fix #2.9 — VendorAutomationConfigModal.
+// Drift-fix #2.9 — EntityAutomationConfigModal.
 // Per-step automation policy selector. Reuses canon's AutomationModeSelector
 // for the actual mode-pill UI so the visual contract stays unified.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type VendorAutomationConfig = Record<string, { mode: AutomationMode; substeps: Record<string, AutomationMode> }>;
+type EntityAutomationConfig = Record<string, { mode: AutomationMode; substeps: Record<string, AutomationMode> }>;
 
-function VendorAutomationConfigModal({
+function EntityAutomationConfigModal({
   open,
   onOpenChange,
   config,
@@ -1529,10 +1526,10 @@ function VendorAutomationConfigModal({
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
-  config: VendorAutomationConfig;
-  onSave: (c: VendorAutomationConfig) => void;
+  config: EntityAutomationConfig;
+  onSave: (c: EntityAutomationConfig) => void;
 }) {
-  const [draft, setDraft] = useState<VendorAutomationConfig>(config);
+  const [draft, setDraft] = useState<EntityAutomationConfig>(config);
   const [expandedStep, setExpandedStep] = useState<string | null>(null);
   useEffect(() => {
     if (open) setDraft(config);
@@ -1543,7 +1540,7 @@ function VendorAutomationConfigModal({
       const cur = d[stepId] ?? { mode: "full", substeps: {} };
       // Cascade to all substeps unless they were individually overridden.
       const nextSubsteps: Record<string, AutomationMode> = {};
-      const step = tprmSteps.find((s) => s.id === stepId);
+      const step = auditAssessmentSteps.find((s) => s.id === stepId);
       if (step) for (const sub of step.substeps) nextSubsteps[sub.id] = mode;
       return { ...d, [stepId]: { mode, substeps: nextSubsteps } };
     });
@@ -1561,15 +1558,15 @@ function VendorAutomationConfigModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto" data-testid="vendor-automation-modal">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto" data-testid="entity-automation-modal">
         <DialogHeader>
-          <DialogTitle>Automation Policy — Vendor Risk Assessment</DialogTitle>
+          <DialogTitle>Automation Policy — Entity Audit</DialogTitle>
           <DialogDescription>
             Configure each step (and individual substeps) to run fully automatically, pause at checkpoints, or require manual triggering.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3 pt-2">
-          {tprmSteps.map((step) => {
+          {auditAssessmentSteps.map((step) => {
             const stepCfg = draft[step.id] ?? { mode: "full" as AutomationMode, substeps: {} };
             const isExpanded = expandedStep === step.id;
             return (
@@ -1600,7 +1597,7 @@ function VendorAutomationConfigModal({
                     value={stepCfg.mode}
                     onChange={(m) => setStepMode(step.id, m)}
                     size="small"
-                    scopeId={`vendor-${step.id}`}
+                    scopeId={`entity-${step.id}`}
                   />
                 </div>
                 {isExpanded && (
@@ -1616,7 +1613,7 @@ function VendorAutomationConfigModal({
                           value={stepCfg.substeps[sub.id] ?? stepCfg.mode}
                           onChange={(m) => setSubstepMode(step.id, sub.id, m)}
                           size="small"
-                          scopeId={`vendor-${step.id}-${sub.id}`}
+                          scopeId={`entity-${step.id}-${sub.id}`}
                         />
                       </div>
                     ))}
@@ -1646,10 +1643,10 @@ function VendorAutomationConfigModal({
   );
 }
 
-type VendorFocusTab = "overview" | "assessment" | "audit";
+type EntityFocusTab = "overview" | "assessment" | "audit";
 
-function VendorFocusPage({
-  vendor,
+function EntityFocusPage({
+  entity,
   status,
   onBack,
   onStartAssessment,
@@ -1657,22 +1654,22 @@ function VendorFocusPage({
   onResolveHitl,
   onResolveBlocker,
 }: {
-  vendor: VendorRecord;
-  status: VendorRunStatus | undefined;
+  entity: EntityRecord;
+  status: EntityRunStatus | undefined;
   onBack: () => void;
   /** Drift-fix #2.7 — empty-state CTA. Called when the user clicks "Run Assessment". */
-  onStartAssessment?: (vendorId: string) => void;
+  onStartAssessment?: (entityId: string) => void;
   onAdvanceStep: (stepId: string) => void;
-  onResolveHitl: (vendorId: string, stepId: string, decision: "approve" | "modify" | "reject") => void;
+  onResolveHitl: (entityId: string, stepId: string, decision: "approve" | "modify" | "reject") => void;
   /** Universal block-resolution handler — fires when an inline affordance is clicked. */
-  onResolveBlocker?: (vendorId: string, stepId: string, substepId: string, affordanceId: string) => void;
+  onResolveBlocker?: (entityId: string, stepId: string, substepId: string, affordanceId: string) => void;
 }) {
-  const [activeTab, setActiveTab] = useState<VendorFocusTab>("assessment");
+  const [activeTab, setActiveTab] = useState<EntityFocusTab>("assessment");
   // Drift-fix #2.4 — run-context band defaults to **collapsed** (was true).
   const [testDetailsOpen, setTestDetailsOpen] = useState(false);
 
-  // Drift-fix #2.3 — cycle dropdown. Cycles are declared in tprmWorkflow.cycles.
-  const cycles = tprmWorkflow.cycles ?? [];
+  // Drift-fix #2.3 — cycle dropdown. Cycles are declared in auditAssessmentWorkflow.cycles.
+  const cycles = auditAssessmentWorkflow.cycles ?? [];
   const initialCycleId = useMemo(() => {
     // Pick the cycle that's "In Progress" if present, else the first.
     return cycles.find((c) => c.status === "In Progress")?.id ?? cycles[0]?.id ?? "onboarding";
@@ -1699,7 +1696,7 @@ function VendorFocusPage({
   // canon's substep-level mode mixing (full / checkpoint / manual).
   const [automationConfig, setAutomationConfig] = useState<Record<string, { mode: AutomationMode; substeps: Record<string, AutomationMode> }>>(() => {
     const cfg: Record<string, { mode: AutomationMode; substeps: Record<string, AutomationMode> }> = {};
-    for (const s of tprmSteps) {
+    for (const s of auditAssessmentSteps) {
       const substepModes: Record<string, AutomationMode> = {};
       for (const sub of s.substeps) substepModes[sub.id] = "full";
       cfg[s.id] = { mode: "full", substeps: substepModes };
@@ -1713,7 +1710,7 @@ function VendorFocusPage({
   // (pending → running → complete) over the canon 1200ms tick cadence.
   const [substepProgress, setSubstepProgress] = useState<Record<string, number>>(() => {
     const prog: Record<string, number> = {};
-    for (const s of tprmSteps) prog[s.id] = 0;
+    for (const s of auditAssessmentSteps) prog[s.id] = 0;
     return prog;
   });
   const [autoExpandedSubs, setAutoExpandedSubs] = useState<Set<string>>(() => new Set());
@@ -1728,17 +1725,17 @@ function VendorFocusPage({
     setManualTriggered((prev) => new Set(prev).add(substepId));
   }, []);
 
-  // Reset substep progression bookkeeping when switching vendors.
+  // Reset substep progression bookkeeping when switching entities.
   useEffect(() => {
     const prog: Record<string, number> = {};
-    for (const s of tprmSteps) prog[s.id] = 0;
+    for (const s of auditAssessmentSteps) prog[s.id] = 0;
     setSubstepProgress(prog);
     setAutoExpandedSubs(new Set());
     setCheckpointAcked(new Set());
     setManualTriggered(new Set());
-  }, [vendor.id]);
+  }, [entity.id]);
 
-  // Drift-fix #2.16 — terminal artifact (Vendor Risk Memo) flag.
+  // Drift-fix #2.16 — terminal artifact (Audit Report) flag.
   const [outputsGenerated, setOutputsGenerated] = useState<boolean>(false);
 
   // Toast feedback portal state — canon parity. Used as the SOLE feedback channel
@@ -1785,9 +1782,9 @@ function VendorFocusPage({
   // workstream-initiated). See ui-pattern-canon.md § 1.10.
   const mirrorToAssistant = useCallback(
     (title: string, body: string, stepId?: string) => {
-      const agentLabel = stepId ? tprmWorkflow.agentNameByStep[stepId] : undefined;
+      const agentLabel = stepId ? auditAssessmentWorkflow.agentNameByStep[stepId] : undefined;
       useHomeAssistantStore.getState().addMessage({
-        id: `tprm-mirror-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        id: `audit-mirror-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         role: "assistant",
         content: `**${title}**\n\n${body}`,
         timestamp: new Date().toISOString(),
@@ -1807,31 +1804,31 @@ function VendorFocusPage({
   // Compute first-non-complete step (active step) — analog of SOX activeStepIdx
   const firstActiveIdx = useMemo(() => {
     if (!status) return 0;
-    const idx = tprmStepIds.findIndex((s) => {
+    const idx = auditAssessmentStepIds.findIndex((s) => {
       const st = status.steps[s];
       return st !== "complete" && st !== "skipped";
     });
-    return idx === -1 ? tprmStepIds.length - 1 : idx;
+    return idx === -1 ? auditAssessmentStepIds.length - 1 : idx;
   }, [status]);
 
   const [activeStepIdx, setActiveStepIdx] = useState(firstActiveIdx);
   useEffect(() => {
     setActiveStepIdx(firstActiveIdx);
-  }, [vendor.id, firstActiveIdx]);
+  }, [entity.id, firstActiveIdx]);
 
   // Visible step order — append "outputs" once the terminal artifact is generated.
   const visibleStepOrder = useMemo(
-    () => (outputsGenerated ? [...tprmStepIds, "outputs"] : tprmStepIds),
+    () => (outputsGenerated ? [...auditAssessmentStepIds, "outputs"] : auditAssessmentStepIds),
     [outputsGenerated],
   );
 
   const activeStepId = visibleStepOrder[activeStepIdx];
   const isOutputsStep = activeStepId === "outputs";
-  const activeStep = isOutputsStep ? null : tprmSteps[activeStepIdx];
+  const activeStep = isOutputsStep ? null : auditAssessmentSteps[activeStepIdx];
   const activeStepStatus: StepRunStatus = isOutputsStep
     ? "complete"
     : status
-      ? status.steps[(activeStep as typeof tprmSteps[number]).id] ?? "pending"
+      ? status.steps[(activeStep as typeof auditAssessmentSteps[number]).id] ?? "pending"
       : "pending";
 
   // Automation-mode pill on step header — canon parity.
@@ -1883,41 +1880,41 @@ function VendorFocusPage({
   // Mirror events (drift-fix #2.11)
   useEffect(() => {
     if (!status) return;
-    for (const step of tprmSteps) {
+    for (const step of auditAssessmentSteps) {
       const st = status.steps[step.id];
-      const completedKey = `${vendor.id}:${step.id}:complete`;
+      const completedKey = `${entity.id}:${step.id}:complete`;
       if (st === "complete" && !mirroredEventsRef.current.has(completedKey)) {
         mirroredEventsRef.current.add(completedKey);
         mirrorToAssistant(
           `${step.title} — Complete`,
-          `${vendor.vendorName}: ${step.title} step finished. ${step.outcome}`,
+          `${entity.entityName}: ${step.title} step finished. ${step.outcome}`,
           step.id,
         );
       }
-      const blockedKey = `${vendor.id}:${step.id}:blocked`;
+      const blockedKey = `${entity.id}:${step.id}:blocked`;
       if ((st === "waiting" || st === "blocked") && !mirroredEventsRef.current.has(blockedKey)) {
         mirroredEventsRef.current.add(blockedKey);
         const reason = st === "blocked" ? "Step is blocked." : "Reviewer disposition required.";
         mirrorToAssistant(`${step.title} — ${st === "blocked" ? "Blocked" : "Awaiting Reviewer"}`,
-          `${vendor.vendorName}: ${reason} Open the vendor focus view to record a decision.`,
+          `${entity.entityName}: ${reason} Open the entity focus view to record a decision.`,
           step.id,
         );
       }
     }
-  }, [status, vendor.id, vendor.vendorName, mirrorToAssistant]);
+  }, [status, entity.id, entity.entityName, mirrorToAssistant]);
 
-  const outcome = getVendorOutcome(vendor, status);
-  const isComplete = outcome?.tone === "approved" || outcome?.tone === "conditional" || outcome?.tone === "rejected" || outcome?.tone === "monitor";
-  const testDetails = getVendorRunContext(vendor, activeCycleId);
+  const outcome = getEntityOutcome(entity, status);
+  const isComplete = outcome?.tone === "satisfactory" || outcome?.tone === "conditional" || outcome?.tone === "unsatisfactory" || outcome?.tone === "re-audit";
+  const testDetails = getEntityRunContext(entity, activeCycleId);
 
   const canNavigateTo = (idx: number): boolean => {
     if (!status) return idx === 0;
     const stepId = visibleStepOrder[idx];
     if (stepId === "outputs") return outputsGenerated;
-    const step = tprmSteps[idx];
+    const step = auditAssessmentSteps[idx];
     const st = status.steps[step.id];
     if (st === "complete" || st === "skipped" || st === "running" || st === "waiting" || st === "blocked") return true;
-    const prev = idx > 0 ? tprmSteps[idx - 1] : null;
+    const prev = idx > 0 ? auditAssessmentSteps[idx - 1] : null;
     if (prev) {
       const ps = status.steps[prev.id];
       if (ps === "complete" || ps === "skipped") return true;
@@ -1925,18 +1922,18 @@ function VendorFocusPage({
     return idx === 0;
   };
 
-  const isLastStep = activeStep ? activeStepIdx === tprmSteps.length - 1 : false;
+  const isLastStep = activeStep ? activeStepIdx === auditAssessmentSteps.length - 1 : false;
   const stepHasHitlGate = activeStep ? activeStep.substeps.some((s) => s.isHitlGate) : false;
 
   return (
-    <div className="relative flex h-full overflow-hidden bg-white dark:bg-background" data-testid={`vendor-focus-${vendor.id}`}>
+    <div className="relative flex h-full overflow-hidden bg-white dark:bg-background" data-testid={`entity-focus-${entity.id}`}>
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header bar — exact SOX pattern */}
         <div className="shrink-0 h-12 px-4 flex items-center gap-3 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
           <button
             onClick={onBack}
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            data-testid="button-vendor-focus-back"
+            data-testid="button-entity-focus-back"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>Overview</span>
@@ -1944,11 +1941,11 @@ function VendorFocusPage({
           <div className="w-px h-5 bg-slate-200 dark:bg-border" />
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-[#266C92]" />
-            <h2 className="text-sm font-semibold text-foreground">{vendor.id}</h2>
+            <h2 className="text-sm font-semibold text-foreground">{entity.id}</h2>
             <span className="text-sm text-muted-foreground">—</span>
-            <span className="text-sm text-foreground">{vendor.vendorName}</span>
-            <Badge className={`text-[10px] h-5 ${tierBadgeClasses(vendor.riskTier)} border-0 ml-2`}>
-              {vendor.riskTier}
+            <span className="text-sm text-foreground">{entity.entityName}</span>
+            <Badge className={`text-[10px] h-5 ${tierBadgeClasses(entity.riskTier)} border-0 ml-2`}>
+              {entity.riskTier}
             </Badge>
           </div>
           {outcome && (
@@ -1964,7 +1961,7 @@ function VendorFocusPage({
             tab dropdown for walkthrough/interim/rollforward. */}
         <div className="shrink-0 border-b border-slate-200 dark:border-border bg-white dark:bg-card">
           <div className="px-6 flex items-center gap-6">
-            {(["overview", "assessment", "audit"] as VendorFocusTab[]).map((tab) => {
+            {(["overview", "assessment", "audit"] as EntityFocusTab[]).map((tab) => {
               if (tab === "assessment") {
                 return (
                   <div key={tab} className="relative" ref={cycleDropdownRef}>
@@ -1982,7 +1979,7 @@ function VendorFocusPage({
                           ? "border-[#266C92] text-[#266C92]"
                           : "border-transparent text-muted-foreground hover:text-foreground"
                       }`}
-                      data-testid="tab-vendor-assessment"
+                      data-testid="tab-entity-assessment"
                     >
                       <span>Assessment</span>
                       {activeCycle && (
@@ -2045,7 +2042,7 @@ function VendorFocusPage({
                       ? "border-[#266C92] text-[#266C92]"
                       : "border-transparent text-muted-foreground hover:text-foreground"
                   }`}
-                  data-testid={`tab-vendor-${tab}`}
+                  data-testid={`tab-entity-${tab}`}
                 >
                   {tab === "audit" ? "Audit Log" : tab}
                 </button>
@@ -2054,17 +2051,17 @@ function VendorFocusPage({
           </div>
         </div>
 
-        {activeTab === "overview" && <VendorOverviewTab vendor={vendor} />}
-        {activeTab === "audit" && <VendorAuditTrailTab status={status} />}
+        {activeTab === "overview" && <EntityOverviewTab entity={entity} />}
+        {activeTab === "audit" && <EntityAuditTrailTab status={status} />}
 
         {/* Empty-state CTA when no run is active — canon parity with the
             "Test with Agent" panel for cold-start objects. */}
         {activeTab === "assessment" && !status && (
-          <VendorAssessmentEmptyState
-            vendor={vendor}
+          <EntityAuditEmptyState
+            entity={entity}
             automationConfig={automationConfig}
             onStart={() => {
-              if (onStartAssessment) onStartAssessment(vendor.id);
+              if (onStartAssessment) onStartAssessment(entity.id);
               showToast("Assessment started — agent dispatching");
             }}
             onConfigure={() => setAutomationModalOpen(true)}
@@ -2079,10 +2076,10 @@ function VendorFocusPage({
                 <div className="relative flex items-center h-8 flex-1 min-w-0">
                   <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 rounded-full bg-slate-200 dark:bg-slate-700" />
                   {(() => {
-                    const completedCount = tprmStepIds.filter(
+                    const completedCount = auditAssessmentStepIds.filter(
                       (s) => status.steps[s] === "complete" || status.steps[s] === "skipped"
                     ).length;
-                    const total = tprmSteps.length;
+                    const total = auditAssessmentSteps.length;
                     const pct = total > 1 ? (completedCount / (total - 1)) * 100 : 0;
                     return (
                       <div
@@ -2094,11 +2091,11 @@ function VendorFocusPage({
                   <div className="relative flex items-center justify-between w-full">
                     {visibleStepOrder.map((stepId, idx) => {
                       const isOutputs = stepId === "outputs";
-                      const step = isOutputs ? null : tprmSteps[idx];
-                      const st: StepRunStatus = isOutputs ? "complete" : status.steps[(step as typeof tprmSteps[number]).id];
+                      const step = isOutputs ? null : auditAssessmentSteps[idx];
+                      const st: StepRunStatus = isOutputs ? "complete" : status.steps[(step as typeof auditAssessmentSteps[number]).id];
                       const isActive = idx === activeStepIdx;
                       const navigable = canNavigateTo(idx);
-                      const shortLabel = isOutputs ? "Output" : (step as typeof tprmSteps[number]).shortLabel;
+                      const shortLabel = isOutputs ? "Output" : (step as typeof auditAssessmentSteps[number]).shortLabel;
                       return (
                         <button
                           key={stepId}
@@ -2171,7 +2168,7 @@ function VendorFocusPage({
             <div className="flex-1 min-h-0 overflow-y-auto">
               <div className="w-[90%] mx-auto px-6 py-6 space-y-6">
                 {isOutputsStep ? (
-                  <VendorRiskMemoContent vendor={vendor} />
+                  <EntityAuditReportContent entity={entity} />
                 ) : activeStep ? (
                 <>
                 <div className="flex items-center gap-2">
@@ -2221,7 +2218,7 @@ function VendorFocusPage({
                         );
                       })()}
                       {(() => {
-                        const phase = tprmPhases.find((p) => p.id === activeStep.phaseId);
+                        const phase = auditAssessmentPhases.find((p) => p.id === activeStep.phaseId);
                         return phase ? (
                           <span className="inline-flex items-center text-[9px] font-medium text-muted-foreground">
                             Phase {phase.ordinal} · {phase.label}
@@ -2230,16 +2227,16 @@ function VendorFocusPage({
                       })()}
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Step {activeStepIdx + 1} of {tprmSteps.length}: {activeStep.description}
+                      Step {activeStepIdx + 1} of {auditAssessmentSteps.length}: {activeStep.description}
                     </p>
                   </div>
                 </div>
 
-                <div data-testid={`vendor-step-block-${activeStep.id}`}>
-                  <VendorStepNodeContent
+                <div data-testid={`entity-step-block-${activeStep.id}`}>
+                  <EntityStepNodeContent
                     step={activeStep}
                     stepStatus={activeStepStatus}
-                    vendorId={vendor.id}
+                    entityId={entity.id}
                     substepProgress={(() => {
                       // Effective-progress pinning. Both blocked + waiting are
                       // variants of the same inline-resolution pattern; we pin
@@ -2250,8 +2247,8 @@ function VendorFocusPage({
 
                       // Variant A — declarative block rule targets a substep.
                       if (activeStepStatus === "blocked") {
-                        const rule = tprmBlockRules.find(
-                          (r) => r.vendorId === vendor.id && r.blockAtStep === activeStep.id
+                        const rule = auditAssessmentBlockRules.find(
+                          (r) => r.entityId === entity.id && r.blockAtStep === activeStep.id
                         );
                         if (rule?.blockAtSubstep) {
                           const idx = activeStep.substeps.findIndex((s) => s.id === rule.blockAtSubstep);
@@ -2282,16 +2279,16 @@ function VendorFocusPage({
 
                 {/* Live monitoring panel — only shown on the Monitoring step. Mirrors SOX "alive" feel. */}
                 {activeStep.id === "monitoring" && (
-                  <MonitoringLivePanel vendor={vendor} fired={!!status.fired} />
+                  <MonitoringLivePanel entity={entity} fired={!!status.fired} />
                 )}
 
                 {/* Final risk decision banner — SOX canon: only render on the LAST step (terminal view). */}
                 {isComplete && outcome && isLastStep && (
                   <div
                     className={`p-4 rounded-xl border ${
-                      outcome.tone === "rejected"
+                      outcome.tone === "unsatisfactory"
                         ? "border-red-200 dark:border-red-800/30 bg-red-50/50 dark:bg-red-900/10"
-                        : outcome.tone === "monitor"
+                        : outcome.tone === "re-audit"
                           ? "border-violet-200 dark:border-violet-800/30 bg-violet-50/50 dark:bg-violet-900/10"
                           : outcome.tone === "conditional"
                             ? "border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/10"
@@ -2299,18 +2296,18 @@ function VendorFocusPage({
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      {outcome.tone === "rejected" ? (
+                      {outcome.tone === "unsatisfactory" ? (
                         <AlertTriangle className="w-4 h-4 text-red-500" />
-                      ) : outcome.tone === "monitor" ? (
+                      ) : outcome.tone === "re-audit" ? (
                         <Activity className="w-4 h-4 text-violet-500" />
                       ) : (
                         <ShieldCheck className={`w-4 h-4 ${outcome.tone === "conditional" ? "text-amber-600 dark:text-amber-400" : "text-[#266C92]"}`} />
                       )}
                       <span
                         className={`text-sm font-medium ${
-                          outcome.tone === "rejected"
+                          outcome.tone === "unsatisfactory"
                             ? "text-red-600 dark:text-red-400"
-                            : outcome.tone === "monitor"
+                            : outcome.tone === "re-audit"
                               ? "text-violet-700 dark:text-violet-300"
                               : outcome.tone === "conditional"
                                 ? "text-amber-700 dark:text-amber-400"
@@ -2368,11 +2365,11 @@ function VendorFocusPage({
                           // Terminal CTA produces an artifact and appends Outputs step.
                           onAdvanceStep(activeStep.id);
                           setOutputsGenerated(true);
-                          setTimeout(() => setActiveStepIdx(tprmSteps.length), 50);
-                          showToast("Risk Memo generated");
+                          setTimeout(() => setActiveStepIdx(auditAssessmentSteps.length), 50);
+                          showToast("Audit Report generated");
                           mirrorToAssistant(
-                            "Vendor Risk Memo — Generated",
-                            `${vendor.vendorName}: terminal artifact ready in the Outputs step.`,
+                            "Audit Report — Generated",
+                            `${entity.entityName}: terminal artifact ready in the Outputs step.`,
                             activeStep.id,
                           );
                         } else {
@@ -2385,7 +2382,7 @@ function VendorFocusPage({
                       {isLastStep ? (
                         <>
                           <FileText className="w-3.5 h-3.5" />
-                          Generate Risk Memo
+                          Generate Audit Report
                         </>
                       ) : (
                         <>
@@ -2416,10 +2413,10 @@ function VendorFocusPage({
       </div>
 
       {/* Right-side utility panel — drift-fix #2.10. Always present across all tabs. */}
-      <VendorUtilityPanel vendor={vendor} status={status} activeStepId={activeStep?.id} />
+      <EntityUtilityPanel entity={entity} status={status} activeStepId={activeStep?.id} />
 
       {/* Drift-fix #2.9 — Automation Config Modal access from empty state + future surfaces. */}
-      <VendorAutomationConfigModal
+      <EntityAutomationConfigModal
         open={automationModalOpen}
         onOpenChange={setAutomationModalOpen}
         config={automationConfig}
@@ -2443,18 +2440,18 @@ function VendorFocusPage({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TPRM Hub view — analog of SOX FieldworkComplexHub (header / stats / actions / pipeline / audit log)
+// Audit Hub view — analog of SOX FieldworkComplexHub (header / stats / actions / pipeline / audit log)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function TPRMHub({
+function AuditAssessmentHub({
   statuses,
-  onVendorClick,
+  onEntityClick,
   onResolveHitl,
   fastForward,
 }: {
-  statuses: VendorRunStatus[];
-  onVendorClick: (vendorId: string) => void;
-  onResolveHitl: (vendorId: string, stepId: string, decision: "approve" | "modify" | "reject") => void;
+  statuses: EntityRunStatus[];
+  onEntityClick: (entityId: string) => void;
+  onResolveHitl: (entityId: string, stepId: string, decision: "approve" | "modify" | "reject") => void;
   fastForward: () => void;
 }) {
   const setCurrentSession = useWorkflowSessionStore((s) => s.setCurrentSession);
@@ -2469,84 +2466,84 @@ function TPRMHub({
   // the tracker is "pushed down" by expansion rather than the pipeline shrinking inside a fixed viewport.
   const fullPaneScroll = actionsExpanded || auditLogExpanded;
 
-  const totalVendors = statuses.length;
-  const completedVendors = statuses.filter((v) =>
-    tprmStepIds.every(
+  const totalEntities = statuses.length;
+  const completedEntities = statuses.filter((v) =>
+    auditAssessmentStepIds.every(
       (sid) => v.steps[sid] === "complete" || v.steps[sid] === "skipped" || (sid === "monitoring" && !v.fired)
     )
   ).length;
-  const autoVendors = statuses.filter((v) => v.track === "automated");
-  const reviewVendors = statuses.filter((v) => v.track === "human-review");
-  const automatedPct = totalVendors > 0 ? Math.round((autoVendors.length / totalVendors) * 100) : 0;
-  const exceptionsOpen = masterVendorList
-    .filter((v) => statuses.some((s) => s.vendorId === v.id))
-    .reduce((acc, v) => acc + v.exceptionRecords.open, 0);
+  const autoEntities = statuses.filter((v) => v.track === "continuous");
+  const reviewEntities = statuses.filter((v) => v.track === "full-audit");
+  const automatedPct = totalEntities > 0 ? Math.round((autoEntities.length / totalEntities) * 100) : 0;
+  // For audit, "open exceptions" = open prior findings carried forward into the cycle.
+  const exceptionsOpen = masterEntityList
+    .filter((v) => statuses.some((s) => s.entityId === v.id))
+    .reduce((acc, v) => acc + v.priorFindings.filter((f) => f.status === "open").length, 0);
 
-  // Action items: vendors with a step in waiting (HITL) or blocked state
+  // Action items: entities with a step in waiting (HITL) or blocked state
   const blockedActions = statuses
     .map((v) => {
-      const waitingStep = tprmSteps.find((s) => v.steps[s.id] === "waiting");
-      const blockedStep = tprmSteps.find((s) => v.steps[s.id] === "blocked");
+      const waitingStep = auditAssessmentSteps.find((s) => v.steps[s.id] === "waiting");
+      const blockedStep = auditAssessmentSteps.find((s) => v.steps[s.id] === "blocked");
       if (!waitingStep && !blockedStep) return null;
       const step = waitingStep ?? blockedStep!;
-      const vendor = masterVendorList.find((m) => m.id === v.vendorId)!;
-      // Pull rich block-rule detail (title, description, severity) for blocked
-      // states so the Action Required panel can surface the same content the
-      // focus view will render under the substep.
+      const entity = masterEntityList.find((m) => m.id === v.entityId)!;
+      // Pull rich block-rule detail (title, description, severity) when this is a
+      // declarative block. Falls back to generic copy for HITL waiting.
       const blockRule = blockedStep
-        ? tprmBlockRules.find(
-            (r) => r.vendorId === v.vendorId && r.blockAtStep === step.id
+        ? auditAssessmentBlockRules.find(
+            (r) => r.entityId === v.entityId && r.blockAtStep === step.id
           )
         : undefined;
       return {
-        vendorId: v.vendorId,
-        vendorName: v.vendorName,
+        entityId: v.entityId,
+        entityName: v.entityName,
         riskTier: v.riskTier,
         track: v.track,
         stepId: step.id,
         stepLabel: step.title,
         kind: waitingStep ? ("waiting" as const) : ("blocked" as const),
-        vendor,
+        entity,
         blockRule,
       };
     })
     .filter(Boolean) as Array<{
-      vendorId: string;
-      vendorName: string;
+      entityId: string;
+      entityName: string;
       riskTier: string;
       track: string;
       stepId: string;
       stepLabel: string;
       kind: "waiting" | "blocked";
-      vendor: VendorRecord;
-      blockRule?: TprmBlockRule;
+      entity: EntityRecord;
+      blockRule?: AuditAssessmentBlockRule;
     }>;
 
-  const isComplete = completedVendors === totalVendors && totalVendors > 0;
+  const isComplete = completedEntities === totalEntities && totalEntities > 0;
 
   // Audit log entries for the hub-level activity feed
   const activityFeed = useMemo(() => {
-    const out: { id: string; ts: string; vendorId: string; type: "info" | "success" | "warning" | "action-needed"; message: string }[] = [];
+    const out: { id: string; ts: string; entityId: string; type: "info" | "success" | "warning" | "action-needed"; message: string }[] = [];
     let n = 0;
     statuses.forEach((s) => {
-      tprmSteps.forEach((step) => {
+      auditAssessmentSteps.forEach((step) => {
         const st = s.steps[step.id];
         if (st === "complete" && step.ordinal <= 4) {
           out.push({
-            id: `${s.vendorId}-${step.id}-c`,
+            id: `${s.entityId}-${step.id}-c`,
             ts: `T-${(60 - n).toString().padStart(2, "0")}m`,
-            vendorId: s.vendorId,
+            entityId: s.entityId,
             type: "success",
-            message: `${s.vendorName} — ${step.title} complete`,
+            message: `${s.entityName} — ${step.title} complete`,
           });
           n += 1;
         } else if (st === "waiting") {
           out.push({
-            id: `${s.vendorId}-${step.id}-w`,
+            id: `${s.entityId}-${step.id}-w`,
             ts: `T-${(60 - n).toString().padStart(2, "0")}m`,
-            vendorId: s.vendorId,
+            entityId: s.entityId,
             type: "action-needed",
-            message: `${s.vendorName} — Awaiting reviewer for ${step.title}`,
+            message: `${s.entityName} — Awaiting reviewer for ${step.title}`,
           });
           n += 1;
         }
@@ -2556,19 +2553,19 @@ function TPRMHub({
   }, [statuses]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden" data-testid="tprm-hub">
+    <div className="flex flex-col h-full overflow-hidden" data-testid="audit-assessment-hub">
       <div className={`flex-1 min-h-0 bg-slate-50 dark:bg-background px-8 py-5 ${fullPaneScroll ? "overflow-y-auto" : "flex flex-col overflow-hidden"}`}>
-        <div className={`w-[90%] max-w-[1600px] mx-auto flex flex-col gap-5 ${fullPaneScroll ? "" : "h-full"}`} data-testid="tprm-tracker-view">
+        <div className={`w-[90%] max-w-[1600px] mx-auto flex flex-col gap-5 ${fullPaneScroll ? "" : "h-full"}`} data-testid="audit-tracker-view">
           {/* Header — mirror SOX FieldworkComplexHub header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Shield className="w-5 h-5 text-[#266C92]" />
               <div>
-                <h2 className="text-sm font-semibold text-foreground">{tprmArchetypeConfig.solutionLabel}</h2>
+                <h2 className="text-sm font-semibold text-foreground">{auditAssessmentArchetypeConfig.solutionLabel}</h2>
                 <p className="text-xs text-muted-foreground">
                   {isComplete
-                    ? "All vendors processed"
-                    : `Vendor assessment pipeline — ${completedVendors}/${totalVendors} vendors complete`}
+                    ? "All entities processed"
+                    : `Entity assessment pipeline — ${completedEntities}/${totalEntities} entities complete`}
                 </p>
               </div>
             </div>
@@ -2587,9 +2584,9 @@ function TPRMHub({
                   setCurrentSession(null);
                   setCurrentSolution("tprm");
                 }}
-                data-testid="button-back-to-tprm"
+                data-testid="button-back-to-audit"
               >
-                Back to TPRM
+                Back to Audit
                 <ExternalLink className="w-3 h-3 ml-1" />
               </Button>
               <Button
@@ -2606,16 +2603,16 @@ function TPRMHub({
           </div>
 
           {/* Stats bar — 4 cards mirror SOX */}
-          <div className="grid grid-cols-4 gap-3" data-testid="tprm-stats-bar">
+          <div className="grid grid-cols-4 gap-3" data-testid="audit-stats-bar">
             <Card className="border border-slate-200 dark:border-border">
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 mb-1">
                   <Target className="w-3.5 h-3.5 text-[#266C92]" />
-                  <span className="text-[11px] text-muted-foreground font-medium">Vendors in Scope</span>
+                  <span className="text-[11px] text-muted-foreground font-medium">Entities in Scope</span>
                 </div>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-xl font-bold text-foreground">{totalVendors}</span>
-                  <span className="text-[10px] text-muted-foreground">{autoVendors.length} auto · {reviewVendors.length} review</span>
+                  <span className="text-xl font-bold text-foreground">{totalEntities}</span>
+                  <span className="text-[10px] text-muted-foreground">{autoEntities.length} auto · {reviewEntities.length} review</span>
                 </div>
               </CardContent>
             </Card>
@@ -2623,11 +2620,11 @@ function TPRMHub({
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 mb-1">
                   <BarChart3 className="w-3.5 h-3.5 text-[#266C92]" />
-                  <span className="text-[11px] text-muted-foreground font-medium">Automated Coverage</span>
+                  <span className="text-[11px] text-muted-foreground font-medium">Continuous Coverage</span>
                 </div>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-xl font-bold text-foreground">{automatedPct}%</span>
-                  <span className="text-[10px] text-muted-foreground">{autoVendors.length} auto-track vendors</span>
+                  <span className="text-[10px] text-muted-foreground">{autoEntities.length} auto-track entities</span>
                 </div>
               </CardContent>
             </Card>
@@ -2635,13 +2632,13 @@ function TPRMHub({
               <CardContent className="p-3">
                 <div className="flex items-center gap-2 mb-1">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#266C92]" />
-                  <span className="text-[11px] text-muted-foreground font-medium">Vendors Closed</span>
+                  <span className="text-[11px] text-muted-foreground font-medium">Entities Closed</span>
                 </div>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-xl font-bold text-foreground">{completedVendors}</span>
+                  <span className="text-xl font-bold text-foreground">{completedEntities}</span>
                   <span className="text-[10px] text-muted-foreground">
-                    of {totalVendors}
-                    {totalVendors > 0 ? ` (${Math.round((completedVendors / totalVendors) * 100)}%)` : ""}
+                    of {totalEntities}
+                    {totalEntities > 0 ? ` (${Math.round((completedEntities / totalEntities) * 100)}%)` : ""}
                   </span>
                 </div>
               </CardContent>
@@ -2649,7 +2646,7 @@ function TPRMHub({
             <Card
               className={`border ${exceptionsOpen > 0 ? "border-red-200 dark:border-red-800/30 cursor-pointer hover:border-red-300 dark:hover:border-red-700/50 transition-colors" : "border-slate-200 dark:border-border"}`}
               onClick={() => exceptionsOpen > 0 && setExceptionsModalOpen(true)}
-              data-testid="tprm-exceptions-card"
+              data-testid="audit-exceptions-card"
               role={exceptionsOpen > 0 ? "button" : undefined}
               tabIndex={exceptionsOpen > 0 ? 0 : undefined}
               onKeyDown={(e) => {
@@ -2679,7 +2676,7 @@ function TPRMHub({
 
           {/* Actions Required panel — appears when waiting/blocked */}
           {blockedActions.length > 0 && (
-            <Card className="border border-slate-200 dark:border-border" data-testid="tprm-actions-card">
+            <Card className="border border-slate-200 dark:border-border" data-testid="audit-actions-card">
               <button
                 onClick={() => setActionsExpanded(!actionsExpanded)}
                 className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-muted/10 transition-colors"
@@ -2698,9 +2695,9 @@ function TPRMHub({
                 <CardContent className="px-4 pb-4 pt-0 space-y-2 border-t border-slate-100 dark:border-border">
                   {blockedActions.map((action) => (
                     <div
-                      key={`${action.vendorId}-${action.stepId}`}
+                      key={`${action.entityId}-${action.stepId}`}
                       className="p-3 rounded-lg border border-slate-200 dark:border-border bg-slate-50/40 dark:bg-muted/10 transition-colors"
-                      data-testid={`action-item-${action.vendorId}`}
+                      data-testid={`action-item-${action.entityId}`}
                     >
                       <div className="flex items-center gap-2 mb-1.5">
                         {action.kind === "blocked" ? (
@@ -2708,8 +2705,8 @@ function TPRMHub({
                         ) : (
                           <Clock className="w-3.5 h-3.5 shrink-0 text-amber-500" />
                         )}
-                        <span className="text-[10px] font-mono font-semibold text-[#266C92]">{action.vendorId}</span>
-                        <span className="text-xs font-medium text-foreground">{action.vendorName}</span>
+                        <span className="text-[10px] font-mono font-semibold text-[#266C92]">{action.entityId}</span>
+                        <span className="text-xs font-medium text-foreground">{action.entityName}</span>
                         {action.blockRule?.title && (
                           <span className="text-xs text-foreground/70">— {action.blockRule.title}</span>
                         )}
@@ -2725,26 +2722,26 @@ function TPRMHub({
                       <p className="text-[11px] text-muted-foreground leading-relaxed mb-2">
                         {action.blockRule?.description
                           ?? (action.kind === "waiting"
-                            ? `Reviewer disposition required for ${action.stepLabel.toLowerCase()}. Open the vendor to record an Approve / Modify / Reject decision.`
-                            : `${action.stepLabel} blocked — investigate the vendor record.`)}
+                            ? `Reviewer disposition required for ${action.stepLabel.toLowerCase()}. Open the entity to record an Approve / Modify / Reject decision.`
+                            : `${action.stepLabel} blocked — investigate the entity record.`)}
                       </p>
                       <div className="flex items-center gap-2">
                         <Button
                           size="sm"
                           className="h-6 text-[10px] bg-[#266C92] hover:bg-[#1e5a7a] text-white"
-                          onClick={() => onVendorClick(action.vendorId)}
-                          data-testid={`button-open-vendor-${action.vendorId}`}
+                          onClick={() => onEntityClick(action.entityId)}
+                          data-testid={`button-open-entity-${action.entityId}`}
                         >
                           <ChevronRight className="w-3 h-3 mr-1" />
-                          Open Vendor to Resolve
+                          Open Entity to Resolve
                         </Button>
                         {action.kind === "waiting" && (
                           <Button
                             size="sm"
                             variant="outline"
                             className="h-6 text-[10px]"
-                            onClick={() => onResolveHitl(action.vendorId, action.stepId, "approve")}
-                            data-testid={`button-quick-approve-${action.vendorId}`}
+                            onClick={() => onResolveHitl(action.entityId, action.stepId, "approve")}
+                            data-testid={`button-quick-approve-${action.entityId}`}
                           >
                             <CheckCircle2 className="w-3 h-3 mr-1" />
                             Quick Approve
@@ -2760,19 +2757,19 @@ function TPRMHub({
 
           {/* Pipeline card — exact SOX grid pattern, grouped by track */}
           <div className={`flex flex-col gap-4 ${fullPaneScroll ? "" : "flex-1 min-h-0"}`}>
-            <Card className={`border border-slate-200 dark:border-border flex flex-col ${fullPaneScroll ? "" : "flex-1 min-h-0"}`} data-testid="tprm-pipeline-card">
+            <Card className={`border border-slate-200 dark:border-border flex flex-col ${fullPaneScroll ? "" : "flex-1 min-h-0"}`} data-testid="audit-pipeline-card">
               <CardHeader className="pb-2 pt-3 px-4 shrink-0">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
                   <Workflow className="w-4 h-4 text-[#266C92]" />
-                  Vendor Assessment Pipeline
+                  Entity Assessment Pipeline
                 </CardTitle>
               </CardHeader>
               <CardContent className={`px-4 pb-4 ${fullPaneScroll ? "" : "flex-1 min-h-0 overflow-y-auto"}`}>
-                {/* Header row — Vendor | Source | 9 step columns | Result */}
+                {/* Header row — Entity | Source | 9 step columns | Result */}
                 <div className="grid grid-cols-[3fr_5rem_repeat(9,1fr)_1fr] gap-2 px-2 py-1.5 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider border-b border-slate-100 dark:border-border mb-1">
-                  <span>Vendor</span>
+                  <span>Entity</span>
                   <span>Source</span>
-                  {tprmSteps.map((s) => (
+                  {auditAssessmentSteps.map((s) => (
                     <span key={s.id} className="text-center" title={s.title}>
                       {s.shortLabel}
                     </span>
@@ -2781,10 +2778,10 @@ function TPRMHub({
                 </div>
 
                 <div>
-                  {/* Human-Review track — analog of SOX PBC group */}
-                  {reviewVendors.length > 0 && (() => {
-                    const reviewComplete = reviewVendors.filter((v) =>
-                      tprmStepIds.every(
+                  {/* Full Audit track — analog of SOX PBC group */}
+                  {reviewEntities.length > 0 && (() => {
+                    const reviewComplete = reviewEntities.filter((v) =>
+                      auditAssessmentStepIds.every(
                         (sid) => v.steps[sid] === "complete" || v.steps[sid] === "skipped" || (sid === "monitoring" && !v.fired)
                       )
                     ).length;
@@ -2793,45 +2790,45 @@ function TPRMHub({
                         <div className="flex items-center gap-2 px-2 py-1.5">
                           <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                           <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                            Human-Review Workflow ({reviewComplete}/{reviewVendors.length})
+                            Full Audit Workflow ({reviewComplete}/{reviewEntities.length})
                           </span>
                         </div>
-                        {reviewVendors.map((v) => {
-                          const vendor = masterVendorList.find((m) => m.id === v.vendorId)!;
-                          const outcome = getVendorOutcome(vendor, v);
+                        {reviewEntities.map((v) => {
+                          const entity = masterEntityList.find((m) => m.id === v.entityId)!;
+                          const outcome = getEntityOutcome(entity, v);
                           const isWarn =
                             Object.values(v.steps).some((s) => s === "blocked") ||
-                            outcome?.tone === "rejected" ||
-                            outcome?.tone === "monitor";
+                            outcome?.tone === "unsatisfactory" ||
+                            outcome?.tone === "re-audit";
                           return (
                             <div
-                              key={v.vendorId}
+                              key={v.entityId}
                               className={`grid grid-cols-[3fr_5rem_repeat(9,1fr)_1fr] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent ${
                                 isWarn
                                   ? "bg-red-50/30 dark:bg-red-900/5 hover:border-l-red-400 hover:bg-red-50/60 dark:hover:bg-red-900/15"
                                   : "hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"
                               }`}
-                              onClick={() => onVendorClick(v.vendorId)}
-                              data-testid={`pipeline-row-${v.vendorId}`}
+                              onClick={() => onEntityClick(v.entityId)}
+                              data-testid={`pipeline-row-${v.entityId}`}
                             >
                               <div className="flex items-center gap-1.5 min-w-0">
-                                <span className={`text-[10px] font-mono font-semibold ${isWarn ? "text-red-500" : "text-foreground"}`}>{v.vendorId}</span>
-                                <span className="text-xs text-foreground truncate">{v.vendorName}</span>
+                                <span className={`text-[10px] font-mono font-semibold ${isWarn ? "text-red-500" : "text-foreground"}`}>{v.entityId}</span>
+                                <span className="text-xs text-foreground truncate">{v.entityName}</span>
                               </div>
                               <span className="text-[10px] text-muted-foreground font-medium truncate">
-                                {v.riskTier === "Tier 3" ? "Tier 3" : v.riskTier === "Tier 2" ? "Tier 2" : "Tier 1"}
+                                {v.riskTier === "High" ? "High" : v.riskTier === "Medium" ? "Medium" : "Low"}
                               </span>
-                              {tprmSteps.map((step) => (
+                              {auditAssessmentSteps.map((step) => (
                                 <div key={step.id} className="flex justify-center">
                                   {stepDot(v.steps[step.id])}
                                 </div>
                               ))}
                               <div className="flex justify-center">
-                                {outcome?.tone === "approved" ? (
+                                {outcome?.tone === "satisfactory" ? (
                                   <ShieldCheck className="w-3 h-3 text-[#266C92]" />
-                                ) : outcome?.tone === "rejected" ? (
+                                ) : outcome?.tone === "unsatisfactory" ? (
                                   <AlertTriangle className="w-3 h-3 text-red-500" />
-                                ) : outcome?.tone === "monitor" ? (
+                                ) : outcome?.tone === "re-audit" ? (
                                   <Activity className="w-3 h-3 text-violet-500" />
                                 ) : outcome?.tone === "conditional" ? (
                                   <AlertCircle className="w-3 h-3 text-amber-500" />
@@ -2846,10 +2843,10 @@ function TPRMHub({
                     );
                   })()}
 
-                  {/* Automated track — analog of SOX Automated group */}
-                  {autoVendors.length > 0 && (() => {
-                    const autoComplete = autoVendors.filter((v) =>
-                      tprmStepIds.every(
+                  {/* Continuous track — analog of SOX Continuous group */}
+                  {autoEntities.length > 0 && (() => {
+                    const autoComplete = autoEntities.filter((v) =>
+                      auditAssessmentStepIds.every(
                         (sid) => v.steps[sid] === "complete" || v.steps[sid] === "skipped"
                       )
                     ).length;
@@ -2858,36 +2855,36 @@ function TPRMHub({
                         <div className="flex items-center gap-2 px-2 py-1.5 border-t border-slate-100 dark:border-border">
                           <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                           <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                            Automated ({autoComplete}/{autoVendors.length})
+                            Continuous ({autoComplete}/{autoEntities.length})
                           </span>
                         </div>
-                        {autoVendors.map((v) => {
-                          const vendor = masterVendorList.find((m) => m.id === v.vendorId)!;
-                          const outcome = getVendorOutcome(vendor, v);
+                        {autoEntities.map((v) => {
+                          const entity = masterEntityList.find((m) => m.id === v.entityId)!;
+                          const outcome = getEntityOutcome(entity, v);
                           return (
                             <div
-                              key={v.vendorId}
+                              key={v.entityId}
                               className="grid grid-cols-[3fr_5rem_repeat(9,1fr)_1fr] gap-2 px-2 py-1.5 rounded items-center transition-all cursor-pointer border-l-2 border-l-transparent hover:border-l-[#266C92] hover:bg-[#266C92]/5 dark:hover:bg-[#266C92]/10"
-                              onClick={() => onVendorClick(v.vendorId)}
-                              data-testid={`pipeline-row-${v.vendorId}`}
+                              onClick={() => onEntityClick(v.entityId)}
+                              data-testid={`pipeline-row-${v.entityId}`}
                             >
                               <div className="flex items-center gap-1.5 min-w-0">
-                                <span className="text-[10px] font-mono font-semibold text-[#266C92]">{v.vendorId}</span>
-                                <span className="text-xs text-foreground truncate">{v.vendorName}</span>
+                                <span className="text-[10px] font-mono font-semibold text-[#266C92]">{v.entityId}</span>
+                                <span className="text-xs text-foreground truncate">{v.entityName}</span>
                               </div>
                               <span className="text-[10px] text-muted-foreground font-medium truncate inline-flex items-center gap-1">
                                 <Zap className="w-2.5 h-2.5" />
                                 Auto
                               </span>
-                              {tprmSteps.map((step) => (
+                              {auditAssessmentSteps.map((step) => (
                                 <div key={step.id} className="flex justify-center">
                                   {stepDot(v.steps[step.id])}
                                 </div>
                               ))}
                               <div className="flex justify-center">
-                                {outcome?.tone === "approved" ? (
+                                {outcome?.tone === "satisfactory" ? (
                                   <ShieldCheck className="w-3 h-3 text-[#266C92]" />
-                                ) : outcome?.tone === "rejected" ? (
+                                ) : outcome?.tone === "unsatisfactory" ? (
                                   <AlertTriangle className="w-3 h-3 text-red-500" />
                                 ) : outcome?.tone === "conditional" ? (
                                   <AlertCircle className="w-3 h-3 text-amber-500" />
@@ -2946,8 +2943,8 @@ function TPRMHub({
                       <p className="text-[10px] font-semibold text-[#266C92] dark:text-[#4da3c9] mb-0.5">Optro Assistant</p>
                       <p className="text-[11px] text-foreground leading-relaxed">
                         {isComplete
-                          ? `Assessment complete across all ${totalVendors} vendors. ${exceptionsOpen} exception${exceptionsOpen !== 1 ? "s" : ""} open — review the findings below.`
-                          : `Vendor assessment is underway — ${completedVendors} of ${totalVendors} vendors processed so far.${blockedActions.length > 0 ? ` ${blockedActions.length} action${blockedActions.length !== 1 ? "s" : ""} await your disposition.` : ""}`}
+                          ? `Assessment complete across all ${totalEntities} entities. ${exceptionsOpen} exception${exceptionsOpen !== 1 ? "s" : ""} open — review the findings below.`
+                          : `Entity assessment is underway — ${completedEntities} of ${totalEntities} entities processed so far.${blockedActions.length > 0 ? ` ${blockedActions.length} action${blockedActions.length !== 1 ? "s" : ""} await your disposition.` : ""}`}
                       </p>
                     </div>
                   </div>
@@ -3029,83 +3026,88 @@ function TPRMHub({
           </DialogHeader>
           <div className="flex-1 min-h-0 overflow-y-auto">
             {(() => {
-              const rows = masterVendorList
-                .filter((v) => statuses.some((s) => s.vendorId === v.id))
-                .filter((v) => v.exceptionRecords.open > 0);
+              // Surface every open prior finding across in-scope entities. Each
+              // finding becomes a row (not each entity) — finer-grained than TPRM's
+              // per-vendor count.
+              type Row = {
+                entityId: string;
+                entityName: string;
+                ownerName: string;
+                finding: { id: string; severity: "high" | "medium" | "low"; area: string; summary: string };
+              };
+              const rows: Row[] = masterEntityList
+                .filter((v) => statuses.some((s) => s.entityId === v.id))
+                .flatMap<Row>((v) =>
+                  v.priorFindings
+                    .filter((f) => f.status === "open")
+                    .map<Row>((f) => ({
+                      entityId: v.id,
+                      entityName: v.entityName,
+                      ownerName: v.ownerExec.name.split(" ").slice(0, 2).join(" "),
+                      finding: f,
+                    }))
+                );
               if (rows.length === 0) {
                 return (
                   <div className="text-center py-8">
                     <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">No open exceptions</p>
+                    <p className="text-sm text-muted-foreground">No open findings</p>
                   </div>
                 );
               }
               return (
                 <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden">
-                  <div className="grid grid-cols-[8rem_1fr_5rem_5rem_6rem] gap-2 px-3 py-2 bg-slate-50 dark:bg-muted/20 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-slate-200 dark:border-border">
-                    <span>Vendor</span>
+                  <div className="grid grid-cols-[8rem_1fr_5rem_6rem_6rem] gap-2 px-3 py-2 bg-slate-50 dark:bg-muted/20 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-slate-200 dark:border-border">
+                    <span>Entity</span>
                     <span>Finding</span>
                     <span className="text-center">Severity</span>
-                    <span className="text-center">Open</span>
+                    <span className="text-center">Area</span>
                     <span>Owner</span>
                   </div>
                   <div className="divide-y divide-slate-100 dark:divide-border/50">
-                    {rows.map((v) => {
-                      // Derive a synthetic severity from risk tier + criticality (no severity in schema yet).
-                      const severity: "critical" | "high" | "medium" =
-                        v.riskTier === "Tier 3" || v.criticality === "Critical"
-                          ? "critical"
-                          : v.riskTier === "Tier 2" || v.criticality === "High"
-                            ? "high"
-                            : "medium";
-                      // Owner derived from the primary contact / TPRM lead convention.
-                      const owner = v.primaryContact?.name?.split(" ").slice(0, 2).join(" ") || "TPRM Lead";
-                      // Summary: prefer the most recent monitoring event description if present, else fall back.
-                      const summary =
-                        v.monitoring[0]?.description ||
-                        `${v.exceptionRecords.open} outstanding remediation item${v.exceptionRecords.open !== 1 ? "s" : ""} from latest assessment.`;
-                      return (
-                        <div
-                          key={v.id}
-                          role="button"
-                          tabIndex={0}
-                          className="grid grid-cols-[8rem_1fr_5rem_5rem_6rem] gap-2 px-3 py-2.5 text-[11px] items-center hover:bg-slate-50/60 dark:hover:bg-muted/10 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#266C92]/40 focus:bg-slate-50 dark:focus:bg-muted/20"
-                          onClick={() => {
+                    {rows.map((row) => (
+                      <div
+                        key={`${row.entityId}-${row.finding.id}`}
+                        role="button"
+                        tabIndex={0}
+                        className="grid grid-cols-[8rem_1fr_5rem_6rem_6rem] gap-2 px-3 py-2.5 text-[11px] items-center hover:bg-slate-50/60 dark:hover:bg-muted/10 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#266C92]/40 focus:bg-slate-50 dark:focus:bg-muted/20"
+                        onClick={() => {
+                          setExceptionsModalOpen(false);
+                          onEntityClick(row.entityId);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
                             setExceptionsModalOpen(false);
-                            onVendorClick(v.id);
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              setExceptionsModalOpen(false);
-                              onVendorClick(v.id);
-                            }
-                          }}
-                          data-testid={`exception-row-${v.id}`}
-                        >
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <span className="font-mono text-[10px] font-semibold text-[#266C92]">{v.id}</span>
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-foreground truncate font-medium">{v.vendorName}</p>
-                            <p className="text-[10px] text-muted-foreground truncate">{summary}</p>
-                          </div>
-                          <div className="text-center">
-                            <Badge className={`text-[9px] h-4 ${
-                              severity === "critical"
-                                ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                                : severity === "high"
-                                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                                  : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
-                            } border-0 capitalize`}>
-                              {severity}
-                            </Badge>
-                          </div>
-                          <span className="text-center font-mono text-foreground font-semibold">{v.exceptionRecords.open}</span>
-                          <span className="text-foreground/80 truncate">{owner}</span>
+                            onEntityClick(row.entityId);
+                          }
+                        }}
+                        data-testid={`finding-row-${row.entityId}-${row.finding.id}`}
+                      >
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="font-mono text-[10px] font-semibold text-[#266C92]">{row.entityId}</span>
                         </div>
-                      );
-                    })}
+                        <div className="min-w-0">
+                          <p className="text-foreground truncate font-medium">{row.entityName}</p>
+                          <p className="text-[10px] text-muted-foreground truncate">
+                            <span className="font-mono">{row.finding.id}</span> — {row.finding.summary}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <Badge className={`text-[9px] h-4 ${
+                            row.finding.severity === "high"
+                              ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                              : row.finding.severity === "medium"
+                                ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                          } border-0 capitalize`}>
+                            {row.finding.severity}
+                          </Badge>
+                        </div>
+                        <span className="text-center text-foreground/80 truncate">{row.finding.area}</span>
+                        <span className="text-foreground/80 truncate">{row.ownerName}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               );
@@ -3118,23 +3120,23 @@ function TPRMHub({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Top-level TPRMSession (chooses Hub vs Focus, owns state + simulation)
+// Top-level AuditAssessmentSession (chooses Hub vs Focus, owns state + simulation)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export default function TPRMSession() {
-  const sessionId = TPRM_SESSION_ID;
+export default function AuditAssessmentSession() {
+  const sessionId = AUDIT_ASSESSMENT_SESSION_ID;
   const { toast } = useToast();
 
-  const [statuses, setStatuses] = usePersistedBlockState<VendorRunStatus[]>(
+  const [statuses, setStatuses] = usePersistedBlockState<EntityRunStatus[]>(
     sessionId,
     "pipeline",
     "statuses",
-    masterVendorList.map((v) => ({
-      vendorId: v.id,
-      vendorName: v.vendorName,
+    masterEntityList.map((v) => ({
+      entityId: v.id,
+      entityName: v.entityName,
       riskTier: v.riskTier,
       track: v.track,
-      steps: tprmStepIds.reduce(
+      steps: auditAssessmentStepIds.reduce(
         (acc, sid) => ({ ...acc, [sid]: "pending" as StepRunStatus }),
         {} as Record<string, StepRunStatus>
       ),
@@ -3157,15 +3159,15 @@ export default function TPRMSession() {
     []
   );
 
-  const [activeVendorId, setActiveVendorId] = useState<string | null>(null);
+  const [activeEntityId, setActiveEntityId] = useState<string | null>(null);
 
   const resolvedSet = useMemo(() => new Set(resolvedHitl), [resolvedHitl]);
 
   useEffect(() => {
     if (phase !== "running") return;
     const timer = setInterval(() => {
-      setStatuses((prev: VendorRunStatus[]) => {
-        const next = tickVendorStatuses(prev, resolvedSet);
+      setStatuses((prev: EntityRunStatus[]) => {
+        const next = tickEntityStatuses(prev, resolvedSet);
         return next ?? prev;
       });
     }, 800);
@@ -3173,7 +3175,7 @@ export default function TPRMSession() {
   }, [phase, resolvedSet]);
 
   const allDone = statuses.every((v) =>
-    tprmStepIds.every(
+    auditAssessmentStepIds.every(
       (sid) => v.steps[sid] === "complete" || v.steps[sid] === "skipped" || (sid === "monitoring" && !v.fired)
     )
   );
@@ -3186,13 +3188,13 @@ export default function TPRMSession() {
   }, [allDone, phase]);
 
   const handleResolveHitl = useCallback(
-    (vendorId: string, stepId: string, decision: "approve" | "modify" | "reject") => {
-      const key = `${vendorId}:${stepId}`;
+    (entityId: string, stepId: string, decision: "approve" | "modify" | "reject") => {
+      const key = `${entityId}:${stepId}`;
       if (decision === "reject") {
         // Mark step blocked rather than resuming the pipeline
-        setStatuses((prev: VendorRunStatus[]) =>
+        setStatuses((prev: EntityRunStatus[]) =>
           prev.map((v) =>
-            v.vendorId === vendorId
+            v.entityId === entityId
               ? { ...v, steps: { ...v.steps, [stepId]: "blocked" as StepRunStatus } }
               : v
           )
@@ -3210,11 +3212,14 @@ export default function TPRMSession() {
     [resolvedSet, setResolvedHitl, setStatuses]
   );
 
-  // Universal block-resolution handler — see EntityFocusPage for the canon
-  // pattern. Single `resolvedSet` resolves both HITL waiting and blocked states.
+  // Universal block-resolution handler — surfaces any inline-affordance click
+  // back into the simulator via the shared `resolvedHitl` set. The simulator
+  // checks the same `resolvedSet` for both HITL waiting and blocked states, so
+  // a single key resolves both. Mirrors SOX canon's `handleResolveAction`
+  // (AgentHubHome.tsx ≈ 6080).
   const handleResolveBlocker = useCallback(
-    (vendorId: string, stepId: string, _substepId: string, _affordanceId: string) => {
-      const key = `${vendorId}:${stepId}`;
+    (entityId: string, stepId: string, _substepId: string, _affordanceId: string) => {
+      const key = `${entityId}:${stepId}`;
       if (!resolvedSet.has(key)) {
         setResolvedHitl((prev: string[]) => [...prev, key]);
       }
@@ -3226,20 +3231,20 @@ export default function TPRMSession() {
   // (or wakes an existing one) so the workflow tab transitions from cold-start
   // to active. Mirrors canon's `handleStartDemoWorkflow` in `FieldworkComplexHub`.
   const handleStartAssessment = useCallback(
-    (vendorId: string) => {
-      const vendor = masterVendorList.find((v) => v.id === vendorId);
-      if (!vendor) return;
-      setStatuses((prev: VendorRunStatus[]) => {
-        const existing = prev.find((s) => s.vendorId === vendorId);
+    (entityId: string) => {
+      const entity = masterEntityList.find((v) => v.id === entityId);
+      if (!entity) return;
+      setStatuses((prev: EntityRunStatus[]) => {
+        const existing = prev.find((s) => s.entityId === entityId);
         if (existing) {
           // Wake the first non-complete step into "running".
           const nextSteps = { ...existing.steps };
-          const firstPending = tprmStepIds.find((sid) => nextSteps[sid] === "pending");
+          const firstPending = auditAssessmentStepIds.find((sid) => nextSteps[sid] === "pending");
           if (firstPending) nextSteps[firstPending] = "running";
-          return prev.map((s) => (s.vendorId === vendorId ? { ...s, steps: nextSteps } : s));
+          return prev.map((s) => (s.entityId === entityId ? { ...s, steps: nextSteps } : s));
         }
-        const fresh = seedVendorRunStatus(vendor);
-        const firstStepId = tprmStepIds[0];
+        const fresh = seedEntityRunStatus(entity);
+        const firstStepId = auditAssessmentStepIds[0];
         fresh.steps[firstStepId] = "running";
         return [...prev, fresh];
       });
@@ -3250,28 +3255,28 @@ export default function TPRMSession() {
 
   const handleAdvanceStep = useCallback(
     (stepId: string) => {
-      if (!activeVendorId) return;
-      setStatuses((prev: VendorRunStatus[]) =>
+      if (!activeEntityId) return;
+      setStatuses((prev: EntityRunStatus[]) =>
         prev.map((v) =>
-          v.vendorId === activeVendorId
+          v.entityId === activeEntityId
             ? { ...v, steps: { ...v.steps, [stepId]: "complete" as StepRunStatus } }
             : v
         )
       );
       // Focus-page actionToast already rendered "Step confirmed — advancing".
     },
-    [activeVendorId, setStatuses]
+    [activeEntityId, setStatuses]
   );
 
   const fastForward = useCallback(() => {
-    setStatuses((prev: VendorRunStatus[]) =>
+    setStatuses((prev: EntityRunStatus[]) =>
       prev.map((v) => {
-        const isAuto = v.track === "automated";
+        const isAuto = v.track === "continuous";
         const nextSteps: Record<string, StepRunStatus> = {};
-        tprmStepIds.forEach((sid) => {
+        auditAssessmentStepIds.forEach((sid) => {
           if (sid === "monitoring") {
             nextSteps[sid] = v.fired ? "complete" : "pending";
-          } else if (isAuto && (sid === "human-review" || sid === "exception")) {
+          } else if (isAuto && (sid === "full-audit" || sid === "exception")) {
             nextSteps[sid] = "skipped";
           } else {
             nextSteps[sid] = "complete";
@@ -3283,17 +3288,17 @@ export default function TPRMSession() {
     // Canon parity — no shadcn toast on hub-level fast-forward.
   }, [setStatuses]);
 
-  const activeVendor = activeVendorId
-    ? masterVendorList.find((v) => v.id === activeVendorId)
+  const activeEntity = activeEntityId
+    ? masterEntityList.find((v) => v.id === activeEntityId)
     : null;
-  const activeStatus = activeVendorId ? statuses.find((s) => s.vendorId === activeVendorId) : undefined;
+  const activeStatus = activeEntityId ? statuses.find((s) => s.entityId === activeEntityId) : undefined;
 
-  if (activeVendor) {
+  if (activeEntity) {
     return (
-      <VendorFocusPage
-        vendor={activeVendor}
+      <EntityFocusPage
+        entity={activeEntity}
         status={activeStatus}
-        onBack={() => setActiveVendorId(null)}
+        onBack={() => setActiveEntityId(null)}
         onStartAssessment={handleStartAssessment}
         onAdvanceStep={handleAdvanceStep}
         onResolveHitl={handleResolveHitl}
@@ -3304,9 +3309,9 @@ export default function TPRMSession() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-slate-50 dark:bg-background" data-testid="tprm-session">
-      <TPRMHub
+      <AuditAssessmentHub
         statuses={statuses}
-        onVendorClick={(vendorId) => setActiveVendorId(vendorId)}
+        onEntityClick={(entityId) => setActiveEntityId(entityId)}
         onResolveHitl={handleResolveHitl}
         fastForward={fastForward}
       />

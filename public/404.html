@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Optro Agentic Platform — Loading…</title>
+    <script>
+      // GitHub Pages SPA fallback (Rafgraph technique).
+      // GH Pages serves this file for any unknown path under the repo subpath.
+      // We rewrite the URL so the deep route lives in the query string, then
+      // index.html unpacks it and pushState's it back into a real route.
+      (function () {
+        var pathSegmentsToKeep = 1; // /agentic-platform/...
+        var l = window.location;
+        l.replace(
+          l.protocol + "//" + l.hostname + (l.port ? ":" + l.port : "") +
+          l.pathname.split("/").slice(0, 1 + pathSegmentsToKeep).join("/") + "/?p=/" +
+          l.pathname.slice(1).split("/").slice(pathSegmentsToKeep).join("/").replace(/&/g, "~and~") +
+          (l.search ? "&q=" + l.search.slice(1).replace(/&/g, "~and~") : "") +
+          l.hash
+        );
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

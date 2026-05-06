@@ -22,13 +22,52 @@ export interface ArchetypeOutput {
   scoreLabel?: string;
 }
 
+/**
+ * Inline action affordance — buttons that surface under a substep row when the
+ * substep is in one of the `showWhen` statuses (blocked / running / waiting).
+ *
+ * Canon establishes this pattern via `pop-ingest` (Upload Population / Request
+ * via Workstream) and `evd-collect` (Upload Evidence / Request via Workstream)
+ * in `AgentHubHome.tsx` ≈ line 3200. We promote it to the framework so any
+ * blockable substep across any solution can declare its resolution affordances
+ * in data and have them render universally.
+ *
+ * Click handlers fire `onResolveBlocker(objectId, stepId, substepId, affordanceId)`
+ * which marks the block resolved and lets the simulator advance the step.
+ */
+export interface InlineAffordance {
+  id: string; // semantic id: "upload" / "request" / "configure" / "skip" / …
+  label: string;
+  variant?: "primary" | "outline";
+  icon: LucideIcon;
+  /** Statuses in which this button should be visible. */
+  showWhen: Array<"running" | "blocked" | "waiting">;
+}
+
 export interface ArchetypeSubstep {
   id: string;
   actionType: SubstepActionType;
+  /**
+   * Short title (≤ 30 chars). Rendered as the bold first line of the substep
+   * row, matching canon's per-substep `label` field. Required for canon parity.
+   */
+  label: string;
+  /** Long description rendered as the muted second line under the label. */
   description: string;
   detail?: string;
+  /**
+   * Lucide icon for the substep content. Rendered muted-gray next to the label
+   * (canon's `SubIcon` slot). Required for canon parity.
+   */
+  icon: LucideIcon;
   output?: ArchetypeOutput;
   isHitlGate?: boolean;
+  /**
+   * Optional resolution affordances — buttons rendered inline under the substep
+   * row when a block surfaces here. Mirrors canon's hardcoded Upload / Request
+   * via Workstream pattern, but data-driven so it's universal across solutions.
+   */
+  inlineAffordances?: InlineAffordance[];
 }
 
 export interface ArchetypeStep {
